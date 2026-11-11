@@ -1,0 +1,75 @@
+[
+  {
+    "id": "PF-01",
+    "case_id": "SIM-017",
+    "observed": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "rule_digest": "MATCH",
+    "case_digest": "MATCH",
+    "state": "MATCH"
+  },
+  {
+    "id": "PF-02",
+    "case_id": "SIM-017",
+    "observed": {
+      "winner_ids": [
+        "S-201"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "rule_digest": "MATCH",
+    "case_digest": "MATCH",
+    "state": "DIFF"
+  },
+  {
+    "id": "PF-03",
+    "case_id": "SIM-017",
+    "observed": null,
+    "rule_digest": "MATCH",
+    "case_digest": "MATCH",
+    "state": "MISSING"
+  },
+  {
+    "id": "PF-04",
+    "case_id": "SIM-017",
+    "observed": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "rule_digest": "DIFFERENT",
+    "case_digest": "MATCH",
+    "state": "VERSION_MISMATCH"
+  },
+  {
+    "id": "PF-05",
+    "case_id": "SIM-017",
+    "observed": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "rule_digest": "MATCH",
+    "case_digest": "MATCH",
+    "invalidate": true,
+    "state": "STALE"
+  }
+]

@@ -1,0 +1,69 @@
+{
+  "id": "MAP-B-1",
+  "bank_id": "B",
+  "layout": "long",
+  "entity_table": "统计切片",
+  "counts_table": "阶段人数长表",
+  "dimensions": {
+    "id": "slice_id",
+    "period": "month_id",
+    "cutoff": "as_at",
+    "branch": "org",
+    "subbranch": "unit_name",
+    "channel": "route",
+    "strategy": "plan",
+    "origin": "issuer",
+    "segment": "cohort_at_launch",
+    "tag": "tag_at_close",
+    "cohort": "population_id",
+    "offset": "start_idx",
+    "definition": "definition_id",
+    "batch": "snapshot"
+  },
+  "count_fields": {
+    "eligible": "M01",
+    "sent": "M02",
+    "success": "M03",
+    "executed": "M04",
+    "contacted": "M05",
+    "effective": "M06",
+    "capacity": "M07",
+    "intentCount": "M08",
+    "activityCount": "M09"
+  },
+  "money_fields": {
+    "aum": "amount_01_fen",
+    "deposit": "amount_02_fen",
+    "wealth": "amount_03_fen",
+    "fund": "amount_04_fen",
+    "loan": "amount_05_fen",
+    "wealthSale": "amount_06_fen",
+    "nonCashWealthSale": "amount_07_fen",
+    "fundSale": "amount_08_fen",
+    "nonMoneyFundSale": "amount_09_fen",
+    "insuranceSale": "amount_10_fen",
+    "depositDemand": "amount_11_fen",
+    "depositTerm": "amount_12_fen"
+  },
+  "source_money_unit": "CNY_FEN",
+  "long_columns": {
+    "id": "切片键",
+    "metric": "指标码",
+    "value": "计数"
+  },
+  "codes": {
+    "channel": {
+      "C01": "remote",
+      "C02": "manager",
+      "C03": "ai",
+      "C04": "wechat",
+      "C05": "sms",
+      "C06": "push"
+    },
+    "origin": {
+      "L": "branch",
+      "H": "hq"
+    }
+  },
+  "dedup_mode": "SYNTHETIC_INTERVAL"
+}

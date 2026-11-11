@@ -1,0 +1,1107 @@
+{
+  "source_points": [
+    {
+      "id": "CL01",
+      "source": "P01、P02。数据分散，需要从策略、渠道及产能来源取数",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "导入甲乙数据，在数据快照看来源、批次、映射及切片",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-06",
+        "UI-07",
+        "UI-08"
+      ],
+      "acceptance": [
+        "AC-005",
+        "AC-006"
+      ]
+    },
+    {
+      "id": "CL02",
+      "source": "P01、P02。人工跨看板汇总和重复制表",
+      "legacy_state": "已测",
+      "legacy_check": "切换期间和渠道，检查三块复盘随同一筛选重算，下载当前明细",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-26"
+      ],
+      "acceptance": [
+        "AC-018",
+        "AC-019",
+        "AC-030"
+      ]
+    },
+    {
+      "id": "CL03",
+      "source": "P02。指标口径重复询问和查找",
+      "legacy_state": "已测",
+      "legacy_check": "点两种触达率，看公式、分母、版本和源行；选择 Q01、Q02",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-09",
+        "UI-17",
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-008",
+        "AC-023"
+      ]
+    },
+    {
+      "id": "CL04",
+      "source": "P02。人工分析慢、异常发现滞后",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "导入后进入异常清单，按阈值与对象检查偏离",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-021",
+        "AC-022"
+      ]
+    },
+    {
+      "id": "CL05",
+      "source": "P02、W01。分析能力集中，基层要用业务语言和引导流程",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "运行条件问法及歧义问法，检查范围和来源，把诊断转成动作",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19",
+        "UI-18",
+        "UI-23"
+      ],
+      "acceptance": [
+        "AC-023",
+        "AC-027"
+      ]
+    },
+    {
+      "id": "CL06",
+      "source": "P01、W01。复盘已常态化／机制与标准描述有差异",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "选择月份，按统一模板形成报告并签认",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-21",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-025",
+        "AC-026"
+      ]
+    },
+    {
+      "id": "CL07",
+      "source": "P01、P08-A。报告应指导下一轮策略提升",
+      "legacy_state": "已测",
+      "legacy_check": "生成改进项、移交活动工作台，登记预发和下期观察",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-03",
+        "UI-15",
+        "UI-16",
+        "UI-24"
+      ],
+      "acceptance": [
+        "AC-014",
+        "AC-016",
+        "AC-017",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "CL08",
+      "source": "P01-S1、P01-S2。报告用事实、基准、趋势和运营解释",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "检查同屏量、率、产能、期间差，读取渠道容量与待核假设",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-18",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-018",
+        "AC-021",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL09",
+      "source": "P01-S2。渠道恢复统计影响对比，原报告作 A/B 类比",
+      "legacy_state": "已测",
+      "legacy_check": "10 月对 9 月选全渠道，查看部分可比与共同覆盖子集",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-10",
+        "UI-17",
+        "UI-24"
+      ],
+      "acceptance": [
+        "AC-020",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "CL10",
+      "source": "P05、P08-A。已部署分行数及分组参与现状",
+      "legacy_state": "已测",
+      "legacy_check": "比较本次范围、全行、东部组、西部组部署分行数",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL11",
+      "source": "P05。策略、部署分行和覆盖度的月增、环比",
+      "legacy_state": "已测",
+      "legacy_check": "查看参与度表三个增长列，切月看基准",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-018",
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL12",
+      "source": "P05。可经营客户、成功下发、策略数、覆盖率和有效触达率",
+      "legacy_state": "已测",
+      "legacy_check": "核对 15,750、11,520、2 项、73.14%、15%",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-008",
+        "AC-018"
+      ]
+    },
+    {
+      "id": "CL13",
+      "source": "P05、W04-S2。五层漏斗及最低转化层",
+      "legacy_state": "已测",
+      "legacy_check": "看五层人数，橙色指向最低可算层",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-018"
+      ]
+    },
+    {
+      "id": "CL14",
+      "source": "W04-S2、W04-S3。经营率与层间率分母",
+      "legacy_state": "已测",
+      "legacy_check": "点有效触达率和有效接触层间转化率",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-09",
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-008"
+      ]
+    },
+    {
+      "id": "CL15",
+      "source": "P05、W04-S2。全渠道和六类渠道",
+      "legacy_state": "已测",
+      "legacy_check": "切换渠道，核对同范围阶段值和口径",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11",
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-010",
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL16",
+      "source": "P05、W04-S2。总行、分行、分组和三种策略来源视角",
+      "legacy_state": "已测",
+      "legacy_check": "切机构、分组及来源页签，核对来源拆分",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-019",
+        "AC-022"
+      ]
+    },
+    {
+      "id": "CL17",
+      "source": "P05、P08-A。AUM、理财及非现管理财、基金及非货基、保险销量",
+      "legacy_state": "已测",
+      "legacy_check": "检查单位、本期、月增、环比、总分行拆分",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-019",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL18",
+      "source": "W04-S2、W04-S3。分行／渠道明细及存款、理财、基金、个贷余额增量",
+      "legacy_state": "已测",
+      "legacy_check": "切分行、渠道、支行明细，核对人数、比率和金额",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-019",
+        "AC-020"
+      ]
+    },
+    {
+      "id": "CL19",
+      "source": "W04-S2。按数据日期、分行、分行机构筛选，重置与导出",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "选数据截止日和支行，重置并下载当前明细",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-26"
+      ],
+      "acceptance": [
+        "AC-019",
+        "AC-030"
+      ]
+    },
+    {
+      "id": "CL20",
+      "source": "W04-S1、W05。按业务关联下发、触达和产能，带客户、节点、批次、策略与日期",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "查候选、策略、两种日期差与金额，查 JSON 中的节点和批次",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-07",
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-006",
+        "AC-011"
+      ]
+    },
+    {
+      "id": "CL21",
+      "source": "W04-S1。下发日相等或加 10，产能关联近 7 天或 30–60 天",
+      "legacy_state": "已测",
+      "legacy_check": "看 T-01 的 7 天、T-02 的 10 天和 O-02 的 60 天边界",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-011"
+      ]
+    },
+    {
+      "id": "CL22",
+      "source": "W04-S1。多匹配、未匹配的归属与核验",
+      "legacy_state": "已测",
+      "legacy_check": "O-01 两候选，选最近触达后指向 T-02；O-03、O-04 未匹配",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-011"
+      ]
+    },
+    {
+      "id": "CL23",
+      "source": "W04-S2。短信各层和有效详情页条件",
+      "legacy_state": "已测",
+      "legacy_check": "组合推送、短链点击和详情，检查触达和有效接触",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL24",
+      "source": "W04-S2。手机银行推送已收到、短链和详情",
+      "legacy_state": "已测",
+      "legacy_check": "重算未收到和已点击；切乙行检查额外停留条件",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-10",
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-009",
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL25",
+      "source": "W04-S2。企微有效接触的三个或条件",
+      "legacy_state": "已测",
+      "legacy_check": "交互一轮、60 秒、点短链各算一次",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL26",
+      "source": "W04-S2。AI 外呼频控、拨打、接通与交互",
+      "legacy_state": "已测",
+      "legacy_check": "检查频控拦截和交互一轮",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL27",
+      "source": "W04-S2。远程财私 ≥60 秒、个贷 ≥10 秒与有效期",
+      "legacy_state": "已测",
+      "legacy_check": "财私试 59／60 秒，个贷试 9／10 秒，关闭有效时段核对执行",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL28",
+      "source": "W04-S2。经理 5+1、成功触达和下游有效条件",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "切换「下游口径为有效」重算",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-11"
+      ],
+      "acceptance": [
+        "AC-010"
+      ]
+    },
+    {
+      "id": "CL29",
+      "source": "W04 正文。月内下发客户、月累计与策略耦合",
+      "legacy_state": "已测",
+      "legacy_check": "查看期间、截止、策略切片及总体与渠道计数",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-07",
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-006",
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL30",
+      "source": "已确认的跨行约定、W04。配置化接入和坏输入校验",
+      "legacy_state": "已测",
+      "legacy_check": "导入甲宽表、乙长表，看元分转换、同语义一致及差异；校验坏行",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-06",
+        "UI-07",
+        "UI-10"
+      ],
+      "acceptance": [
+        "AC-005",
+        "AC-006",
+        "AC-009"
+      ]
+    },
+    {
+      "id": "CL31",
+      "source": "P06、P08-A。重点客群采用部署口径或标签待定",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "选大众并切换两种口径，核对特色次数、触达和 AUM",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL32",
+      "source": "P06、P08-A。活动与策略关系及特色产能",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "回访服务、新客欢迎有绑定与指标；支付达标待绑定",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-03",
+        "UI-17"
+      ],
+      "acceptance": [
+        "AC-002",
+        "AC-019"
+      ]
+    },
+    {
+      "id": "CL33",
+      "source": "W04、W05。数据架构补图、三份表结构和现有智能化现状",
+      "legacy_state": "待材料",
+      "legacy_check": "对照原件占位和文件名",
+      "new_status": "EVIDENCE_PENDING",
+      "ui_ids": [
+        "UI-07",
+        "UI-08"
+      ],
+      "acceptance": [
+        "AC-006"
+      ]
+    },
+    {
+      "id": "CL34",
+      "source": "P03、W01–W03、P08-A。问口径、数值、异常、归因、报告",
+      "legacy_state": "已测",
+      "legacy_check": "输入业务问题或选示例，查看相应输出",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-023"
+      ]
+    },
+    {
+      "id": "CL35",
+      "source": "W01。指标名、期间、机构、分组、渠道、条件与排序",
+      "legacy_state": "已测",
+      "legacy_check": "用 R02–R13 核对多指标、多机构、期间、筛选和渠道贡献排序",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-023",
+        "AC-033"
+      ]
+    },
+    {
+      "id": "CL36",
+      "source": "W01、P08-A。缺范围、指标或策略参数时澄清",
+      "legacy_state": "已测",
+      "legacy_check": "输入 Q03、Q04，或选缺本期／基准范围生成报告",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-023",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL37",
+      "source": "W01、P08-A。阈值可调整并识别升降方向",
+      "legacy_state": "已测",
+      "legacy_check": "输入 12%，比较原 10% 结果，再按题述方向查 R14–R26",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18",
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-021",
+        "AC-023"
+      ]
+    },
+    {
+      "id": "CL38",
+      "source": "P08-A。期间 ≥10%、同组下偏 ≥20%、自身 6 月 ≥1σ、层间下偏 ≥15%、结构 ≥5 个百分点",
+      "legacy_state": "已测",
+      "legacy_check": "看五种规则的阈值、基准与触发样本",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-021"
+      ]
+    },
+    {
+      "id": "CL39",
+      "source": "P04、P08-A。环比、同比、同组、自身、全行、总行及目标对照",
+      "legacy_state": "已测",
+      "legacy_check": "试基准下拉、历史图与阈值",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-18",
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-021",
+        "AC-033"
+      ]
+    },
+    {
+      "id": "CL40",
+      "source": "P04、P07。有效触达数／率按漏斗、渠道、客群、支行拆解",
+      "legacy_state": "已测",
+      "legacy_check": "查看固定顺序 +384、0、−144、−432、0，再切维度",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-018",
+        "AC-022"
+      ]
+    },
+    {
+      "id": "CL41",
+      "source": "P07。AUM 按客群、渠道、支行、总分行拆解",
+      "legacy_state": "已测",
+      "legacy_check": "选 AUM 和四种维度，核对贡献与余量",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-022"
+      ]
+    },
+    {
+      "id": "CL42",
+      "source": "P07、W03。销量按客群／支行，存款按类型",
+      "legacy_state": "已测",
+      "legacy_check": "选理财销量、存款增量，检查客群、支行和活期／定期",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18",
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-022",
+        "AC-023"
+      ]
+    },
+    {
+      "id": "CL43",
+      "source": "P04、P08-A。结论含异常对象、原因线索与影响程度",
+      "legacy_state": "已测",
+      "legacy_check": "查机构、渠道、环节、幅度、阈值及待核业务假设",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-021",
+        "AC-022",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL44",
+      "source": "P04、P08-A。参与度、漏损、渠道、客群、策略效果五种假设",
+      "legacy_state": "已测",
+      "legacy_check": "选行动、负责人、验证证据与 30／90 天时点",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18",
+        "UI-23",
+        "UI-24"
+      ],
+      "acceptance": [
+        "AC-027",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "CL45",
+      "source": "W01–W03、P03。组合问法、题述数字、条件归因",
+      "legacy_state": "条件覆盖",
+      "legacy_check": "跑 R38–R46，核对查数加归因、题述数字提示、异常才归因",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19"
+      ],
+      "acceptance": [
+        "AC-023"
+      ]
+    },
+    {
+      "id": "CL46",
+      "source": "W01–W03、P08-A。分行、策略、客群、渠道及专题报告",
+      "legacy_state": "已测",
+      "legacy_check": "运行 R47–R56。查看报告范围与专题对照",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-19",
+        "UI-21",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-023",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL47",
+      "source": "P08-A。三块固定顺序、摘要三条、异常表和七段模板",
+      "legacy_state": "已测",
+      "legacy_check": "生成报告，查看参与度、漏斗、执行效果及附录",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-21",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL48",
+      "source": "P08-A。绝对与相对值、基准、就近口径、术语一致和源数据",
+      "legacy_state": "已测",
+      "legacy_check": "点核对指标来源，检查快照、截止、分母和源行",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-09",
+        "UI-17",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-008",
+        "AC-025"
+      ]
+    },
+    {
+      "id": "CL49",
+      "source": "P08-A。异常要有阈值，区分数据验证与假设，建议有责任和动作",
+      "legacy_state": "已测",
+      "legacy_check": "看异常表、统计拆解、待核假设、责任方及预期证据",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-18",
+        "UI-22",
+        "UI-23"
+      ],
+      "acceptance": [
+        "AC-021",
+        "AC-025",
+        "AC-027"
+      ]
+    },
+    {
+      "id": "CL50",
+      "source": "P08-A。缺数时给取数清单",
+      "legacy_state": "已测",
+      "legacy_check": "选 2026-01 环比及未绑定活动，检查清单与签认状态",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-17",
+        "UI-22",
+        "UI-26"
+      ],
+      "acceptance": [
+        "AC-020",
+        "AC-025",
+        "AC-030"
+      ]
+    },
+    {
+      "id": "CL51",
+      "source": "P01、P08-A 与 CampaignLab 设计。试算、规则回放和结果差异",
+      "legacy_state": "已测",
+      "legacy_check": "45% 估算；对照 SIM-017、018、019 的原结果、改案、频控和差异",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-13",
+        "UI-14",
+        "UI-15",
+        "UI-20"
+      ],
+      "acceptance": [
+        "AC-013",
+        "AC-014",
+        "AC-015",
+        "AC-024"
+      ]
+    },
+    {
+      "id": "CL52",
+      "source": "已确认的跨行约定。案例移交、预发、行内回执与下期复核",
+      "legacy_state": "已测",
+      "legacy_check": "保存 SIM-017，导入 PRE-101，登记 REL-101，查看下期 1,944 人",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-03",
+        "UI-15",
+        "UI-16",
+        "UI-24"
+      ],
+      "acceptance": [
+        "AC-016",
+        "AC-017",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "CL53",
+      "source": "P08-A 与设计稿。签认、补数和版本追溯",
+      "legacy_state": "已测",
+      "legacy_check": "签认后补数，旧报告引用 A-001，新报告引用 A-001-R1",
+      "new_status": "DESIGN_SPECIFIED",
+      "ui_ids": [
+        "UI-08",
+        "UI-22",
+        "UI-24"
+      ],
+      "acceptance": [
+        "AC-007",
+        "AC-026",
+        "AC-028"
+      ]
+    },
+    {
+      "id": "CL54",
+      "source": "P08-A。完整指标字典及下钻规则引用",
+      "legacy_state": "待材料",
+      "legacy_check": "对照模板中引用的两份规则文件",
+      "new_status": "EVIDENCE_PENDING",
+      "ui_ids": [
+        "UI-09",
+        "UI-18"
+      ],
+      "acceptance": [
+        "AC-008",
+        "AC-022"
+      ]
+    },
+    {
+      "id": "CL55",
+      "source": "P09、P06。邮件报告样例及其他优化项",
+      "legacy_state": "待材料",
+      "legacy_check": "核对 PPT 占位，提供完整样例及优化项定义",
+      "new_status": "EVIDENCE_PENDING",
+      "ui_ids": [
+        "UI-21",
+        "UI-22"
+      ],
+      "acceptance": [
+        "AC-025"
+      ]
+    }
+  ],
+  "manual_points": [
+    {
+      "id": "1.1",
+      "title": "选定本期、范围和比较基准",
+      "ui_id": "UI-17",
+      "acceptance": "AC-018"
+    },
+    {
+      "id": "1.2",
+      "title": "用经营卡和五层漏斗锁定优先问题",
+      "ui_id": "UI-17",
+      "acceptance": "AC-018"
+    },
+    {
+      "id": "1.3",
+      "title": "追到有效触达率的分子、分母和源行",
+      "ui_id": "UI-17",
+      "acceptance": "AC-008"
+    },
+    {
+      "id": "1.4",
+      "title": "核对漏斗最后一层的转化率",
+      "ui_id": "UI-17",
+      "acceptance": "AC-008"
+    },
+    {
+      "id": "1.5",
+      "title": "比较分行参与度与覆盖水平",
+      "ui_id": "UI-17",
+      "acceptance": "AC-019"
+    },
+    {
+      "id": "1.6",
+      "title": "核对执行效果、余额增量和销量",
+      "ui_id": "UI-17",
+      "acceptance": "AC-019"
+    },
+    {
+      "id": "1.7",
+      "title": "下钻过程与产能明细并导出",
+      "ui_id": "UI-17",
+      "acceptance": "AC-019"
+    },
+    {
+      "id": "1.8",
+      "title": "按部署客群或月末标签看专题",
+      "ui_id": "UI-17",
+      "acceptance": "AC-019"
+    },
+    {
+      "id": "1.9",
+      "title": "查已绑定活动的策略专题",
+      "ui_id": "UI-17",
+      "acceptance": "AC-002"
+    },
+    {
+      "id": "1.10",
+      "title": "处理待绑定活动",
+      "ui_id": "UI-03",
+      "acceptance": "AC-002"
+    },
+    {
+      "id": "1.11",
+      "title": "识别采集变化引起的部分可比",
+      "ui_id": "UI-17",
+      "acceptance": "AC-020"
+    },
+    {
+      "id": "2.1",
+      "title": "导入样本并查来源字段映射",
+      "ui_id": "UI-07",
+      "acceptance": "AC-006"
+    },
+    {
+      "id": "2.2",
+      "title": "对照两行的同口径结果",
+      "ui_id": "UI-10",
+      "acceptance": "AC-009"
+    },
+    {
+      "id": "2.3",
+      "title": "识别跨行定义不同的指标",
+      "ui_id": "UI-10",
+      "acceptance": "AC-009"
+    },
+    {
+      "id": "2.4",
+      "title": "阅读六渠道的五层判定矩阵",
+      "ui_id": "UI-11",
+      "acceptance": "AC-010"
+    },
+    {
+      "id": "2.5",
+      "title": "重算一条历史触达事件",
+      "ui_id": "UI-11",
+      "acceptance": "AC-010"
+    },
+    {
+      "id": "2.6",
+      "title": "核对触达与产能的归属窗口",
+      "ui_id": "UI-11",
+      "acceptance": "AC-011"
+    },
+    {
+      "id": "3.1",
+      "title": "用自然语言按条件查数",
+      "ui_id": "UI-19",
+      "acceptance": "AC-023"
+    },
+    {
+      "id": "3.2",
+      "title": "查询指标公式和分母",
+      "ui_id": "UI-19",
+      "acceptance": "AC-008"
+    },
+    {
+      "id": "3.3",
+      "title": "询问一个变化是否异常",
+      "ui_id": "UI-19",
+      "acceptance": "AC-023"
+    },
+    {
+      "id": "3.4",
+      "title": "用问法定位变化来源",
+      "ui_id": "UI-19",
+      "acceptance": "AC-023"
+    },
+    {
+      "id": "3.5",
+      "title": "一次提问完成查数与对照归因",
+      "ui_id": "UI-19",
+      "acceptance": "AC-023"
+    },
+    {
+      "id": "3.6",
+      "title": "用问法发起专项报告",
+      "ui_id": "UI-19",
+      "acceptance": "AC-025"
+    },
+    {
+      "id": "3.7",
+      "title": "遇到模糊问法时补齐条件",
+      "ui_id": "UI-19",
+      "acceptance": "AC-023"
+    },
+    {
+      "id": "3.8",
+      "title": "设置异常规则与阈值版本",
+      "ui_id": "UI-18",
+      "acceptance": "AC-021"
+    },
+    {
+      "id": "3.9",
+      "title": "复算五层量率贡献",
+      "ui_id": "UI-18",
+      "acceptance": "AC-022"
+    },
+    {
+      "id": "3.10",
+      "title": "切换下钻维度并核对余量",
+      "ui_id": "UI-18",
+      "acceptance": "AC-022"
+    },
+    {
+      "id": "3.11",
+      "title": "用趋势检验异常并提出待核假设",
+      "ui_id": "UI-18",
+      "acceptance": "AC-022"
+    },
+    {
+      "id": "3.12",
+      "title": "创建带验证条件的改进项",
+      "ui_id": "UI-23",
+      "acceptance": "AC-027"
+    },
+    {
+      "id": "4.1",
+      "title": "估算接触转化调整的影响量级",
+      "ui_id": "UI-20",
+      "acceptance": "AC-024"
+    },
+    {
+      "id": "4.2",
+      "title": "用历史样本比较原规则和候选规则",
+      "ui_id": "UI-15",
+      "acceptance": "AC-014"
+    },
+    {
+      "id": "4.3",
+      "title": "处理原规则复算与历史实际不一致",
+      "ui_id": "UI-15",
+      "acceptance": "AC-015"
+    },
+    {
+      "id": "4.4",
+      "title": "处理仅有汇总数据的回放",
+      "ui_id": "UI-13",
+      "acceptance": "AC-015"
+    },
+    {
+      "id": "4.5",
+      "title": "保存验收案例并移交活动工作台",
+      "ui_id": "UI-15",
+      "acceptance": "AC-016"
+    },
+    {
+      "id": "5.1",
+      "title": "核对活动与策略版本并接收案例",
+      "ui_id": "UI-03",
+      "acceptance": "AC-002"
+    },
+    {
+      "id": "5.2",
+      "title": "导入模拟预发并核对一致性",
+      "ui_id": "UI-16",
+      "acceptance": "AC-016"
+    },
+    {
+      "id": "5.3",
+      "title": "登记模拟行内发布回执",
+      "ui_id": "UI-03",
+      "acceptance": "AC-017"
+    },
+    {
+      "id": "5.4",
+      "title": "沿原范围查看下期观察",
+      "ui_id": "UI-24",
+      "acceptance": "AC-028"
+    },
+    {
+      "id": "6.1",
+      "title": "生成、审阅和导出复盘报告",
+      "ui_id": "UI-21",
+      "acceptance": "AC-025"
+    },
+    {
+      "id": "6.2",
+      "title": "审阅客户经理渠道专项报告",
+      "ui_id": "UI-22",
+      "acceptance": "AC-025"
+    },
+    {
+      "id": "6.3",
+      "title": "保留部分可比报告草稿",
+      "ui_id": "UI-22",
+      "acceptance": "AC-025"
+    },
+    {
+      "id": "6.4",
+      "title": "缺本期或基准时导出取数清单",
+      "ui_id": "UI-22",
+      "acceptance": "AC-025"
+    },
+    {
+      "id": "6.5",
+      "title": "签认本次复盘并保存版本",
+      "ui_id": "UI-22",
+      "acceptance": "AC-026"
+    },
+    {
+      "id": "6.6",
+      "title": "查看、分派和跟踪改进项",
+      "ui_id": "UI-23",
+      "acceptance": "AC-027"
+    },
+    {
+      "id": "6.7",
+      "title": "保存下期复核意见",
+      "ui_id": "UI-24",
+      "acceptance": "AC-028"
+    },
+    {
+      "id": "6.8",
+      "title": "导入模拟补数并重新审阅",
+      "ui_id": "UI-08",
+      "acceptance": "AC-007"
+    },
+    {
+      "id": "6.9",
+      "title": "查阅和导出历史签认版本",
+      "ui_id": "UI-22",
+      "acceptance": "AC-026"
+    }
+  ]
+}

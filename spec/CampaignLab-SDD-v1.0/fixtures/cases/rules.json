@@ -1,0 +1,48 @@
+{
+  "CP-V1": {
+    "schema_version": 1,
+    "template": "coupon_threshold",
+    "currency": "CNY",
+    "zone": "Asia/Shanghai",
+    "starts_at": "2026-10-01T00:00:00+08:00",
+    "ends_at": "2026-11-01T00:00:00+08:00",
+    "new_customer_days": 30,
+    "min_payment_fen": 10000,
+    "coupon_fen": 2000,
+    "max_per_customer": 3,
+    "budget_fen": 10000000,
+    "stacking": "DENY_OTHER_APPLIED",
+    "refund_policy": "KEEP"
+  },
+  "CP-V2": {
+    "schema_version": 1,
+    "template": "coupon_threshold",
+    "currency": "CNY",
+    "zone": "Asia/Shanghai",
+    "starts_at": "2026-10-01T00:00:00+08:00",
+    "ends_at": "2026-11-01T00:00:00+08:00",
+    "new_customer_days": 30,
+    "min_payment_fen": 10000,
+    "coupon_fen": 2000,
+    "max_per_customer": 3,
+    "budget_fen": 10000000,
+    "stacking": "DENY_OTHER_APPLIED",
+    "refund_policy": "RECOMPUTE_UNUSED"
+  },
+  "CB-V1": {
+    "schema_version": 1,
+    "template": "callback_priority",
+    "zone": "Asia/Shanghai",
+    "channel": "remote",
+    "priority": "ARRIVAL",
+    "daily_cap": 1
+  },
+  "CB-V2": {
+    "schema_version": 1,
+    "template": "callback_priority",
+    "zone": "Asia/Shanghai",
+    "channel": "remote",
+    "priority": "APPOINTMENT_FIRST",
+    "daily_cap": 1
+  }
+}

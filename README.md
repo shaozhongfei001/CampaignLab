@@ -28,3 +28,12 @@ python3 build.py
 
 - 换行符 LF、UTF-8 无 BOM（见 `.gitattributes`）；`core.autocrlf=input`
 - 构建产物与 handoff zip 不入库，由 `build.py` / `package.py` 重新生成
+
+## 规格基线与设计裁定
+
+- `spec/CampaignLab-SDD-v1.0/` — SDD 交接包 v1.0.0，按字节原样入库（`.gitattributes` 对 `spec/**` 禁用 EOL 转换）。校验：`cd spec/CampaignLab-SDD-v1.0 && python3 qa/verify_package.py`
+- `spec/frontend-template-spdb-v1.1/` — 浦发风格前端设计模板 V1.1，同样按字节入库，仅作视觉真值参照，不参与构建
+- `docs/decisions/ADR-003-frontend-design-baseline.md` — 前端设计基线裁定（采纳模板视觉语言，不采纳其运行时）
+- `docs/design/token-mapping.md` — 令牌 → Element Plus → ECharts 三处一致映射
+- `docs/design/page-component-map.md` — 26 页 ↔ 组件族映射与自研清单
+- `docs/design/frontend-pitfalls.md` — WSL/Playwright/编码等执行约定

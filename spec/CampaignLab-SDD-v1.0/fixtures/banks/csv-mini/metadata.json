@@ -1,0 +1,84 @@
+{
+  "bank_id": "A",
+  "bank_name": "甲行（模拟）",
+  "snapshot_code": "A-CSV-001",
+  "branches": [
+    {
+      "id": "B01",
+      "name": "东岚",
+      "group": "东部组"
+    },
+    {
+      "id": "B02",
+      "name": "云川",
+      "group": "东部组"
+    },
+    {
+      "id": "B03",
+      "name": "澄海",
+      "group": "东部组"
+    },
+    {
+      "id": "B04",
+      "name": "临川",
+      "group": "西部组"
+    },
+    {
+      "id": "B05",
+      "name": "青屿",
+      "group": "西部组"
+    }
+  ],
+  "channels": {
+    "remote": "远程",
+    "manager": "客户经理",
+    "ai": "AI外呼",
+    "wechat": "企业微信",
+    "sms": "短信",
+    "push": "手机银行推送"
+  },
+  "strategies": [
+    {
+      "id": "S-101",
+      "name": "预约回拨",
+      "origin": "branch",
+      "source_version": "V1"
+    },
+    {
+      "id": "S-201",
+      "name": "集中触达",
+      "origin": "hq",
+      "source_version": "V1"
+    },
+    {
+      "id": "S-301",
+      "name": "新客服务",
+      "origin": "branch",
+      "source_version": "V1"
+    }
+  ],
+  "coverage": [
+    {
+      "period": "2026-09",
+      "channel": "remote",
+      "cutoff": "2026-09-30",
+      "close_mode": "MONTH_END",
+      "coverage": "AVAILABLE",
+      "definition_id": "D-2026.1",
+      "semantic_key": "REMOTE-1"
+    },
+    {
+      "period": "2026-10",
+      "channel": "remote",
+      "cutoff": "2026-10-31",
+      "close_mode": "MONTH_END",
+      "coverage": "AVAILABLE",
+      "definition_id": "D-2026.1",
+      "semantic_key": "REMOTE-1"
+    }
+  ],
+  "sources": [
+    "合成 CSV 示例"
+  ],
+  "push_detail_seconds": 0
+}

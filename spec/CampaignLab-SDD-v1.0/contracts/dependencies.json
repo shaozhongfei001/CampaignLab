@@ -1,0 +1,33 @@
+{
+  "contract_version": "1.0.0",
+  "target": {"os": "Ubuntu 22.04 or newer", "architecture": "x86_64", "python": ">=3.14,<3.15", "node": ">=24,<25", "sqlite": ">=3.38 with JSON functions"},
+  "python_runtime": {
+    "fastapi": ">=0.118,<1",
+    "pydantic": ">=2.12,<3",
+    "uvicorn": ">=0.38,<1",
+    "sqlalchemy": ">=2.0,<2.1",
+    "alembic": ">=1.16,<2",
+    "duckdb": ">=1.4,<3",
+    "python-multipart": ">=0.0.20,<1"
+  },
+  "python_dev": ["ruff", "mypy", "pytest", "httpx", "jsonschema", "openapi-spec-validator"],
+  "frontend_runtime": {
+    "vue": ">=3.5 <4",
+    "vue-router": ">=4 <5",
+    "element-plus": ">=2 <3",
+    "echarts": ">=6 <7"
+  },
+  "frontend_dev": {
+    "vite": ">=7 <9",
+    "@vitejs/plugin-vue": "resolve compatible stable",
+    "typescript": ">=5.9 <7",
+    "vitest": ">=5 <6",
+    "@playwright/test": ">=1 <2",
+    "vue-tsc": "resolve compatible stable",
+    "eslint": "resolve compatible stable",
+    "eslint-plugin-vue": "resolve compatible stable",
+    "openapi-typescript": "resolve compatible stable"
+  },
+  "lock_policy": "M0 resolves and verifies target wheels and npm peer constraints, pins exact tools and saves real locks",
+  "runtime_network": "localhost only"
+}

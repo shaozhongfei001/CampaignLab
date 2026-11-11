@@ -1,0 +1,586 @@
+{
+  "usage": "示例 ID 为测试别名，运行替换为同一工作区的实际 ID 和摘要。写入附幂等键，修订动作附 If-Match。",
+  "examples": [
+    {
+      "operationId": "createWorkspace",
+      "request": {
+        "name": "合成验证",
+        "source_class": "SYNTHETIC"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "createActivity",
+      "request": {
+        "name": "回访服务",
+        "bank_id": "A",
+        "external_activity_id": "AC-101",
+        "description": "合成回拨活动"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "updateActivity",
+      "request": {
+        "bindings": [
+          {
+            "strategy_id": "S-101",
+            "source_version": "V1",
+            "valid_from": "2026-01-01",
+            "valid_until": "2026-12-01",
+            "evidence_id": "EV-AC-101"
+          }
+        ]
+      },
+      "status": 200
+    },
+    {
+      "operationId": "createRule",
+      "request": {
+        "label": "赠券候选口径",
+        "content": {
+          "schema_version": 1,
+          "template": "coupon_threshold",
+          "currency": "CNY",
+          "zone": "Asia/Shanghai",
+          "starts_at": "2026-10-01T00:00:00+08:00",
+          "ends_at": "2026-11-01T00:00:00+08:00",
+          "new_customer_days": 30,
+          "min_payment_fen": 10000,
+          "coupon_fen": 2000,
+          "max_per_customer": 3,
+          "budget_fen": 10000000,
+          "stacking": "DENY_OTHER_APPLIED",
+          "refund_policy": "RECOMPUTE_UNUSED"
+        },
+        "terms": [
+          {
+            "key": "new_customer",
+            "clause": "支付发生时，注册尚未满三十天",
+            "decision": "支付发生时，注册尚未满三十天",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          },
+          {
+            "key": "payment",
+            "clause": "实付至少一百元且券面额二十元",
+            "decision": "实付至少一百元且券面额二十元",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          },
+          {
+            "key": "time_window",
+            "clause": "活动起点包含，结束点排除",
+            "decision": "活动起点包含，结束点排除",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          },
+          {
+            "key": "stacking",
+            "clause": "已经应用互斥优惠时排除",
+            "decision": "已经应用互斥优惠时排除",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          },
+          {
+            "key": "budget_and_quota",
+            "clause": "预算按券面额占用，个人最多三次",
+            "decision": "预算按券面额占用，个人最多三次",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          },
+          {
+            "key": "refund",
+            "clause": "未核销且退款后低于门槛时撤回，已核销转人工",
+            "decision": "未核销且退款后低于门槛时撤回，已核销转人工",
+            "status": "CONFIRMED",
+            "evidence_id": "EV-CLAUSE-001"
+          }
+        ],
+        "parent_rule_id": "CP-V1"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "configureImport",
+      "request": {
+        "mapping": {
+          "id": "MAP-B-1",
+          "bank_id": "B",
+          "layout": "long",
+          "entity_table": "统计切片",
+          "counts_table": "阶段人数长表",
+          "dimensions": {
+            "id": "slice_id",
+            "period": "month_id",
+            "cutoff": "as_at",
+            "branch": "org",
+            "subbranch": "unit_name",
+            "channel": "route",
+            "strategy": "plan",
+            "origin": "issuer",
+            "segment": "cohort_at_launch",
+            "tag": "tag_at_close",
+            "cohort": "population_id",
+            "offset": "start_idx",
+            "definition": "definition_id",
+            "batch": "snapshot"
+          },
+          "count_fields": {
+            "eligible": "M01",
+            "sent": "M02",
+            "success": "M03",
+            "executed": "M04",
+            "contacted": "M05",
+            "effective": "M06",
+            "capacity": "M07",
+            "intentCount": "M08",
+            "activityCount": "M09"
+          },
+          "money_fields": {
+            "aum": "amount_01_fen",
+            "deposit": "amount_02_fen",
+            "wealth": "amount_03_fen",
+            "fund": "amount_04_fen",
+            "loan": "amount_05_fen",
+            "wealthSale": "amount_06_fen",
+            "nonCashWealthSale": "amount_07_fen",
+            "fundSale": "amount_08_fen",
+            "nonMoneyFundSale": "amount_09_fen",
+            "insuranceSale": "amount_10_fen",
+            "depositDemand": "amount_11_fen",
+            "depositTerm": "amount_12_fen"
+          },
+          "source_money_unit": "CNY_FEN",
+          "long_columns": {
+            "id": "切片键",
+            "metric": "指标码",
+            "value": "计数"
+          },
+          "codes": {
+            "channel": {
+              "C01": "remote",
+              "C02": "manager",
+              "C03": "ai",
+              "C04": "wechat",
+              "C05": "sms",
+              "C06": "push"
+            },
+            "origin": {
+              "L": "branch",
+              "H": "hq"
+            }
+          },
+          "dedup_mode": "SYNTHETIC_INTERVAL"
+        }
+      },
+      "status": 200
+    },
+    {
+      "operationId": "runComparison",
+      "request": {
+        "left": {
+          "snapshot_id": "A-001",
+          "period": "2026-10",
+          "periods": [],
+          "cutoff": null,
+          "branch_ids": [
+            "B01"
+          ],
+          "group": null,
+          "subbranch": null,
+          "channel_ids": [
+            "remote"
+          ],
+          "origin": "ALL",
+          "strategy_ids": [],
+          "segment": null,
+          "segment_basis": "DEPLOYMENT",
+          "activity_id": null,
+          "baseline": {
+            "kind": "previous",
+            "period": null,
+            "branch_id": null
+          }
+        },
+        "right": {
+          "snapshot_id": "B-001",
+          "period": "2026-10",
+          "periods": [],
+          "cutoff": null,
+          "branch_ids": [
+            "B01"
+          ],
+          "group": null,
+          "subbranch": null,
+          "channel_ids": [
+            "remote"
+          ],
+          "origin": "ALL",
+          "strategy_ids": [],
+          "segment": null,
+          "segment_basis": "DEPLOYMENT",
+          "activity_id": null,
+          "baseline": {
+            "kind": "previous",
+            "period": null,
+            "branch_id": null
+          }
+        }
+      },
+      "status": 202
+    },
+    {
+      "operationId": "runReview",
+      "request": {
+        "scope": {
+          "snapshot_id": "A-001",
+          "period": "2026-10",
+          "periods": [],
+          "cutoff": null,
+          "branch_ids": [
+            "B01"
+          ],
+          "group": null,
+          "subbranch": null,
+          "channel_ids": [
+            "remote"
+          ],
+          "origin": "ALL",
+          "strategy_ids": [],
+          "segment": null,
+          "segment_basis": "DEPLOYMENT",
+          "activity_id": null,
+          "baseline": {
+            "kind": "previous",
+            "period": null,
+            "branch_id": null
+          }
+        },
+        "group_by": "branch"
+      },
+      "status": 202
+    },
+    {
+      "operationId": "runDiagnosis",
+      "request": {
+        "review_id": "REVIEW-001",
+        "threshold_id": "THRESHOLD-001",
+        "metric_id": "effective",
+        "dimension": null,
+        "direction": "both",
+        "rule": "all"
+      },
+      "status": 202
+    },
+    {
+      "operationId": "interpretQuestion",
+      "request": {
+        "question": "生成9月客户经理渠道专项分析报告，对比各分行执行效率",
+        "context": {
+          "snapshot_id": "A-001",
+          "period": "2026-10",
+          "periods": [],
+          "cutoff": null,
+          "branch_ids": [
+            "B01"
+          ],
+          "group": null,
+          "subbranch": null,
+          "channel_ids": [
+            "remote"
+          ],
+          "origin": "ALL",
+          "strategy_ids": [],
+          "segment": null,
+          "segment_basis": "DEPLOYMENT",
+          "activity_id": null,
+          "baseline": {
+            "kind": "previous",
+            "period": null,
+            "branch_id": null
+          }
+        }
+      },
+      "status": 200
+    },
+    {
+      "operationId": "executeQuestion",
+      "request": {
+        "plan": {
+          "intent": "REPORT",
+          "scope": {
+            "snapshot_id": "A-001",
+            "period": "2026-09",
+            "periods": [],
+            "cutoff": null,
+            "branch_ids": [],
+            "group": null,
+            "subbranch": null,
+            "channel_ids": [
+              "manager"
+            ],
+            "origin": "ALL",
+            "strategy_ids": [],
+            "segment": null,
+            "segment_basis": "DEPLOYMENT",
+            "activity_id": null,
+            "baseline": {
+              "kind": "previous",
+              "period": null,
+              "branch_id": null
+            }
+          },
+          "metric_ids": [
+            "execution",
+            "reach",
+            "effectiveRate",
+            "aum"
+          ],
+          "group_by": "branch",
+          "dimension": null,
+          "condition": null,
+          "direction": "both",
+          "branch_subset": [],
+          "focus_branch_id": null,
+          "claims": [],
+          "conditional_attribution": false,
+          "sort_desc": false,
+          "report_type": "TOPIC"
+        },
+        "threshold_id": "THRESHOLD-001"
+      },
+      "status": 202
+    },
+    {
+      "operationId": "computeEstimate",
+      "request": {
+        "review_id": "REVIEW-001",
+        "contact_conversion": "0.45"
+      },
+      "status": 200
+    },
+    {
+      "operationId": "createCase",
+      "request": {
+        "activity_id": "AC-101",
+        "name": "回拨案例 SIM-017",
+        "mode": "HISTORICAL",
+        "input": {
+          "schema_version": 1,
+          "template": "callback_priority",
+          "customer_id": "SIM-U17",
+          "day": "2026-10-20",
+          "channel": "remote",
+          "used": 0,
+          "events": [
+            {
+              "seq": 1,
+              "event_id": "E-01",
+              "at": "2026-10-20T09:30:00+08:00",
+              "strategy_id": "S-201",
+              "appointment": false
+            },
+            {
+              "seq": 2,
+              "event_id": "E-02",
+              "at": "2026-10-20T11:00:00+08:00",
+              "strategy_id": "S-101",
+              "appointment": true
+            }
+          ]
+        },
+        "expected": {
+          "winner_ids": [
+            "S-101"
+          ],
+          "used": 1,
+          "budget_used_fen": null,
+          "coupons": [],
+          "manual_review": false
+        },
+        "observed_original": {
+          "winner_ids": [
+            "S-201"
+          ],
+          "used": 1,
+          "budget_used_fen": null,
+          "coupons": [],
+          "manual_review": false
+        },
+        "observed_rule_id": "CB-V1",
+        "source_evidence_ids": [
+          "EXEC-17"
+        ],
+        "action_id": "ACTION-001"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "createRun",
+      "request": {
+        "activity_id": "AC-101",
+        "case_ids": [
+          "SIM-017",
+          "SIM-018",
+          "SIM-019"
+        ],
+        "baseline_rule_id": "CB-V1",
+        "candidate_rule_id": "CB-V2",
+        "snapshot_id": "A-001"
+      },
+      "status": 202
+    },
+    {
+      "operationId": "createCandidate",
+      "request": {
+        "case_id": "SIM-017",
+        "expectation": {
+          "winner_ids": [
+            "S-101"
+          ],
+          "used": 1,
+          "budget_used_fen": null,
+          "coupons": [],
+          "manual_review": false
+        },
+        "note": "人工核对 V2 预约优先结果"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "createPreflight",
+      "request": {
+        "activity_id": "AC-101",
+        "source_batch": "PRE-101",
+        "observed_at": "2026-10-23T10:00:00+08:00",
+        "candidate_ids": [
+          "CAND-017"
+        ],
+        "observations": [
+          {
+            "candidate_id": "CAND-017",
+            "rule_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "case_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "actual": {
+              "winner_ids": [
+                "S-101"
+              ],
+              "used": 1,
+              "budget_used_fen": null,
+              "coupons": [],
+              "manual_review": false
+            },
+            "source_label": "合成预发"
+          }
+        ],
+        "source_evidence_ids": [
+          "EV-PRE-101"
+        ]
+      },
+      "status": 201
+    },
+    {
+      "operationId": "recordReceipt",
+      "request": {
+        "preflight_id": "PREFLIGHT-101",
+        "source_system": "模拟活动平台",
+        "source_release_id": "REL-101",
+        "source_version": "V2",
+        "rule_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "released_at": "2026-10-24T10:00:00+08:00",
+        "source_evidence_id": "EV-REL-101"
+      },
+      "status": 201
+    },
+    {
+      "operationId": "createReport",
+      "request": {
+        "review_id": "REVIEW-001",
+        "kind": "REVIEW",
+        "title": "东岚远程渠道 10 月复盘",
+        "diagnosis_id": "DIAG-001"
+      },
+      "status": 202
+    },
+    {
+      "operationId": "signReport",
+      "request": {
+        "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "reviewer_name": "演示审核者",
+        "note": "核对来源和分母"
+      },
+      "status": 200
+    },
+    {
+      "operationId": "correctSnapshot",
+      "request": {
+        "reason": "合成补数",
+        "patches": [
+          {
+            "slice_id": "2026-10:B01:remote:1",
+            "field": "aum",
+            "value_fen": -123300000,
+            "evidence_id": "EV-LATE-01"
+          }
+        ]
+      },
+      "status": 202
+    },
+    {
+      "operationId": "createAction",
+      "request": {
+        "title": "验证预约优先回拨",
+        "owner": "渠道运营",
+        "due_on": "2026-11-30",
+        "checkpoint_days": 30,
+        "hypothesis": "接触层存在排队或时段问题",
+        "verification": "下期对齐后检查接触与有效触达变化",
+        "review_id": "REVIEW-001",
+        "diagnosis_id": "DIAG-001",
+        "evidence_ids": [
+          "EV-SPLIT-001"
+        ]
+      },
+      "status": 201
+    },
+    {
+      "operationId": "reviewAction",
+      "request": {
+        "next_review_id": "REVIEW-NEXT-001",
+        "case_ids": [
+          "SIM-017"
+        ],
+        "receipt_id": "RECEIPT-101",
+        "verification_outcome": "OBSERVED",
+        "note": "下期同口径观察为 1944 人"
+      },
+      "status": 200
+    },
+    {
+      "operationId": "createExport",
+      "request": {
+        "kind": "EVIDENCE_ZIP",
+        "subject": {
+          "kind": "run",
+          "id": "RUN-001"
+        },
+        "reason": "交接合成验证证据"
+      },
+      "status": 202
+    }
+  ],
+  "estimate_response": {
+    "review_id": "REVIEW-001",
+    "executed": 8640,
+    "assumed_contact_conversion": "0.45",
+    "fixed_valid_conversion": "0.5",
+    "estimate_exact": "1944",
+    "estimate_count": 1944,
+    "observed_base": 1728,
+    "delta_count": 216,
+    "evidence_ids": [
+      "EV-FUNNEL-001"
+    ]
+  }
+}

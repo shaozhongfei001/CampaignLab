@@ -19,3 +19,6 @@
 *.woff binary
 *.woff2 binary
 *.pdf binary
+
+# 供应商化基线：按字节原样保存，禁止任何 EOL/编码转换（否则包内 SHA256 校验失效）
+spec/** -text

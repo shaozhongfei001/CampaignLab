@@ -1,0 +1,899 @@
+[
+  {
+    "id": "CP-01",
+    "name": "差一分未达标",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 9999,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9999,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9999,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-02",
+    "name": "门槛相等",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 10000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 10000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 10000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-03",
+    "name": "重复事件与重复订单",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        },
+        {
+          "seq": 3,
+          "event_id": "E-03",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-04",
+    "name": "互斥优惠已应用",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": true
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-05",
+    "name": "预算刚够",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 9998000,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 10000000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 10000000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-06",
+    "name": "预算差一分",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 9998001,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 9998001,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 9998001,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-07",
+    "name": "未核销部分退款",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-02",
+          "kind": "REFUND",
+          "at": "2026-10-21T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 2500,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9500,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9500,
+          "coupon_state": "REVOKED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-08",
+    "name": "已核销部分退款",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-02",
+          "kind": "REDEEM",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 0,
+          "other_offer_applied": false
+        },
+        {
+          "seq": 3,
+          "event_id": "E-03",
+          "kind": "REFUND",
+          "at": "2026-10-21T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 2500,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9500,
+          "coupon_state": "REDEEMED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 9500,
+          "coupon_state": "MANUAL_REVIEW"
+        }
+      ],
+      "manual_review": true
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": false
+  },
+  {
+    "id": "CP-09",
+    "name": "达到个人上限",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 3,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 3,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 3,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-10",
+    "name": "活动起点包含",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-27T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-01T00:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": 2000,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "ISSUED"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-11",
+    "name": "活动截止点排除",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-10-15T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-11-01T00:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "CP-12",
+    "name": "注册已满三十天",
+    "activity_id": "COUPON-01",
+    "mode": "SYNTHETIC",
+    "baseline_rule_id": "CP-V1",
+    "candidate_rule_id": "CP-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "coupon_threshold",
+      "customer_id": "C-01",
+      "registered_at": "2026-09-20T12:00:00+08:00",
+      "initial_used": 0,
+      "initial_budget_used_fen": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "kind": "PAYMENT",
+          "at": "2026-10-20T12:00:00+08:00",
+          "order_id": "ORDER-01",
+          "amount_fen": 12000,
+          "other_offer_applied": false
+        }
+      ]
+    },
+    "observed_original": null,
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 0,
+      "budget_used_fen": 0,
+      "coupons": [
+        {
+          "order_id": "ORDER-01",
+          "net_paid_fen": 12000,
+          "coupon_state": "NONE"
+        }
+      ],
+      "manual_review": false
+    },
+    "expected_original_status": "NOT_REQUIRED",
+    "candidate_eligible": true
+  },
+  {
+    "id": "SIM-017",
+    "name": "回拨案例 SIM-017",
+    "activity_id": "AC-101",
+    "mode": "HISTORICAL",
+    "baseline_rule_id": "CB-V1",
+    "candidate_rule_id": "CB-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "callback_priority",
+      "customer_id": "SIM-U17",
+      "day": "2026-10-20",
+      "channel": "remote",
+      "used": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "at": "2026-10-20T09:30:00+08:00",
+          "strategy_id": "S-201",
+          "appointment": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-02",
+          "at": "2026-10-20T11:00:00+08:00",
+          "strategy_id": "S-101",
+          "appointment": true
+        }
+      ]
+    },
+    "observed_original": {
+      "winner_ids": [
+        "S-201"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_baseline": {
+      "winner_ids": [
+        "S-201"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "source_label": "执行样本 EXEC-17",
+    "expected_original_status": "MATCH",
+    "candidate_eligible": true
+  },
+  {
+    "id": "SIM-018",
+    "name": "回拨案例 SIM-018",
+    "activity_id": "AC-101",
+    "mode": "HISTORICAL",
+    "baseline_rule_id": "CB-V1",
+    "candidate_rule_id": "CB-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "callback_priority",
+      "customer_id": "SIM-U18",
+      "day": "2026-10-21",
+      "channel": "remote",
+      "used": 0,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "at": "2026-10-21T09:45:00+08:00",
+          "strategy_id": "S-201",
+          "appointment": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-02",
+          "at": "2026-10-21T11:30:00+08:00",
+          "strategy_id": "S-101",
+          "appointment": true
+        }
+      ]
+    },
+    "observed_original": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_baseline": {
+      "winner_ids": [
+        "S-201"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [
+        "S-101"
+      ],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "source_label": "执行样本 EXEC-18",
+    "expected_original_status": "DIFF",
+    "candidate_eligible": false
+  },
+  {
+    "id": "SIM-019",
+    "name": "回拨案例 SIM-019",
+    "activity_id": "AC-101",
+    "mode": "HISTORICAL",
+    "baseline_rule_id": "CB-V1",
+    "candidate_rule_id": "CB-V2",
+    "input": {
+      "schema_version": 1,
+      "template": "callback_priority",
+      "customer_id": "SIM-U19",
+      "day": "2026-10-22",
+      "channel": "remote",
+      "used": 1,
+      "events": [
+        {
+          "seq": 1,
+          "event_id": "E-01",
+          "at": "2026-10-22T09:15:00+08:00",
+          "strategy_id": "S-201",
+          "appointment": false
+        },
+        {
+          "seq": 2,
+          "event_id": "E-02",
+          "at": "2026-10-22T10:00:00+08:00",
+          "strategy_id": "S-101",
+          "appointment": true
+        }
+      ]
+    },
+    "observed_original": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_baseline": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "expected_candidate": {
+      "winner_ids": [],
+      "used": 1,
+      "budget_used_fen": null,
+      "coupons": [],
+      "manual_review": false
+    },
+    "source_label": "执行样本 EXEC-19",
+    "expected_original_status": "MATCH",
+    "candidate_eligible": true
+  }
+]

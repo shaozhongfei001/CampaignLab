@@ -1,0 +1,405 @@
+[
+  {
+    "id": "deployed",
+    "label": "已部署分行数",
+    "unit": "BRANCH",
+    "formula": "去重计数",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "DISTINCT",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "strategies",
+    "label": "下发策略数",
+    "unit": "STRATEGY",
+    "formula": "去重计数",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "DISTINCT",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "策略数",
+      "策略数量"
+    ]
+  },
+  {
+    "id": "eligible",
+    "label": "可经营客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "sent",
+    "label": "下发客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "下发人数",
+      "名单规模"
+    ]
+  },
+  {
+    "id": "success",
+    "label": "下发成功客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "下发成功人数"
+    ]
+  },
+  {
+    "id": "executed",
+    "label": "已执行客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "contacted",
+    "label": "已接触客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "触达客户数",
+      "接触客户数"
+    ]
+  },
+  {
+    "id": "effective",
+    "label": "有效触达客户数",
+    "unit": "PERSON",
+    "formula": "按月客户集合并集",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "UNION",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "有效接触客户数",
+      "有效触客数",
+      "有效触达人数"
+    ]
+  },
+  {
+    "id": "cover",
+    "label": "策略覆盖率",
+    "unit": "RATIO",
+    "formula": "success / eligible",
+    "numerator_id": "success",
+    "denominator_id": "eligible",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "覆盖率"
+    ]
+  },
+  {
+    "id": "successRate",
+    "label": "下发成功率",
+    "unit": "RATIO",
+    "formula": "success / sent",
+    "numerator_id": "success",
+    "denominator_id": "sent",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "execution",
+    "label": "名单执行率",
+    "unit": "RATIO",
+    "formula": "executed / success",
+    "numerator_id": "executed",
+    "denominator_id": "success",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "执行率"
+    ]
+  },
+  {
+    "id": "reach",
+    "label": "触达率",
+    "unit": "RATIO",
+    "formula": "contacted / success",
+    "numerator_id": "contacted",
+    "denominator_id": "success",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "接触率"
+    ]
+  },
+  {
+    "id": "effectiveRate",
+    "label": "有效触达率",
+    "unit": "RATIO",
+    "formula": "effective / success",
+    "numerator_id": "effective",
+    "denominator_id": "success",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "有效接触率"
+    ]
+  },
+  {
+    "id": "contactConv",
+    "label": "接触层间转化率",
+    "unit": "RATIO",
+    "formula": "contacted / executed",
+    "numerator_id": "contacted",
+    "denominator_id": "executed",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "接触转化率"
+    ]
+  },
+  {
+    "id": "validConv",
+    "label": "有效接触层间转化率",
+    "unit": "RATIO",
+    "formula": "effective / contacted",
+    "numerator_id": "effective",
+    "denominator_id": "contacted",
+    "aggregation": "DIVIDE",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "有效接触转化率"
+    ]
+  },
+  {
+    "id": "aum",
+    "label": "AUM余额增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "AUM增量",
+      "AUM"
+    ]
+  },
+  {
+    "id": "deposit",
+    "label": "存款余额增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "存款增量"
+    ]
+  },
+  {
+    "id": "wealth",
+    "label": "理财余额增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "理财增量"
+    ]
+  },
+  {
+    "id": "fund",
+    "label": "基金余额增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "基金增量"
+    ]
+  },
+  {
+    "id": "loan",
+    "label": "个贷余额增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "个贷增量"
+    ]
+  },
+  {
+    "id": "wealthSale",
+    "label": "理财销量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "nonCashWealthSale",
+    "label": "非现金管理类理财销量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "非现管理财销量"
+    ]
+  },
+  {
+    "id": "fundSale",
+    "label": "基金销量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "nonMoneyFundSale",
+    "label": "非货币基金销量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": [
+      "非货基金销量",
+      "非货基销量"
+    ]
+  },
+  {
+    "id": "insuranceSale",
+    "label": "保险销量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "depositDemand",
+    "label": "活期存款增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "depositTerm",
+    "label": "定期存款增量",
+    "unit": "CNY_FEN",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "intentCount",
+    "label": "意向沟通次数",
+    "unit": "EVENT",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "activityCount",
+    "label": "活动特色人数",
+    "unit": "PERSON",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  },
+  {
+    "id": "capacity",
+    "label": "可执行容量",
+    "unit": "SEAT",
+    "formula": "同口径可加值合计",
+    "numerator_id": null,
+    "denominator_id": null,
+    "aggregation": "SUM",
+    "version": "CL-METRIC-1",
+    "evidence_ids": [],
+    "aliases": []
+  }
+]

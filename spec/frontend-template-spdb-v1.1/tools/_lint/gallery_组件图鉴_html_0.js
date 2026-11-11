@@ -1,0 +1,227 @@
+
+var SECT = [];
+function sec(id, name, note, html, code, doIt, dont){ SECT.push({id:id,name:name,note:note,html:html,code:code,d:doIt,x:dont}); }
+
+/* ---------------- 0 设计令牌 ---------------- */
+sec("s0","设计令牌 tokens",
+  "所有颜色／圆角／阴影一律走 CSS 变量，禁止在组件里写死色值。",
+  '<div class="g-wrap">'
+  + ["ink-900","ink-700","ink-500","ink-300","ink-100"].map(function(k){return '<div style="text-align:center"><span style="display:block;width:58px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--'+k+')"></span><span class="tiny mono">'+k+'</span></div>';}).join("")
+  + '<div style="width:1px;height:34px;background:var(--ink-200)"></div>'
+  + ["brand-700","brand-600","brand-100","brand-50"].map(function(k){return '<div style="text-align:center"><span style="display:block;width:58px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--'+k+')"></span><span class="tiny mono">'+k+'</span></div>';}).join("")
+  + '<div style="width:1px;height:34px;background:var(--ink-200)"></div>'
+  + [["ok-600","ok-100"],["warn-600","warn-100"],["danger-600","danger-100"],["info-600","info-100"],["violet-600","violet-100"]].map(function(k){
+      return '<div style="text-align:center"><span style="display:flex;width:58px;height:34px;border-radius:7px;border:1px solid var(--line);overflow:hidden"><i style="flex:1;background:var(--'+k[0]+')"></i><i style="flex:1;background:var(--'+k[1]+')"></i></span><span class="tiny mono">'+k[0].replace("-600","")+'</span></div>';}).join("")
+  + '</div>'
+  + '<div class="hr"></div><div class="tagline">'
+  + '<span class="pill">r-sm 6px</span><span class="pill">r-md 10px</span><span class="pill">r-lg 14px</span><span class="pill">正文 13px</span><span class="pill">数字 .num tabular-nums</span></div>',
+  "--ink-900..50 中性阶 / --brand-* 主色 / --ok|--warn|--danger|--info|--violet 语义色\n"
++ "语义色只有两种用途：① 表达状态；② 表达风险等级。禁止当装饰色使用。",
+  "换品牌只改 tokens.css 的 :root，组件层不动。",
+  "在业务页里写 #1e88e5 之类的字面色（母版图表默认色除外，需先登记进 tokens）。");
+
+/* ---------------- 1 卡片 ---------------- */
+sec("s1","卡片 card",
+  "页面的最小信息单元：card-h 标题 / card-b 内容 / card-f 结论行。",
+  '<section class="card" style="max-width:640px"><div class="card-h"><span class="t"><span class="ic">标</span>卡片标题</span>'
+  + '<span class="meta">右上只放口径或计数</span></div>'
+  + '<div class="card-b">card-b 默认 overflow-y:auto，内容超高自动出滚动条，不会撑破卡片。</div>'
+  + '<div class="card-f"><span class="tiny">表尾：影响本页判断的事实</span><span class="note">右对齐注记</span></div></section>',
+  '<section class="card"><div class="card-h"><span class="t"><span class="ic">标</span>标题</span><span class="meta">口径</span></div>'
++ '<div class="card-b">内容</div><div class="card-f"><span class="tiny">结论</span><span class="note">注记</span></div></section>',
+  "一卡一主题；card-h 的 .ic 是单字徽标，不放图片。",
+  "把整页塞进一个卡片；或在 card-b 里再套一层带边框的“卡片”造成双框。");
+
+/* ---------------- 2 KPI ---------------- */
+sec("s2","指标 kpi / kpi2 / kpirow",
+  "kpi(l,v,s,cls) 由 charts.js 生成，四个一行用 .kpirow 包。",
+  '<div class="kpirow" style="max-width:none">'
+  + kpi("总量","1,284","环比 <b>+2.1%</b>","") + kpi("达标率","96.4%","阈值 95%","ok")
+  + kpi("待复核","42","超 24h 有 6","warn") + kpi("失败","\u2014","缺数不写 0","bad") + '</div>'
+  + '<div class="hr"></div>'
+  + '<div class="kpirow" style="grid-template-columns:repeat(3,minmax(0,1fr))">'
+  + '<div class="kpi"><div class="l">轻量 kpi（浅底）</div><div class="v">18<small> 项</small></div><div class="s">kpi .l/.v/.s</div></div>'
+  + '<div class="kpi good"><div class="l">good 变体</div><div class="v">+3.1%</div><div class="s">.kpi.good</div></div>'
+  + '<div class="kpi bad"><div class="l">bad 变体</div><div class="v">7</div><div class="s">.kpi.bad</div></div></div>',
+  'kpi("标签","数值","说明","ok|warn|bad|dim")   // 生成 .kpi2\n'
++ 'objCard("01","对象名","OBJ-0001","<b>状态</b>","ok")  // 生成 .obj（配合 .objrow）',
+  "数值用 nf/pc/pp 格式化后传入；缺数传 null 或直接写 \u2014。",
+  "给 .v 传未格式化的原始浮点数（如 0.0411）；用同色强调多个 kpi。");
+
+/* ---------------- 3 表格 ---------------- */
+sec("s3","表格 tbl",
+  "数据密集区一律用 .tbl，外包 .card-b.flush.scroll 才能横向纵向都受控。",
+  '<div class="card" style="max-width:760px"><div class="card-h"><span class="t">明细</span></div>'
+  + '<div class="card-b flush scroll" style="max-height:200px"><table class="tbl"><thead><tr><th>编号</th><th>名称</th>'
+  + '<th class="r">数值</th><th class="r">差异</th><th>状态</th><th>行高亮</th></tr></thead><tbody>'
+  + '<tr><td class="mono">A-0001</td><td class="wrap">普通行</td><td class="r num">1,284</td><td class="r num">+0.79pp</td><td>'+stTag("PASS")+'</td><td>—</td></tr>'
+  + '<tr class="roww"><td class="mono">A-0002</td><td class="wrap">待复核行</td><td class="r num">912</td><td class="r num">\u2014</td><td>'+stTag("REVIEW")+'</td><td><span class="mono-b">tr.roww</span></td></tr>'
+  + '<tr class="rowbad"><td class="mono">A-0003</td><td class="wrap">异常行</td><td class="r num">\u2014</td><td class="r num">\u2014</td><td>'+stTag("FAILED")+'</td><td><span class="mono-b">tr.rowbad</span></td></tr>'
+  + '</tbody></table></div></div>',
+  '<div class="card-b flush scroll"><table class="tbl"><thead>…</thead><tbody>'
++ '<tr class="rowbad"><td class="mono">…</td><td class="r num">…</td><td>'+stTag("FAILED")+'</td></tr>'
++ '</tbody></table></div>',
+  "数字列加 class=\"r num\" 右对齐等宽；文本列加 .wrap 允许换行。",
+  "用 <br> 撑表格行；在 td 里放按钮组超过 2 个。");
+
+/* ---------------- 4 徽标 ---------------- */
+sec("s4","徽标 tag / chip / pill / st / dot-s",
+  "同一页面同一族徽标只用一种，别混着用。",
+  '<div class="g-wrap">'
+  + '<div><div class="sec-t">状态 tag（stTag 生成）</div><div class="tagline" style="margin:6px 0">'
+  + stTag("PASS")+stTag("OK")+stTag("REVIEW")+stTag("PENDING_REVIEW")+stTag("DEGRADED")+stTag("FAILED")
+  + '<span class="tag sys">系统</span><span class="tag ai">AI 候选</span><span class="tag syn">示例</span></div></div>'
+  + '<div><div class="sec-t">bandTag 等级带</div><div class="tagline" style="margin:6px 0">'+bandTag("LOW")+bandTag("MID")+bandTag("HIGH")+bandTag("OK")+'</div></div>'
+  + '<div><div class="sec-t">chip 计数／口径（可含 .num）</div><div class="tagline" style="margin:6px 0">'
+  + '<span class="chip">默认</span><span class="chip ok">ok 4</span><span class="chip warn">warn 2</span><span class="chip danger">danger 1</span>'
+  + '<span class="chip info">info</span><span class="chip violet">violet</span><span class="chip dark">dark</span><span class="chip ver">V1.0</span><span class="chip syn">SYNTHETIC</span></div></div>'
+  + '<div><div class="sec-t">pill 纯文字标签</div><div class="tagline" style="margin:6px 0">'
+  + '<span class="pill ok">ok</span><span class="pill warn">warn</span><span class="pill danger">danger</span><span class="pill info">info</span><span class="pill gray">gray</span><span class="pill violet">violet</span></div></div>'
+  + '<div><div class="sec-t">st 流程态 / dot-s 圆点 / badge-n 计数</div><div class="tagline" style="margin:6px 0">'
+  + '<span class="st ok">DONE</span><span class="st req">WAIT_ACK</span><span class="st bad">TIMEOUT</span>'
+  + '<span class="dot-s"></span><span class="dot-s w"></span><span class="dot-s b"></span><span class="dot-s g"></span>'
+  + '<span class="badge-n g">7</span><span class="badge-n w">3</span><span class="badge-n b">12</span></div></div>'
+  + '</div>',
+  "stTag(\"REVIEW\")  // PASS/OK/APPROVED→ok；WARN/REVIEW/PENDING_REVIEW/DEGRADED/INFO→warn；其余→bad\n"
++ "bandTag(\"HIGH\")  // LOW/OK→ok；MID/WARN→warn；其余→bad",
+  "状态词表统一大写英文枚举，中文解释写在旁边的文本里。",
+  "自造新枚举值（会全部落到 bad 红）；同一行并排 6 个以上徽标。");
+
+/* ---------------- 5 提示条 ---------------- */
+sec("s5","提示条 banner / okbox / warnbox / infobox",
+  "banner 用于页面／卡片级重要声明；box 用于局部结论。",
+  '<div style="display:grid;gap:8px;max-width:760px">'
+  + '<div class="banner info"><span class="ic">i</span><div><b>信息：</b>口径说明放在数字之前，读者才知道数是谁的。</div></div>'
+  + '<div class="banner warn"><span class="ic">!</span><div><b>注意：</b>降级只向更安全档位，不得向上。</div></div>'
+  + '<div class="banner danger"><span class="ic">&#215;</span><div><b>阻断：</b>缺证据时禁止提交正式动作。</div></div>'
+  + '<div class="infobox"><b>infobox：</b>中性补充说明，可用 HTML。</div>'
+  + '<div class="okbox">okbox：通过类结论。</div><div class="warnbox">warnbox：条件性结论。</div><div class="badbox">badbox：失败／禁止类结论。</div>'
+  + '</div>',
+  '<div class="banner warn"><span class="ic">!</span><div><b>标题：</b>正文一句话说清后果与下一步。</div></div>',
+  "首行加粗点明性质，正文不超过两行。",
+  "用 banner 做装饰性欢迎语；danger 与 warn 在同一屏同时出现超过 2 条。");
+
+/* ---------------- 6 流程 ---------------- */
+sec("s6","流程 statusband / stepper / tl / gates",
+  "四个层级：全局状态带 → 审批步骤条 → 时间线 → 闸门。",
+  '<div class="statusband" style="max-width:900px"><div class="sb-l"><div><div class="t">全链路状态</div><div class="s">请求态 ≠ 权威状态</div></div></div>'
+  + '<div class="sb-flow">'
+  + '<div class="sb-node done"><span class="n">1</span><span class="tx"><b>生成</b><span>09:12 已完成</span></span></div>'
+  + '<div class="sb-node now"><span class="n">2</span><span class="tx"><b>复核</b><span>当前节点</span></span></div>'
+  + '<div class="sb-node warn"><span class="n">3</span><span class="tx"><b>提交</b><span>等待回执</span></span></div>'
+  + '<div class="sb-node bad"><span class="n">4</span><span class="tx"><b>失败</b><span>需人工接管</span></span></div>'
+  + '<div class="sb-node wait"><span class="n">5</span><span class="tx"><b>回执</b><span>未开始</span></span></div>'
+  + '</div><div class="sb-r"><div class="evn"><b>3 / 5</b> 已完成</div></div></div>'
+  + '<div class="two" style="margin-top:10px">'
+  + '<div><div class="sec-t">stepper 审批步骤</div><div class="stepper" style="margin-top:8px">'
+  + '<div class="sp done"><div class="c">&#10003;</div><div class="t">起草</div><div class="s">岗位 甲</div></div>'
+  + '<div class="sp now"><div class="c">2</div><div class="t">业务审批</div><div class="s">待批准</div></div>'
+  + '<div class="sp block"><div class="c">&#215;</div><div class="t">发布</div><div class="s">被阻断</div></div></div></div>'
+  + '<div><div class="sec-t">gates 闸门 / gate2</div><div class="gates" style="grid-template-columns:1fr;margin-top:8px">'
+  + '<div class="gate ok"><div class="gi">&#10003;</div><div style="min-width:0"><div class="gt">闸门</div><div class="gv">已通过</div><div class="gs">说明</div></div><div class="gx"><span class="tag ok">PASS</span></div></div>'
+  + '<div class="gate warn"><div class="gi">2</div><div style="min-width:0"><div class="gt">闸门</div><div class="gv">待复核</div><div class="gs">说明</div></div><div class="gx"><button class="btn btn-sm">查看</button></div></div>'
+  + '</div></div></div>'
+  + '<div class="sec-t" style="margin-top:12px">tl 时间线</div>'
+  + '<div class="tl" style="max-width:520px;margin-top:8px">'
+  + '<div class="tl-i"><span class="d"></span><div class="h"><span class="ti">已完成事件</span><span class="tm num">09:12</span></div><div class="m">只写已发生事实与来源。</div></div>'
+  + '<div class="tl-i warn"><span class="d"></span><div class="h"><span class="ti">待确认事件</span><span class="tm num">09:14</span></div><div class="m">未确认前不得进入下一步。</div></div>'
+  + '<div class="tl-i trim"><span class="d"></span><div class="h"><span class="ti">裁剪节点</span><span class="tm num">\u2014</span></div><div class="m">斜纹底表示本条不适用。</div></div></div>',
+  ".statusband>.sb-l+.sb-flow>.sb-node(done|now|warn|bad|wait)+.sb-r\n"
++ ".stepper>.sp(done|now|block)>.c+.t+.s\n.tl>.tl-i(.warn|.bad|.trim)>.d+.h(.ti+.tm)+.m\n"
++ ".gates>.gate(.ok|.warn|.bad)>.gi+.gt/.gv/.gs+.gx",
+  "未到达节点的 .tm 写 \u2014，不得预填计划时间当成事实。",
+  "用 .sb-node 数量凑进度百分比；把 4 个以上节点压进一行导致 .tx 折行。");
+
+/* ---------------- 7 图表 ---------------- */
+sec("s7","图表 charts（零依赖 SVG）",
+  "函数只返回字符串，随容器宽度缩放；禁止把数据写死成图片。",
+  '<div class="two">'
+  + '<div class="card" style="box-shadow:none"><div class="card-h"><span class="t">lineChart</span></div><div class="card-b">'
+  + lineChart([{name:"A",color:"#0048d8",data:[3,5,4,7,9,8,11],fill:"#0048d8"},{name:"B",color:"#18a890",data:[6,5,7,4,3,4,5]}],
+              ["1","2","3","4","5","6","7"],{h:120,threshold:10})+'</div></div>'
+  + '<div class="card" style="box-shadow:none"><div class="card-h"><span class="t">hbars（仅正值）</span></div><div class="card-b">'
+  + hbars([{l:"类别甲",v:412},{l:"类别乙",v:288},{l:"类别丙",v:164,c:"#18a890"},{l:"类别丁",v:97,c:"#e74c3c"}],{rh:24})+'</div></div>'
+  + '<div class="card" style="box-shadow:none"><div class="card-h"><span class="t">columns / spark</span></div><div class="card-b">'
+  + columns([{l:"A",v:12},{l:"B",v:19,t:"19"},{l:"C",v:7},{l:"D",v:24,t:"24"}],{h:96})+spark([9,11,10,14,13,17,16,19],{w:300,h:34,color:"#0048d8"})+'</div></div>'
+  + '<div class="card" style="box-shadow:none"><div class="card-h"><span class="t">donut / radar</span></div><div class="card-b">'
+  + '<div class="flex" style="justify-content:space-around;align-items:flex-start">'
+  + '<div style="flex:none;width:126px">'+donut([{l:"甲",v:44,c:"#0048d8"},{l:"乙",v:31,c:"#18a890"},{l:"丙",v:25,c:"#f39c12"}],{w:126,h:104,r:32,sw:11,center:"3",sub:"类型"})+'</div>'
+  + '<div style="flex:none;width:200px">'+radar([{l:"稳",v:80},{l:"健",v:55},{l:"成",v:70},{l:"长",v:40},{l:"覆",v:62},{l:"盖",v:50}],{w:200,h:160,r:48})+'</div>'
+  + '</div></div></div></div>',
+  "lineChart(series,labels,{w,h,min,max,dec,threshold,area,legend})   series:[{name,color,data,fill,width,dash}]\n"
++ "hbars(items,{w,rh,pl,pr,max})   items:[{l,v,c,t}]  ⚠ 负值会被 Math.max(2,bw) 夹成 2px，正负对比请用 columns\n" + "columns(items,{w,h,max})   items:[{l,v,t,c,dim}]\n"
++ "donut(items,{w,h,r,sw,center,sub,legend})  items:[{l,v,c,t,dash}]\n"+ "radar(items,{w,h,r})  items:[{l,v}]  v 为 0..100\n"+ "stacked(segs,{w,h})  segs:[{l,v,c}]   spark(data,{w,h,color})",
+  "标题里先说口径再说结论；同一图内序列不超过 4 条。",
+  "用双 Y 轴制造相关性；缺数补 0（会让折线假跌到零轴）。");
+
+/* ---------------- 8 对象卡 ---------------- */
+sec("s8","对象卡 objCard / obj",
+  "多对象并列页的“状态总览行”，一对象一格，互不替代。",
+  '<div class="objrow" style="grid-template-columns:repeat(4,minmax(0,1fr));max-width:900px">'
+  + objCard("01","对象名称","OBJ-2026-0001",'<span class="dot-s"></span><b>正常</b><span>· 权威来源</span>',"ok")
+  + objCard("02","对象名称","OBJ-2026-0002",'<span class="dot-s w"></span><b>待受领</b><span>· 本地记录</span>',"req")
+  + objCard("03","对象名称","OBJ-2026-0003",'<span class="dot-s b"></span><b>失败</b><span>· 需接管</span>',"bad")
+  + objCard("04","对象名称","OBJ-2026-0004",'<span class="dot-s g"></span><b>不适用</b><span>· 已裁剪</span>',"auth")+'</div>',
+  'objCard(i,l,v,st,cls)   // cls: ok|req|bad|auth；st 传 HTML（dot-s + b + span）',
+  "每格三行：对象名 / 编号（可截断带 title）/ 状态。五格以内一行放下。",
+  "在 .v 里写长句；用颜色区分“归属机构”这种与状态无关的维度。");
+
+/* ---------------- 9 表单控件 ---------------- */
+sec("s9","控件 btn / chk / metric-line / empty",
+  "按钮只有 5 档语义；勾选行 .chk 承载“已确认／待补／禁止”三态。",
+  '<div class="g-wrap" style="align-items:stretch">'
+  + '<div style="min-width:340px"><div class="sec-t">按钮（同一屏只允许一个 btn-p）</div><div class="btnrow" style="margin-top:8px">'
+  + '<button class="btn btn-p">主操作</button><button class="btn">默认</button><button class="btn btn-s">浅边</button>'
+  + '<button class="btn btn-g">幽灵</button><button class="btn btn-ok">通过</button><button class="btn btn-d">拒绝</button>'
+  + '<button class="btn btn-sm">小</button><button class="btn" disabled>禁用</button></div>'
+  + '<div class="hr"></div><div class="sec-t">勾选三态</div><div style="margin-top:7px;display:grid;gap:5px">'
+  + '<div class="chk ok"><span class="ci">&#10003;</span><span><b>已确认</b>：说明文字</span><span class="r">09:12</span></div>'
+  + '<div class="chk warn"><span class="ci">!</span><span><b>待补充</b>：需要证据</span><span class="r">待办</span></div>'
+  + '<div class="chk bad"><span class="ci">&#215;</span><span><b>禁止项</b>：客户已拒绝</span><span class="r">2026-11-18</span></div>'
+  + '</div><div class="hr"></div><div class="sec-t">度量行 metric-line</div><div style="margin-top:6px">'
+  + '<div class="metric-line"><span>度量名称</span><b>82.4%</b><span class="bar2"><i style="width:82%"></i></span></div>'
+  + '<div class="metric-line"><span>度量名称</span><b>\u2014</b><span class="bar2"><i style="width:0"></i></span></div>'
+  + '</div></div>'
+  + '<div style="min-width:300px"><div class="sec-t">空状态 empty</div>'
+  + '<div class="empty" style="border:1px dashed var(--ink-300);border-radius:8px;margin-top:8px">'
+  + '<div class="big">&#9723;</div><b>暂无可展示的数据</b>'
+  + '<div class="tiny">说明为什么没有、下一步做什么。</div></div>'
+  + '<div class="sec-t" style="margin-top:12px">引用 quote / 证据 evrow</div>'
+  + '<div class="quote" style="margin-top:7px"><b>原话：</b>“引用内容必须可回溯到来源记录。”<div class="src">来源编号 · 时间 · 版本</div></div>'
+  + '<div class="evrow"><span class="ev"><span class="i">&#9670;</span>证据一</span><span class="ev"><span class="i">&#9670;</span>证据二</span><span class="ev"><span class="i">&#9670;</span>规则 v3.2</span></div>'
+  + '</div></div>',
+  '<button class="btn btn-p">主操作</button>   // btn-p|btn-s|btn-g|btn-ok|btn-d|btn-sm\n'
++ '<div class="chk ok"><span class="ci">&#10003;</span><span><b>标题</b>说明</span><span class="r">右侧注记</span></div>\n'
++ '<div class="metric-line"><span>名</span><b>值</b><span class="bar2"><i style="width:82%"></i></span></div>',
+  "不可逆动作的按钮必须紧邻一行说明后果（.hint）。",
+  "把 btn-d（拒绝／删除）放在主操作旁边且同样尺寸。");
+
+/* ---------------- 10 壳层 ---------------- */
+sec("s10","壳层 rail / appbar / pagebar / sheet / toast",
+  "壳层由 youxia-shell.js 驱动，DOM 骨架固定，不要改名。",
+  '<div class="g-rule" style="grid-template-columns:1fr">'
+  + '<div class="g-do"><b>骨架（缺一不可）</b>.shell &gt; .rail#rail（.rail-top/.rail-group/.rail-item/.rail-sub/.rail-foot）'
+  + '+ .main（.appbar / .pagebar#pagebar / .view#viewHost）；body 末尾 .scrim#scrim、#sheetHost、.toast#toast。</div></div>'
+  + '<div class="g-code">YX.init({start:"p01", views:{p01:{title,sub,group,segs,fn}}, sheets:{sh1:fn}, hooks:{act,afterRender,beforeNav}});\n'
+  + '声明式交互：data-nav 切视图 / data-open 开抽屉 / data-close 关抽屉 / data-say 轻提示 / data-act 交给业务钩子\n'
+  + 'YX.nav("p02")  YX.say("已保存","ok")  YX.openSheet("sh1")  YX.closeSheet()  YX.render()</div>'
+  + '<div class="g-rule">'
+  + '<div class="g-do"><b>路由</b>视图 id 写进 location.hash，刷新／分享链接可直达；hash 非法时回落到 start。</div>'
+  + '<div class="g-dont"><b>反例</b>在 onclick 里写内联 JS 拼字符串；或视图函数直接改 DOM 绕过 render()。</div></div>',
+  "长页：视图根节点写 <div class=\"screen v2scroll\">，shell 自动给 .view 加 .vscroll 整页滚动。",
+  "自己再实现一套 tab 切换；或把抽屉内容写进 .view 里。");
+
+/* 渲染 */
+var gn = [], gh = [];
+SECT.forEach(function(s, i){
+  gn.push('<h4>' + (i < 10 ? "0" : "") + i + '</h4><a href="#' + s.id + '">' + s.name + '</a>');
+  gh.push('<section class="g-sec" id="' + s.id + '"><div class="gt"><b>' + s.name + '</b><span>' + s.note + '</span></div>'
+    + '<div class="g-demo">' + s.html + '</div>'
+    + (s.code ? '<div class="g-code">' + esc(s.code) + '</div>' : "")
+    + '<div class="g-rule">'
+    + (s.d ? '<div class="g-do"><b>应当</b>' + s.d + '</div>' : "")
+    + (s.x ? '<div class="g-dont"><b>不要</b>' + s.x + '</div>' : "")
+    + '</div></section>');
+});
+document.getElementById("gn").innerHTML = '<h4>图鉴</h4><a href="#s0">组件目录</a>' + gn.join("");
+document.getElementById("gal").innerHTML = gh.join("");

@@ -1,0 +1,402 @@
+{
+  "total": 79,
+  "passed": 79,
+  "failed": 0,
+  "results": [
+    {
+      "id": "V01",
+      "name": "导入宽表和长表，元／分转换及切片数",
+      "status": "PASS"
+    },
+    {
+      "id": "V02",
+      "name": "主例两期五层人数，两个有效触达分母",
+      "status": "PASS"
+    },
+    {
+      "id": "V03",
+      "name": "量率拆解与固定参数试算",
+      "status": "PASS"
+    },
+    {
+      "id": "V04",
+      "name": "当前范围、全行、分组、机构、产品和来源",
+      "status": "PASS"
+    },
+    {
+      "id": "V05",
+      "name": "企微恢复时仅比较共同范围，独立同比可算",
+      "status": "PASS"
+    },
+    {
+      "id": "V06",
+      "name": "总体去重、零分母和负金额",
+      "status": "PASS"
+    },
+    {
+      "id": "V07",
+      "name": "五类异常规则各有可判定样本及阈值",
+      "status": "PASS"
+    },
+    {
+      "id": "V08",
+      "name": "归因按客群、渠道、支行、来源和存款类型下钻",
+      "status": "PASS"
+    },
+    {
+      "id": "V09",
+      "name": "客群口径保留，未绑定活动守住数据边界",
+      "status": "PASS"
+    },
+    {
+      "id": "V10",
+      "name": "窗端点、加10、多候选及去重归属",
+      "status": "PASS"
+    },
+    {
+      "id": "V11",
+      "name": "远程财私与个贷的边界和时间范围",
+      "status": "PASS"
+    },
+    {
+      "id": "V12",
+      "name": "短信、推送、企微、AI外呼、经理渠道事件",
+      "status": "PASS"
+    },
+    {
+      "id": "V13",
+      "name": "乙行差异口径被保留",
+      "status": "PASS"
+    },
+    {
+      "id": "V14",
+      "name": "原规则复算一致、差异和频次耗尽",
+      "status": "PASS"
+    },
+    {
+      "id": "V15",
+      "name": "七段报告、阈值、口径、版本与取数清单",
+      "status": "PASS"
+    },
+    {
+      "id": "V16",
+      "name": "快照更正保留原值",
+      "status": "PASS"
+    },
+    {
+      "id": "V17",
+      "name": "输入校验拦截重复、负人数、错误列及孤立长表",
+      "status": "PASS"
+    },
+    {
+      "id": "V18",
+      "name": "比较参照均值、同比和目标的口径",
+      "status": "PASS"
+    },
+    {
+      "id": "R01",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R02",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R03",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R04",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R05",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R06",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R07",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R08",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R09",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R10",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R11",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R12",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R13",
+      "name": "问法：数值",
+      "status": "PASS"
+    },
+    {
+      "id": "R14",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R15",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R16",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R17",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R18",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R19",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R20",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R21",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R22",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R23",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R24",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R25",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R26",
+      "name": "问法：异常",
+      "status": "PASS"
+    },
+    {
+      "id": "R27",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R28",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R29",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R30",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R31",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R32",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R33",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R34",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R35",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R36",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R37",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R38",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R39",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R40",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R41",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R42",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R43",
+      "name": "问法：归因",
+      "status": "PASS"
+    },
+    {
+      "id": "R44",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R45",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R46",
+      "name": "问法：组合",
+      "status": "PASS"
+    },
+    {
+      "id": "R47",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R48",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R49",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R50",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R51",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R52",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R53",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R54",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R55",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "R56",
+      "name": "问法：报告",
+      "status": "PASS"
+    },
+    {
+      "id": "Q01",
+      "name": "问法：口径",
+      "status": "PASS"
+    },
+    {
+      "id": "Q02",
+      "name": "问法：口径",
+      "status": "PASS"
+    },
+    {
+      "id": "Q03",
+      "name": "问法：澄清",
+      "status": "PASS"
+    },
+    {
+      "id": "Q04",
+      "name": "问法：澄清",
+      "status": "PASS"
+    },
+    {
+      "id": "V19",
+      "name": "单文件内嵌数据与独立 JSON 一致",
+      "status": "PASS"
+    }
+  ]
+}

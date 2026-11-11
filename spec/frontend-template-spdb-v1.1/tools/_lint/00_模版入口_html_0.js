@@ -1,0 +1,39 @@
+
+var FILES = [["README_设计与使用说明.md", 13014, "1eff7b24d6f6df89cfca35f781241d2f93286944b300527730e4d792c0da8b0e"], ["checklist_交付前自检.md", 4024, "b1c2ca4a8257a46a00b0c45e82a69d947f7d5318e45a64a696b6560a972214a5"], ["css/tokens.css", 3199, "a4e27cc208ccc428d63c0c287822c77bd91162181b3d33f90ebf9474d47b6c34"], ["css/youxia-ui.css", 104677, "7ab1eadff01dc5f8240c6b0084a3dbda4fa484333f91b84a3e6b42994d64c0b6"], ["gallery_组件图鉴.html", 24323, "4320e095e40121ba268d287a5b47f98c99b6db1518f590878246747553a1127c"], ["js/youxia-charts.js", 10260, "6d831e1415154721c8a0373865c5ea5564789aca3a11716fac3f2ecc481546cf"], ["js/youxia-shell.js", 7438, "c3cdc9761e4a407ce8869467168cf405184352be38999f8482826f5677696998"], ["template_blank.html", 14103, "aca591120b952542564bf0391c92a7083871fc4b844756c14bea2ca45a1820a7"], ["template_blank_singlefile.html", 139725, "4b966e044d3305a100aff6552d57f1063a4d204c9bb72a5774bcbe296be1dd28"], ["tools/class_contract.json", 2617, "32bc20cbb234be391798d3221ad9d55f65682551ae0181eb38cb4ebc5c24145d"], ["tools/extract_report.json", 2087, "35e627688d7a38a65771cb192c9f1603e1826310a5fafebe51d43aa9b3be9e04"]];
+var MASTER_SHA = "f1b54b203443db54388466b859b87ab9953643b0470455e9935bc59023a43f4d";
+function viewIdx(){
+  var rows = FILES.map(function(f){
+    return '<tr><td class="mono wrap">'+esc(f[0])+'</td><td class="r num">'+nf(f[1])+'</td>'
+      + '<td class="mono">'+f[2].slice(0,32)+'</td><td id="st-'+f[0].replace(/[^\w]/g,"_")+'"><span class="pill gray">未校验</span></td></tr>';
+  }).join("");
+  return '<div class="screen v2scroll"><div class="pg cols">'
+    + '<div class="banner info"><span class="ic">i</span><div><b>这套模板是从原型母版机械提取的，不是手写复刻。</b>'
+      + '样式层序 L1 基座 → L2 壳层 → L3 浦发浅色 → L4 工作台组件；提取时剔除 20 条项目专用规则，'
+      + '清单见 <span class="mono">tools/extract_report.json</span>。模板内<b>不含</b>业务页面、演示数据与故事步骤。</div></div>'
+    + '<div class="kpirow">'+kpi("文件数", nf(FILES.length), "不含 _shots 与临时件")+kpi("总体积", nf(sumBy(FILES,function(x){return x[1];})/1024,1)+" KB", "单文件版占 139 KB")+kpi("组件族", "11", "图鉴内 11 组")+kpi("浏览器断言", "76", "0 FAIL（交付时）","ok")+'</div>'
+    + '<section class="card"><div class="card-h"><span class="t">交付物</span><span class="meta">SHA256 前 32 位</span></div>'
+      + '<div class="card-b flush scroll"><table class="tbl"><thead><tr><th>文件</th><th class="r">字节</th><th>SHA256</th><th>校验</th></tr></thead>'
+      + '<tbody>'+rows+'</tbody></table></div>'
+      + '<div class="card-f"><span class="tiny">比对不一致 = 你手上的文件被改过或复制不全，请重新取包</span>'
+      + '<span class="note">母版 <span class="mono">'+MASTER_SHA.slice(0,16)+'…</span></span></div></section>'
+    + '</div></div>';
+}
+YX.init({start:"idx", views:{idx:{title:"文件清单与完整性校验", sub:"交付时哈希已写入页面，可离线核对", group:"idx", segs:[], fn:viewIdx}}});
+document.getElementById("recheck").addEventListener("click", async function(){
+  var bad = 0, n = 0;
+  for (var i = 0; i < FILES.length; i++) {
+    var f = FILES[i], cell = document.getElementById("st-" + f[0].replace(/[^\w]/g, "_"));
+    try {
+      var r = await fetch(encodeURI(f[0]));
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var buf = await r.arrayBuffer();
+      var d = await crypto.subtle.digest("SHA-256", buf);
+      var hex = Array.prototype.map.call(new Uint8Array(d), function(x){ return ("0" + x.toString(16)).slice(-2); }).join("");
+      n++;
+      if (hex === f[2]) { cell.innerHTML = '<span class="pill ok">一致</span>'; }
+      else { cell.innerHTML = '<span class="pill danger">不一致</span>'; bad++; }
+    } catch (e) { cell.innerHTML = '<span class="pill warn">取不到</span>'; bad++; }
+  }
+  say(bad ? ("校验完成：" + n + " 个文件已比对，<b>" + bad + " 个不一致</b>（见表格右侧）")
+           : ("校验完成：" + n + " 个文件哈希全部一致，与你手上的包是同一版本"), bad ? "danger" : "ok", 6000);
+});

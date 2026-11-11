@@ -1,0 +1,5631 @@
+[
+  {
+    "id": "R01",
+    "question": "查10月东岚分行远程渠道有效触达率",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "effectiveRate": "0.15"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R02",
+    "question": "查询2026年9月东岚分行的AUM余额增量",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "aum": "817913900"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R03",
+    "question": "帮我查一下9月份各分行的下发成功率",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.890893975306895"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9007263837346325"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9278280542986426"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9390735146022156"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.8199534613147179"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R04",
+    "question": "统计9月东部组有效接触客户数，按分行展示",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": "东部组",
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effective"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 3,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "effective": "49753"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "effective": "113465"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "effective": "4458"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R05",
+    "question": "对比东岚和云川9月的存款增量、理财增量和基金增量",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit",
+        "wealth",
+        "fund"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [
+        "B01",
+        "B02"
+      ],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 2,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "441673400",
+            "wealth": "229015800",
+            "fund": "122686900"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "deposit": "920899700",
+            "wealth": "477503400",
+            "fund": "255805400"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R06",
+    "question": "展示9月各分行下发策略数、名单执行率和触达率",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "strategies",
+        "execution",
+        "reach"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "strategies": "2",
+            "execution": "0.3596706495280528",
+            "reach": "0.18993443963959672"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "strategies": "2",
+            "execution": "0.7507507917973312",
+            "reach": "0.40418178338924404"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "strategies": "2",
+            "execution": "0.7980980248719824",
+            "reach": "0.40530764854100626"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "strategies": "2",
+            "execution": "0.7183199285075961",
+            "reach": "0.3470241286863271"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "strategies": "2",
+            "execution": "0.6509400496630011",
+            "reach": "0.32075203973040084"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R07",
+    "question": "帮我拉一下9月澄海、临川、青屿的有效触达率数据",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [
+        "B03",
+        "B04",
+        "B05"
+      ],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 3,
+      "rows": [
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "effectiveRate": "0.1811753230919288"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "effectiveRate": "0.16536193029490617"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "effectiveRate": "0.16293011706278823"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R08",
+    "question": "统计9月客户经理渠道下发客户数超过50万的分行有哪些",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "manager"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "sent"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": {
+        "metric_id": "sent",
+        "operator": ">",
+        "value": "500000",
+        "unit": "PERSON"
+      },
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 2,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "sent": "552720"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "manager",
+          "current_values": {
+            "sent": "553440"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R09",
+    "question": "查询9月下发成功率低于85%的分行及对应数据",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": {
+        "metric_id": "successRate",
+        "operator": "<",
+        "value": "0.85",
+        "unit": "RATIO"
+      },
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.8199534613147179"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R10",
+    "question": "汇总9月各渠道的AUM增量，按贡献度从高到低排序",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": "channel",
+      "dimension": "channel",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": true,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 6,
+      "rows": [
+        {
+          "label": "客户经理",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "aum": "665255000"
+          }
+        },
+        {
+          "label": "远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "aum": "68610000"
+          }
+        },
+        {
+          "label": "手机银行推送",
+          "branch": "B01",
+          "channel": "push",
+          "current_values": {
+            "aum": "30749500"
+          }
+        },
+        {
+          "label": "短信",
+          "branch": "B01",
+          "channel": "sms",
+          "current_values": {
+            "aum": "27560400"
+          }
+        },
+        {
+          "label": "AI外呼",
+          "branch": "B01",
+          "channel": "ai",
+          "current_values": {
+            "aum": "25739000"
+          }
+        },
+        {
+          "label": "企业微信",
+          "branch": "B01",
+          "channel": "wechat",
+          "current_values": {
+            "aum": null
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R11",
+    "question": "对比东岚8月和9月的名单执行率变化",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "custom",
+          "period": "2026-08",
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R12",
+    "question": "展示各分行9月环比8月的存款增量波动情况",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "custom",
+          "period": "2026-08",
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "441673400"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "deposit": "920899700"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "deposit": "126829500"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "deposit": "144136700"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "deposit": "158733200"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R13",
+    "question": "查询东岚近两个月触达率的趋势变化",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "VALUE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "custom",
+          "period": "2026-09",
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "reach"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "reach": "0.39182715656069217"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R14",
+    "question": "10月东岚远程渠道触达率是否异常下降？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "reach"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "reach": "0.3"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R15",
+    "question": "9月东岚的名单执行率是否出现异常下降？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R16",
+    "question": "检测9月各分行下发成功率有无异常波动",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.890893975306895"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9007263837346325"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9278280542986426"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9390735146022156"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.8199534613147179"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R17",
+    "question": "帮我看看云川9月AUM增量是否存在异常",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B02"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "云川分行 · 全渠道",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "aum": "1705370100"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R18",
+    "question": "东岚9月存款增量环比8月下降38%，这个波动是否异常？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "custom",
+          "period": "2026-08",
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "38%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "441673400"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R19",
+    "question": "对比9月和8月，哪些分行的理财增量出现异常变化？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "custom",
+          "period": "2026-08",
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "wealth"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "wealth": "229015800"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "wealth": "477503400"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "wealth": "65763300"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "wealth": "74737500"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "wealth": "82305900"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R20",
+    "question": "检测各分行9月基金增量环比波动，标记异常点",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "fund"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "fund": "122686900"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "fund": "255805400"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "fund": "35230300"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "fund": "40037900"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "fund": "44092400"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R21",
+    "question": "9月东岚客户经理渠道执行率35%，是否属于异常偏低？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "manager"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "35%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 客户经理",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.35"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R22",
+    "question": "检测各分行手机银行渠道下发成功率，标记低于正常范围的异常值",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "push"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "push",
+          "current_values": {
+            "successRate": "0.94"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "push",
+          "current_values": {
+            "successRate": "0.9499092558983666"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "push",
+          "current_values": {
+            "successRate": "0.9599700149925038"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "push",
+          "current_values": {
+            "successRate": "0.879948914431673"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "push",
+          "current_values": {
+            "successRate": "0.8899888765294772"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R23",
+    "question": "AI外呼渠道的有效触达率在各分行间是否存在异常差异？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "ai"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "ai",
+          "current_values": {
+            "effectiveRate": "0.22342342342342342"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "ai",
+          "current_values": {
+            "effectiveRate": "0.18403247631935046"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "ai",
+          "current_values": {
+            "effectiveRate": "0.1510519690703111"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "ai",
+          "current_values": {
+            "effectiveRate": "0.17121144389807777"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "ai",
+          "current_values": {
+            "effectiveRate": null
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R24",
+    "question": "对东岚9月所有产能指标进行异常检测，列出异常项",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum",
+        "deposit",
+        "wealth",
+        "fund",
+        "loan",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "aum": "817913900",
+            "deposit": "441673400",
+            "wealth": "229015800",
+            "fund": "122686900",
+            "loan": "24537800",
+            "wealthSale": "679430400",
+            "nonCashWealthSale": "458100800",
+            "fundSale": "370598400",
+            "nonMoneyFundSale": "221329600",
+            "insuranceSale": "159563200"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R25",
+    "question": "扫描9月数据，标记触达率、有效触达率、名单执行率的异常分行",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution",
+        "effectiveRate",
+        "reach"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528",
+            "effectiveRate": "0.09878330136719758",
+            "reach": "0.18993443963959672"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7507507917973312",
+            "effectiveRate": "0.22155680438017206",
+            "reach": "0.40418178338924404"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7980980248719824",
+            "effectiveRate": "0.1811753230919288",
+            "reach": "0.40530764854100626"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7183199285075961",
+            "effectiveRate": "0.16536193029490617",
+            "reach": "0.3470241286863271"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.6509400496630011",
+            "effectiveRate": "0.16293011706278823",
+            "reach": "0.32075203973040084"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R26",
+    "question": "帮我检查9月各分行漏斗转化率，找出存在异常断点的环节",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ANOMALY",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate",
+        "execution",
+        "contactConv",
+        "validConv"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.890893975306895",
+            "execution": "0.3596706495280528",
+            "contactConv": "0.5280787851019315",
+            "validConv": "0.5200915724111977"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9007263837346325",
+            "execution": "0.7507507917973312",
+            "contactConv": "0.5383701060396017",
+            "validConv": "0.548161281595424"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9278280542986426",
+            "execution": "0.7980980248719824",
+            "contactConv": "0.5078419390976678",
+            "validConv": "0.4470069186804372"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.9390735146022156",
+            "execution": "0.7183199285075961",
+            "contactConv": "0.4831052500622045",
+            "validConv": "0.4765142150803461"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.8199534613147179",
+            "execution": "0.6509400496630011",
+            "contactConv": "0.49275204359673025",
+            "validConv": "0.5079628400796284"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R27",
+    "question": "解释10月东岚远程渠道有效触达客户数下降的原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effective"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "effective": "1728"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R28",
+    "question": "东岚9月名单执行率从96%降至81%，帮我做归因分析",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "96%",
+        "81%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R29",
+    "question": "东岚存款增量环比下降38%，主要是什么原因导致的？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "38%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "618353900"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R30",
+    "question": "分析东岚AUM增量低于同组均值16亿的核心影响因素",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "16亿"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "aum": "1145100100"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R31",
+    "question": "东岚有效触达率高于均值，帮我分析下原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "effectiveRate": "0.2073728869532109"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R32",
+    "question": "东岚与云川的理财增量差距主要是哪些原因导致的",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "branch",
+          "period": null,
+          "branch_id": "B02"
+        }
+      },
+      "metric_ids": [
+        "wealth"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "wealth": "320627800"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R33",
+    "question": "东岚理财增量低于同组均值，是哪个客层拖累的？做归因分析",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "wealth"
+      ],
+      "group_by": null,
+      "dimension": "segment",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "wealth": "320627800"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R34",
+    "question": "对比东岚和同组均值，从渠道维度归因AUM增量差距",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": null,
+      "dimension": "channel",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "aum": "1145100100"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R35",
+    "question": "东岚存款增量落后同组均值10.42亿，按存款类型拆解归因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": null,
+      "dimension": "deposit_type",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [
+        "10.42亿"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "618353900"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R36",
+    "question": "分析东岚已接触客户中，哪些客群对触达率提升贡献最大？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "reach"
+      ],
+      "group_by": null,
+      "dimension": "segment",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": true,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "reach": "0.39182715656069217"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R37",
+    "question": "归因东岚有效接触客户数低于均值的原因，按客户类型拆解",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effective"
+      ],
+      "group_by": null,
+      "dimension": "segment",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "effective": "106751"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R38",
+    "question": "查询东岚9月存款增量，并分析为什么低于同组均值",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "441673400"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R39",
+    "question": "帮我查9月各分行名单执行率，同时归因东岚排名靠后的原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": true,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7980980248719824"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7507507917973312"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.7183199285075961"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.6509400496630011"
+          }
+        },
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R40",
+    "question": "统计9月客户经理渠道的AUM增量，并分析东岚贡献度偏低的原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "manager"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "aum": "665255000"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "manager",
+          "current_values": {
+            "aum": "1538705000"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "manager",
+          "current_values": {
+            "aum": "34848800"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "manager",
+          "current_values": {
+            "aum": "43006800"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "manager",
+          "current_values": {
+            "aum": "44095600"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R41",
+    "question": "东岚9月名单执行率异常下降，帮我分析原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "execution": "0.3596706495280528"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R42",
+    "question": "检测到东岚存款增量环比大幅下滑，做归因分析",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "618353900"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R43",
+    "question": "东岚客户经理渠道执行率异常偏低，帮我拆解归因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "ATTRIBUTION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "manager"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "down",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 客户经理",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.7299987940183309"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R44",
+    "question": "帮我看看东岚9月下发成功率86%是否异常，如果异常帮我归因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "successRate"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [
+        "86%"
+      ],
+      "conditional_attribution": true,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "successRate": "0.890893975306895"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R45",
+    "question": "判断东岚有效触达率7%在组内是否属于异常值，并分析原因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [
+        "7%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "effectiveRate": "0.2073728869532109"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R46",
+    "question": "东岚触达率32%高于同组均值，这个偏离是否异常？做归因分析",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "COMPOSITE",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "peer",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "reach"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": "B01",
+      "claims": [
+        "32%"
+      ],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "reach": "0.39182715656069217"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "R47",
+    "question": "生成东岚分行10月远程渠道复盘报告",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "cover": "0.7314285714285714",
+            "successRate": "0.96",
+            "execution": "0.75",
+            "reach": "0.3",
+            "effectiveRate": "0.15",
+            "effective": "1728",
+            "contactConv": "0.4",
+            "validConv": "0.5",
+            "aum": "-407400000",
+            "deposit": "-219996000",
+            "wealthSale": "22809600",
+            "nonCashWealthSale": "15379200",
+            "fundSale": "12441600",
+            "nonMoneyFundSale": "7430400",
+            "insuranceSale": "5356800"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R48",
+    "question": "生成东岚分行2026年9月策略复盘报告",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "cover": "0.7117080580775074",
+            "successRate": "0.890893975306895",
+            "execution": "0.3596706495280528",
+            "reach": "0.18993443963959672",
+            "effectiveRate": "0.09878330136719758",
+            "effective": "49753",
+            "contactConv": "0.5280787851019315",
+            "validConv": "0.5200915724111977",
+            "aum": "817913900",
+            "deposit": "441673400",
+            "wealthSale": "679430400",
+            "nonCashWealthSale": "458100800",
+            "fundSale": "370598400",
+            "nonMoneyFundSale": "221329600",
+            "insuranceSale": "159563200"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R49",
+    "question": "帮我复盘本年度东岚分行的策略执行情况",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08",
+          "2026-09",
+          "2026-10"
+        ],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "yoy",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "cover": "0.7333013673491996",
+            "successRate": "0.9181786094973211",
+            "execution": "0.6507316054958058",
+            "reach": "0.32170133643320026",
+            "effectiveRate": "0.15642103757896703",
+            "effective": "813828",
+            "contactConv": "0.49436869781065795",
+            "validConv": "0.48623061163890163",
+            "aum": "11795782500",
+            "deposit": "6369719700",
+            "wealthSale": "10841701200",
+            "nonCashWealthSale": "7309934900",
+            "fundSale": "5913655200",
+            "nonMoneyFundSale": "3531766300",
+            "insuranceSale": "2546157100"
+          }
+        }
+      ],
+      "legacy_report_state": "PARTIAL_DRAFT"
+    }
+  },
+  {
+    "id": "R50",
+    "question": "输出东岚分行9月产能诊断报告",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "aum",
+        "deposit",
+        "wealth",
+        "fund",
+        "loan",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "OUTCOME_DIAGNOSIS"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "aum": "817913900",
+            "deposit": "441673400",
+            "wealth": "229015800",
+            "fund": "122686900",
+            "loan": "24537800",
+            "wealthSale": "679430400",
+            "nonCashWealthSale": "458100800",
+            "fundSale": "370598400",
+            "nonMoneyFundSale": "221329600",
+            "insuranceSale": "159563200"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R51",
+    "question": "帮我复盘下策略：S-101",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [
+          "S-101"
+        ],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程 · 预约回拨",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "cover": "0.7353191489361702",
+            "successRate": "0.96",
+            "execution": "0.75",
+            "reach": "0.3",
+            "effectiveRate": "0.15",
+            "effective": "1296",
+            "contactConv": "0.4",
+            "validConv": "0.5",
+            "aum": "-271600000",
+            "deposit": "-146664000",
+            "wealthSale": "17107200",
+            "nonCashWealthSale": "11534400",
+            "fundSale": "9331200",
+            "nonMoneyFundSale": "5572800",
+            "insuranceSale": "4017600"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R52",
+    "question": "复盘下上月针对大众客群的策略情况",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": "大众",
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": "segment",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 全渠道 · 大众（部署客群）",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "cover": "0.7384615384615385",
+            "successRate": "0.96",
+            "execution": "0.8",
+            "reach": "0.4",
+            "effectiveRate": "0.2",
+            "effective": "960",
+            "contactConv": "0.5",
+            "validConv": "0.5",
+            "aum": "57459500",
+            "deposit": "31028100",
+            "wealthSale": "22690800",
+            "nonCashWealthSale": "15299100",
+            "fundSale": "12376800",
+            "nonMoneyFundSale": "7391700",
+            "insuranceSale": "5328900"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R53",
+    "question": "复盘上2026年9月远程渠道策略整体的执行情况",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "cover",
+        "successRate",
+        "execution",
+        "reach",
+        "effectiveRate",
+        "effective",
+        "contactConv",
+        "validConv",
+        "aum",
+        "deposit",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "REVIEW"
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "全行 · 远程",
+          "branch": "all",
+          "channel": "remote",
+          "current_values": {
+            "cover": "0.6610434859310224",
+            "successRate": "0.9007512019230769",
+            "execution": "0.7938419454915435",
+            "reach": "0.41698635620642494",
+            "effectiveRate": "0.19915268372418854",
+            "effective": "5970",
+            "contactConv": "0.5252762953313442",
+            "validConv": "0.4776",
+            "aum": "404490000",
+            "deposit": "218424100",
+            "wealthSale": "78804000",
+            "nonCashWealthSale": "53133000",
+            "fundSale": "42984000",
+            "nonMoneyFundSale": "25671000",
+            "insuranceSale": "18507000"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R54",
+    "question": "生成9月客户经理渠道专项分析报告，对比各分行执行效率",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "manager"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution",
+        "reach",
+        "effectiveRate",
+        "aum"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "TOPIC"
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.35",
+            "reach": "0.18549967474386078",
+            "effectiveRate": "0.09645877378435518",
+            "aum": "665255000"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.75",
+            "reach": "0.40499823327230094",
+            "effectiveRate": "0.22274822524172047",
+            "aum": "1538705000"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.7798165137614679",
+            "reach": "0.4287993617869964",
+            "effectiveRate": "0.18428400478659754",
+            "aum": "34848800"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.8099637083470802",
+            "reach": "0.453480699439129",
+            "effectiveRate": "0.20851204223028702",
+            "aum": "43006800"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "manager",
+          "current_values": {
+            "execution": "0.6199713785975512",
+            "reach": "0.35331531245031006",
+            "effectiveRate": "0.17300047702337415",
+            "aum": "44095600"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R55",
+    "question": "帮我写一份9月存款增量专题报告，分析各分行存款变化趋势及归因",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "deposit"
+      ],
+      "group_by": "branch",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "TOPIC"
+    },
+    "expected": {
+      "row_count": 5,
+      "rows": [
+        {
+          "label": "东岚分行",
+          "branch": "B01",
+          "channel": "all",
+          "current_values": {
+            "deposit": "441673400"
+          }
+        },
+        {
+          "label": "云川分行",
+          "branch": "B02",
+          "channel": "all",
+          "current_values": {
+            "deposit": "920899700"
+          }
+        },
+        {
+          "label": "澄海分行",
+          "branch": "B03",
+          "channel": "all",
+          "current_values": {
+            "deposit": "126829500"
+          }
+        },
+        {
+          "label": "临川分行",
+          "branch": "B04",
+          "channel": "all",
+          "current_values": {
+            "deposit": "144136700"
+          }
+        },
+        {
+          "label": "青屿分行",
+          "branch": "B05",
+          "channel": "all",
+          "current_values": {
+            "deposit": "158733200"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "R56",
+    "question": "输出9月AI外呼与远程渠道效能对比报告，评估渠道策略优化方向",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "REPORT",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-09",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote",
+          "ai"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "execution",
+        "reach",
+        "effectiveRate",
+        "aum"
+      ],
+      "group_by": "channel",
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": "TOPIC"
+    },
+    "expected": {
+      "row_count": 2,
+      "rows": [
+        {
+          "label": "远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "execution": "0.8",
+            "reach": "0.4",
+            "effectiveRate": "0.2",
+            "aum": "68610000"
+          }
+        },
+        {
+          "label": "AI外呼",
+          "branch": "B01",
+          "channel": "ai",
+          "current_values": {
+            "execution": "0.7299813780260708",
+            "reach": "0.40130353817504655",
+            "effectiveRate": "0.21260086902545003",
+            "aum": "25739000"
+          }
+        }
+      ],
+      "legacy_report_state": "DRAFT_READY"
+    }
+  },
+  {
+    "id": "Q01",
+    "question": "不同渠道的有效触达客户数统计口径是什么？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "DEFINITION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effective"
+      ],
+      "group_by": null,
+      "dimension": "channel",
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "effective": "1728"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "Q02",
+    "question": "有效触达率的分母是什么？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "READY",
+    "plan": {
+      "intent": "DEFINITION",
+      "scope": {
+        "snapshot_id": "A-001",
+        "period": "2026-10",
+        "periods": [],
+        "cutoff": null,
+        "branch_ids": [
+          "B01"
+        ],
+        "group": null,
+        "subbranch": null,
+        "channel_ids": [
+          "remote"
+        ],
+        "origin": "ALL",
+        "strategy_ids": [],
+        "segment": null,
+        "segment_basis": "DEPLOYMENT",
+        "activity_id": null,
+        "baseline": {
+          "kind": "previous",
+          "period": null,
+          "branch_id": null
+        }
+      },
+      "metric_ids": [
+        "effectiveRate"
+      ],
+      "group_by": null,
+      "dimension": null,
+      "condition": null,
+      "direction": "both",
+      "branch_subset": [],
+      "focus_branch_id": null,
+      "claims": [],
+      "conditional_attribution": false,
+      "sort_desc": false,
+      "report_type": null
+    },
+    "expected": {
+      "row_count": 1,
+      "rows": [
+        {
+          "label": "东岚分行 · 远程",
+          "branch": "B01",
+          "channel": "remote",
+          "current_values": {
+            "effectiveRate": "0.15"
+          }
+        }
+      ],
+      "legacy_report_state": null
+    }
+  },
+  {
+    "id": "Q03",
+    "question": "上个月触达怎样？",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "CLARIFY",
+    "plan": null,
+    "expected": {
+      "issue_text": "请确认要看的指标，例如已接触客户数、触达率、有效触达客户数或有效触达率。"
+    }
+  },
+  {
+    "id": "Q04",
+    "question": "帮我复盘下策略：XXX",
+    "context": {
+      "snapshot_id": "A-001",
+      "period": "2026-10",
+      "periods": [],
+      "cutoff": null,
+      "branch_ids": [
+        "B01"
+      ],
+      "group": null,
+      "subbranch": null,
+      "channel_ids": [
+        "remote"
+      ],
+      "origin": "ALL",
+      "strategy_ids": [],
+      "segment": null,
+      "segment_basis": "DEPLOYMENT",
+      "activity_id": null,
+      "baseline": {
+        "kind": "previous",
+        "period": null,
+        "branch_id": null
+      }
+    },
+    "state": "CLARIFY",
+    "plan": null,
+    "expected": {
+      "issue_text": "请填写策略编号或名称，例如 S-101 预约回拨。"
+    }
+  }
+]
