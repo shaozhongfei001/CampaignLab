@@ -1,0 +1,1215 @@
+{
+ "schema": "1.0",
+ "phase": "M0",
+ "wave": 0,
+ "updated_at": "2026-11-12T02:38:50+08:00",
+ "budget": {
+  "phase_quota": 100,
+  "phase_used": 0,
+  "flash_share_tasks": 0.0,
+  "flash_share_tokens": 0.0
+ },
+ "tasks": {
+  "M0-01": {
+   "status": "TODO",
+   "lane": "T",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "uv sync --locked 成功",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "npm ci 成功",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "doctor 记录 CPython patch/sqlite_version/Node/浏览器",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "锁文件入库",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [],
+   "deps": [],
+   "scope": [
+    "pyproject.toml",
+    "uv.lock",
+    ".python-version",
+    "web/package.json",
+    "web/package-lock.json",
+    "scripts/",
+    "evidence/M0/env.md",
+    "contracts/PROVENANCE.md"
+   ],
+   "blockers": []
+  },
+  "M0-02": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-001",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-034",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-035",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "alembic 首迁与 sqlite-v1.sql 结构比对通过",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "契约测试 202/Problem/ETag/幂等",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-001",
+    "AC-034",
+    "AC-035"
+   ],
+   "deps": [
+    "M0-01"
+   ],
+   "scope": [
+    "src/campaignlab/api/session.py",
+    "src/campaignlab/api/workspaces.py",
+    "src/campaignlab/api/common.py",
+    "src/campaignlab/application/",
+    "src/campaignlab/infra/db/",
+    "migrations/",
+    "tests/api/session/",
+    "tests/integration/bootstrap/"
+   ],
+   "blockers": []
+  },
+  "M0-03": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-001 页面侧",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-034",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "vue-tsc 通过",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "vitest 通过",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "1440x900 与 1024x768 截图",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "公共组件冻结清单",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-001",
+    "AC-034"
+   ],
+   "deps": [
+    "M0-01"
+   ],
+   "scope": [
+    "web/src/router/",
+    "web/src/styles/",
+    "web/src/components/",
+    "web/src/composables/",
+    "web/src/api/",
+    "web/src/pages/workspace/",
+    "web/tests/unit/shell/",
+    "evidence/M0/ui/"
+   ],
+   "blockers": []
+  },
+  "M0-03b": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "flash",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "vitest 覆盖六态",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "截图归档",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [],
+   "deps": [
+    "M0-03"
+   ],
+   "scope": [
+    "web/src/components/state/",
+    "web/tests/unit/state/"
+   ],
+   "blockers": []
+  },
+  "M0-04": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-029 负例（含 worker 中断后续租与恢复）",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-031",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-029",
+    "AC-031"
+   ],
+   "deps": [
+    "M0-02"
+   ],
+   "scope": [
+    "src/campaignlab/worker/",
+    "src/campaignlab/api/jobs.py",
+    "src/campaignlab/infra/artifacts.py",
+    "tests/integration/jobs/"
+   ],
+   "blockers": []
+  },
+  "M1-01": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-005",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-006",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "A/B 各 510 切片、B 长表 4590 阶段项",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "大于 8MiB 拒绝",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "负例返回具体行列",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-005",
+    "AC-006"
+   ],
+   "deps": [
+    "M0-04"
+   ],
+   "scope": [
+    "src/campaignlab/domain/ingest/",
+    "src/campaignlab/api/imports.py",
+    "src/campaignlab/infra/files.py",
+    "tests/domain/ingest/",
+    "tests/golden/ingest/"
+   ],
+   "blockers": []
+  },
+  "M1-02": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-007",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-008",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-020",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "A-001-R1 为 -394900000 分且原 A-001 仍为 -407400000 分",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-007",
+    "AC-008",
+    "AC-020"
+   ],
+   "deps": [
+    "M1-01"
+   ],
+   "scope": [
+    "src/campaignlab/domain/snapshot/",
+    "src/campaignlab/api/snapshots.py",
+    "src/campaignlab/api/definitions.py",
+    "tests/domain/snapshot/",
+    "tests/golden/snapshot/"
+   ],
+   "blockers": []
+  },
+  "M1-03": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-009",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-010",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-011",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "远程财私 59/60 与个贷 9/10 两侧正确",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "推送 B 2/3 秒两侧正确",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-009",
+    "AC-010",
+    "AC-011"
+   ],
+   "deps": [
+    "M1-02"
+   ],
+   "scope": [
+    "src/campaignlab/domain/caliber/",
+    "src/campaignlab/api/channels.py",
+    "src/campaignlab/api/compare.py",
+    "tests/domain/caliber/",
+    "tests/golden/caliber/"
+   ],
+   "blockers": []
+  },
+  "M1-04": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "mixed",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-005 至 AC-011 页面侧",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-020",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "vitest 与 Playwright 走查",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "截图归档",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-005",
+    "AC-011",
+    "AC-020"
+   ],
+   "deps": [
+    "M0-03",
+    "M1-01",
+    "M1-02",
+    "M1-03"
+   ],
+   "scope": [
+    "web/src/pages/data/",
+    "web/src/features/import/",
+    "web/src/features/scope/",
+    "web/tests/unit/data/",
+    "web/tests/e2e/data/"
+   ],
+   "blockers": []
+  },
+  "M2-01": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-002",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-003",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-004",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "确认版不可变、变更走草稿",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "旧 ETag 拒绝(412)",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-002",
+    "AC-003",
+    "AC-004"
+   ],
+   "deps": [
+    "M0-02"
+   ],
+   "scope": [
+    "src/campaignlab/domain/activity/",
+    "src/campaignlab/api/activities.py",
+    "src/campaignlab/api/rules.py",
+    "tests/domain/activity/",
+    "tests/api/activities/"
+   ],
+   "blockers": []
+  },
+  "M2-02": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-012",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-013",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-014",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-015",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "golden-cases.json 双版本 100% 一致",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "反例覆盖正负一分与端点",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-012",
+    "AC-013",
+    "AC-014",
+    "AC-015"
+   ],
+   "deps": [
+    "M2-01",
+    "M0-04"
+   ],
+   "scope": [
+    "src/campaignlab/domain/rules/",
+    "src/campaignlab/domain/replay/",
+    "tests/domain/rules/",
+    "tests/golden/rules/"
+   ],
+   "blockers": []
+  },
+  "M2-03": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-016",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-017",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "五种预发状态逐一对齐 preflight-vectors.json",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-016",
+    "AC-017"
+   ],
+   "deps": [
+    "M2-02"
+   ],
+   "scope": [
+    "src/campaignlab/domain/preflight/",
+    "src/campaignlab/api/preflight.py",
+    "tests/domain/preflight/",
+    "tests/integration/preflight/"
+   ],
+   "blockers": []
+  },
+  "M2-04": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "mixed",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-002 至 AC-004、AC-012 至 AC-017 页面侧",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "Playwright 赠券闭环录像与截图",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-002",
+    "AC-004",
+    "AC-012",
+    "AC-017"
+   ],
+   "deps": [
+    "M0-03",
+    "M2-01",
+    "M2-02",
+    "M2-03"
+   ],
+   "scope": [
+    "web/src/pages/rules/",
+    "web/src/pages/cases/",
+    "web/src/features/diff/",
+    "web/tests/unit/rules/",
+    "web/tests/e2e/coupon/"
+   ],
+   "blockers": []
+  },
+  "M3-01": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-018",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-019",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-020",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-033",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "analytics-golden.json 全量对齐",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-018",
+    "AC-019",
+    "AC-020",
+    "AC-033"
+   ],
+   "deps": [
+    "M1-02"
+   ],
+   "scope": [
+    "src/campaignlab/domain/analytics/",
+    "src/campaignlab/infra/duckdb/",
+    "src/campaignlab/api/reviews.py",
+    "tests/domain/analytics/",
+    "tests/golden/analytics/"
+   ],
+   "blockers": []
+  },
+  "M3-02": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-021",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-022",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-024",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "正负贡献分解与黄金值一致",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-021",
+    "AC-022",
+    "AC-024"
+   ],
+   "deps": [
+    "M3-01"
+   ],
+   "scope": [
+    "src/campaignlab/domain/diagnosis/",
+    "src/campaignlab/api/diagnosis.py",
+    "src/campaignlab/api/estimate.py",
+    "tests/domain/diagnosis/",
+    "tests/golden/diagnosis/"
+   ],
+   "blockers": []
+  },
+  "M3-03": {
+   "status": "TODO",
+   "lane": "D",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-023",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "60 条问法计划全部可重复执行",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "歧义问法返回待澄清",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-023"
+   ],
+   "deps": [
+    "M3-01",
+    "M3-02"
+   ],
+   "scope": [
+    "src/campaignlab/domain/ask/",
+    "src/campaignlab/api/ask.py",
+    "tests/domain/ask/",
+    "tests/golden/ask/"
+   ],
+   "blockers": []
+  },
+  "M3-04": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "mixed",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-018 至 AC-024、AC-033 页面侧",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "漏斗与趋势图等义表格可切换",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "截图归档",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-018",
+    "AC-024",
+    "AC-033"
+   ],
+   "deps": [
+    "M0-03",
+    "M3-01",
+    "M3-02",
+    "M3-03"
+   ],
+   "scope": [
+    "web/src/pages/review/",
+    "web/src/features/charts/",
+    "web/tests/unit/review/",
+    "web/tests/e2e/review/"
+   ],
+   "blockers": []
+  },
+  "M4-01": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-025",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-026",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "历史签认与后续记录可同时查询",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-025",
+    "AC-026"
+   ],
+   "deps": [
+    "M3-03"
+   ],
+   "scope": [
+    "src/campaignlab/domain/report/",
+    "src/campaignlab/api/reports.py",
+    "tests/domain/report/",
+    "tests/integration/report/"
+   ],
+   "blockers": []
+  },
+  "M4-02": {
+   "status": "TODO",
+   "lane": "S",
+   "tier_planned": "mixed",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-027",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-028",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-030",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "导出制品原子且可校验",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-027",
+    "AC-028",
+    "AC-030"
+   ],
+   "deps": [
+    "M2-03",
+    "M4-01"
+   ],
+   "scope": [
+    "src/campaignlab/domain/action/",
+    "src/campaignlab/infra/audit/",
+    "src/campaignlab/api/actions.py",
+    "src/campaignlab/api/evidence.py",
+    "tests/domain/action/",
+    "tests/integration/audit/"
+   ],
+   "blockers": []
+  },
+  "M4-03": {
+   "status": "TODO",
+   "lane": "F",
+   "tier_planned": "mixed",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-025 至 AC-028、AC-030 页面侧",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "回拨闭环 Playwright 证据",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-025",
+    "AC-028",
+    "AC-030"
+   ],
+   "deps": [
+    "M0-03",
+    "M0-04",
+    "M4-01",
+    "M4-02"
+   ],
+   "scope": [
+    "web/src/pages/report/",
+    "web/src/pages/evidence/",
+    "web/tests/unit/report/",
+    "web/tests/e2e/callback/"
+   ],
+   "blockers": []
+  },
+  "M5-01": {
+   "status": "TODO",
+   "lane": "T",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "AC-029",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-031",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-032",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "AC-035",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "backup/restore 演练成功",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "断网后数据图表静态资源与会话仍工作",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "性能量测记录",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [
+    "AC-029",
+    "AC-031",
+    "AC-032",
+    "AC-035"
+   ],
+   "deps": [
+    "M4-03"
+   ],
+   "scope": [
+    "scripts/",
+    "tests/perf/",
+    "tests/recovery/",
+    "evidence/M5/"
+   ],
+   "blockers": []
+  },
+  "M5-02": {
+   "status": "TODO",
+   "lane": "Q",
+   "tier_planned": "max",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "35 条 AC 逐条结论",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "缺陷单齐备",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "独立环境与开发环境隔离",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [],
+   "deps": [
+    "M5-01"
+   ],
+   "scope": [
+    "qa-reports/",
+    "evidence/M5-qa/",
+    "orchestrator/defects/"
+   ],
+   "blockers": []
+  },
+  "M5-03": {
+   "status": "TODO",
+   "lane": "O",
+   "tier_planned": "human",
+   "tier_used": "",
+   "attempt": 0,
+   "tokens": 0,
+   "commit": "",
+   "branch": "m0-framework",
+   "gates": [
+    {
+     "id": "交付回执签署",
+     "rc": null,
+     "evidence": ""
+    },
+    {
+     "id": "待补事项与责任明确",
+     "rc": null,
+     "evidence": ""
+    }
+   ],
+   "acs": [],
+   "deps": [
+    "M5-02"
+   ],
+   "scope": [
+    "docs/delivery/HANDOVER.md"
+   ],
+   "blockers": []
+  }
+ },
+ "waves": [
+  {
+   "wave": 0,
+   "mode": "serial",
+   "tasks": [
+    "M0-01"
+   ]
+  },
+  {
+   "wave": 1,
+   "mode": "parallel",
+   "tasks": [
+    "M0-02",
+    "M0-03"
+   ]
+  },
+  {
+   "wave": 2,
+   "mode": "parallel",
+   "tasks": [
+    "M0-04",
+    "M0-03b"
+   ]
+  },
+  {
+   "wave": 3,
+   "mode": "parallel-lanes",
+   "lanes": {
+    "L1": [
+     "M1-01",
+     "M1-02",
+     "M1-03"
+    ],
+    "L2": [
+     "M2-01",
+     "M2-02",
+     "M2-03"
+    ]
+   },
+   "note": "lane 内串行，两 lane 之间并行；跨 lane 写权限已确认不相交"
+  },
+  {
+   "wave": 4,
+   "mode": "parallel",
+   "tasks": [
+    "M1-04",
+    "M2-04"
+   ],
+   "constraint": "按 web/src/pages/<domain> 切分，公共组件已冻结"
+  },
+  {
+   "wave": 5,
+   "mode": "serial",
+   "tasks": [
+    "M3-01",
+    "M3-02",
+    "M3-03"
+   ]
+  },
+  {
+   "wave": 6,
+   "mode": "parallel",
+   "tasks": [
+    "M3-04",
+    "M4-01"
+   ]
+  },
+  {
+   "wave": 7,
+   "mode": "serial",
+   "tasks": [
+    "M4-02",
+    "M4-03"
+   ]
+  },
+  {
+   "wave": 8,
+   "mode": "serial",
+   "tasks": [
+    "M5-01",
+    "M5-02",
+    "M5-03"
+   ]
+  }
+ ],
+ "critical_path": [
+  "M0-01",
+  "M0-02",
+  "M0-04",
+  "M1-01",
+  "M1-02",
+  "M3-01",
+  "M3-02",
+  "M3-03",
+  "M4-01",
+  "M4-02",
+  "M4-03",
+  "M5-01",
+  "M5-02",
+  "M5-03"
+ ],
+ "defects": [],
+ "change_requests": [],
+ "pending_owner": [
+  {
+   "id": "ADR-003-1",
+   "item": "主色 #0048d8 与白 rail + 深蓝顶栏",
+   "default": "按 ADR-003 建议值推进"
+  },
+  {
+   "id": "ADR-003-2",
+   "item": "语义色文字层保留 AA 达标深色",
+   "default": "按 ADR-003 建议值推进"
+  },
+  {
+   "id": "ADR-003-3",
+   "item": "图表 c3/c4 对比度不足 3:1 的补偿方式",
+   "default": "数据标签 + 等义表格"
+  },
+  {
+   "id": "SRC-1",
+   "item": "CampaignLab-Bank-Strategy-Review-Source-Extract.md 未随包提供",
+   "default": "用 docx/pptx 重建 extract"
+  }
+ ]
+}
