@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # 原型基线验收：可在本地(WSL2 Ubuntu)或 CI 中执行，退出码非 0 即失败
 set -euo pipefail
+
+# 工具链自发现：本地 WSL2 非登录 shell 也要能找到 Linux node
+if [ -d "$HOME/.local/share/node/bin" ]; then PATH="$HOME/.local/share/node/bin:$PATH"; fi
+export PATH
+for t in node python3 sha256sum git; do
+  command -v "$t" >/dev/null 2>&1 || { echo "FAIL: 缺少 $t，请在 WSL2 Ubuntu 中执行"; exit 127; }
+done
+echo "env: node=$(node -v) python=$(python3 -V 2>&1 | cut -d\" -f2)"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT/prototype"
 
