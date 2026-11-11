@@ -1,0 +1,21 @@
+# 部署目标是 Ubuntu：仓库内容与工作树一律 LF，禁止 Windows 侧改写
+* text=auto eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+# 二进制资产不做换行/BOM 处理
+*.docx binary
+*.pptx binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

@@ -1,0 +1,20 @@
+# 运行时/构建产物
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+dist/
+build/
+coverage/
+.playwright-mcp/
+test-results/
+# 环境与本地
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+# 本地 IDE/工具目录
+.vscode/
+.idea/
