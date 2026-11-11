@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RuleContent",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/CouponRule"
+    },
+    {
+      "$ref": "#/$defs/CallbackRule"
+    }
+  ],
+  "$defs": {
+    "CouponRule": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "template": {
+          "const": "coupon_threshold"
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "zone": {
+          "const": "Asia/Shanghai"
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ends_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "new_customer_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365
+        },
+        "min_payment_fen": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9000000000000
+        },
+        "coupon_fen": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9000000000000
+        },
+        "max_per_customer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "budget_fen": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9000000000000
+        },
+        "stacking": {
+          "type": "string",
+          "enum": [
+            "ALLOW",
+            "DENY_OTHER_APPLIED"
+          ]
+        },
+        "refund_policy": {
+          "type": "string",
+          "enum": [
+            "KEEP",
+            "RECOMPUTE_UNUSED"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "template",
+        "currency",
+        "zone",
+        "starts_at",
+        "ends_at",
+        "new_customer_days",
+        "min_payment_fen",
+        "coupon_fen",
+        "max_per_customer",
+        "budget_fen",
+        "stacking",
+        "refund_policy"
+      ],
+      "additionalProperties": false
+    },
+    "CallbackRule": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "template": {
+          "const": "callback_priority"
+        },
+        "zone": {
+          "const": "Asia/Shanghai"
+        },
+        "channel": {
+          "const": "remote"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "ARRIVAL",
+            "APPOINTMENT_FIRST"
+          ]
+        },
+        "daily_cap": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      "required": [
+        "schema_version",
+        "template",
+        "zone",
+        "channel",
+        "priority",
+        "daily_cap"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

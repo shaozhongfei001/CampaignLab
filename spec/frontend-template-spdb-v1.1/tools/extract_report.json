@@ -1,0 +1,133 @@
+{
+ "source_master": "S03_S04_运营后台_全链路联动工作台_V2.3_本地母版_浦发风格.html",
+ "source_master_sha256": "f1b54b203443db54388466b859b87ab9953643b0470455e9935bc59023a43f4d",
+ "dropped_project_rules": [
+  [
+   "L4",
+   ".screen.dp03 .tbl.compact th,.screen.dp03 .tbl.compact td"
+  ],
+  [
+   "L4",
+   ".screen.dp03 .veto2"
+  ],
+  [
+   "L4",
+   ".screen.dp03 .veto2 .metric-line"
+  ],
+  [
+   "L4",
+   ".screen.dp03 .card-b.tight"
+  ],
+  [
+   "L4",
+   ".screen.dp03 .appr-list .ar"
+  ],
+  [
+   "L4",
+   ".screen.dp01 .metric-line"
+  ],
+  [
+   "L4",
+   ".screen.dp01 .card-b.tight"
+  ],
+  [
+   "L4",
+   ".screen.dp01 .hbars-row"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .chk"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .metric-line"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .card-b.tight"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .tasknav"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .tasknav .ti"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .tasknav .ti .ic"
+  ],
+  [
+   "L4",
+   ".screen.dp05 .tasknav .ti .tx b"
+  ],
+  [
+   "L4",
+   ".screen.p5 .tbl.compact th,.screen.p5 .tbl.compact td"
+  ],
+  [
+   "L4",
+   ".screen.p5 .card-f"
+  ],
+  [
+   "L4",
+   ".screen.dp06 .tbl.compact td,.screen.dp03 .tbl.compact td"
+  ],
+  [
+   "L4",
+   ".screen.dp06 .tbl.compact th,.screen.dp03 .tbl.compact th"
+  ],
+  [
+   "L4",
+   ".screen.p5 .kpirow"
+  ]
+ ],
+ "js_functions": [
+  "var PAL=[\"#0048d8\",\"#18a890\",\"#f39c12\",\"#8a94a6\",\"#e74c3c\",\"#60c0a8\",\"#3368e0\"];",
+  "esc",
+  "pad",
+  "nf",
+  "pct",
+  "n2",
+  "pc",
+  "ii",
+  "pp",
+  "stTag",
+  "bandTag",
+  "sumBy",
+  "wavgBy",
+  "normCdf",
+  "twoProp",
+  "srmTest",
+  "synRow",
+  "kpi",
+  "objCard",
+  "svg",
+  "lineChart",
+  "hbars",
+  "donut",
+  "radar",
+  "columns",
+  "stacked",
+  "spark"
+ ],
+ "js_missing": [],
+ "files": [
+  [
+   "css\\youxia-ui.css",
+   104677,
+   "7ab1eadff01dc5f8"
+  ],
+  [
+   "css\\tokens.css",
+   3199,
+   "a4e27cc208ccc428"
+  ],
+  [
+   "js\\youxia-charts.js",
+   10260,
+   "6d831e1415154721"
+  ]
+ ]
+}

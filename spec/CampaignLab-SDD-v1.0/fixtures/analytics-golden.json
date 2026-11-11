@@ -1,0 +1,144 @@
+{
+  "scope": {
+    "snapshot_id": "A-001",
+    "period": "2026-10",
+    "periods": [],
+    "cutoff": null,
+    "branch_ids": [
+      "B01"
+    ],
+    "group": null,
+    "subbranch": null,
+    "channel_ids": [
+      "remote"
+    ],
+    "origin": "ALL",
+    "strategy_ids": [],
+    "segment": null,
+    "segment_basis": "DEPLOYMENT",
+    "activity_id": null,
+    "baseline": {
+      "kind": "previous",
+      "period": null,
+      "branch_id": null
+    }
+  },
+  "threshold": {
+    "label": "默认阈值",
+    "mom_pct": "10",
+    "peer_pct": "20",
+    "own_sigma": "1",
+    "layer_pct": "15",
+    "mix_pp": "5"
+  },
+  "current": {
+    "deployed": "1",
+    "strategies": "2",
+    "eligible": "15750",
+    "sent": "12000",
+    "success": "11520",
+    "executed": "8640",
+    "contacted": "3456",
+    "effective": "1728",
+    "capacity": "9600",
+    "intentCount": "576",
+    "activityCount": "864",
+    "aum": "-407400000",
+    "deposit": "-219996000",
+    "wealth": "-114072000",
+    "fund": "-61110000",
+    "loan": "-12222000",
+    "wealthSale": "22809600",
+    "nonCashWealthSale": "15379200",
+    "fundSale": "12441600",
+    "nonMoneyFundSale": "7430400",
+    "insuranceSale": "5356800",
+    "depositDemand": "-96798300",
+    "depositTerm": "-123197700",
+    "cover": "0.7314285714285714",
+    "successRate": "0.96",
+    "execution": "0.75",
+    "reach": "0.3",
+    "effectiveRate": "0.15",
+    "contactConv": "0.4",
+    "validConv": "0.5"
+  },
+  "baseline": {
+    "deployed": "1",
+    "strategies": "2",
+    "eligible": "13250",
+    "sent": "10000",
+    "success": "9600",
+    "executed": "7680",
+    "contacted": "3840",
+    "effective": "1920",
+    "capacity": "8532",
+    "intentCount": "640",
+    "activityCount": "960",
+    "aum": "68610000",
+    "deposit": "37049400",
+    "wealth": "19210800",
+    "fund": "10291500",
+    "loan": "2058300",
+    "wealthSale": "25344000",
+    "nonCashWealthSale": "17088000",
+    "fundSale": "13824000",
+    "nonMoneyFundSale": "8256000",
+    "insuranceSale": "5952000",
+    "depositDemand": "16301600",
+    "depositTerm": "20747800",
+    "cover": "0.7245283018867924",
+    "successRate": "0.96",
+    "execution": "0.8",
+    "reach": "0.4",
+    "effectiveRate": "0.2",
+    "contactConv": "0.5",
+    "validConv": "0.5"
+  },
+  "delta_effective": -192,
+  "funnel_contributions": [
+    384,
+    0,
+    -144,
+    -432,
+    0
+  ],
+  "estimate": {
+    "assumed_contact_conversion": "0.45",
+    "fixed_valid_conversion": "0.5",
+    "estimate_count": 1944,
+    "delta_count": 216
+  },
+  "next_observation": {
+    "period": "2026-11",
+    "effective": 1944,
+    "comparison_period": "2026-10",
+    "delta": 216
+  },
+  "cross_bank": {
+    "remote_state": "FULL",
+    "push_comparison": "NOT_COMPARABLE",
+    "push_b_min_seconds": 3,
+    "slices_each": 510
+  },
+  "partial": {
+    "period": "2026-10",
+    "excluded_channel": "wechat",
+    "state": "PARTIAL"
+  },
+  "correction": {
+    "slice_id": "2026-10:B01:remote:1",
+    "field": "aum",
+    "previous_fen": -135800000,
+    "value_fen": -123300000,
+    "base_total_fen": -407400000,
+    "corrected_total_fen": -394900000
+  },
+  "link_examples": {
+    "O-01_pending": null,
+    "O-01_nearest": "T-02",
+    "O-02_age_days": 60,
+    "O-03_state": "UNMATCHED",
+    "O-04_state": "UNMATCHED"
+  }
+}

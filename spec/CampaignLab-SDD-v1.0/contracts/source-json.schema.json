@@ -1,0 +1,527 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SourceJson",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "metadata": {
+      "$ref": "#/$defs/SourceMetadata"
+    },
+    "tables": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/SourceTable"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "metadata",
+    "tables"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Branch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "group": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "group"
+      ],
+      "additionalProperties": false
+    },
+    "Strategy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "branch",
+            "hq"
+          ]
+        },
+        "source_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "origin",
+        "source_version"
+      ],
+      "additionalProperties": false
+    },
+    "SourceActivity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "strategy_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "valid_from": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metric_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "strategy_ids",
+        "valid_from",
+        "valid_until",
+        "metric_label",
+        "evidence_label"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "remote",
+            "manager",
+            "ai",
+            "wechat",
+            "sms",
+            "push"
+          ]
+        },
+        "cutoff": {
+          "type": "string",
+          "format": "date"
+        },
+        "close_mode": {
+          "type": "string",
+          "enum": [
+            "MONTH_END",
+            "DAY"
+          ]
+        },
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "AVAILABLE",
+            "NOT_COLLECTED",
+            "RESTORED"
+          ]
+        },
+        "definition_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "semantic_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+      },
+      "required": [
+        "period",
+        "channel",
+        "cutoff",
+        "close_mode",
+        "coverage",
+        "definition_id",
+        "semantic_key"
+      ],
+      "additionalProperties": false
+    },
+    "SourceMetadata": {
+      "type": "object",
+      "properties": {
+        "bank_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "bank_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "snapshot_code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Branch"
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "channels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "strategies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Strategy"
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceActivity"
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Coverage"
+          },
+          "minItems": 1,
+          "maxItems": 4000
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "push_detail_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 42,
+            "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+          }
+        },
+        "link_policy": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+                },
+                "route_windows": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -36600,
+                      "maximum": 36600
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                },
+                "dispatch_days": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -36600,
+                      "maximum": 36600
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  }
+                }
+              },
+              "required": [
+                "version",
+                "route_windows",
+                "dispatch_days"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "touches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "customer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "strategy": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "node": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "batch": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "remote",
+                  "manager",
+                  "ai",
+                  "wechat",
+                  "sms",
+                  "push"
+                ]
+              },
+              "dispatchDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "at": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "id",
+              "customer",
+              "strategy",
+              "node",
+              "batch",
+              "channel",
+              "dispatchDate",
+              "at"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "outcomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "customer": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "amount_fen": {
+                "type": "integer",
+                "minimum": -9000000000000,
+                "maximum": 9000000000000
+              }
+            },
+            "required": [
+              "id",
+              "customer",
+              "date",
+              "amount_fen"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "bank_id",
+        "bank_name",
+        "snapshot_code",
+        "branches",
+        "channels",
+        "strategies",
+        "coverage",
+        "sources",
+        "push_detail_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "SourceTable": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "minItems": 1,
+          "maxItems": 180
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 180
+          },
+          "minItems": 1,
+          "maxItems": 1000000
+        }
+      },
+      "required": [
+        "columns",
+        "rows"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

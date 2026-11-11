@@ -1,0 +1,65 @@
+{
+  "id": "MAP-A-1",
+  "bank_id": "A",
+  "layout": "wide",
+  "entity_table": "月度宽表",
+  "counts_table": "月度宽表",
+  "dimensions": {
+    "id": "记录号",
+    "period": "统计月",
+    "cutoff": "数据截止",
+    "branch": "分行号",
+    "subbranch": "支行",
+    "channel": "投放渠道",
+    "strategy": "策略号",
+    "origin": "策略来源",
+    "segment": "部署客群",
+    "tag": "月末标签",
+    "cohort": "客户集合",
+    "offset": "集合起点",
+    "definition": "触达口径版本",
+    "batch": "来源批次"
+  },
+  "count_fields": {
+    "eligible": "可经营",
+    "sent": "下发",
+    "success": "接收",
+    "executed": "执行",
+    "contacted": "接触",
+    "effective": "有效",
+    "capacity": "容量",
+    "intentCount": "意向次数",
+    "activityCount": "活动特色"
+  },
+  "money_fields": {
+    "aum": "AUM变动",
+    "deposit": "存款变动",
+    "wealth": "理财变动",
+    "fund": "基金变动",
+    "loan": "个贷变动",
+    "wealthSale": "理财销量",
+    "nonCashWealthSale": "非现管理财销量",
+    "fundSale": "基金销量",
+    "nonMoneyFundSale": "非货基销量",
+    "insuranceSale": "保险销量",
+    "depositDemand": "活期变动",
+    "depositTerm": "定期变动"
+  },
+  "source_money_unit": "CNY_YUAN",
+  "long_columns": null,
+  "codes": {
+    "channel": {
+      "远程": "remote",
+      "客户经理": "manager",
+      "AI外呼": "ai",
+      "企业微信": "wechat",
+      "短信": "sms",
+      "手机银行推送": "push"
+    },
+    "origin": {
+      "分行": "branch",
+      "总行": "hq"
+    }
+  },
+  "dedup_mode": "SYNTHETIC_INTERVAL"
+}
