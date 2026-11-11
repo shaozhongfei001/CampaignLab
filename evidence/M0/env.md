@@ -1,1 +1,20 @@
-# 环境取证\n\n| 项 | 值 |\n|---|---|\n| as_of | 2026-11-12T02:38:50+08:00 |\n| os | Ubuntu 24.04.2 LTS |\n| kernel | 6.18.58.1-microsoft-standard-WSL2 x86_64 |\n| python3_system | Python 3.12.3 |\n| sqlite3_system | 3.45.1 |\n| node | v22.23.5 |\n| npm | 10.9.9 |\n| git | git version 2.43.0 |\n| docker | Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2 |\n| uv | MISSING |\n| python314 | MISSING |\n| browser | MISSING |\n| make | GNU Make 4.3 |\n| ripgrep | ripgrep 14.1.0 |\n\n说明：M0-01 需在此追加 CPython 3.14 patch、其内置 sqlite3 版本、uv 与 Node 24 的最终锁定值与锁文件哈希。\n
+# 环境取证
+
+| 项 | 值 |
+|---|---|
+| as_of | 2026-11-12T03:13:10+08:00 |
+| os | MISSING |
+| kernel | 6.18.58.1-microsoft-standard-WSL2 x86_64 |
+| python3_system | Python 3.12.3 |
+| sqlite3_system | 3.45.1 |
+| uv | MISSING |
+| python314_uv | Python 3.14.10 |
+| node | v24.22.3 |
+| node_elf | /home/szf/.local/share/node-v24/bin/node |
+| git | git version 2.43.0 |
+| make | GNU Make 4.3 |
+| ripgrep | ripgrep 14.1.0 |
+| docker | Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2 |
+| browser | MISSING（见 BLK-01） |
+
+说明：M0-01 的锁定版本、cp314 wheel 判定与锁文件哈希由该任务追加到 `evidence/M0/M0-01/`；本表为编排器 wave0 基线取证。
