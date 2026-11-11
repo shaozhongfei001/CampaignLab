@@ -1,0 +1,687 @@
+{
+ "spec_version": "1.0.0",
+ "operations": {
+  "exchangeSession": {
+   "method": "POST",
+   "path": "/session/exchange",
+   "operation": {
+    "operationId": "exchangeSession",
+    "parameters": [],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Session"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "security": [],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "SessionExchange"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Session": {
+     "type": "object",
+     "properties": {
+      "actor_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "actor_name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "allowed_roles": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "OPERATOR",
+         "DESIGNER",
+         "DATA_OWNER",
+         "ANALYST",
+         "TESTER",
+         "REVIEWER"
+        ]
+       },
+       "minItems": 1,
+       "maxItems": 6
+      }
+     },
+     "required": [
+      "actor_id",
+      "actor_name",
+      "allowed_roles"
+     ],
+     "additionalProperties": false
+    },
+    "SessionExchange": {
+     "type": "object",
+     "properties": {
+      "token": {
+       "type": "string",
+       "minLength": 16,
+       "maxLength": 180
+      }
+     },
+     "required": [
+      "token"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "getSession": {
+   "method": "GET",
+   "path": "/session",
+   "operation": {
+    "operationId": "getSession",
+    "parameters": [],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Session"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Session": {
+     "type": "object",
+     "properties": {
+      "actor_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "actor_name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "allowed_roles": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "OPERATOR",
+         "DESIGNER",
+         "DATA_OWNER",
+         "ANALYST",
+         "TESTER",
+         "REVIEWER"
+        ]
+       },
+       "minItems": 1,
+       "maxItems": 6
+      }
+     },
+     "required": [
+      "actor_id",
+      "actor_name",
+      "allowed_roles"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "getHealth": {
+   "method": "GET",
+   "path": "/health",
+   "operation": {
+    "operationId": "getHealth",
+    "parameters": [],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Health"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "security": []
+   },
+   "schemas": {
+    "Health": {
+     "type": "object",
+     "properties": {
+      "status": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "DEGRADED"
+       ]
+      },
+      "app_version": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      },
+      "contract_version": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      },
+      "worker": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "OFFLINE"
+       ]
+      },
+      "schema_revision": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      }
+     },
+     "required": [
+      "status",
+      "app_version",
+      "contract_version",
+      "worker",
+      "schema_revision"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "listWorkspaces": {
+   "method": "GET",
+   "path": "/workspaces",
+   "operation": {
+    "operationId": "listWorkspaces",
+    "parameters": [
+     {
+      "name": "cursor",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 300
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100,
+       "default": 25
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 100
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 60
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "WorkspacePage"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "WorkspacePage": {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "items": {
+        "$schema": "Workspace"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      },
+      "next_cursor": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 300
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "items",
+      "next_cursor"
+     ],
+     "additionalProperties": false
+    },
+    "Workspace": "TRUNCATED"
+   }
+  },
+  "createWorkspace": {
+   "method": "POST",
+   "path": "/workspaces",
+   "operation": {
+    "operationId": "createWorkspace",
+    "parameters": [
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Workspace"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "WorkspaceCreate"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Workspace": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "source_class": {
+       "type": "string",
+       "enum": [
+        "SYNTHETIC",
+        "AUTHORIZED_DEIDENTIFIED"
+       ]
+      },
+      "authorization_note": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "name",
+      "source_class",
+      "authorization_note"
+     ],
+     "additionalProperties": false
+    },
+    "WorkspaceCreate": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "source_class": {
+       "type": "string",
+       "enum": [
+        "SYNTHETIC",
+        "AUTHORIZED_DEIDENTIFIED"
+       ]
+      },
+      "authorization_note": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "name",
+      "source_class"
+     ],
+     "additionalProperties": false
+    }
+   }
+  }
+ },
+ "pages": {
+  "UI-01": {
+   "meta": {
+    "id": "UI-01",
+    "requirement": "FR-01",
+    "title": "工作区与首次进入",
+    "route": "/",
+    "path": "ui/UI-01-workspace.md",
+    "operation_ids": [
+     "exchangeSession",
+     "getSession",
+     "getHealth",
+     "listWorkspaces",
+     "createWorkspace"
+    ],
+    "acceptance": [
+     "AC-001",
+     "AC-034"
+    ]
+   },
+   "markdown_lines": 41,
+   "markdown": "# UI-01 工作区与首次进入\n\n路由 `/`。导航为「入口」。适用角色为本机操作员。需求编号 FR-01。\n\n换取本机会话，创建工作区并选择数据用途，进入两条业务流程。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 顶栏 | 状态、当前操作者、最近工作区 |\n| 12列主卡 | 左 8 列工作区列表，右 4 列两条首跑路线。窄屏路线置于列表下方 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 列表 | 名称、数据用途、创建时间 | Workspace.name/source_class/created_at |\n| 创建 | 名称必填，选择合成或授权脱敏，后者填写授权依据 | WorkspaceCreate |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 进入本机工作台 | exchangeSession, getSession | 入口令牌仅在首次使用，随后按会话检查。成功后加载列表 |\n| 刷新工作区 | getHealth, listWorkspaces | 服务可用时取列表，worker 离线时显示作业受限 |\n| 新建工作区 | createWorkspace | 成功后进入所选工作区的活动页 |\n\n## 页面状态与边界\n\n- 无工作区时突出创建。授权脱敏须在操作记录填来源授权，工作区类型创建后固定。切换后清除上一个工作区的草稿范围和轮询。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-001、AC-034，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-02 活动列表](UI-02-activity-list.md)、[UI-06 数据导入任务](UI-06-import-list.md)、[UI-25 作业状态与恢复](UI-25-jobs.md)。\n"
+  }
+ }
+}

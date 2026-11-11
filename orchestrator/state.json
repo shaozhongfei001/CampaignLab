@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T02:38:50+08:00",
+ "updated_at": "2026-11-12T02:40:24+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -11,10 +11,10 @@
  },
  "tasks": {
   "M0-01": {
-   "status": "TODO",
+   "status": "RUNNING",
    "lane": "T",
    "tier_planned": "max",
-   "tier_used": "",
+   "tier_used": "qwen3.8-max",
    "attempt": 0,
    "tokens": 0,
    "commit": "",
@@ -53,7 +53,8 @@
     "evidence/M0/env.md",
     "contracts/PROVENANCE.md"
    ],
-   "blockers": []
+   "blockers": [],
+   "agent": "01a1cbe8-fca4-7ee3-93f9-60d3bd4d1f20"
   },
   "M0-02": {
    "status": "TODO",
