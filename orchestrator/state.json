@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T02:07:05+08:00",
+  "updated_at": "2026-11-13T02:46:54+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -353,7 +353,15 @@
       "design": "orchestrator/handoff/M0-02-design.md",
       "design_lines": 117,
       "s1_status": "DONE",
-      "rulings": "orchestrator/tasks/M0-02.md 文末裁定记录（Q1..Q8）"
+      "rulings": "orchestrator/tasks/M0-02.md 文末裁定记录（Q1..Q8）",
+      "slice": {
+        "path": "orchestrator/handoff/M0-02.slice.json",
+        "spec_version": "1.0.1",
+        "source_openapi_sha16": "592571099d638251",
+        "source_openapi_bytes": 443309,
+        "recut_at": "2026-11-13T02:17:03+08:00",
+        "recut_reason": "CR-002/ADR-006"
+      }
     },
     "M0-03": {
       "status": "IN_PROGRESS",
@@ -431,7 +439,15 @@
         "S10": "TODO"
       },
       "design_doc": "orchestrator/handoff/M0-03-design.md",
-      "last_commit_note": "2026-11-13T01:37:27+08:00 S1+S2 入库；9 条未决问题已裁定；立 D-010"
+      "last_commit_note": "2026-11-13T01:37:27+08:00 S1+S2 入库；9 条未决问题已裁定；立 D-010",
+      "slice": {
+        "path": "orchestrator/handoff/M0-03.slice.json",
+        "spec_version": "1.0.1",
+        "source_openapi_sha16": "592571099d638251",
+        "source_openapi_bytes": 443309,
+        "recut_at": "2026-11-13T02:17:03+08:00",
+        "recut_reason": "CR-002/ADR-006"
+      }
     },
     "M0-03b": {
       "status": "TODO",
@@ -2185,7 +2201,7 @@
       "id": "D-013",
       "task": "M0-02",
       "severity": "MINOR",
-      "status": "OPEN",
+      "status": "FIXED_PENDING_Q",
       "title": "CR-002 影响面记载不完整（另 6 资源同缺状态字段、9 处用 state 命名），且选项 B 执行后必须重切切片并同步全部 sha16 基准文本",
       "found_by": "Plato G 项 / BLK-Q3 / Q-N3；步骤 6b 由编排器独立发现",
       "file": "orchestrator/defects/D-013.md",
@@ -2200,7 +2216,8 @@
       "evidence": [
         "orchestrator/defects/D-013.md",
         "qa-reports/m0/Q-VERIFY-M0-01.md"
-      ]
+      ],
+      "fix_at": "2026-11-13T02:17:03+08:00"
     },
     {
       "id": "D-014",
@@ -2271,9 +2288,9 @@
     {
       "id": "CR-002",
       "task": "M0-02",
-      "status": "APPROVED_OPTION_B_PENDING_MERGE",
-      "adr": "ADR-006（待新建）",
-      "nodes": 1,
+      "status": "MERGED",
+      "adr": "ADR-006",
+      "nodes": 13,
       "file": "orchestrator/change-requests/CR-002.md",
       "title": "listWorkspaces.status 在契约内无对应字段",
       "severity": "MINOR",
@@ -2306,6 +2323,49 @@
         "until": "Round 2 的 Plato 与 Ohm 返回后原子执行",
         "reason": "现在改契约会让 Ohm 的 PRE-3 切片 sha 自检假红、让 Plato 的分母核对（ruff=51）与 G 项判定失去基准",
         "steps_ref": "orchestrator/change-requests/CR-002.md 第 6.3 节（8 步，一次提交）"
+      },
+      "merged_at": "2026-11-13T02:17:03+08:00",
+      "adr_file": "docs/decisions/ADR-006-remove-listworkspaces-status.md",
+      "option": "B（从 listWorkspaces 移除 status 参数）",
+      "live_after": {
+        "bytes": 443309,
+        "sha16": "592571099d638251",
+        "info.version": "1.0.1"
+      },
+      "executed_by": "编排器（Lane T）按 CR-002.md 6.3 的 8 步 + 步骤 6b 一次原子提交",
+      "contract_gate": "check rc=0（登记项=13 实测差异=13）；check --validate rc=0（元校验=6）",
+      "slices_recut": {
+        "M0-02.slice.json": {
+          "sha16": "592571099d638251",
+          "bytes": 443309,
+          "spec_version": "1.0.1"
+        },
+        "M0-03.slice.json": {
+          "sha16": "592571099d638251",
+          "bytes": 443309,
+          "spec_version": "1.0.1"
+        },
+        "diff_vs_head": "仅 source.openapi 的 sha16/bytes 两行替换 + 被删的 status 参数块（10 行）；切片内 `\"name\": \"status\"` 查询参数残留 0。注意：切片内仍存在 getHealth → Health.properties.status（enum READY/DEGRADED），那是合法响应字段、与本 CR 无关，不得误删。",
+        "diff_measurement": {
+          "orchestrator/handoff/M0-02.slice.json": {
+            "git_diff_total_lines": 32,
+            "hunk_body_lines": 26,
+            "changed_lines": 14,
+            "added": 2,
+            "removed": 12,
+            "unified0_changed_lines": 14,
+            "grep_name_status_count": 0
+          },
+          "orchestrator/handoff/M0-03.slice.json": {
+            "git_diff_total_lines": 32,
+            "hunk_body_lines": 26,
+            "changed_lines": 14,
+            "added": 2,
+            "removed": 12,
+            "unified0_changed_lines": 14,
+            "grep_name_status_count": 0
+          }
+        }
       }
     }
   ],
@@ -2367,7 +2427,7 @@
         "M0-02",
         "M0-03"
       ],
-      "status": "IN_FLIGHT_ROUND2",
+      "status": "ROUND2_RETURNED_CR002_MERGED_AWAIT_ROUND3",
       "round": 2,
       "round1_dispatched": [
         "Q-VERIFY-M0-01/collect（flash）",
@@ -2390,7 +2450,10 @@
         "M0-02/S2（max：首迁 28 表 + 删 pyproject 的 package=false + uv lock）",
         "M0-03/S3+S4（flash：tokens.css 机械落地 + openapi-typescript 生成）"
       ],
-      "round2_started_at": "2026-11-12T23:51:06+08:00"
+      "round2_started_at": "2026-11-12T23:51:06+08:00",
+      "round2_result": "双双 RETURNED 并已 close_agent：Plato(Q judge, max, 自报 155k tokens) 判定档入库 b317fac；Ohm(M0-03/S1+S2, max, 自报 95k tokens) 入库 f12dcf8。in_flight_agents=[]。随后编排器原子执行 CR-002 选项 B（本次提交）。",
+      "round3_preconditions_cleared_at": "2026-11-13T02:46:54+08:00",
+      "round3_preconditions": "CR-002 已 MERGED；两切片已重切为 592571099d638251/443309B，S2/S3/S4 派单必须引用重切后的切片；M0-02 设计 Q4 与 M0-03 设计 Q7 的临时处置已取消，派单提示词必须显式告知子智能体不得实现 status 相关分支"
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
@@ -2398,8 +2461,8 @@
       "8 【已完成】Ohm(M0-03/S1+S2) 返回并入库 f12dcf8；9 条未决问题全部裁定",
       "9 【已完成】Plato(Q-VERIFY-M0-01 judge) 返回并入库；M0-01 判 PASS_WITH_TODO；D-001..D-009 全 CLOSED；新立 D-011..D-016",
       "10 【已完成】BLK-Q1(MAJOR)/BLK-Q2 修净；CR-001.md:37 措辞精确化；手册升 v1.6 加 15.9/15.10；BLOCKERS 加 BLK-08/NOTE-08/NOTE-09",
-      "11 【下一步·最高优先】原子执行 CR-002 选项 B（CR-002.md 6.3 的 8 步 + 步骤 6b 任务卡 PRE-3 硬编码 sha16/bytes 同步，依 D-013/BLK-Q3）",
-      "12 【Round 3 派单，CR-002 落地后】M0-02/S2（max high，首迁 28 表 + 删 [tool.uv] package=false + uv lock，禁再带 PYTHONPATH=src）∥ M0-03/S3+S4（flash，tokens.css 机械落地 + openapi-typescript 生成 types.ts）",
+      "11 【已完成】CR-002 选项 B 原子提交：ADR-006 新建、契约移除 listWorkspaces.status（parameters 4→3）、CHANGES.json 登记 12→13、契约门禁 check/--validate rc=0、两切片重切（592571099d638251/443309B）、基准文本二分同步（前瞻改/历史只加注）、16 项 G 全 rc==expected、分母 63→64；并提交前修复 contract 块整块替换的数据丢失、补 4 处漏加注的历史指纹、修正 Q4/Q7 追注的表格结构（CR-002.md §7 第 9/10/11 行）",
+      "12 【下一步·最高优先】M0-02/S2（max high，首迁 28 表 + 删 [tool.uv] package=false + uv lock，禁再带 PYTHONPATH=src）∥ M0-03/S3+S4（flash，tokens.css 机械落地 + openapi-typescript 生成 types.ts）",
       "13 【并行·补卡】D-016：分批撰写 25 张任务卡（先 wave2 的 M0-04/M0-03b，再 wave3 的 M1-01..03/M2-01..03）；每批提交后 KNOWN_MISSING 单调收敛",
       "14 wave2 出口冻结公共件前：指标注册表预留月报扩展点、ADR-005 的 Problem code 注册表冻结留痕、flash_share dev 口径 ≥0.60",
       "15 【需项目负责人】ADR-005 追认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
@@ -2493,130 +2556,139 @@
       "29be319"
     ],
     "self_check_gates_rc0": {
-      "checked_at": "2026-11-12T23:45:58+08:00",
+      "checked_at": "2026-11-13T02:46:54+08:00",
       "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
-      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。",
+      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。 2026-11-13T02:46:54+08:00 追记（第 5 次接管）：CR-002 选项 B 原子提交前，从磁盘全表重跑 16 项 G（含 G4c 真实篡改负例），rc 全部 == expected；分母 ruff=64(py=9/md=55)、pytest=43、mypy=9；双口径 tracked 64 + untracked 0 == 64 成立；spec/ dirty=0。提交前复核另检出并修复 3 类问题（均记入 CR-002.md §7 第 9/10/11 行）：① state.json.contract 曾被整块替换、丢失 HEAD 的 live_dir/registry/gate/ci_job/baselines（含两份 spec 基线 sha256 锚点）→ 已按无损合并修复；② 4 处历史/门禁文本仍写死旧指纹却未加注（tasks/M0-03.md:134、M0-03-design.md:9、M0-02-design.md:7 与 §5 V1、两卡 Q4/Q7 裁定结果）→ 已按 D-011 体例补纯增量标注（两设计文档 numstat removed=0）；③ 设计文档 Q4/Q7 追注曾被塞成 4 列表格的第 5 个单元格且缺收尾竖线、嵌套双星号破坏加粗 → 已还原原文字节并改为表后独立 blockquote。另：CHANGES.json 缩进规范化为 indent=2（符合 check_contracts.py:6 与其余 10 个同目录文件），语义等价已程序化证明，显式登记非静默夹带。",
       "gates": {
         "G1_baseline_v1.0": {
           "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.0,
+          "last_summary": "",
+          "measured_at": "2026-11-13T02:41:41+08:00"
         },
         "G2_baseline_v1.0.1_patch": {
           "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 1,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.0,
+          "last_summary": "",
+          "measured_at": "2026-11-13T02:41:41+08:00"
         },
         "G3_frontend_baseline": {
           "cmd": "python3 scripts/check_frontend_baseline.py",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.0,
+          "last_summary": "FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）",
+          "measured_at": "2026-11-13T02:41:41+08:00"
         },
         "G4_slice_unknown_op_negative": {
           "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json",
           "rc": 2,
           "expected": 2,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.1,
+          "last_summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']",
+          "measured_at": "2026-11-13T02:41:41+08:00"
         },
         "G4b_slice_unknown_ac_negative": {
           "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json",
           "rc": 2,
           "expected": 2,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.1,
+          "last_summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']",
+          "measured_at": "2026-11-13T02:41:41+08:00"
         },
         "G4c_frontend_tamper_negative": {
           "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
           "rc": 1,
           "expected": 1,
-          "note": "本轮已真实执行篡改负例：cp 备份 -> printf 追加换行 -> 实测 rc=1 -> cp 还原 -> git status --porcelain spec/ == 0。不再沿用 run-02 的转录值。",
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.1,
+          "last_summary": "FRONTEND BASELINE FAIL (1 项): ['css/tokens.css']",
+          "measured_at": "2026-11-13T02:41:57+08:00",
+          "note": "本轮真实执行篡改负例：备份 -> printf 追加换行 -> 实测 rc -> cp 还原 -> 断言 spec/ dirty=0。不沿用转录值。",
+          "spec_dirty_after_restore": 0
         },
         "G5_contract_gate": {
           "cmd": "python3 scripts/check_contracts.py check",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 0.1,
+          "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped",
+          "measured_at": "2026-11-13T02:41:42+08:00"
         },
         "G6_contract_meta_validate": {
           "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 2,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "elapsed_s": 1.8,
+          "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6",
+          "measured_at": "2026-11-13T02:41:43+08:00"
         },
         "G7_ruff_check": {
           "cmd": "uv run --no-sync ruff check .",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "All checks passed!"
+          "elapsed_s": 0.0,
+          "last_summary": "All checks passed!",
+          "measured_at": "2026-11-13T02:41:43+08:00"
         },
         "G8_ruff_format": {
           "cmd": "uv run --no-sync ruff format --check .",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "63 files already formatted"
+          "elapsed_s": 0.0,
+          "last_summary": "64 files already formatted",
+          "measured_at": "2026-11-13T02:41:43+08:00"
         },
         "G9_mypy": {
           "cmd": "uv run --no-sync mypy",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "Success: no issues found in 9 source files"
+          "elapsed_s": 0.2,
+          "last_summary": "Success: no issues found in 9 source files",
+          "measured_at": "2026-11-13T02:41:44+08:00"
         },
         "G10_pytest": {
           "cmd": "uv run --no-sync pytest -q",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 1,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "43 passed in 2.69s"
+          "elapsed_s": 3.5,
+          "last_summary": "43 passed in 3.21s",
+          "measured_at": "2026-11-13T02:41:47+08:00"
         },
         "G11_prototype_verify": {
           "cmd": "bash scripts/verify.sh",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 1,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "PASS: 字节级复现"
+          "elapsed_s": 0.6,
+          "last_summary": "PASS: 字节级复现",
+          "measured_at": "2026-11-13T02:41:48+08:00"
         },
         "G12_package_verify": {
           "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "PACKAGE PASS 6/6"
+          "elapsed_s": 0.1,
+          "last_summary": "PACKAGE PASS 6/6",
+          "measured_at": "2026-11-13T02:41:48+08:00"
         },
         "G13_npm_ci_and_build": {
           "cmd": "npm --prefix web ci && npm --prefix web run build",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 9,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "✓ built in 137ms"
+          "elapsed_s": 7.8,
+          "last_summary": "✓ built in 148ms",
+          "measured_at": "2026-11-13T02:41:56+08:00"
         },
         "G14_doctor": {
           "cmd": "bash scripts/doctor.sh",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 1,
-          "measured_at": "2026-11-13T02:07:05+08:00",
-          "last_summary": "  RESULT: HEALTHY"
+          "elapsed_s": 1.4,
+          "last_summary": "  RESULT: HEALTHY",
+          "measured_at": "2026-11-13T02:41:57+08:00"
         }
       },
       "spec_untouched": {
@@ -2633,36 +2705,38 @@
       "counts": {
         "pytest_passed": 43,
         "mypy_source_files": 9,
-        "ruff_formatted_files": 63,
-        "contract_registered_nodes": 12,
+        "ruff_formatted_files": 64,
+        "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
         "frontend_baseline_rows": 8,
-        "live_openapi_sha16": "01bd28f0772f506e",
+        "live_openapi_sha16": "592571099d638251",
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 63,
+          "total": 64,
           "in_scope_py": 9,
-          "in_scope_md": 54,
+          "in_scope_md": 55,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T02:07:05+08:00：Q 判定档报告（+1 md）、D-011..D-016（+6 md）、test_task_cards.py（+1 py）入库后重测",
+          "measured_after": "2026-11-13T02:46:54+08:00：CR-002 选项 B 原子提交前重测。相对上一次（63）+1 md ＝ 新增 docs/decisions/ADR-006-remove-listworkspaces-status.md；其余为纯内容编辑，不改变文件数。",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）",
-          "identity": "tracked_in_scope(63) + untracked_not_ignored_in_scope(0) == ruff_total(63) -> True",
+          "identity": "tracked_in_scope(64) + untracked_not_ignored_in_scope(0) == ruff_total(64) -> True",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "qa-reports/m0/Q-VERIFY-M0-01.md 属并行 Q lane（Plato）在飞产物，尚未返回，本次不提交；其入库时分母将再 +1",
-          "counting_method": "手册 15.10：-z NUL 分隔与 -c core.quotepath=false 双口径互验一致（63==63）才可写入 counts"
+          "untracked_component_note": "git add 显式 13 路径后复测：untracked_in_scope=0（ADR-006 已入暂存区）。add 前的中间态曾为 tracked 63 + untracked 1（ADR-006）= 64，两口径均等于 ruff_total。",
+          "counting_method": "手册 15.10：-z NUL 分隔与 -c core.quotepath=false 双口径互验一致（64==64）才可写入 counts；本次两口径逐项全等。",
+          "prev_total": 63
         },
         "ruff_lint_scope_files": 9,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T02:07:05+08:00",
-        "counts_refresh_reason": "Q-VERIFY-M0-01 judge 入库（+1 md 报告，19 个 .log 不计入 ruff 分母）、D-011..D-016（+6 md）、tests/unit/test_task_cards.py（+1 py）"
+        "counts_refreshed_at": "2026-11-13T02:46:54+08:00",
+        "counts_refresh_reason": "CR-002/ADR-006 原子提交前刷新：+1 md（ADR-006）使 ruff 分母 63→64；pytest/mypy 复跑仍为 43 passed / 9 源文件；contract_registered_nodes 12→13；live_openapi_sha16/bytes 随移除 listWorkspaces.status 变为 592571099d638251 / 443309。",
+        "live_openapi_bytes": 443309
       },
       "denominator_history": [
         {
@@ -2713,8 +2787,104 @@
             "mypy_source_files": 8
           },
           "note": "演进链 51→53(D-009)→54→56(M0-03 S1+S2)→63(本次)；pytest 32→38→43；mypy 7→8→9"
+        },
+        {
+          "at": "2026-11-13T02:46:54+08:00",
+          "ruff_total": 64,
+          "in_scope_py": 9,
+          "in_scope_md": 55,
+          "pytest_passed": 43,
+          "mypy_source_files": 9,
+          "cause": "CR-002/ADR-006 原子提交（+1 md：ADR-006）",
+          "prev": {
+            "ruff_total": 63,
+            "in_scope_py": 9,
+            "pytest_passed": 43,
+            "mypy_source_files": 9
+          },
+          "note": "演进链 51→53(D-009)→54→56(M0-03 S1+S2)→63(Q 判定档)→64(本次 CR-002)；pytest 32→38→43→43；mypy 7→8→9→9。稳定分母仍为 ruff_lint_scope_files=9（纯 Python），未变。",
+          "dual_method": {
+            "z_nul": {
+              "tracked_total": 156,
+              "tracked_in_scope": 64,
+              "py": 9,
+              "md": 55,
+              "untracked_total": 0,
+              "untracked_in_scope": 0,
+              "identity_sum": 64
+            },
+            "quotepath_false": {
+              "tracked_total": 156,
+              "tracked_in_scope": 64,
+              "py": 9,
+              "md": 55,
+              "untracked_total": 0,
+              "untracked_in_scope": 0,
+              "identity_sum": 64
+            },
+            "consistent": true
+          },
+          "commit": "本次提交（CR-002；见 git log -1）"
         }
-      ]
+      ],
+      "post_write_confirmation": {
+        "purpose": "账本（counts/gates/denominator_history/note）写入后复跑，证明写入本身未打破任何门禁与守护测试",
+        "at": "2026-11-13T02:49:15+08:00",
+        "gates": {
+          "G5_contract_gate": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped",
+            "measured_at": "2026-11-13T02:47:39+08:00"
+          },
+          "G6_contract_meta_validate": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6",
+            "measured_at": "2026-11-13T02:47:40+08:00"
+          },
+          "G7_ruff_check": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "All checks passed!",
+            "measured_at": "2026-11-13T02:47:41+08:00"
+          },
+          "G8_ruff_format": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "64 files already formatted",
+            "measured_at": "2026-11-13T02:47:41+08:00"
+          },
+          "G9_mypy": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "Success: no issues found in 9 source files",
+            "measured_at": "2026-11-13T02:47:41+08:00"
+          },
+          "G10_pytest": {
+            "rc": 0,
+            "expected": 0,
+            "last_summary": "43 passed in 2.70s",
+            "measured_at": "2026-11-13T02:47:44+08:00"
+          }
+        },
+        "guardian_tests": {
+          "cmd": "uv run --no-sync pytest -q tests/unit/test_state_ledger.py tests/unit/test_task_cards.py",
+          "rc": 0,
+          "passed": 11
+        },
+        "denominator_after_add": {
+          "tracked_in_scope": 64,
+          "untracked_in_scope": 0,
+          "py": 9,
+          "md": 55,
+          "ruff_total": 64,
+          "identity": "64+0==64 -> True",
+          "dual_method_consistent": true
+        },
+        "spec_dirty": 0,
+        "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
+      }
     },
     "post_patch_review": {
       "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
@@ -2883,7 +3053,8 @@
             "bytes": 443552,
             "match": true
           },
-          "verdict": "PASS（手册 15.4 第 5 条：切片 sha16 与活契约实算值一致，可直接派单，无需重切）"
+          "verdict": "PASS（手册 15.4 第 5 条：切片 sha16 与活契约实算值一致，可直接派单，无需重切）",
+          "superseded_by": "CR-002/ADR-006 于 2026-11-13T02:17:03+08:00 移除 listWorkspaces.status；活契约指纹由 01bd28f0772f506e/443552B 变为 592571099d638251/443309B，两份切片已重切。本条为**历史留痕，原值不改写**。"
         }
       },
       {
@@ -2992,6 +3163,52 @@
       "blocking": "手册 15.5 无拆解表不得 spawn → wave2 起整条 DAG 实质停摆",
       "guard": "tests/unit/test_task_cards.py（KNOWN_MISSING 必须单调收敛；任务总数分母钉死 29）",
       "plan": "按 wave 顺序补卡：wave2(M0-04,M0-03b) → wave3(M1-01..03,M2-01..03) → 其余；max 起草 + flash 机械铺开；每批提交后 KNOWN_MISSING 单调收敛并重算 card_gap"
+    },
+    "cr002_merge": {
+      "cr": "CR-002",
+      "adr": "docs/decisions/ADR-006-remove-listworkspaces-status.md",
+      "option": "B",
+      "merged_at": "2026-11-13T02:46:54+08:00",
+      "parent_commit": "b317fac",
+      "commit_query": "git log --oneline --grep='CR-002' -1（本条不写死自身 sha，避免悬空键）",
+      "contract": {
+        "parameters_before": [
+          "cursor",
+          "limit",
+          "q",
+          "status"
+        ],
+        "parameters_after": [
+          "cursor",
+          "limit",
+          "q"
+        ],
+        "bytes_before": 443552,
+        "bytes_after": 443309,
+        "sha16_before": "01bd28f0772f506e",
+        "sha16_after": "592571099d638251",
+        "info_version": "1.0.1（不 bump，依 ADR-006 §3）",
+        "registered_nodes": "12 -> 13"
+      },
+      "gates": {
+        "check": "rc=0 登记项=13 实测差异=13",
+        "check_validate": "rc=0 元校验=6",
+        "full_table": "16/16 rc==expected"
+      },
+      "denominator": {
+        "ruff_total": "63 -> 64",
+        "py": 9,
+        "md": "54 -> 55",
+        "pytest": 43,
+        "mypy": 9
+      },
+      "preflight_repairs": [
+        "state.json.contract 无损合并（还原 live_dir/registry/gate/ci_job/baselines）",
+        "4 处历史指纹补纯增量加注",
+        "设计文档 Q4/Q7 追注改为合法 blockquote",
+        "CHANGES.json indent 规范化显式登记"
+      ],
+      "out_of_scope_warning": "ADR-006 §4.7：另有 6 个资源同缺状态字段、9 处用 state 命名，属独立议题，不得据本 ADR 推断其余已处理"
     }
   },
   "acceptance": {
@@ -3018,7 +3235,7 @@
     "live_dir": "contracts",
     "openapi_info_version": "1.0.1",
     "registry": "contracts/CHANGES.json",
-    "registered_nodes": 12,
+    "registered_nodes": 13,
     "gate": "python3 scripts/check_contracts.py check",
     "ci_job": "contract-gate",
     "baselines": [
@@ -3037,7 +3254,22 @@
         "path": "spec/frontend-template-spdb-v1.1",
         "note": "前端设计基线，ADR-003"
       }
-    ]
+    ],
+    "live_openapi": {
+      "path": "contracts/openapi.json",
+      "bytes": 443309,
+      "sha16": "592571099d638251",
+      "sha256": "592571099d63825188446e33d297befa8911554a77782b9318a34e328b33aec1",
+      "info_version": "1.0.1"
+    },
+    "last_change": {
+      "cr": "CR-002",
+      "adr": "ADR-006",
+      "at": "2026-11-13T02:17:03+08:00",
+      "kind": "removed",
+      "pointer": "/paths/~1workspaces/get/parameters/3"
+    },
+    "merge_note": "CR-002 落地时曾把本块整块替换，丢失 HEAD 的 live_dir/registry/gate/ci_job/baselines（含两份 spec 基线的 manifest_sha256/zip_sha256 永久校验锚点）。编排器于本次提交前检出并按『无损合并』修复：HEAD 键全部还原、仅更新 registered_nodes 与 openapi_info_version、追加 live_openapi/last_change。新写的 changes_file 与既有 registry 同值（contracts/CHANGES.json），为避免双真值来源已折叠进 registry，值无丢失。"
   },
   "critical_paths": [
     [

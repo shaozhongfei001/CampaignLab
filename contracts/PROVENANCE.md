@@ -19,7 +19,7 @@
 | source-mapping.schema.json | v1.0 基线 | 逐字节相同 |
 | traceability.json | v1.0 基线 | 逐字节相同 |
 | sqlite-v1.sql | v1.0 基线 | 逐字节相同（门禁强制，不允许漂移） |
-| openapi.json | v1.0 基线 + v1.0.1 补丁 | 结构差异 10 处；JSON 规范化 indent=2 / ensure_ascii=False |
+| openapi.json | v1.0 基线 + v1.0.1 补丁 + **CR-002** | 结构差异 **11** 处（含 CR-002 移除 `listWorkspaces.status` 的 1 处 `removed`）；JSON 规范化 indent=2 / ensure_ascii=False |
 | source-json.schema.json | v1.0 基线 + v1.0.1 补丁 | 结构差异 1 处；同上规范化 |
 | source-metadata.schema.json | v1.0 基线 + v1.0.1 补丁 | 结构差异 1 处；同上规范化 |
 | CHANGES.json | 本仓自建 | 变更登记，非基线内容 |
@@ -61,4 +61,7 @@ python3 scripts/check_contracts.py check --validate
 
 切片输出含 `source` 段（来源路径 + `openapi` 的 bytes 与 sha256 前 16），
 下游必须校验该 sha16 与派单当时活契约的实算值一致，不一致即重切（手册 15.4 第 5 条）。
-当前活契约指纹：`openapi.json` = `01bd28f0772f506e`（443552 B，`info.version` 1.0.1）。
+当前活契约指纹：`openapi.json` = `592571099d638251`（443309 B，`info.version` 1.0.1）。
+**CR-002 / ADR-006 于 2026-11-13T02:17:03+08:00 移除了 `listWorkspaces` 的 `status` 查询参数**，前一指纹 `01bd28f0772f506e` / 443552 B 已作废；
+登记项由 12 → **13** 条。指纹属易变值，**权威现值见 `orchestrator/state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16`**，
+文档内一律不得写死（依 D-012/D-014）。

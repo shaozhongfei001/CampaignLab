@@ -2,6 +2,19 @@
 > ② §5 的 V1–V13 共 10 处 `PYTHONPATH=src` 前缀已去除（Q7 裁定后由 S2 删 `[tool.uv] package = false`）；
 > ③ §6 关于 `evidence/**` 不在 `scope_allow` 的说法已按 Q8 裁定更正。修改者为编排器，**非 S1 原作者**。
 
+>
+> **编排器追注（2026-11-13T02:17:03+08:00，依 CR-002 / ADR-006 / D-013）**：本文写作时（S1）的活契约指纹
+> `01bd28f0772f506e` / `443552 B` 已**作废**——CR-002 选项 B 已把 `listWorkspaces` 的 `status` 查询参数
+> 从活契约移除，现值 `592571099d638251` / `443309 B`（**权威来源**：
+> `orchestrator/state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16` / `.live_openapi_bytes`，禁写死）。
+> 下列各处属**历史测量，原值不改写**，但**不得再作为期望值复跑**：
+> ① 开头「依据」段的 `source.openapi.sha16` / `bytes`；
+> ② §5 的 **V1**（原文「输出须为 `01bd28f0772f506e 443552`」）——复跑 V1 必须改为与 `state.json` 权威键比对，
+>    与权威键不一致才是真红，与本文写死值不一致属**基准漂移**；
+> ③ §8 的 **C1**（`wc -l` = 117）与 **C2**（48 files）——本文件因编排器追注已增长，`wc -l` 与 ruff 分母均已漂移，
+>    分母权威值见 `counts.ruff_formatted_files`。
+> 另：§7 **Q4** 的临时处置已**取消**，详见 §7 表后的编排器追注块。
+
 # M0-02 设计 · S1 契约抽取与设计
 
 依据 `orchestrator/handoff/M0-02.slice.json`（spec_version=1.0.1；`source.openapi.sha16=01bd28f0772f506e`、`bytes=443552`，本次实算一致 → 切片新鲜可派单）。活契约 `contracts/sqlite-v1.sql` 与基线 `spec/CampaignLab-SDD-v1.0/contracts/sqlite-v1.sql` **字节相同**（sha256 `ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e`，`diff -u` 无输出）→ 不存在「以哪份为准」的分歧；按手册第 7 节，实现唯一依据是活契约 `contracts/`，spec 仅参考。基址 `/api/v1`（`servers[0].url`）；全局 `security=[{LocalSession:[]}]` ＝ Cookie `cl_session`，`exchangeSession`/`getHealth` 显式 `security:[]`（免会话），其余 3 个 op 继承全局；每个响应必带 `X-Request-Id`（正则 `^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$`，取 `uuid4().hex`）；`create_app()` 必须置 `openapi_url=None, docs_url=None, redoc_url=None`，契约真值只在 `contracts/openapi.json`，不得暴露第二个 OpenAPI 面。
@@ -109,6 +122,23 @@ DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝�
 | Q6 | 三处运行参数契约未规定：会话 TTL、JSON 正文上限、worker 心跳窗口（OPERATIONS.md 只给了文件 64 MiB／8 MiB 与令牌 60s）。 | AC-035 可测性、413 触发点、`Health.worker` 灵敏度 | 取 `session_ttl_seconds=3600`、`MAX_JSON_BODY_BYTES=1_048_576`、`WORKER_HEARTBEAT_TTL_SECONDS=15`，全部经 `AppConfig` 可注入（测试用小值） |
 | Q7 | **`pyproject.toml` 与 `uv.lock` 不在 `scope_allow` 内**，但 gate「`uv run python -m campaignlab doctor` 可运行」与「pytest 全绿」都要求 `campaignlab` 可导入：已实测 `uv run --no-sync python -c "import campaignlab"` → `ModuleNotFoundError`（M0-01 设了 `[tool.uv] package = false`，其注释明确写「M0-02 交付 CLI 与 `__main__` 后删除」）；`PYTHONPATH=src` 可用但会改变 gate 命令原文。 | 全部 gate 命令口径、S2–S5 执行方式 | §5 统一用 `PYTHONPATH=src` 前缀；请裁定「把 `pyproject.toml`＋`uv.lock` 加入 M0-02 `scope_allow`（由 S2 删 `package = false` 并重跑 `uv lock`）」还是「交 Lane T 单独改」 |
 | Q8 | `scope_allow` 未包含 `evidence/**`，与任务卡 `outputs:` 指定的 `evidence/M0/M0-02/{commands.md,ac.md,migration-diff.md,http/**}` 冲突；另 S3 的产出列只写 `src/campaignlab/api/**`，而 `state.json` 的 `M0-02.scope` 还含 `src/campaignlab/application/`、`src/campaignlab/infra/db/`、`tests/api/session/`、`tests/integration/bootstrap/`。 | S3/S5 是否越界（手册 6.4 要求越界即回报） | 按 `scope_allow` ∪ `state.json.M0-02.scope` 划白名单（均在 `src/campaignlab/**` 内，未触碰 `scope_deny`），`evidence/**` 按 `outputs:` 执行；请裁定确认，或把 `evidence/M0/M0-02/**` 与 `evidence/M0/summaries/**` 显式加入 `scope_allow` |
+
+> **【编排器追注 · 2026-11-13T02:17:03+08:00 · CR-002 / ADR-006 · 只加注不改写】**
+>
+> 上表 **Q4** 已由项目负责人裁定，并按 **选项 B**（从契约移除该参数）原子执行完毕：
+>
+> - `listWorkspaces` 的 `status` 查询参数已从活契约 `contracts/openapi.json` **移除**；
+>   登记见 `contracts/CHANGES.json`（pointer `/paths/~1workspaces/get/parameters/3`，kind `removed`，cr `CR-002`，adr `ADR-006`），登记项 12 → 13。
+> - 故 Q4 的临时处置（常量 `WORKSPACE_STATUS_WHITELIST` 与「任何非空 `status` → 422 `INVALID_SCOPE`」过渡分支）**取消**：
+>   S3/S4 **不得实现**该分支，也**不得**为其编写契约测试或用例期望。
+> - 两份切片（`M0-02.slice.json` / `M0-03.slice.json`）已按移除后的活契约**重切**；
+>   其 `source.openapi.sha16` / `bytes` 的**权威现值**见
+>   `orchestrator/state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16` / `.live_openapi_bytes`，
+>   文档内**禁写死**（依 D-012 / D-013 / D-014）。
+> - 重切后切片内 `listWorkspaces` 的 `status` **查询参数**残留为 0；
+>   仍存在的 `getHealth → Health.properties.status`（enum `READY` / `DEGRADED`）是**合法响应字段**，与本条无关，不得误删。
+>
+> 本追注为**新增留痕**；上表 Q4 行原文**保持字节不变**（手册 15.9 / 15.10：历史测量值绝不重写）。
 
 ## 8. 本文件自检（命令 → rc，均在 WSL 仓库根 `/home/szf/dev/CampaignLab` 执行）
 

@@ -2,6 +2,16 @@
 > 引用 `spec/CampaignLab-SDD-v1.0/framework/FRONTEND.md:12`；AC-034 的 HTTP 负例本体归 M0-02。
 > 修改者为编排器，**非 S1/S2 原作者（Ohm）**；其余内容未改动。
 
+>
+> **编排器追注（2026-11-13T02:17:03+08:00，依 CR-002 / ADR-006 / D-013）**：下文 **PRE-3 门禁自证**
+> （`bytes=443552`、sha256 `01bd28f0…`、`source.openapi.sha16=01bd28f0772f506e`）是 S1/S2 于 HEAD=`f12dcf8`
+> 时点的**历史测量，原值不改写**，但**已作废、不得再作为期望值复跑**：CR-002 选项 B 已移除 `listWorkspaces.status`，
+> 活契约现值 `592571099d638251` / `443309 B`（权威来源
+> `orchestrator/state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16` / `.live_openapi_bytes`，禁写死）。
+> 切片已重切，**S3/S4 必须以重切后的 `orchestrator/handoff/M0-03.slice.json` 为准**。
+> 另：§8 **Q7** 的临时处置已由「临时」转「终态」，详见 §8 表后的编排器追注块；
+> §9 自检中的 ruff 分母（54 files）亦已漂移，权威值见 `counts.ruff_formatted_files`。
+
 # M0-03 设计 · S1 工程骨架与严格基线 + S2 令牌体系
 
 lane F · tier `qwen3.8-max` · 子任务 S1（工程骨架与严格模式基线）+ S2（令牌体系设计）。依据（全部只读）：`orchestrator/tasks/M0-03.md`（含 PRE-3 门禁与文末加注）、`docs/design/token-mapping.md`（唯一令牌真值）、`docs/design/page-component-map.md` §1、`docs/decisions/ADR-003`、`docs/decisions/ADR-005`、`ui/COMMON.md`、`framework/FRONTEND.md`、`orchestrator/handoff/M0-03.slice.json`、`docs/design/frontend-pitfalls.md`。
@@ -102,6 +112,18 @@ S5 需在本节补：`web/src/api/http.ts`（cookie credentials、ETag/If-Match�
 | Q7 | **`listWorkspaces` 的 `status` 查询参数语义未定**：M0-02 设计 Q4 已记「`Workspace` schema 与表都无 `status` 字段」，其临时处置是任何非空 `status` → 422 `INVALID_SCOPE`。 | UI-01 工作区列表是否需要状态筛选控件 | S6 暂不提供该筛选控件；若裁定补 `status` 字段，属契约变更，须重切再派 |
 | Q8 | **`scope_allow` 未含 `orchestrator/handoff/**`**：任务卡 `scope_allow` 只列 `web/**` 与 `evidence/M0/{ui,M0-03}/**`，但档位表把 S2/S5 的 `M0-03-design.md` 与 S10 的 `M0-03-public-components.md` 指定为该目录产物（与 M0-02 设计 Q8 同类冲突）。 | S2/S5/S10 是否越界 | 按档位表 `outputs` 执行（本文件即产物），未触碰 `scope_deny`；请求把这两个文件显式加入 `scope_allow` |
 | Q9 | **`exactOptionalPropertyTypes` 与 Element Plus props 的摩擦风险**：该开关对库组件的可选 prop 极严（`undefined` 与「不传」不等价），S6 铺开表单字段时可能大量报错。 | S6 工作量、typecheck 门禁 | 保留该开关（派单明确要求）。S6 处置口径：可选 prop 用 `v-bind="x ?? undefined"` 或 `:prop="value ?? undefined"`，**不得**为过检查而关掉 tsconfig 开关；摩擦面过大即回报编排器 |
+
+> **【编排器追注 · 2026-11-13T02:17:03+08:00 · CR-002 / ADR-006 · 只加注不改写】**
+>
+> 上表 **Q7** 已随 CR-002 **选项 B** 落定：`listWorkspaces` 的 `status` 查询参数已从活契约移除（ADR-006）。
+>
+> - 「UI-01 **不提供**状态筛选控件」由**临时处置转为终态**；S6 不得实现该控件。
+> - M0-02 设计 Q4 的「任何非空 `status` → 422 `INVALID_SCOPE`」过渡分支同步**取消**，前端不得为其写错误分支断言。
+> - 切片已重切，**S3/S4 必须以重切后的 `orchestrator/handoff/M0-03.slice.json` 为准**；
+>   其 `source.openapi.sha16` / `bytes` 权威现值见
+>   `orchestrator/state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16` / `.live_openapi_bytes`（禁写死）。
+>
+> 本追注为**新增留痕**；上表 Q7 行原文**保持字节不变**。
 
 ## 9. 本文件自检（命令 → 实测 rc；均在 WSL 仓库根 `/home/szf/dev/CampaignLab` 执行）
 

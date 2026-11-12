@@ -1,125 +1,136 @@
 {
- "schema": "campaignlab.contract-changes/1",
- "note": "活契约 contracts/ 相对不可变基线的全部结构差异登记。scripts/check_contracts.py check 强制一一对应。",
- "baseline": {
-  "path": "spec/CampaignLab-SDD-v1.0/contracts",
-  "manifest": "spec/CampaignLab-SDD-v1.0/SHA256SUMS",
-  "manifest_sha256": "3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91",
-  "openapi_info_version_at_baseline": "1.0.0"
- },
- "live": {
-  "path": "contracts",
-  "openapi_info_version": "1.0.1",
-  "normalization": "json indent=2, ensure_ascii=False"
- },
- "entries": [
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyCapacity",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
+  "schema": "campaignlab.contract-changes/1",
+  "note": "活契约 contracts/ 相对不可变基线的全部结构差异登记。scripts/check_contracts.py check 强制一一对应。",
+  "baseline": {
+    "path": "spec/CampaignLab-SDD-v1.0/contracts",
+    "manifest": "spec/CampaignLab-SDD-v1.0/SHA256SUMS",
+    "manifest_sha256": "3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91",
+    "openapi_info_version_at_baseline": "1.0.0"
   },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyComparison",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
+  "live": {
+    "path": "contracts",
+    "openapi_info_version": "1.0.1",
+    "normalization": "json indent=2, ensure_ascii=False"
   },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyOriginOverlap",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyParticipation",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyProduction",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyReview",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/MonthlyTrend",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/Review/properties/monthly_review",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/components/schemas/ReviewCreate/properties/profile",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "openapi.json",
-   "pointer": "/info/version",
-   "kind": "changed",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "UPDATE"
-  },
-  {
-   "file": "source-json.schema.json",
-   "pointer": "/$defs/SourceMetadata/properties/monthly_review",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  },
-  {
-   "file": "source-metadata.schema.json",
-   "pointer": "/properties/monthly_review",
-   "kind": "added",
-   "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "cr": "CR-001",
-   "adr": "ADR-004",
-   "delta_tool_state": "ADD"
-  }
- ]
+  "entries": [
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyCapacity",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyComparison",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyOriginOverlap",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyParticipation",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyProduction",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyReview",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/MonthlyTrend",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/Review/properties/monthly_review",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/components/schemas/ReviewCreate/properties/profile",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/info/version",
+      "kind": "changed",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "UPDATE"
+    },
+    {
+      "file": "source-json.schema.json",
+      "pointer": "/$defs/SourceMetadata/properties/monthly_review",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "source-metadata.schema.json",
+      "pointer": "/properties/monthly_review",
+      "kind": "added",
+      "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "cr": "CR-001",
+      "adr": "ADR-004",
+      "delta_tool_state": "ADD"
+    },
+    {
+      "file": "openapi.json",
+      "pointer": "/paths/~1workspaces/get/parameters/3",
+      "kind": "removed",
+      "source": "orchestrator/change-requests/CR-002.md",
+      "cr": "CR-002",
+      "adr": "ADR-006",
+      "delta_tool_state": "N/A（非 monthly_delta.py 产出；由编排器依项目负责人裁定的 CR-002 选项 B 手工登记）",
+      "registered_at": "2026-11-13T02:13:12+08:00",
+      "note": "pointer 与 kind 由 python3 scripts/check_contracts.py diff 实测得到（removed /paths/~1workspaces/get/parameters/3），非手写猜测；移除理由与影响面见 docs/decisions/ADR-006-remove-listworkspaces-status.md"
+    }
+  ]
 }

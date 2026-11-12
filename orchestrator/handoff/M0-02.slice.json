@@ -4,8 +4,8 @@
   "live_contracts": "contracts",
   "openapi": {
    "path": "contracts/openapi.json",
-   "bytes": 443552,
-   "sha16": "01bd28f0772f506e"
+   "bytes": 443309,
+   "sha16": "592571099d638251"
   },
   "readonly_originals": "spec/CampaignLab-SDD-v1.0",
   "monthly_delta": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
@@ -386,16 +386,6 @@
        "type": "string",
        "minLength": 1,
        "maxLength": 100
-      }
-     },
-     {
-      "name": "status",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "minLength": 1,
-       "maxLength": 60
       }
      }
     ],
