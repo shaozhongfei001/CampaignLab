@@ -205,5 +205,8 @@ ramework
 
 - 判定：Noto Sans CJK 已注册到中文字体族，字形度量与行内设计基线一致的障碍消除；
   `orchestrator/BLOCKERS.md` 的 BLK-02 由「安装进行中」置为**已关闭**。
-- 剩余 WARN 仅 BLK-01（Playwright 浏览器真跑待 M0-03 验证），非阻塞。
+- **更正（同轮实测）**：`doctor.sh` 摘要实为 `PASS=16 WARN=0 FAIL=0 / RESULT: HEALTHY`，即 BLK-01 在 doctor 口径下也已是 `[ OK ]`（浏览器缓存存在 + `web/node_modules/@playwright/test` 已安装），本节初稿写的「剩余 WARN 仅 BLK-01」不准确，特此更正。
+- BLK-01 仍**保持开启**，但性质由「环境缺失」降为「任务级待验证」：doctor 只证明缓存与包存在，未证明浏览器能用真实 spec 启动；须由 M0-03 真跑一次 Playwright 才能关闭（见 BLOCKERS 该行措辞）。
 - 本节不改动 `spec/`，不并发改写 `sources.list`；密码零落盘（安装由已落地的限定范围免密 sudo 完成）。
+
+- 更正时间：2026-11-12T22:56:48+08:00；提交信息 `8ce2bdc` 中同样含该不准确表述，因禁止 force-push 不改写历史，仅在此留痕（同 NOTE-03 处理口径）。

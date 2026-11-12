@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 0,
-  "updated_at": "2026-11-12T22:55:34+08:00",
+  "updated_at": "2026-11-12T22:56:48+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -2237,8 +2237,18 @@
         "fc_lang_zh_noto_count": 30,
         "doctor_rc": 0,
         "verified_at": "2026-11-12T22:55:34+08:00",
-        "blocker": "BLK-02 CLOSED"
-      }
+        "blocker": "BLK-02 CLOSED",
+        "doctor_summary": "PASS=16 WARN=0 FAIL=0 RESULT=HEALTHY"
+      },
+      "doctor_summary": {
+        "PASS": 16,
+        "WARN": 0,
+        "FAIL": 0,
+        "RESULT": "HEALTHY",
+        "rc": 0,
+        "at": "2026-11-12T22:56:48+08:00"
+      },
+      "blk01_status": "OPEN_TASK_LEVEL：doctor 判 OK（缓存+包存在），但需 M0-03 用真实 spec 启动一次才能关闭"
     }
   },
   "acceptance": {

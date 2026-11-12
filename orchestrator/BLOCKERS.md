@@ -2,7 +2,7 @@
 
 | 编号 | 阻塞任务 | 事项 | 需要谁 | 建议命令或动作 |
 |---|---|---|---|---|
-| BLK-01 | 降级：待 M0-03 验证 | Playwright 浏览器缓存已存在（chromium-1254 与 headless shell），可能无需 sudo | 待验证 | M0-03 用真实 spec 启动一次；失败再走 npx playwright install --with-deps chromium |
+| BLK-01 | M0-03（性质已降级为任务级待验证） | `doctor.sh` 已判 `[ OK ]`：浏览器缓存存在（chromium-1234/1254 与 headless shell）+ `web/node_modules/@playwright/test` 已安装，摘要 `PASS=16 WARN=0 FAIL=0`。但 doctor 只证明「存在」，不证明「能用真实 spec 启动」 | 无需人工 | M0-03 用真实 spec 启动一次 Playwright 并留证据；成功即置已关闭；失败再走 `npx playwright install --with-deps chromium`（免密 sudo 已就绪） |
 | BLK-02 | 已关闭（2026-11-12T22:55:34+08:00） | `fonts-noto-cjk 1:20230817+repack1-3` 安装完成；`fc-list :lang=zh \| grep -ci noto` = 30，`bash scripts/doctor.sh` rc=0；M0-03、M5-01 的视觉走查不再需要「字体度量不一致」声明 | — | 证据：`evidence/monthly/M0-P01/run-04/commands.md` 第 7 节 |
 | BLK-03 | 各阶段 PR | gh 未认证，编排器无法建 PR 与触发 workflow | 项目负责人 | `gh auth login`，或用 compare 链接手工建 PR |
 | BLK-04 | M3-01、M3-03 的行内语义 | ADR-003 三项未决（主色与导航、语义色分层、图表补偿） | 项目负责人 | 现按推荐值推进并留痕，收到裁定后回归核对 |
