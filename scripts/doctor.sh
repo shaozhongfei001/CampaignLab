@@ -243,7 +243,11 @@ fi
 if have fc-list; then
   ZH="$(fc-list :lang=zh 2>/dev/null | wc -l)"
   if [ "$ZH" -gt 0 ]; then ok "存在中文字体（fc-list :lang=zh = ${ZH} 条）"; else warn "无中文字体，视觉走查结论不可用（BLK-02，需 root 安装 fonts-noto-cjk）"; fi
-  if fc-list 2>/dev/null | grep -qi "noto sans cjk"; then info "Noto Sans CJK 已安装"; else warn "未安装 Noto Sans CJK（BLK-02 未解除，字体度量可能与行内设计基线不一致）"; fi
+  # D-007：此处曾用 `fc-list | grep -qi`。grep -q 命中即退出，fc-list（约 18.8KB 输出）继续写管道
+  # 会收 SIGPIPE(141)，在 set -uo pipefail 下被传播成「未安装」假 WARN（实测 30 次中 28 次误报）。
+  # grep -c 读完全部输入不提前退出，故无 SIGPIPE；同时把命中条数写进消息便于取证。
+  NOTO_CNT="$(fc-list 2>/dev/null | grep -ci "noto sans cjk")"
+  if [ "${NOTO_CNT:-0}" -gt 0 ]; then info "Noto Sans CJK 已安装（fc-list 命中 ${NOTO_CNT} 条）"; else warn "未安装 Noto Sans CJK（BLK-02 未解除，字体度量可能与行内设计基线不一致）"; fi
 else
   warn "fc-list 不可用，无法判定字体"
 fi

@@ -210,3 +210,27 @@ ramework
 - 本节不改动 `spec/`，不并发改写 `sources.list`；密码零落盘（安装由已落地的限定范围免密 sudo 完成）。
 
 - 更正时间：2026-11-12T22:56:48+08:00；提交信息 `8ce2bdc` 中同样含该不准确表述，因禁止 force-push 不改写历史，仅在此留痕（同 NOTE-03 处理口径）。
+
+
+## 8. 重要更正：第 7 节的 `PASS=16 WARN=0` 是**侥幸绿**，根因见 D-007（2026-11-12T23:30:05+08:00）
+
+第 7 节记录的 `PASS=16 WARN=0 FAIL=0` 与提交 `8ce2bdc`、`33bf5c5` 中的「doctor 实为 WARN=0」
+**不成立**：那是 `scripts/doctor.sh:246` 的 SIGPIPE 竞态落在少数幸运分支上的结果。
+
+- Q lane 取证员（qwen3.8-flash）在复核 D-001..D-006 时发现该矛盾（发现编号 F-A4-1）。
+- 编排器独立复现（修复前，30 次）：`rc0=2`、`rc141_sigpipe=28`、`rc1_nomatch=0` → 假 WARN 率 93%。
+- 机理：脚本头 `set -uo pipefail`；`grep -q` 命中即退出（第 21 行 / 共 169 行），
+  `fc-list` 输出 18,876 字节 > 管道缓冲，继续写 → SIGPIPE(141) → pipefail 传播 → 走 else 报「未安装」。
+- 对照组：`fc-list :lang=zh | grep -qi noto` 20 次全 rc=0（`:lang=zh` 仅 3,269 字节，不阻塞）——
+  这正是编排器早先自测未复现问题的原因。
+- 修复：改用 `NOTO_CNT="$(fc-list 2>/dev/null | grep -ci "noto sans cjk")"`；`grep -c` 读完全部输入，无提前退出。
+- 修复后实测：连跑 30 次 doctor，出现「未安装 Noto Sans CJK」的次数 = **0/30**；
+  `Noto Sans CJK 已安装（fc-list 命中 10 条）`；`bash scripts/doctor.sh` rc=0；
+  `pytest -q` = **32 passed**（原 28，新增 4 条回归）；`mypy` = 7 源文件；`ruff check` rc=0；`ruff format --check .` = 46 files rc=0。
+- 判读纪律（一并更正第 7 节的口径）：`doctor.sh:54-59` 会用 `git status --porcelain` 对脏树 **WARN**，
+  `DOCTOR_SKIP_VERIFY=1` 也会 **WARN**。故 **WARN 计数不可单独作为判据**，必须看 WARN 文本；
+  「脏树」与「跳过 verify」两类 WARN 在子智能体并发写文件时属预期。
+- BLK-02 的关闭结论不受影响：字体确已安装（`dpkg -l` 有 `ii` + `fc-list` 命中 10 条为独立证据），
+  此前 WARN 属工具假阴性。
+- 缺陷单：`orchestrator/defects/D-007.md`（MAJOR，FIXED_PENDING_Q）；回归：`tests/unit/test_doctor_determinism.py`。
+- 提交信息 `8ce2bdc`、`33bf5c5` 含上述不准确表述；禁止 force-push，故不改写历史，仅在此更正留痕（同 NOTE-03 口径）。
