@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T05:13:29+08:00",
+  "updated_at": "2026-11-13T05:33:25+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -3202,7 +3202,7 @@
       "counts": {
         "pytest_passed": 76,
         "mypy_source_files": 16,
-        "ruff_formatted_files": 88,
+        "ruff_formatted_files": 91,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -3211,31 +3211,32 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 88,
+          "total": 91,
           "in_scope_py": 18,
-          "in_scope_md": 70,
+          "in_scope_md": 73,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T04:58:57+08:00：Round 4 派单前置治理提交前刷新。新增 1 个 md（orchestrator/handoff/D-016-batch2-context.md）使 md 分母 69→70、总分母 87→88；5 份 .slice.json 为 json，不计入 ruff format 作用域（已实测：新增后 ruff 报 88）。",
+          "measured_after": "2026-11-13T05:33:25+08:00：手册升 v1.8（新增 §15.11）与 Round 4 四 lane 在飞期间刷新。**本值为在飞中间态**：tracked_in_scope=88（py 18 + md 70，手册为 modified 不增计数）+ untracked_not_ignored_in_scope=3（Round 4 lane 产物：orchestrator/handoff/M0-04-design.md 属 Heisenberg、orchestrator/tasks/M3-01.md 与 M3-02.md 属 Archimedes）== ruff_total(91)。Round 4 产物入库后必须由编排器再刷新一次（届时 untracked=0、tracked=91），并复验恒等式。",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "提交前实测 tracked_in_scope(87: py 18 + md 69) + untracked_not_ignored_in_scope(1) == ruff_total(88) -> True；提交后预期 tracked(88: py 18 + md 70) + untracked(0) == 88，由编排器在 push 后复测并回填。",
+          "identity": "tracked_in_scope(88: py 18 + md 70) + untracked_not_ignored_in_scope(3: Round4 在飞 lane 产物) == ruff_total(91) -> True（双口径互验：-c core.quotepath=false 与 -z NUL 两种数法 md 均为 70）",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
-            "+1 md（orchestrator/handoff/D-016-batch2-context.md，D-016 批次2 预抽上下文）"
+            "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
+            "+2 md（orchestrator/tasks/M3-01.md、M3-02.md，T lane Archimedes / D-016 批次2，尚余 M3-03、M4-01 在飞）"
           ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "git add 显式 8 路径后复测：untracked_in_scope 应为 0，tracked 应为 88。",
+          "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 87,
-          "untracked_component_sum_check": "0 py + 1 md = 1，与 untracked_in_scope 实测 1 相等"
+          "prev_total": 88,
+          "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等"
         },
         "ruff_lint_scope_files": 18,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T04:58:57+08:00",
-        "counts_refresh_reason": "Round 4 派单前置：+1 md 使 ruff format 分母 87→88；ruff_lint_scope_files（纯 Python 稳定分母）保持 18 不变；pytest 76 passed / mypy 16 源文件 / contract 登记项 13 / 前端基线 8/8 复跑均未变。",
+        "counts_refreshed_at": "2026-11-13T05:33:25+08:00",
+        "counts_refresh_reason": "手册 v1.8 治理提交 + Round 4 在飞产物使 ruff format 分母实测 88→91；纯 Python 稳定分母 ruff_lint_scope_files 保持 18 不变；pytest/mypy/契约/前端基线本轮未复跑（Lane A 正独占 Python 工具链，编排器不与之并发争用 .venv，避免 NOTE-10 假红），沿用 04:58:57 实测值 76/16/13/8。",
         "live_openapi_bytes": 443309
       },
       "denominator_history": [
