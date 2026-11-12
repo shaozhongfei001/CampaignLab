@@ -1,2244 +1,2371 @@
 {
- "schema": "1.0",
- "phase": "M0",
- "wave": 0,
- "updated_at": "2026-11-12T22:16:36+08:00",
- "budget": {
-  "phase_quota": 100,
-  "phase_used": 0,
-  "flash_share_tasks": 0.0,
-  "flash_share_tokens": 0.0,
-  "phase_quotas": {
-   "M0": 100,
-   "M1": 150,
-   "M2": 150,
-   "M3": 175,
-   "M4": 140,
-   "M5": 110
+  "schema": "1.0",
+  "phase": "M0",
+  "wave": 0,
+  "updated_at": "2026-11-12T22:52:29+08:00",
+  "budget": {
+    "phase_quota": 100,
+    "phase_used": 0,
+    "flash_share_tasks": 0.0,
+    "flash_share_tokens": 0.0,
+    "phase_quotas": {
+      "M0": 100,
+      "M1": 150,
+      "M2": 150,
+      "M3": 175,
+      "M4": 140,
+      "M5": 110
+    },
+    "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额",
+    "subtask_log": [],
+    "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
+    "accounting_status": "NOT_STARTED（已派子任务数=0，故占比暂不可测；wave1 起必须有真值）"
   },
-  "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额",
-  "subtask_log": [],
-  "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
-  "accounting_status": "NOT_STARTED（已派子任务数=0，故占比暂不可测；wave1 起必须有真值）"
- },
- "tasks": {
-  "M0-01": {
-   "status": "VERIFYING",
-   "lane": "T",
-   "tier_planned": "max",
-   "tier_used": "max",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "uv lock --check",
-     "cmd": "uv lock --check",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/commands.md"
+  "tasks": {
+    "M0-01": {
+      "status": "VERIFYING",
+      "lane": "T",
+      "tier_planned": "max",
+      "tier_used": "max",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "uv lock --check",
+          "cmd": "uv lock --check",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/commands.md"
+        },
+        {
+          "id": "uv sync --locked",
+          "cmd": "uv sync --locked",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/commands.md"
+        },
+        {
+          "id": "npm ci",
+          "cmd": "npm --prefix web ci",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/npm.md"
+        },
+        {
+          "id": "npm run build",
+          "cmd": "npm --prefix web run build",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/npm.md"
+        },
+        {
+          "id": "doctor HEALTHY",
+          "cmd": "bash scripts/doctor.sh",
+          "rc": 0,
+          "evidence": "evidence/M0/env.md"
+        },
+        {
+          "id": "prototype baseline",
+          "cmd": "bash scripts/verify.sh",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/orchestrator-verification.md"
+        },
+        {
+          "id": "python quality gates",
+          "cmd": "ruff check . ; ruff format --check . ; mypy ; pytest -q",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/recovery-2026-11-12.md"
+        },
+        {
+          "id": "cp314 wheels (BLK-06 closed)",
+          "cmd": "uv sync (duckdb 2.0.0 / pydantic-core 2.50.4 / fastapi 0.162.4 / sqlalchemy 2.0.57 / alembic 1.20.1)",
+          "rc": 0,
+          "evidence": "evidence/M0/M0-01/wheels.md"
+        },
+        {
+          "id": "contract slice tool D-001 fix",
+          "cmd": "contract_slice.py --all-tables ; diff vs legacy ; pytest",
+          "rc": 0,
+          "evidence": "orchestrator/defects/D-001.md"
+        }
+      ],
+      "acs": [],
+      "deps": [],
+      "scope": [
+        "pyproject.toml",
+        "uv.lock",
+        ".python-version",
+        "web/package.json",
+        "web/package-lock.json",
+        "scripts/",
+        "evidence/M0/env.md",
+        "contracts/PROVENANCE.md"
+      ],
+      "blockers": [],
+      "agent": "01a1cbe8-fca4-7ee3-93f9-60d3bd4d1f20",
+      "escalated": false,
+      "evidence": [
+        "evidence/M0/env.md",
+        "evidence/M0/M0-01/",
+        "evidence/M0/summaries/M0-01.md"
+      ],
+      "note": "wave0 出口自验全绿；断电恢复后 mypy 与 pytest 由不可用转绿（强于中断前）。待 Q 交叉验证判 PASS / PASS_WITH_TODO。",
+      "depth": 1,
+      "height": 14,
+      "slack": 0,
+      "critical": true
     },
-    {
-     "id": "uv sync --locked",
-     "cmd": "uv sync --locked",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/commands.md"
+    "M0-02": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-001",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-034",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-035",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "alembic 首迁与 sqlite-v1.sql 结构比对通过",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "契约测试 202/Problem/ETag/幂等",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-001",
+        "AC-034",
+        "AC-035"
+      ],
+      "deps": [
+        "M0-01"
+      ],
+      "scope": [
+        "src/campaignlab/api/session.py",
+        "src/campaignlab/api/workspaces.py",
+        "src/campaignlab/api/common.py",
+        "src/campaignlab/application/",
+        "src/campaignlab/infra/db/",
+        "migrations/",
+        "tests/api/session/",
+        "tests/integration/bootstrap/"
+      ],
+      "blockers": [],
+      "depth": 2,
+      "height": 13,
+      "slack": 0,
+      "critical": true
     },
-    {
-     "id": "npm ci",
-     "cmd": "npm --prefix web ci",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/npm.md"
+    "M0-03": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-001 页面侧",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-034",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "vue-tsc 通过",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "vitest 通过",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "1440x900 与 1024x768 截图",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "公共组件冻结清单",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-001",
+        "AC-034"
+      ],
+      "deps": [
+        "M0-01"
+      ],
+      "scope": [
+        "web/src/router/",
+        "web/src/styles/",
+        "web/src/components/",
+        "web/src/composables/",
+        "web/src/api/",
+        "web/src/pages/workspace/",
+        "web/tests/unit/shell/",
+        "evidence/M0/ui/"
+      ],
+      "blockers": [],
+      "depth": 2,
+      "height": 5,
+      "slack": 8,
+      "critical": false
     },
-    {
-     "id": "npm run build",
-     "cmd": "npm --prefix web run build",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/npm.md"
+    "M0-03b": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "flash",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "vitest 覆盖六态",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "截图归档",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [],
+      "deps": [
+        "M0-03"
+      ],
+      "scope": [
+        "web/src/components/state/",
+        "web/tests/unit/state/"
+      ],
+      "blockers": [],
+      "depth": 3,
+      "height": 1,
+      "slack": 11,
+      "critical": false
     },
-    {
-     "id": "doctor HEALTHY",
-     "cmd": "bash scripts/doctor.sh",
-     "rc": 0,
-     "evidence": "evidence/M0/env.md"
+    "M0-04": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-029 负例（含 worker 中断后续租与恢复）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-031",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-029",
+        "AC-031"
+      ],
+      "deps": [
+        "M0-02"
+      ],
+      "scope": [
+        "src/campaignlab/worker/",
+        "src/campaignlab/api/jobs.py",
+        "src/campaignlab/infra/artifacts.py",
+        "tests/integration/jobs/"
+      ],
+      "blockers": [],
+      "depth": 3,
+      "height": 12,
+      "slack": 0,
+      "critical": true
     },
-    {
-     "id": "prototype baseline",
-     "cmd": "bash scripts/verify.sh",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/orchestrator-verification.md"
+    "M1-01": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-005",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-006",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "A/B 各 510 切片、B 长表 4590 阶段项",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "大于 8MiB 拒绝",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "负例返回具体行列",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-005",
+        "AC-006"
+      ],
+      "deps": [
+        "M0-04"
+      ],
+      "scope": [
+        "src/campaignlab/domain/ingest/",
+        "src/campaignlab/api/imports.py",
+        "src/campaignlab/infra/files.py",
+        "tests/domain/ingest/",
+        "tests/golden/ingest/"
+      ],
+      "blockers": [],
+      "depth": 4,
+      "height": 11,
+      "slack": 0,
+      "critical": true
     },
-    {
-     "id": "python quality gates",
-     "cmd": "ruff check . ; ruff format --check . ; mypy ; pytest -q",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/recovery-2026-11-12.md"
+    "M1-02": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-007",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-008",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-020",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "A-001-R1 为 -394900000 分且原 A-001 仍为 -407400000 分",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-007",
+        "AC-008",
+        "AC-020"
+      ],
+      "deps": [
+        "M1-01"
+      ],
+      "scope": [
+        "src/campaignlab/domain/snapshot/",
+        "src/campaignlab/api/snapshots.py",
+        "src/campaignlab/api/definitions.py",
+        "tests/domain/snapshot/",
+        "tests/golden/snapshot/"
+      ],
+      "blockers": [],
+      "depth": 5,
+      "height": 10,
+      "slack": 0,
+      "critical": true
     },
-    {
-     "id": "cp314 wheels (BLK-06 closed)",
-     "cmd": "uv sync (duckdb 2.0.0 / pydantic-core 2.50.4 / fastapi 0.162.4 / sqlalchemy 2.0.57 / alembic 1.20.1)",
-     "rc": 0,
-     "evidence": "evidence/M0/M0-01/wheels.md"
+    "M1-03": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-009",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-010",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-011",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "远程财私 59/60 与个贷 9/10 两侧正确",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "推送 B 2/3 秒两侧正确",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-009",
+        "AC-010",
+        "AC-011"
+      ],
+      "deps": [
+        "M1-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/caliber/",
+        "src/campaignlab/api/channels.py",
+        "src/campaignlab/api/compare.py",
+        "tests/domain/caliber/",
+        "tests/golden/caliber/"
+      ],
+      "blockers": [],
+      "depth": 6,
+      "height": 2,
+      "slack": 7,
+      "critical": false
     },
-    {
-     "id": "contract slice tool D-001 fix",
-     "cmd": "contract_slice.py --all-tables ; diff vs legacy ; pytest",
-     "rc": 0,
-     "evidence": "orchestrator/defects/D-001.md"
+    "M1-04": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-005 至 AC-011 页面侧",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-020",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "vitest 与 Playwright 走查",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "截图归档",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-005",
+        "AC-011",
+        "AC-020"
+      ],
+      "deps": [
+        "M0-03",
+        "M1-01",
+        "M1-02",
+        "M1-03"
+      ],
+      "scope": [
+        "web/src/pages/data/",
+        "web/src/features/import/",
+        "web/src/features/scope/",
+        "web/tests/unit/data/",
+        "web/tests/e2e/data/"
+      ],
+      "blockers": [],
+      "depth": 7,
+      "height": 1,
+      "slack": 7,
+      "critical": false
+    },
+    "M2-01": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-002",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-003",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-004",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "确认版不可变、变更走草稿",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "旧 ETag 拒绝(412)",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-002",
+        "AC-003",
+        "AC-004"
+      ],
+      "deps": [
+        "M0-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/activity/",
+        "src/campaignlab/api/activities.py",
+        "src/campaignlab/api/rules.py",
+        "tests/domain/activity/",
+        "tests/api/activities/"
+      ],
+      "blockers": [],
+      "depth": 3,
+      "height": 8,
+      "slack": 4,
+      "critical": false
+    },
+    "M2-02": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-012",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-013",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-014",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-015",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "golden-cases.json 双版本 100% 一致",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "反例覆盖正负一分与端点",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-012",
+        "AC-013",
+        "AC-014",
+        "AC-015"
+      ],
+      "deps": [
+        "M2-01",
+        "M0-04"
+      ],
+      "scope": [
+        "src/campaignlab/domain/rules/",
+        "src/campaignlab/domain/replay/",
+        "tests/domain/rules/",
+        "tests/golden/rules/"
+      ],
+      "blockers": [],
+      "depth": 4,
+      "height": 7,
+      "slack": 4,
+      "critical": false
+    },
+    "M2-03": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-016",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-017",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "五种预发状态逐一对齐 preflight-vectors.json",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-016",
+        "AC-017"
+      ],
+      "deps": [
+        "M2-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/preflight/",
+        "src/campaignlab/api/preflight.py",
+        "tests/domain/preflight/",
+        "tests/integration/preflight/"
+      ],
+      "blockers": [],
+      "depth": 5,
+      "height": 6,
+      "slack": 4,
+      "critical": false
+    },
+    "M2-04": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-002 至 AC-004、AC-012 至 AC-017 页面侧",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "Playwright 赠券闭环录像与截图",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-002",
+        "AC-004",
+        "AC-012",
+        "AC-017"
+      ],
+      "deps": [
+        "M0-03",
+        "M2-01",
+        "M2-02",
+        "M2-03"
+      ],
+      "scope": [
+        "web/src/pages/rules/",
+        "web/src/pages/cases/",
+        "web/src/features/diff/",
+        "web/tests/unit/rules/",
+        "web/tests/e2e/coupon/"
+      ],
+      "blockers": [],
+      "depth": 6,
+      "height": 1,
+      "slack": 8,
+      "critical": false
+    },
+    "M3-01": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-018",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-019",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-020",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-033",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "analytics-golden.json 全量对齐",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-018",
+        "AC-019",
+        "AC-020",
+        "AC-033"
+      ],
+      "deps": [
+        "M1-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/analytics/",
+        "src/campaignlab/infra/duckdb/",
+        "src/campaignlab/api/reviews.py",
+        "tests/domain/analytics/",
+        "tests/golden/analytics/"
+      ],
+      "blockers": [],
+      "depth": 6,
+      "height": 9,
+      "slack": 0,
+      "critical": true
+    },
+    "M3-02": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-021",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-022",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-024",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "正负贡献分解与黄金值一致",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-021",
+        "AC-022",
+        "AC-024"
+      ],
+      "deps": [
+        "M3-01"
+      ],
+      "scope": [
+        "src/campaignlab/domain/diagnosis/",
+        "src/campaignlab/api/diagnosis.py",
+        "src/campaignlab/api/estimate.py",
+        "tests/domain/diagnosis/",
+        "tests/golden/diagnosis/"
+      ],
+      "blockers": [],
+      "depth": 7,
+      "height": 8,
+      "slack": 0,
+      "critical": true
+    },
+    "M3-03": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-023",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "60 条问法计划全部可重复执行",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "歧义问法返回待澄清",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-023"
+      ],
+      "deps": [
+        "M3-01",
+        "M3-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/ask/",
+        "src/campaignlab/api/ask.py",
+        "tests/domain/ask/",
+        "tests/golden/ask/"
+      ],
+      "blockers": [],
+      "depth": 8,
+      "height": 7,
+      "slack": 0,
+      "critical": true
+    },
+    "M3-04": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-018 至 AC-024、AC-033 页面侧",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "漏斗与趋势图等义表格可切换",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "截图归档",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-018",
+        "AC-024",
+        "AC-033"
+      ],
+      "deps": [
+        "M0-03",
+        "M3-01",
+        "M3-02",
+        "M3-03"
+      ],
+      "scope": [
+        "web/src/pages/review/",
+        "web/src/features/charts/",
+        "web/tests/unit/review/",
+        "web/tests/e2e/review/"
+      ],
+      "blockers": [],
+      "depth": 9,
+      "height": 4,
+      "slack": 2,
+      "critical": false
+    },
+    "M4-01": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-025",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-026",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "历史签认与后续记录可同时查询",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-025",
+        "AC-026"
+      ],
+      "deps": [
+        "M3-03"
+      ],
+      "scope": [
+        "src/campaignlab/domain/report/",
+        "src/campaignlab/api/reports.py",
+        "tests/domain/report/",
+        "tests/integration/report/"
+      ],
+      "blockers": [],
+      "depth": 9,
+      "height": 6,
+      "slack": 0,
+      "critical": true
+    },
+    "M4-02": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-027",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-028",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-030",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "导出制品原子且可校验",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-027",
+        "AC-028",
+        "AC-030"
+      ],
+      "deps": [
+        "M2-03",
+        "M4-01"
+      ],
+      "scope": [
+        "src/campaignlab/domain/action/",
+        "src/campaignlab/infra/audit/",
+        "src/campaignlab/api/actions.py",
+        "src/campaignlab/api/evidence.py",
+        "tests/domain/action/",
+        "tests/integration/audit/"
+      ],
+      "blockers": [],
+      "depth": 10,
+      "height": 5,
+      "slack": 0,
+      "critical": true
+    },
+    "M4-03": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-025 至 AC-028、AC-030 页面侧",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "回拨闭环 Playwright 证据",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-025",
+        "AC-028",
+        "AC-030"
+      ],
+      "deps": [
+        "M0-03",
+        "M0-04",
+        "M4-01",
+        "M4-02"
+      ],
+      "scope": [
+        "web/src/pages/report/",
+        "web/src/pages/evidence/",
+        "web/tests/unit/report/",
+        "web/tests/e2e/callback/"
+      ],
+      "blockers": [],
+      "depth": 11,
+      "height": 4,
+      "slack": 0,
+      "critical": true
+    },
+    "M5-01": {
+      "status": "TODO",
+      "lane": "T",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-029",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-031",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-032",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-035",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "backup/restore 演练成功",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "断网后数据图表静态资源与会话仍工作",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "性能量测记录",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-029",
+        "AC-031",
+        "AC-032",
+        "AC-035"
+      ],
+      "deps": [
+        "M4-03"
+      ],
+      "scope": [
+        "scripts/",
+        "tests/perf/",
+        "tests/recovery/",
+        "evidence/M5/"
+      ],
+      "blockers": [],
+      "depth": 12,
+      "height": 3,
+      "slack": 0,
+      "critical": true
+    },
+    "M5-02": {
+      "status": "TODO",
+      "lane": "Q",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "35 条 AC 逐条结论",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "缺陷单齐备",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "独立环境与开发环境隔离",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [],
+      "deps": [
+        "M5-01"
+      ],
+      "scope": [
+        "qa-reports/m5-02/",
+        "evidence/M5-qa/",
+        "orchestrator/defects/D-*.md"
+      ],
+      "blockers": [],
+      "ac_scope": "47 条（原 35 + AC-MR-01..12）",
+      "note": "独立 QA 重跑全部 47 条 AC；与 M5-P01 并行。写权限收敛到 qa-reports/m5-02/ 与 defects/D-*.md，与 M5-P01 的 qa-reports/monthly/ 与 defects/DMR-*.md 文件名不相交（M0-P01 校验器要求）。",
+      "depth": 13,
+      "height": 2,
+      "slack": 0,
+      "critical": true
+    },
+    "M5-03": {
+      "status": "TODO",
+      "lane": "O",
+      "tier_planned": "human",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "交付回执签署",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "待补事项与责任明确",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [],
+      "deps": [
+        "M5-02",
+        "M5-P01"
+      ],
+      "scope": [
+        "docs/delivery/HANDOVER.md"
+      ],
+      "blockers": [],
+      "note": "交付确认必须同时覆盖三条端到端路径（赠券、回拨、全行月报），故依赖 M5-P01。",
+      "depth": 14,
+      "height": 1,
+      "slack": 0,
+      "critical": true
+    },
+    "M0-P01": {
+      "status": "DONE",
+      "lane": "T",
+      "tier_planned": "max",
+      "tier_used": "max",
+      "attempt": 1,
+      "tokens": 0,
+      "commit": "baa7389f413b02f727c2df777fa1fa903c47091b",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "patch manifest sha256sum -c (21)",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
+        },
+        {
+          "id": "monthly_delta.py --base <v1.0 zip>",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/precheck-base.log"
+        },
+        {
+          "id": "monthly_delta.py --contracts-dir contracts (pre)",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
+        },
+        {
+          "id": "check_contracts.py diff (12 pointers, both baselines)",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/merged-diff.log"
+        },
+        {
+          "id": "check_contracts.py check --validate",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/check-validate.log"
+        },
+        {
+          "id": "monthly_delta.py post-merge (12 ALREADY, idempotent)",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-01/post-merge-precheck.log"
+        },
+        {
+          "id": "tamper negative test (check must fail)",
+          "rc": 1,
+          "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
+        },
+        {
+          "id": "frontend baseline machine check (D-002)",
+          "cmd": "python3 scripts/check_frontend_baseline.py",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        },
+        {
+          "id": "frontend baseline tamper negative (expect rc=1)",
+          "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css",
+          "rc": 1,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        },
+        {
+          "id": "unit tests for baseline checker (14 passed)",
+          "cmd": "uv run --no-sync pytest -q",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        },
+        {
+          "id": "evidence not ignored (D-003)",
+          "cmd": "git ls-files --others --exclude-standard evidence | wc -l",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        },
+        {
+          "id": "npm ci + build",
+          "cmd": "npm --prefix web ci && npm --prefix web run build",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        },
+        {
+          "id": "doctor HEALTHY",
+          "cmd": "bash scripts/doctor.sh",
+          "rc": 0,
+          "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+        }
+      ],
+      "acs": [],
+      "deps": [],
+      "scope": [
+        "contracts/",
+        "scripts/check_contracts.py",
+        ".github/workflows/verify.yml",
+        "docs/delivery/MONTHLY-DELTA-PLAN.md",
+        "docs/decisions/ADR-004-monthly-review-delta-v1.0.1.md",
+        "orchestrator/change-requests/CR-001.md",
+        "orchestrator/tasks/M0-P01.md",
+        "evidence/monthly/M0-P01/",
+        "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/"
+      ],
+      "blockers": [],
+      "note": "补丁接续登记与月报契约合入，Lane T 自执行；12 节点 ADD/UPDATE，0 CONFLICT；CR-001 + ADR-004。收尾含 D-002（前端基线机读校验 + 6 例单测）与 D-003（证据可入库），提交 29be319。",
+      "depth": 1,
+      "height": 1,
+      "slack": 13,
+      "critical": false,
+      "followup_commits": [
+        "f842ec2",
+        "29be319"
+      ]
+    },
+    "M1-P01": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-MR-01 标准接入（含等价 CSV 复验、旧 A/B 快照请求月报的兼容）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-02 输入负例与授权（重复客户月/重复产能键/缺覆盖客户/未知分行/覆盖声明冲突）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-10 输入侧：修订竞争与不可变旧快照",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "原 AC-005/006/007 回归",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "契约门禁 check_contracts.py check 仍为 PASS（不得偷改活契约）",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-MR-01",
+        "AC-MR-02",
+        "AC-MR-10",
+        "AC-005",
+        "AC-006",
+        "AC-007"
+      ],
+      "deps": [
+        "M0-04",
+        "M1-01",
+        "M1-02"
+      ],
+      "scope": [
+        "src/campaignlab/domain/monthly_ingest/",
+        "src/campaignlab/api/monthly_imports.py",
+        "tests/domain/monthly_ingest/",
+        "tests/golden/monthly_ingest/",
+        "evidence/monthly/M1-P01/"
+      ],
+      "blockers": [],
+      "note": "DISTINCT_CUSTOMER 与扩展粒度、SOURCE_JSON 与等价 CSV 归一、原子发布制品。改公共件（application/ 发布管线）须走 CR。",
+      "depth": 6,
+      "height": 5,
+      "slack": 4,
+      "critical": false
+    },
+    "M3-P01": {
+      "status": "TODO",
+      "lane": "D",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-MR-03 三月与范围桥（7/4/6 户等黄金值）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-04 比较边界（semantic_key 变更/全月缺失/跨年/同名异义/已覆盖零值/月中）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-05 双覆盖与分行参与",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-06 渠道容量（容量=0/使用=0/超额/缺容量/语义键变化）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-07 客群与产品（未知新老客标签、未声明保险余额）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-08 总分行去重（同客户多渠道/重复活动/无法核实交集）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "monthly-golden.json 全量比对 + 原 AC-008、018-022 回归",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-MR-03",
+        "AC-MR-04",
+        "AC-MR-05",
+        "AC-MR-06",
+        "AC-MR-07",
+        "AC-MR-08",
+        "AC-008",
+        "AC-018",
+        "AC-019",
+        "AC-020",
+        "AC-021",
+        "AC-022"
+      ],
+      "deps": [
+        "M1-P01"
+      ],
+      "scope": [
+        "src/campaignlab/domain/monthly/",
+        "src/campaignlab/api/monthly_reviews.py",
+        "tests/domain/monthly/",
+        "tests/golden/monthly/",
+        "evidence/monthly/M3-P01/"
+      ],
+      "blockers": [],
+      "note": "分母/交集/去重/覆盖率口径 = 强制 max。infra/duckdb 与指标注册表属公共件，需扩展走 CR 由 T 串行合并。算法单测可在 M1-P01 完成前用包内样本先行。",
+      "depth": 7,
+      "height": 4,
+      "slack": 4,
+      "critical": false
+    },
+    "M3-P02": {
+      "status": "TODO",
+      "lane": "F",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-MR-03..08 浏览器走查（真实 API、权限、分母与缺口展示、去重与证据交互）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "UI-17 月报视角：趋势/分母/缺口/去重/证据；同一 review_id 进入报告",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "typecheck/lint/test/build 退出码 0；类型客户端按 openapi 1.0.1 重新生成且 diff 为空",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-MR-03",
+        "AC-MR-04",
+        "AC-MR-05",
+        "AC-MR-06",
+        "AC-MR-07",
+        "AC-MR-08"
+      ],
+      "deps": [
+        "M0-03",
+        "M3-P01",
+        "M3-04"
+      ],
+      "scope": [
+        "web/src/pages/review/monthly/",
+        "web/src/features/monthly/",
+        "web/tests/unit/monthly/",
+        "web/tests/e2e/monthly/",
+        "evidence/monthly/M3-P02/"
+      ],
+      "blockers": [],
+      "note": "max 出交互设计 + flash 量产页面与状态。改 UI-17 既有文件或公共组件须走 CR。",
+      "depth": 10,
+      "height": 3,
+      "slack": 2,
+      "critical": false
+    },
+    "M4-P01": {
+      "status": "TODO",
+      "lane": "S",
+      "tier_planned": "mixed",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-MR-09 月报、签认与缺项（PARTIAL_DRAFT、缺焦点月快照）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-10 补采更正与恢复（两份报告其一签认、03 更正、重启与恢复）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-11 行动与下期（改进项责任与检查点、04 复核、无同义口径）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "原 AC-025-030 回归",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-MR-09",
+        "AC-MR-10",
+        "AC-MR-11",
+        "AC-025",
+        "AC-026",
+        "AC-027",
+        "AC-028",
+        "AC-029",
+        "AC-030"
+      ],
+      "deps": [
+        "M4-01",
+        "M4-02",
+        "M4-03",
+        "M3-P01"
+      ],
+      "scope": [
+        "src/campaignlab/domain/monthly_report/",
+        "src/campaignlab/api/monthly_reports.py",
+        "web/src/pages/report/monthly/",
+        "tests/domain/monthly_report/",
+        "tests/integration/monthly_report/",
+        "web/tests/e2e/monthly_report/",
+        "evidence/monthly/M4-P01/"
+      ],
+      "blockers": [],
+      "note": "签认/更正状态机 = 强制 max；UI-21/22/24/26 的月报变体与导出样板可下放 flash。",
+      "depth": 12,
+      "height": 3,
+      "slack": 0,
+      "critical": true
+    },
+    "M5-P01": {
+      "status": "TODO",
+      "lane": "Q",
+      "tier_planned": "max",
+      "tier_used": "",
+      "attempt": 0,
+      "tokens": 0,
+      "commit": "",
+      "branch": "m0-framework",
+      "gates": [
+        {
+          "id": "AC-MR-12 三条路径与交付（赠券/回拨/全行月报同一提交、锁、固定合成数据）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "AC-MR-01..11 独立实测复跑（不复用开发实例与上下文）",
+          "rc": null,
+          "evidence": ""
+        },
+        {
+          "id": "跨工作区、重启与恢复演练",
+          "rc": null,
+          "evidence": ""
+        }
+      ],
+      "acs": [
+        "AC-MR-01",
+        "AC-MR-02",
+        "AC-MR-03",
+        "AC-MR-04",
+        "AC-MR-05",
+        "AC-MR-06",
+        "AC-MR-07",
+        "AC-MR-08",
+        "AC-MR-09",
+        "AC-MR-10",
+        "AC-MR-11",
+        "AC-MR-12"
+      ],
+      "deps": [
+        "M3-P02",
+        "M4-P01",
+        "M5-01"
+      ],
+      "scope": [
+        "qa-reports/monthly/",
+        "evidence/monthly/M5-P01/",
+        "orchestrator/defects/DMR-*.md"
+      ],
+      "blockers": [],
+      "note": "独立 QA 线，与 M5-02 并行；缺陷单编号前缀 DMR- 以与 M5-02 的 D- 文件名不相交。",
+      "depth": 13,
+      "height": 2,
+      "slack": 0,
+      "critical": true
     }
-   ],
-   "acs": [],
-   "deps": [],
-   "scope": [
-    "pyproject.toml",
-    "uv.lock",
-    ".python-version",
-    "web/package.json",
-    "web/package-lock.json",
-    "scripts/",
-    "evidence/M0/env.md",
-    "contracts/PROVENANCE.md"
-   ],
-   "blockers": [],
-   "agent": "01a1cbe8-fca4-7ee3-93f9-60d3bd4d1f20",
-   "escalated": false,
-   "evidence": [
-    "evidence/M0/env.md",
-    "evidence/M0/M0-01/",
-    "evidence/M0/summaries/M0-01.md"
-   ],
-   "note": "wave0 出口自验全绿；断电恢复后 mypy 与 pytest 由不可用转绿（强于中断前）。待 Q 交叉验证判 PASS / PASS_WITH_TODO。",
-   "depth": 1,
-   "height": 14,
-   "slack": 0,
-   "critical": true
   },
-  "M0-02": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
+  "waves": [
     {
-     "id": "AC-001",
-     "rc": null,
-     "evidence": ""
+      "wave": 0,
+      "mode": "serial",
+      "tasks": [
+        "M0-01",
+        "M0-P01"
+      ],
+      "note": "M0-P01 为 v1.0.1 补丁接续登记与契约合入，2026-11-12 由 Lane T 执行完成"
     },
     {
-     "id": "AC-034",
-     "rc": null,
-     "evidence": ""
+      "wave": 1,
+      "mode": "parallel",
+      "tasks": [
+        "M0-02",
+        "M0-03"
+      ]
     },
     {
-     "id": "AC-035",
-     "rc": null,
-     "evidence": ""
+      "wave": 2,
+      "mode": "parallel",
+      "tasks": [
+        "M0-04",
+        "M0-03b"
+      ]
     },
     {
-     "id": "alembic 首迁与 sqlite-v1.sql 结构比对通过",
-     "rc": null,
-     "evidence": ""
+      "wave": 3,
+      "mode": "parallel-lanes",
+      "lanes": {
+        "L1": [
+          "M1-01",
+          "M1-02",
+          "M1-03"
+        ],
+        "L2": [
+          "M2-01",
+          "M2-02",
+          "M2-03"
+        ]
+      },
+      "note": "lane 内串行，两 lane 之间并行；跨 lane 写权限已确认不相交"
     },
     {
-     "id": "契约测试 202/Problem/ETag/幂等",
-     "rc": null,
-     "evidence": ""
+      "wave": 4,
+      "mode": "parallel",
+      "tasks": [
+        "M1-04",
+        "M2-04",
+        "M1-P01"
+      ],
+      "constraint": "pages/data 与 pages/{rules,cases} 与后端 monthly_ingest 三者写权限不相交"
+    },
+    {
+      "wave": 5,
+      "mode": "parallel-lanes",
+      "lanes": {
+        "L1": [
+          "M3-01",
+          "M3-02",
+          "M3-03"
+        ],
+        "L3": [
+          "M3-P01"
+        ]
+      },
+      "note": "L3 只写 domain/monthly 与 tests/{domain,golden}/monthly；infra/duckdb 与指标注册表属公共件，改动走 CR"
+    },
+    {
+      "wave": 6,
+      "mode": "parallel",
+      "tasks": [
+        "M3-04",
+        "M4-01"
+      ]
+    },
+    {
+      "wave": 7,
+      "mode": "parallel-lanes",
+      "lanes": {
+        "L1": [
+          "M4-02",
+          "M4-03"
+        ],
+        "L4": [
+          "M3-P02"
+        ]
+      },
+      "note": "lane 内串行；M3-P02 只写 pages/review/monthly 与 features/monthly，改 UI-17 既有文件走 CR"
+    },
+    {
+      "wave": 8,
+      "mode": "serial",
+      "tasks": [
+        "M4-P01",
+        "M5-01"
+      ]
+    },
+    {
+      "wave": 9,
+      "mode": "parallel",
+      "tasks": [
+        "M5-02",
+        "M5-P01"
+      ],
+      "constraint": "两条独立 QA 线：qa-reports/ + evidence/M5-qa/ + defects/D-* vs qa-reports/monthly/ + evidence/monthly/M5-P01/ + defects/DMR-*"
+    },
+    {
+      "wave": 10,
+      "mode": "serial",
+      "tasks": [
+        "M5-03"
+      ]
     }
-   ],
-   "acs": [
-    "AC-001",
-    "AC-034",
-    "AC-035"
-   ],
-   "deps": [
-    "M0-01"
-   ],
-   "scope": [
-    "src/campaignlab/api/session.py",
-    "src/campaignlab/api/workspaces.py",
-    "src/campaignlab/api/common.py",
-    "src/campaignlab/application/",
-    "src/campaignlab/infra/db/",
-    "migrations/",
-    "tests/api/session/",
-    "tests/integration/bootstrap/"
-   ],
-   "blockers": [],
-   "depth": 2,
-   "height": 13,
-   "slack": 0,
-   "critical": true
-  },
-  "M0-03": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-001 页面侧",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-034",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "vue-tsc 通过",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "vitest 通过",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "1440x900 与 1024x768 截图",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "公共组件冻结清单",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-001",
-    "AC-034"
-   ],
-   "deps": [
-    "M0-01"
-   ],
-   "scope": [
-    "web/src/router/",
-    "web/src/styles/",
-    "web/src/components/",
-    "web/src/composables/",
-    "web/src/api/",
-    "web/src/pages/workspace/",
-    "web/tests/unit/shell/",
-    "evidence/M0/ui/"
-   ],
-   "blockers": [],
-   "depth": 2,
-   "height": 5,
-   "slack": 8,
-   "critical": false
-  },
-  "M0-03b": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "flash",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "vitest 覆盖六态",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "截图归档",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [],
-   "deps": [
-    "M0-03"
-   ],
-   "scope": [
-    "web/src/components/state/",
-    "web/tests/unit/state/"
-   ],
-   "blockers": [],
-   "depth": 3,
-   "height": 1,
-   "slack": 11,
-   "critical": false
-  },
-  "M0-04": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-029 负例（含 worker 中断后续租与恢复）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-031",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-029",
-    "AC-031"
-   ],
-   "deps": [
-    "M0-02"
-   ],
-   "scope": [
-    "src/campaignlab/worker/",
-    "src/campaignlab/api/jobs.py",
-    "src/campaignlab/infra/artifacts.py",
-    "tests/integration/jobs/"
-   ],
-   "blockers": [],
-   "depth": 3,
-   "height": 12,
-   "slack": 0,
-   "critical": true
-  },
-  "M1-01": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-005",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-006",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "A/B 各 510 切片、B 长表 4590 阶段项",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "大于 8MiB 拒绝",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "负例返回具体行列",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-005",
-    "AC-006"
-   ],
-   "deps": [
-    "M0-04"
-   ],
-   "scope": [
-    "src/campaignlab/domain/ingest/",
-    "src/campaignlab/api/imports.py",
-    "src/campaignlab/infra/files.py",
-    "tests/domain/ingest/",
-    "tests/golden/ingest/"
-   ],
-   "blockers": [],
-   "depth": 4,
-   "height": 11,
-   "slack": 0,
-   "critical": true
-  },
-  "M1-02": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-007",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-008",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-020",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "A-001-R1 为 -394900000 分且原 A-001 仍为 -407400000 分",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-007",
-    "AC-008",
-    "AC-020"
-   ],
-   "deps": [
-    "M1-01"
-   ],
-   "scope": [
-    "src/campaignlab/domain/snapshot/",
-    "src/campaignlab/api/snapshots.py",
-    "src/campaignlab/api/definitions.py",
-    "tests/domain/snapshot/",
-    "tests/golden/snapshot/"
-   ],
-   "blockers": [],
-   "depth": 5,
-   "height": 10,
-   "slack": 0,
-   "critical": true
-  },
-  "M1-03": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-009",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-010",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-011",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "远程财私 59/60 与个贷 9/10 两侧正确",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "推送 B 2/3 秒两侧正确",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-009",
-    "AC-010",
-    "AC-011"
-   ],
-   "deps": [
-    "M1-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/caliber/",
-    "src/campaignlab/api/channels.py",
-    "src/campaignlab/api/compare.py",
-    "tests/domain/caliber/",
-    "tests/golden/caliber/"
-   ],
-   "blockers": [],
-   "depth": 6,
-   "height": 2,
-   "slack": 7,
-   "critical": false
-  },
-  "M1-04": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-005 至 AC-011 页面侧",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-020",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "vitest 与 Playwright 走查",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "截图归档",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-005",
-    "AC-011",
-    "AC-020"
-   ],
-   "deps": [
-    "M0-03",
+  ],
+  "critical_path": [
+    "M0-01",
+    "M0-02",
+    "M0-04",
     "M1-01",
     "M1-02",
-    "M1-03"
-   ],
-   "scope": [
-    "web/src/pages/data/",
-    "web/src/features/import/",
-    "web/src/features/scope/",
-    "web/tests/unit/data/",
-    "web/tests/e2e/data/"
-   ],
-   "blockers": [],
-   "depth": 7,
-   "height": 1,
-   "slack": 7,
-   "critical": false
-  },
-  "M2-01": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-002",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-003",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-004",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "确认版不可变、变更走草稿",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "旧 ETag 拒绝(412)",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-002",
-    "AC-003",
-    "AC-004"
-   ],
-   "deps": [
-    "M0-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/activity/",
-    "src/campaignlab/api/activities.py",
-    "src/campaignlab/api/rules.py",
-    "tests/domain/activity/",
-    "tests/api/activities/"
-   ],
-   "blockers": [],
-   "depth": 3,
-   "height": 8,
-   "slack": 4,
-   "critical": false
-  },
-  "M2-02": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-012",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-013",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-014",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-015",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "golden-cases.json 双版本 100% 一致",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "反例覆盖正负一分与端点",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-012",
-    "AC-013",
-    "AC-014",
-    "AC-015"
-   ],
-   "deps": [
-    "M2-01",
-    "M0-04"
-   ],
-   "scope": [
-    "src/campaignlab/domain/rules/",
-    "src/campaignlab/domain/replay/",
-    "tests/domain/rules/",
-    "tests/golden/rules/"
-   ],
-   "blockers": [],
-   "depth": 4,
-   "height": 7,
-   "slack": 4,
-   "critical": false
-  },
-  "M2-03": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-016",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-017",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "五种预发状态逐一对齐 preflight-vectors.json",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-016",
-    "AC-017"
-   ],
-   "deps": [
-    "M2-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/preflight/",
-    "src/campaignlab/api/preflight.py",
-    "tests/domain/preflight/",
-    "tests/integration/preflight/"
-   ],
-   "blockers": [],
-   "depth": 5,
-   "height": 6,
-   "slack": 4,
-   "critical": false
-  },
-  "M2-04": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-002 至 AC-004、AC-012 至 AC-017 页面侧",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "Playwright 赠券闭环录像与截图",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-002",
-    "AC-004",
-    "AC-012",
-    "AC-017"
-   ],
-   "deps": [
-    "M0-03",
-    "M2-01",
-    "M2-02",
-    "M2-03"
-   ],
-   "scope": [
-    "web/src/pages/rules/",
-    "web/src/pages/cases/",
-    "web/src/features/diff/",
-    "web/tests/unit/rules/",
-    "web/tests/e2e/coupon/"
-   ],
-   "blockers": [],
-   "depth": 6,
-   "height": 1,
-   "slack": 8,
-   "critical": false
-  },
-  "M3-01": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-018",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-019",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-020",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-033",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "analytics-golden.json 全量对齐",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-018",
-    "AC-019",
-    "AC-020",
-    "AC-033"
-   ],
-   "deps": [
-    "M1-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/analytics/",
-    "src/campaignlab/infra/duckdb/",
-    "src/campaignlab/api/reviews.py",
-    "tests/domain/analytics/",
-    "tests/golden/analytics/"
-   ],
-   "blockers": [],
-   "depth": 6,
-   "height": 9,
-   "slack": 0,
-   "critical": true
-  },
-  "M3-02": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-021",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-022",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-024",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "正负贡献分解与黄金值一致",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-021",
-    "AC-022",
-    "AC-024"
-   ],
-   "deps": [
-    "M3-01"
-   ],
-   "scope": [
-    "src/campaignlab/domain/diagnosis/",
-    "src/campaignlab/api/diagnosis.py",
-    "src/campaignlab/api/estimate.py",
-    "tests/domain/diagnosis/",
-    "tests/golden/diagnosis/"
-   ],
-   "blockers": [],
-   "depth": 7,
-   "height": 8,
-   "slack": 0,
-   "critical": true
-  },
-  "M3-03": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-023",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "60 条问法计划全部可重复执行",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "歧义问法返回待澄清",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-023"
-   ],
-   "deps": [
-    "M3-01",
-    "M3-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/ask/",
-    "src/campaignlab/api/ask.py",
-    "tests/domain/ask/",
-    "tests/golden/ask/"
-   ],
-   "blockers": [],
-   "depth": 8,
-   "height": 7,
-   "slack": 0,
-   "critical": true
-  },
-  "M3-04": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-018 至 AC-024、AC-033 页面侧",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "漏斗与趋势图等义表格可切换",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "截图归档",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-018",
-    "AC-024",
-    "AC-033"
-   ],
-   "deps": [
-    "M0-03",
     "M3-01",
     "M3-02",
-    "M3-03"
-   ],
-   "scope": [
-    "web/src/pages/review/",
-    "web/src/features/charts/",
-    "web/tests/unit/review/",
-    "web/tests/e2e/review/"
-   ],
-   "blockers": [],
-   "depth": 9,
-   "height": 4,
-   "slack": 2,
-   "critical": false
-  },
-  "M4-01": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-025",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-026",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "历史签认与后续记录可同时查询",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-025",
-    "AC-026"
-   ],
-   "deps": [
-    "M3-03"
-   ],
-   "scope": [
-    "src/campaignlab/domain/report/",
-    "src/campaignlab/api/reports.py",
-    "tests/domain/report/",
-    "tests/integration/report/"
-   ],
-   "blockers": [],
-   "depth": 9,
-   "height": 6,
-   "slack": 0,
-   "critical": true
-  },
-  "M4-02": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-027",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-028",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-030",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "导出制品原子且可校验",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-027",
-    "AC-028",
-    "AC-030"
-   ],
-   "deps": [
-    "M2-03",
-    "M4-01"
-   ],
-   "scope": [
-    "src/campaignlab/domain/action/",
-    "src/campaignlab/infra/audit/",
-    "src/campaignlab/api/actions.py",
-    "src/campaignlab/api/evidence.py",
-    "tests/domain/action/",
-    "tests/integration/audit/"
-   ],
-   "blockers": [],
-   "depth": 10,
-   "height": 5,
-   "slack": 0,
-   "critical": true
-  },
-  "M4-03": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-025 至 AC-028、AC-030 页面侧",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "回拨闭环 Playwright 证据",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-025",
-    "AC-028",
-    "AC-030"
-   ],
-   "deps": [
-    "M0-03",
-    "M0-04",
-    "M4-01",
-    "M4-02"
-   ],
-   "scope": [
-    "web/src/pages/report/",
-    "web/src/pages/evidence/",
-    "web/tests/unit/report/",
-    "web/tests/e2e/callback/"
-   ],
-   "blockers": [],
-   "depth": 11,
-   "height": 4,
-   "slack": 0,
-   "critical": true
-  },
-  "M5-01": {
-   "status": "TODO",
-   "lane": "T",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-029",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-031",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-032",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-035",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "backup/restore 演练成功",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "断网后数据图表静态资源与会话仍工作",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "性能量测记录",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-029",
-    "AC-031",
-    "AC-032",
-    "AC-035"
-   ],
-   "deps": [
-    "M4-03"
-   ],
-   "scope": [
-    "scripts/",
-    "tests/perf/",
-    "tests/recovery/",
-    "evidence/M5/"
-   ],
-   "blockers": [],
-   "depth": 12,
-   "height": 3,
-   "slack": 0,
-   "critical": true
-  },
-  "M5-02": {
-   "status": "TODO",
-   "lane": "Q",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "35 条 AC 逐条结论",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "缺陷单齐备",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "独立环境与开发环境隔离",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [],
-   "deps": [
-    "M5-01"
-   ],
-   "scope": [
-    "qa-reports/m5-02/",
-    "evidence/M5-qa/",
-    "orchestrator/defects/D-*.md"
-   ],
-   "blockers": [],
-   "ac_scope": "47 条（原 35 + AC-MR-01..12）",
-   "note": "独立 QA 重跑全部 47 条 AC；与 M5-P01 并行。写权限收敛到 qa-reports/m5-02/ 与 defects/D-*.md，与 M5-P01 的 qa-reports/monthly/ 与 defects/DMR-*.md 文件名不相交（M0-P01 校验器要求）。",
-   "depth": 13,
-   "height": 2,
-   "slack": 0,
-   "critical": true
-  },
-  "M5-03": {
-   "status": "TODO",
-   "lane": "O",
-   "tier_planned": "human",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "交付回执签署",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "待补事项与责任明确",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [],
-   "deps": [
-    "M5-02",
-    "M5-P01"
-   ],
-   "scope": [
-    "docs/delivery/HANDOVER.md"
-   ],
-   "blockers": [],
-   "note": "交付确认必须同时覆盖三条端到端路径（赠券、回拨、全行月报），故依赖 M5-P01。",
-   "depth": 14,
-   "height": 1,
-   "slack": 0,
-   "critical": true
-  },
-  "M0-P01": {
-   "status": "DONE",
-   "lane": "T",
-   "tier_planned": "max",
-   "tier_used": "max",
-   "attempt": 1,
-   "tokens": 0,
-   "commit": "baa7389f413b02f727c2df777fa1fa903c47091b",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "patch manifest sha256sum -c (21)",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
-    },
-    {
-     "id": "monthly_delta.py --base <v1.0 zip>",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/precheck-base.log"
-    },
-    {
-     "id": "monthly_delta.py --contracts-dir contracts (pre)",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
-    },
-    {
-     "id": "check_contracts.py diff (12 pointers, both baselines)",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/merged-diff.log"
-    },
-    {
-     "id": "check_contracts.py check --validate",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/check-validate.log"
-    },
-    {
-     "id": "monthly_delta.py post-merge (12 ALREADY, idempotent)",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-01/post-merge-precheck.log"
-    },
-    {
-     "id": "tamper negative test (check must fail)",
-     "rc": 1,
-     "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
-    },
-    {
-     "id": "frontend baseline machine check (D-002)",
-     "cmd": "python3 scripts/check_frontend_baseline.py",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    },
-    {
-     "id": "frontend baseline tamper negative (expect rc=1)",
-     "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css",
-     "rc": 1,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    },
-    {
-     "id": "unit tests for baseline checker (14 passed)",
-     "cmd": "uv run --no-sync pytest -q",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    },
-    {
-     "id": "evidence not ignored (D-003)",
-     "cmd": "git ls-files --others --exclude-standard evidence | wc -l",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    },
-    {
-     "id": "npm ci + build",
-     "cmd": "npm --prefix web ci && npm --prefix web run build",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    },
-    {
-     "id": "doctor HEALTHY",
-     "cmd": "bash scripts/doctor.sh",
-     "rc": 0,
-     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
-    }
-   ],
-   "acs": [],
-   "deps": [],
-   "scope": [
-    "contracts/",
-    "scripts/check_contracts.py",
-    ".github/workflows/verify.yml",
-    "docs/delivery/MONTHLY-DELTA-PLAN.md",
-    "docs/decisions/ADR-004-monthly-review-delta-v1.0.1.md",
-    "orchestrator/change-requests/CR-001.md",
-    "orchestrator/tasks/M0-P01.md",
-    "evidence/monthly/M0-P01/",
-    "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/"
-   ],
-   "blockers": [],
-   "note": "补丁接续登记与月报契约合入，Lane T 自执行；12 节点 ADD/UPDATE，0 CONFLICT；CR-001 + ADR-004。收尾含 D-002（前端基线机读校验 + 6 例单测）与 D-003（证据可入库），提交 29be319。",
-   "depth": 1,
-   "height": 1,
-   "slack": 13,
-   "critical": false,
-   "followup_commits": [
-    "f842ec2",
-    "29be319"
-   ]
-  },
-  "M1-P01": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-MR-01 标准接入（含等价 CSV 复验、旧 A/B 快照请求月报的兼容）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-02 输入负例与授权（重复客户月/重复产能键/缺覆盖客户/未知分行/覆盖声明冲突）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-10 输入侧：修订竞争与不可变旧快照",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "原 AC-005/006/007 回归",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "契约门禁 check_contracts.py check 仍为 PASS（不得偷改活契约）",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-MR-01",
-    "AC-MR-02",
-    "AC-MR-10",
-    "AC-005",
-    "AC-006",
-    "AC-007"
-   ],
-   "deps": [
-    "M0-04",
-    "M1-01",
-    "M1-02"
-   ],
-   "scope": [
-    "src/campaignlab/domain/monthly_ingest/",
-    "src/campaignlab/api/monthly_imports.py",
-    "tests/domain/monthly_ingest/",
-    "tests/golden/monthly_ingest/",
-    "evidence/monthly/M1-P01/"
-   ],
-   "blockers": [],
-   "note": "DISTINCT_CUSTOMER 与扩展粒度、SOURCE_JSON 与等价 CSV 归一、原子发布制品。改公共件（application/ 发布管线）须走 CR。",
-   "depth": 6,
-   "height": 5,
-   "slack": 4,
-   "critical": false
-  },
-  "M3-P01": {
-   "status": "TODO",
-   "lane": "D",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-MR-03 三月与范围桥（7/4/6 户等黄金值）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-04 比较边界（semantic_key 变更/全月缺失/跨年/同名异义/已覆盖零值/月中）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-05 双覆盖与分行参与",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-06 渠道容量（容量=0/使用=0/超额/缺容量/语义键变化）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-07 客群与产品（未知新老客标签、未声明保险余额）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-08 总分行去重（同客户多渠道/重复活动/无法核实交集）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "monthly-golden.json 全量比对 + 原 AC-008、018-022 回归",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-MR-03",
-    "AC-MR-04",
-    "AC-MR-05",
-    "AC-MR-06",
-    "AC-MR-07",
-    "AC-MR-08",
-    "AC-008",
-    "AC-018",
-    "AC-019",
-    "AC-020",
-    "AC-021",
-    "AC-022"
-   ],
-   "deps": [
-    "M1-P01"
-   ],
-   "scope": [
-    "src/campaignlab/domain/monthly/",
-    "src/campaignlab/api/monthly_reviews.py",
-    "tests/domain/monthly/",
-    "tests/golden/monthly/",
-    "evidence/monthly/M3-P01/"
-   ],
-   "blockers": [],
-   "note": "分母/交集/去重/覆盖率口径 = 强制 max。infra/duckdb 与指标注册表属公共件，需扩展走 CR 由 T 串行合并。算法单测可在 M1-P01 完成前用包内样本先行。",
-   "depth": 7,
-   "height": 4,
-   "slack": 4,
-   "critical": false
-  },
-  "M3-P02": {
-   "status": "TODO",
-   "lane": "F",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-MR-03..08 浏览器走查（真实 API、权限、分母与缺口展示、去重与证据交互）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "UI-17 月报视角：趋势/分母/缺口/去重/证据；同一 review_id 进入报告",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "typecheck/lint/test/build 退出码 0；类型客户端按 openapi 1.0.1 重新生成且 diff 为空",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-MR-03",
-    "AC-MR-04",
-    "AC-MR-05",
-    "AC-MR-06",
-    "AC-MR-07",
-    "AC-MR-08"
-   ],
-   "deps": [
-    "M0-03",
-    "M3-P01",
-    "M3-04"
-   ],
-   "scope": [
-    "web/src/pages/review/monthly/",
-    "web/src/features/monthly/",
-    "web/tests/unit/monthly/",
-    "web/tests/e2e/monthly/",
-    "evidence/monthly/M3-P02/"
-   ],
-   "blockers": [],
-   "note": "max 出交互设计 + flash 量产页面与状态。改 UI-17 既有文件或公共组件须走 CR。",
-   "depth": 10,
-   "height": 3,
-   "slack": 2,
-   "critical": false
-  },
-  "M4-P01": {
-   "status": "TODO",
-   "lane": "S",
-   "tier_planned": "mixed",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-MR-09 月报、签认与缺项（PARTIAL_DRAFT、缺焦点月快照）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-10 补采更正与恢复（两份报告其一签认、03 更正、重启与恢复）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-11 行动与下期（改进项责任与检查点、04 复核、无同义口径）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "原 AC-025-030 回归",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-MR-09",
-    "AC-MR-10",
-    "AC-MR-11",
-    "AC-025",
-    "AC-026",
-    "AC-027",
-    "AC-028",
-    "AC-029",
-    "AC-030"
-   ],
-   "deps": [
+    "M3-03",
     "M4-01",
     "M4-02",
     "M4-03",
-    "M3-P01"
-   ],
-   "scope": [
-    "src/campaignlab/domain/monthly_report/",
-    "src/campaignlab/api/monthly_reports.py",
-    "web/src/pages/report/monthly/",
-    "tests/domain/monthly_report/",
-    "tests/integration/monthly_report/",
-    "web/tests/e2e/monthly_report/",
-    "evidence/monthly/M4-P01/"
-   ],
-   "blockers": [],
-   "note": "签认/更正状态机 = 强制 max；UI-21/22/24/26 的月报变体与导出样板可下放 flash。",
-   "depth": 12,
-   "height": 3,
-   "slack": 0,
-   "critical": true
-  },
-  "M5-P01": {
-   "status": "TODO",
-   "lane": "Q",
-   "tier_planned": "max",
-   "tier_used": "",
-   "attempt": 0,
-   "tokens": 0,
-   "commit": "",
-   "branch": "m0-framework",
-   "gates": [
-    {
-     "id": "AC-MR-12 三条路径与交付（赠券/回拨/全行月报同一提交、锁、固定合成数据）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "AC-MR-01..11 独立实测复跑（不复用开发实例与上下文）",
-     "rc": null,
-     "evidence": ""
-    },
-    {
-     "id": "跨工作区、重启与恢复演练",
-     "rc": null,
-     "evidence": ""
-    }
-   ],
-   "acs": [
-    "AC-MR-01",
-    "AC-MR-02",
-    "AC-MR-03",
-    "AC-MR-04",
-    "AC-MR-05",
-    "AC-MR-06",
-    "AC-MR-07",
-    "AC-MR-08",
-    "AC-MR-09",
-    "AC-MR-10",
-    "AC-MR-11",
-    "AC-MR-12"
-   ],
-   "deps": [
-    "M3-P02",
-    "M4-P01",
-    "M5-01"
-   ],
-   "scope": [
-    "qa-reports/monthly/",
-    "evidence/monthly/M5-P01/",
-    "orchestrator/defects/DMR-*.md"
-   ],
-   "blockers": [],
-   "note": "独立 QA 线，与 M5-02 并行；缺陷单编号前缀 DMR- 以与 M5-02 的 D- 文件名不相交。",
-   "depth": 13,
-   "height": 2,
-   "slack": 0,
-   "critical": true
-  }
- },
- "waves": [
-  {
-   "wave": 0,
-   "mode": "serial",
-   "tasks": [
-    "M0-01",
-    "M0-P01"
-   ],
-   "note": "M0-P01 为 v1.0.1 补丁接续登记与契约合入，2026-11-12 由 Lane T 执行完成"
-  },
-  {
-   "wave": 1,
-   "mode": "parallel",
-   "tasks": [
-    "M0-02",
-    "M0-03"
-   ]
-  },
-  {
-   "wave": 2,
-   "mode": "parallel",
-   "tasks": [
-    "M0-04",
-    "M0-03b"
-   ]
-  },
-  {
-   "wave": 3,
-   "mode": "parallel-lanes",
-   "lanes": {
-    "L1": [
-     "M1-01",
-     "M1-02",
-     "M1-03"
-    ],
-    "L2": [
-     "M2-01",
-     "M2-02",
-     "M2-03"
-    ]
-   },
-   "note": "lane 内串行，两 lane 之间并行；跨 lane 写权限已确认不相交"
-  },
-  {
-   "wave": 4,
-   "mode": "parallel",
-   "tasks": [
-    "M1-04",
-    "M2-04",
-    "M1-P01"
-   ],
-   "constraint": "pages/data 与 pages/{rules,cases} 与后端 monthly_ingest 三者写权限不相交"
-  },
-  {
-   "wave": 5,
-   "mode": "parallel-lanes",
-   "lanes": {
-    "L1": [
-     "M3-01",
-     "M3-02",
-     "M3-03"
-    ],
-    "L3": [
-     "M3-P01"
-    ]
-   },
-   "note": "L3 只写 domain/monthly 与 tests/{domain,golden}/monthly；infra/duckdb 与指标注册表属公共件，改动走 CR"
-  },
-  {
-   "wave": 6,
-   "mode": "parallel",
-   "tasks": [
-    "M3-04",
-    "M4-01"
-   ]
-  },
-  {
-   "wave": 7,
-   "mode": "parallel-lanes",
-   "lanes": {
-    "L1": [
-     "M4-02",
-     "M4-03"
-    ],
-    "L4": [
-     "M3-P02"
-    ]
-   },
-   "note": "lane 内串行；M3-P02 只写 pages/review/monthly 与 features/monthly，改 UI-17 既有文件走 CR"
-  },
-  {
-   "wave": 8,
-   "mode": "serial",
-   "tasks": [
-    "M4-P01",
-    "M5-01"
-   ]
-  },
-  {
-   "wave": 9,
-   "mode": "parallel",
-   "tasks": [
+    "M5-01",
     "M5-02",
-    "M5-P01"
-   ],
-   "constraint": "两条独立 QA 线：qa-reports/ + evidence/M5-qa/ + defects/D-* vs qa-reports/monthly/ + evidence/monthly/M5-P01/ + defects/DMR-*"
-  },
-  {
-   "wave": 10,
-   "mode": "serial",
-   "tasks": [
     "M5-03"
-   ]
-  }
- ],
- "critical_path": [
-  "M0-01",
-  "M0-02",
-  "M0-04",
-  "M1-01",
-  "M1-02",
-  "M3-01",
-  "M3-02",
-  "M3-03",
-  "M4-01",
-  "M4-02",
-  "M4-03",
-  "M5-01",
-  "M5-02",
-  "M5-03"
- ],
- "defects": [
-  {
-   "id": "D-001",
-   "task": "M0-01",
-   "severity": "MAJOR",
-   "status": "FIXED_PENDING_Q",
-   "file": "orchestrator/defects/D-001.md"
-  },
-  {
-   "id": "D-002",
-   "task": "M0-P01",
-   "severity": "MINOR",
-   "status": "FIXED_PENDING_Q",
-   "file": "orchestrator/defects/D-002.md",
-   "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI，并补 tests/unit/test_frontend_baseline.py 6 例（手册 13.3 第 4 条）"
-  },
-  {
-   "id": "D-003",
-   "task": "M0-P01",
-   "severity": "MINOR",
-   "status": "FIXED_PENDING_Q",
-   "file": "orchestrator/defects/D-003.md",
-   "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库"
-  },
-  {
-   "id": "D-004",
-   "task": "M0-P01",
-   "severity": "MAJOR",
-   "status": "FIXED_PENDING_Q",
-   "file": "orchestrator/defects/D-004.md",
-   "summary": "scripts/contract_slice.py 的 openapi/pages/DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码为 1.0.0；活契约已是 1.0.1。wave1 内容经实测字节等价不受影响，但 5 个月报任务（M1-P01/M3-P01/M3-P02/M4-P01/M5-P01）会被静默提供过期契约。",
-   "blocks": "已解除：wave1 派单前置 PRE-1 完成",
-   "commit": "1f5912e",
-   "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
-  },
-  {
-   "id": "D-005",
-   "task": "M0-P01",
-   "severity": "MAJOR",
-   "status": "FIXED_PENDING_Q",
-   "commit": "1f5912e",
-   "file": "orchestrator/defects/D-005.md",
-   "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
-   "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。"
-  }
- ],
- "change_requests": [
-  {
-   "id": "CR-001",
-   "task": "M0-P01",
-   "status": "ACCEPTED",
-   "adr": "ADR-004",
-   "nodes": 12,
-   "file": "orchestrator/change-requests/CR-001.md"
-  }
- ],
- "pending_owner": [
-  {
-   "id": "ADR-003-1",
-   "item": "主色 #0048d8 与白 rail + 深蓝顶栏",
-   "default": "按 ADR-003 建议值推进"
-  },
-  {
-   "id": "ADR-003-2",
-   "item": "语义色文字层保留 AA 达标深色",
-   "default": "按 ADR-003 建议值推进"
-  },
-  {
-   "id": "ADR-003-3",
-   "item": "图表 c3/c4 对比度不足 3:1 的补偿方式",
-   "default": "数据标签 + 等义表格"
-  },
-  {
-   "id": "SRC-1",
-   "item": "CampaignLab-Bank-Strategy-Review-Source-Extract.md 未随包提供",
-   "default": "用 docx/pptx 重建 extract"
-  },
-  {
-   "id": "Q-VERIFY-M0-01",
-   "item": "M0-01 已由编排器独立自验（九项门禁 rc 全 0），是否仍需单独派 Q 子智能体交叉验证",
-   "default": "按手册 4.2 派 Q（不采信自述）；flash 采集 + max 判定。若项目负责人要省成本，可改为接受自验并置 PASS_WITH_TODO",
-   "blocks": "不阻塞 wave1：M0-02/M0-03 只依赖 wave0 环境就绪，已就绪"
-  }
- ],
- "resume": {
-  "recovered_at": "2026-11-12T21:19:36+08:00",
-  "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
-  "wave": 0,
-  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
-  "next_actions": [
-   "0 【闸门】owner_gate=AWAIT_OWNER_GO：在项目负责人明确下达「开工」之前，不得 spawn 任何开发子智能体（手册 15.1）",
-   "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空：D-004/D-005 修复并重切 wave1 切片（spec_version=1.0.1）、M0-02/M0-03 卡补子任务档位表、M0-03 补活契约版本门禁",
-   "2 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事，并追认手册 15.6（关键任务 L 循环上限 2 轮）——该条已随 v1.2 写入手册，属事实生效，需追认或改回",
-   "3 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001 至 D-005；证据在 evidence/monthly/M0-P01/run-01|02|03 与 evidence/M0/M0-01/",
-   "4 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001..D-005 由 FIXED_PENDING_Q 置 CLOSED",
-   "5 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01）；两卡子任务档位表已就位（M0-02 flash 3/5、M0-03 flash 6/10），spawn 必须显式填 model",
-   "6 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条）"
   ],
-  "in_flight_agents": [],
-  "dispatch_requirements": [
-   "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
-   "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
-   "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
-   "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串"
-  ],
-  "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
-  "persisted": {
-   "working_tree_clean": false,
-   "head": "1f5912e",
-   "head_full": "1f5912e60e11512ef40c4e74333af8fce56dd8db",
-   "remote_head": "待本次 state 提交推送后与 HEAD 一致",
-   "remote_ref": "origin/m0-framework",
-   "head_semantics": "head/head_full 指最近一次**交付提交**（1f5912e：D-004/D-005 修复、wave1 任务卡档位表、切片按活契约 1.0.1 重切、手册第 3.1/3.2/7/15.4 节同步）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
-   "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。",
-   "note": "本 state 提交推送后，(a)(b) 两条即成立；届时 dirty=0、ahead/behind=0/0。"
-  },
-  "context": "驱动模型已于 2026-11-12 两次切换（宿主重启一次、模型切换一次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；重跑通过后**先确认 resume.owner_gate.status == GO** 才允许派单（手册 15.1），否则只可做只读自检、门禁复跑、治理与证据修复、计划与评审文档编写。",
-  "patch": {
-   "id": "v1.0.1-monthly-review-delta",
-   "task": "M0-P01",
-   "status": "MERGED",
-   "nodes": 12,
-   "conflicts": 0,
-   "contract_version": "1.0.1"
-  },
-  "critical_path_len": 14,
-  "slack_note": "slack=0 为关键任务（无浮动）；slack>0 表示可容忍的波次延误。月报任务中 M4-P01/M5-P01 为关键，M1-P01/M3-P01/M3-P02 有浮动，可用来吸收 max 档返工。",
-  "m0_p01_commit": "baa7389",
-  "recovery_history": [
-   {
-    "recovered_at": "2026-11-12T12:28:41+08:00",
-    "incident": "host reboot by Windows Update; all subagent instances destroyed; zero data loss confirmed",
-    "head_at_recovery": "baa7389"
-   }
-  ],
-  "owner_gate": {
-   "status": "AWAIT_OWNER_GO",
-   "granted_at": null,
-   "granted_by": null,
-   "required_human_phrase": "开工",
-   "rule": "手册 15.1：非 GO 时只允许只读自检、门禁复跑、治理与证据修复、计划与评审文档编写；禁止 spawn 任何开发子智能体，禁止执行手册第 12 节第 4、5 步。编排器不得自行推断放行，也不得把「继续」「好的」当作放行。",
-   "conflict_rule": "闸门与 next_actions 冲突时以闸门为准。"
-  },
-  "d002_d003_commit": "29be319",
-  "m0_p01_commits": [
-   "baa7389",
-   "f842ec2",
-   "29be319"
-  ],
-  "self_check_gates_rc0": {
-   "checked_at": "2026-11-12T22:16:36+08:00",
-   "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
-   "note": "rc 由本文件生成时实跑取得，非人工誊写。G4/G4b/G4c 的 expected 为 1 或 2（篡改与未命中负例），Q 复核时不得据此判红。G4c 沿用 run-02 实测，本轮不重复篡改基线以免污染 spec/。",
-   "gates": {
-    "G1_baseline_v1.0": {
-     "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
-     "rc": 0,
-     "expected": 0
+  "defects": [
+    {
+      "id": "D-001",
+      "task": "M0-01",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "file": "orchestrator/defects/D-001.md"
     },
-    "G2_baseline_v1.0.1_patch": {
-     "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
-     "rc": 0,
-     "expected": 0
+    {
+      "id": "D-002",
+      "task": "M0-P01",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "file": "orchestrator/defects/D-002.md",
+      "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI，并补 tests/unit/test_frontend_baseline.py 6 例（手册 13.3 第 4 条）"
     },
-    "G3_frontend_baseline": {
-     "cmd": "python3 scripts/check_frontend_baseline.py",
-     "rc": 0,
-     "expected": 0
+    {
+      "id": "D-003",
+      "task": "M0-P01",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "file": "orchestrator/defects/D-003.md",
+      "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库"
     },
-    "G4_slice_unknown_op_negative": {
-     "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json",
-     "rc": 2,
-     "expected": 2
+    {
+      "id": "D-004",
+      "task": "M0-P01",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "file": "orchestrator/defects/D-004.md",
+      "summary": "scripts/contract_slice.py 的 openapi/pages/DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码为 1.0.0；活契约已是 1.0.1。wave1 内容经实测字节等价不受影响，但 5 个月报任务（M1-P01/M3-P01/M3-P02/M4-P01/M5-P01）会被静默提供过期契约。",
+      "blocks": "已解除：wave1 派单前置 PRE-1 完成",
+      "commit": "1f5912e",
+      "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
     },
-    "G4b_slice_unknown_ac_negative": {
-     "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json",
-     "rc": 2,
-     "expected": 2
-    },
-    "G4c_frontend_tamper_negative": {
-     "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
-     "rc": 1,
-     "expected": 1,
-     "note": "run-02 实测；本轮未重复篡改基线，避免污染 spec/"
-    },
-    "G5_contract_gate": {
-     "cmd": "python3 scripts/check_contracts.py check",
-     "rc": 0,
-     "expected": 0
-    },
-    "G6_contract_meta_validate": {
-     "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
-     "rc": 0,
-     "expected": 0
-    },
-    "G7_ruff_check": {
-     "cmd": "uv run --no-sync ruff check .",
-     "rc": 0,
-     "expected": 0
-    },
-    "G8_ruff_format": {
-     "cmd": "uv run --no-sync ruff format --check .",
-     "rc": 0,
-     "expected": 0
-    },
-    "G9_mypy": {
-     "cmd": "uv run --no-sync mypy",
-     "rc": 0,
-     "expected": 0
-    },
-    "G10_pytest": {
-     "cmd": "uv run --no-sync pytest -q",
-     "rc": 0,
-     "expected": 0
-    },
-    "G11_prototype_verify": {
-     "cmd": "bash scripts/verify.sh",
-     "rc": 0,
-     "expected": 0
-    },
-    "G12_package_verify": {
-     "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
-     "rc": 0,
-     "expected": 0
-    },
-    "G13_npm_ci_and_build": {
-     "cmd": "npm --prefix web ci && npm --prefix web run build",
-     "rc": 0,
-     "expected": 0
-    },
-    "G14_doctor": {
-     "cmd": "bash scripts/doctor.sh",
-     "rc": 0,
-     "expected": 0
+    {
+      "id": "D-005",
+      "task": "M0-P01",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "commit": "1f5912e",
+      "file": "orchestrator/defects/D-005.md",
+      "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
+      "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。"
     }
-   },
-   "spec_untouched": {
-    "cmd": "git status --porcelain spec/",
-    "result": "empty",
-    "rc": 0,
-    "expected": 0
-   },
-   "evidence_ignored_count": {
-    "cmd": "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'",
-    "result": 0,
-    "expected": 0
-   },
-   "counts": {
-    "pytest_passed": 28,
-    "mypy_source_files": 6,
-    "ruff_formatted_files": 35,
-    "contract_registered_nodes": 12,
-    "acceptance_denominator": 47,
-    "acceptance_resolvable": 47,
-    "frontend_baseline_rows": 8,
-    "live_openapi_sha16": "01bd28f0772f506e",
-    "live_openapi_info_version": "1.0.1"
-   }
-  },
-  "post_patch_review": {
-   "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
-   "status": "PENDING_OWNER_CONFIRMATION",
-   "decisions_needed": [
-    "M0-04 任务卡增加「指标注册表可外部注册」验收项（建议批准）",
-    "M4-P01 max 设计子任务前置到 wave7（触发条件：M3-P01 已 PASS）",
-    "M5-P01 flash 采集脚本与走查清单前置到 wave8",
-    "critical=true 任务的 L 循环上限 3 轮 → 2 轮 + 降级交付选项",
-    "M0 阶段 5 项复核合并为一次 Q（flash 采集 + max 判定）"
-   ],
-   "applied_now": [
-    "手册 v1.2 第 15 节（15.1-15.6）",
-    "state.json 成本账本字段 budget.subtask_log 与 accounting_rule",
-    ".gitignore 证据否定规则（D-003）",
-    "check_frontend_baseline.py 的 6 条单测（手册 13.3 第 4 条）"
-   ]
-  },
-  "dispatch_preconditions": {
-   "note": "PRE-1/2/3 已于提交 1f5912e 全部清空。owner_gate 放行后可直接派 wave1；派单前仍须校验切片 source.openapi.sha16 与当时活契约实算值一致（手册 15.4 第 5 条）。",
-   "items": [
-    {
-     "id": "PRE-1",
-     "status": "DONE",
-     "severity": "MAJOR",
-     "item": "修 D-004：contract_slice.py 改读活契约 contracts/，spec_version 从 info.version 取，补差分回归 + 篡改负例 + 单测，并重切 M0-02/M0-03 切片入库（spec_version 应为 1.0.1）",
-     "ref": "orchestrator/defects/D-004.md",
-     "allowed_under_owner_gate": true,
-     "reason_allowed": "属治理与工具修复，非业务开发；且它是派单前置，绕不过去",
-     "commit": "1f5912e",
-     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
-    },
-    {
-     "id": "PRE-2",
-     "status": "DONE",
-     "severity": "MINOR",
-     "item": "M0-02.md / M0-03.md 任务卡补「子任务档位表」（手册 15.5：无拆解表不得 spawn）；两卡写于 02:51，早于 15.5 生效",
-     "ref": "orchestrator/tasks/M0-02.md, orchestrator/tasks/M0-03.md",
-     "allowed_under_owner_gate": true,
-     "commit": "1f5912e",
-     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
-    },
-    {
-     "id": "PRE-3",
-     "status": "DONE",
-     "severity": "MINOR",
-     "item": "M0-03.md 增一条显式门禁：活契约 info.version 必须为 1.0.1，使「openapi-typescript 产物 diff 为空」有明确版本基准",
-     "ref": "orchestrator/tasks/M0-03.md, docs/delivery/MONTHLY-DELTA-PLAN.md 第 1 节",
-     "allowed_under_owner_gate": true,
-     "commit": "1f5912e",
-     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
-    }
-   ],
-   "wave1_slice_content_verdict": "M0-02/M0-03 现有切片内容经差分回归实测与活契约重切结果字节等价（v1.0.1 的 12 个节点与这 5 个 operationId 无交集），故内容不需重做，只需重切以修正 spec_version 与来源标记。",
-   "cleared_at": "2026-11-12T22:16:36+08:00",
-   "all_cleared": true
-  },
-  "d004_d005_commit": "1f5912e"
- },
- "acceptance": {
-  "baseline_total": 35,
-  "monthly_total": 12,
-  "total": 47,
-  "monthly_ids": [
-   "AC-MR-01",
-   "AC-MR-02",
-   "AC-MR-03",
-   "AC-MR-04",
-   "AC-MR-05",
-   "AC-MR-06",
-   "AC-MR-07",
-   "AC-MR-08",
-   "AC-MR-09",
-   "AC-MR-10",
-   "AC-MR-11",
-   "AC-MR-12"
   ],
-  "monthly_source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/CampaignLab-Review-Acceptance-Checklist.append.md"
- },
- "contract": {
-  "live_dir": "contracts",
-  "openapi_info_version": "1.0.1",
-  "registry": "contracts/CHANGES.json",
-  "registered_nodes": 12,
-  "gate": "python3 scripts/check_contracts.py check",
-  "ci_job": "contract-gate",
+  "change_requests": [
+    {
+      "id": "CR-001",
+      "task": "M0-P01",
+      "status": "ACCEPTED",
+      "adr": "ADR-004",
+      "nodes": 12,
+      "file": "orchestrator/change-requests/CR-001.md"
+    }
+  ],
+  "pending_owner": [
+    {
+      "id": "ADR-003-1",
+      "item": "主色 #0048d8 与白 rail + 深蓝顶栏",
+      "default": "按 ADR-003 建议值推进",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "按 ADR-003 建议值推进（主色 #0048d8 + 白 rail + 深蓝顶栏）",
+      "resolved_at": "2026-11-12T22:48:36+08:00",
+      "resolved_by": "项目负责人（授权用默认值裁定）"
+    },
+    {
+      "id": "ADR-003-2",
+      "item": "语义色文字层保留 AA 达标深色",
+      "default": "按 ADR-003 建议值推进",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "按 ADR-003 建议值推进（语义色文字层保留 AA 达标深色）",
+      "resolved_at": "2026-11-12T22:48:36+08:00",
+      "resolved_by": "项目负责人（授权用默认值裁定）"
+    },
+    {
+      "id": "ADR-003-3",
+      "item": "图表 c3/c4 对比度不足 3:1 的补偿方式",
+      "default": "数据标签 + 等义表格",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "数据标签 + 等义表格",
+      "resolved_at": "2026-11-12T22:48:36+08:00",
+      "resolved_by": "项目负责人（授权用默认值裁定）"
+    },
+    {
+      "id": "SRC-1",
+      "item": "CampaignLab-Bank-Strategy-Review-Source-Extract.md 未随包提供",
+      "default": "用 docx/pptx 重建 extract",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "用 docx/pptx 重建 extract",
+      "resolved_at": "2026-11-12T22:48:36+08:00",
+      "resolved_by": "项目负责人（授权用默认值裁定）"
+    },
+    {
+      "id": "Q-VERIFY-M0-01",
+      "item": "M0-01 已由编排器独立自验（九项门禁 rc 全 0），是否仍需单独派 Q 子智能体交叉验证",
+      "default": "按手册 4.2 派 Q（不采信自述）；flash 采集 + max 判定。若项目负责人要省成本，可改为接受自验并置 PASS_WITH_TODO",
+      "blocks": "不阻塞 wave1：M0-02/M0-03 只依赖 wave0 环境就绪，已就绪",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "按手册 4.2 派 Q，且 M0 阶段 5 项复核合并为一次（flash 采集 + max 判定）",
+      "resolved_at": "2026-11-12T22:48:36+08:00",
+      "resolved_by": "项目负责人（授权用默认值裁定）"
+    }
+  ],
+  "resume": {
+    "recovered_at": "2026-11-12T22:48:36+08:00",
+    "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
+    "wave": 0,
+    "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
+    "next_actions": [
+      "0 【已完成】owner_gate=GO：项目负责人明确下达『确认开工』并授权长程无人值守、裁定用默认值（见 resume.owner_decisions）",
+      "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空",
+      "2 【已完成】POST-PATCH-REVIEW 第 6 节 4 件事全部按建议批准；手册 15.6（关键任务 L 循环上限 2 轮）已追认；pending_owner 5 项全部按默认值裁定",
+      "3 【进行中-环境】fonts-noto-cjk 安装完成后：fc-list :lang=zh | grep -ci noto > 0，复跑 bash scripts/doctor.sh，把 orchestrator/BLOCKERS.md 的 BLK-02 置为已关闭并附实测",
+      "4 【下一步-派单】派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001 至 D-006；证据写 evidence/M0/Q-VERIFY-M0-01/ 与 qa-reports/m0/",
+      "5 【下一步-派单】并行派 M0-02 / S1（qwen3.8-max，high）：契约抽取与设计，只写 orchestrator/handoff/M0-02-design.md（与 Q 的写路径无交集）",
+      "6 【延后到 Round 2】M0-03 / S1+S2（qwen3.8-max）：工程骨架 + 令牌体系设计；刻意延后以避免其改 web/ 时与 Q 的 G13（npm build）撞并发假红",
+      "7 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001..D-006 由 FIXED_PENDING_Q 置 CLOSED",
+      "8 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条）"
+    ],
+    "in_flight_agents": [],
+    "dispatch_requirements": [
+      "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
+      "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
+      "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
+      "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串"
+    ],
+    "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
+    "persisted": {
+      "working_tree_clean": true,
+      "head": "1f5912e",
+      "head_full": "1f5912e60e11512ef40c4e74333af8fce56dd8db",
+      "remote_head": "待本次 state 提交推送后与 HEAD 一致",
+      "remote_ref": "origin/m0-framework",
+      "head_semantics": "head/head_full 指最近一次**交付提交**（1f5912e：D-004/D-005 修复、wave1 任务卡档位表、切片按活契约 1.0.1 重切、手册第 3.1/3.2/7/15.4 节同步）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
+      "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。",
+      "note": "head/head_full 仍指最近一次交付提交 1f5912e（语义见 head_semantics）；governance_head_at_takeover 是本次接管时的工作提交 07ab3ca。本次治理提交推送后需再次复核 dirty=0 且 ahead/behind=0/0。",
+      "governance_head_at_takeover": "07ab3ca",
+      "remote_sync_verified": {
+        "cmd": "git rev-list --left-right --count '@{u}...HEAD'",
+        "result": "0\t0",
+        "at": "2026-11-12T22:48:36+08:00"
+      }
+    },
+    "context": "驱动模型已于 2026-11-12 三次接管（宿主重启一次、模型切换两次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；本轮已于 run-04 全表重跑通过，且 resume.owner_gate.status == GO（项目负责人明确下达『确认开工』），故允许按 next_actions 派单。sudo 免密策略见手册 15.7 与 resume.owner_gate.sudo_policy；任何实例不得再等待密码输入，也不得把密码写入任何文件。",
+    "patch": {
+      "id": "v1.0.1-monthly-review-delta",
+      "task": "M0-P01",
+      "status": "MERGED",
+      "nodes": 12,
+      "conflicts": 0,
+      "contract_version": "1.0.1"
+    },
+    "critical_path_len": 14,
+    "slack_note": "slack=0 为关键任务（无浮动）；slack>0 表示可容忍的波次延误。月报任务中 M4-P01/M5-P01 为关键，M1-P01/M3-P01/M3-P02 有浮动，可用来吸收 max 档返工。",
+    "m0_p01_commit": "baa7389",
+    "recovery_history": [
+      {
+        "recovered_at": "2026-11-12T12:28:41+08:00",
+        "incident": "host reboot by Windows Update; all subagent instances destroyed; zero data loss confirmed",
+        "head_at_recovery": "baa7389"
+      },
+      {
+        "recovered_at": "2026-11-12T22:48:36+08:00",
+        "incident": "driver model switch (qwen3.8-max -> qwen3.8-flash -> qwen3.8-max); new instance took over; zero data loss",
+        "head_at_recovery": "07ab3ca",
+        "actions": [
+          "全表重跑 resume.self_check_gates_rc0（16 项，rc 全 == expected），证据 evidence/monthly/M0-P01/run-04/commands.md",
+          "落地限定范围免密 sudo（/etc/sudoers.d/90-campaignlab-ops），正/负例双向验证，密码零落盘",
+          "owner_gate 置 GO（项目负责人明确下达『确认开工』）",
+          "登记 D-006：ruff format 分母口径未定义（含 .md），历史值 35 不可复现"
+        ]
+      }
+    ],
+    "owner_gate": {
+      "status": "GO",
+      "granted_at": "2026-11-12T22:48:36+08:00",
+      "granted_by": "项目负责人",
+      "required_human_phrase": "开工",
+      "rule": "手册 15.1：非 GO 时只允许只读自检、门禁复跑、治理与证据修复、计划与评审文档编写；禁止 spawn 任何开发子智能体，禁止执行手册第 12 节第 4、5 步。编排器不得自行推断放行，也不得把「继续」「好的」当作放行。",
+      "conflict_rule": "闸门与 next_actions 冲突时以闸门为准。",
+      "granted_phrase": "确认开工（并明示：本次为长程无人值守执行，裁定用默认值；开工前安装 fonts-noto-cjk；sudo 密码已授权，不用阻塞）",
+      "unattended": true,
+      "sudo_policy": {
+        "file": "/etc/sudoers.d/90-campaignlab-ops",
+        "mode": "0440 root:root",
+        "scope": "Cmnd_Alias 仅含 apt-get/apt/apt-mark/dpkg/fc-cache/fc-list/systemctl/service/docker/docker-compose/snap 的绝对路径",
+        "verified_positive": {
+          "sudo -n apt-get --version": 0,
+          "sudo -n dpkg --version": 0,
+          "sudo -n fc-cache --version": 0
+        },
+        "verified_negative": {
+          "sudo -n true": 1,
+          "sudo -n bash -c true": 1,
+          "sudo -n tee": 1,
+          "sudo -n cat": 1
+        },
+        "password_handling": "密码只经 PTY stdin 静默传入（read -rs），零落盘；不进 argv/脚本/日志/证据/提交/state.json",
+        "rule": "子智能体一律不得 sudo；alias 之外的 root 需求必须登记 BLOCKER 并继续其他 lane，禁止扩权或绕过"
+      }
+    },
+    "d002_d003_commit": "29be319",
+    "m0_p01_commits": [
+      "baa7389",
+      "f842ec2",
+      "29be319"
+    ],
+    "self_check_gates_rc0": {
+      "checked_at": "2026-11-12T22:48:36+08:00",
+      "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
+      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。",
+      "gates": {
+        "G1_baseline_v1.0": {
+          "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G2_baseline_v1.0.1_patch": {
+          "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 1,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G3_frontend_baseline": {
+          "cmd": "python3 scripts/check_frontend_baseline.py",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G4_slice_unknown_op_negative": {
+          "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json",
+          "rc": 2,
+          "expected": 2,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G4b_slice_unknown_ac_negative": {
+          "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json",
+          "rc": 2,
+          "expected": 2,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G4c_frontend_tamper_negative": {
+          "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
+          "rc": 1,
+          "expected": 1,
+          "note": "本轮已真实执行篡改负例：cp 备份 -> printf 追加换行 -> 实测 rc=1 -> cp 还原 -> git status --porcelain spec/ == 0。不再沿用 run-02 的转录值。",
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G5_contract_gate": {
+          "cmd": "python3 scripts/check_contracts.py check",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G6_contract_meta_validate": {
+          "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 2,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G7_ruff_check": {
+          "cmd": "uv run --no-sync ruff check .",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G8_ruff_format": {
+          "cmd": "uv run --no-sync ruff format --check .",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G9_mypy": {
+          "cmd": "uv run --no-sync mypy",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G10_pytest": {
+          "cmd": "uv run --no-sync pytest -q",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 1,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G11_prototype_verify": {
+          "cmd": "bash scripts/verify.sh",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 1,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G12_package_verify": {
+          "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 0,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G13_npm_ci_and_build": {
+          "cmd": "npm --prefix web ci && npm --prefix web run build",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 9,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        },
+        "G14_doctor": {
+          "cmd": "bash scripts/doctor.sh",
+          "rc": 0,
+          "expected": 0,
+          "elapsed_s": 1,
+          "measured_at": "2026-11-12T22:48:36+08:00"
+        }
+      },
+      "spec_untouched": {
+        "cmd": "git status --porcelain spec/",
+        "result": "empty",
+        "rc": 0,
+        "expected": 0
+      },
+      "evidence_ignored_count": {
+        "cmd": "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'",
+        "result": 0,
+        "expected": 0
+      },
+      "counts": {
+        "pytest_passed": 28,
+        "mypy_source_files": 6,
+        "ruff_formatted_files": 39,
+        "contract_registered_nodes": 12,
+        "acceptance_denominator": 47,
+        "acceptance_resolvable": 47,
+        "frontend_baseline_rows": 8,
+        "live_openapi_sha16": "01bd28f0772f506e",
+        "live_openapi_info_version": "1.0.1",
+        "ruff_formatted_files_composition": {
+          "cmd": "uv run --no-sync ruff format --check .",
+          "total": 39,
+          "in_scope_py": 6,
+          "in_scope_md": 33,
+          "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
+          "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
+          "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
+          "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
+          "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
+          "measured_after": "本次治理提交新增 run-04 证据与 D-006 两个 .md 后复测：37 -> 39，ruff format --check . 仍 rc=0"
+        },
+        "ruff_lint_scope_files": 6,
+        "ruff_format_check_rc_after_governance_files": 0
+      }
+    },
+    "post_patch_review": {
+      "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
+      "status": "PENDING_OWNER_CONFIRMATION",
+      "decisions_needed": [
+        "M0-04 任务卡增加「指标注册表可外部注册」验收项（建议批准）",
+        "M4-P01 max 设计子任务前置到 wave7（触发条件：M3-P01 已 PASS）",
+        "M5-P01 flash 采集脚本与走查清单前置到 wave8",
+        "critical=true 任务的 L 循环上限 3 轮 → 2 轮 + 降级交付选项",
+        "M0 阶段 5 项复核合并为一次 Q（flash 采集 + max 判定）"
+      ],
+      "applied_now": [
+        "手册 v1.2 第 15 节（15.1-15.6）",
+        "state.json 成本账本字段 budget.subtask_log 与 accounting_rule",
+        ".gitignore 证据否定规则（D-003）",
+        "check_frontend_baseline.py 的 6 条单测（手册 13.3 第 4 条）"
+      ]
+    },
+    "dispatch_preconditions": {
+      "note": "PRE-1/2/3 已于提交 1f5912e 全部清空。owner_gate 放行后可直接派 wave1；派单前仍须校验切片 source.openapi.sha16 与当时活契约实算值一致（手册 15.4 第 5 条）。",
+      "items": [
+        {
+          "id": "PRE-1",
+          "status": "DONE",
+          "severity": "MAJOR",
+          "item": "修 D-004：contract_slice.py 改读活契约 contracts/，spec_version 从 info.version 取，补差分回归 + 篡改负例 + 单测，并重切 M0-02/M0-03 切片入库（spec_version 应为 1.0.1）",
+          "ref": "orchestrator/defects/D-004.md",
+          "allowed_under_owner_gate": true,
+          "reason_allowed": "属治理与工具修复，非业务开发；且它是派单前置，绕不过去",
+          "commit": "1f5912e",
+          "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
+        },
+        {
+          "id": "PRE-2",
+          "status": "DONE",
+          "severity": "MINOR",
+          "item": "M0-02.md / M0-03.md 任务卡补「子任务档位表」（手册 15.5：无拆解表不得 spawn）；两卡写于 02:51，早于 15.5 生效",
+          "ref": "orchestrator/tasks/M0-02.md, orchestrator/tasks/M0-03.md",
+          "allowed_under_owner_gate": true,
+          "commit": "1f5912e",
+          "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
+        },
+        {
+          "id": "PRE-3",
+          "status": "DONE",
+          "severity": "MINOR",
+          "item": "M0-03.md 增一条显式门禁：活契约 info.version 必须为 1.0.1，使「openapi-typescript 产物 diff 为空」有明确版本基准",
+          "ref": "orchestrator/tasks/M0-03.md, docs/delivery/MONTHLY-DELTA-PLAN.md 第 1 节",
+          "allowed_under_owner_gate": true,
+          "commit": "1f5912e",
+          "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
+        }
+      ],
+      "wave1_slice_content_verdict": "M0-02/M0-03 现有切片内容经差分回归实测与活契约重切结果字节等价（v1.0.1 的 12 个节点与这 5 个 operationId 无交集），故内容不需重做，只需重切以修正 spec_version 与来源标记。",
+      "cleared_at": "2026-11-12T22:16:36+08:00",
+      "all_cleared": true
+    },
+    "d004_d005_commit": "1f5912e",
+    "owner_decisions": {
+      "granted_at": "2026-11-12T22:48:36+08:00",
+      "granted_by": "项目负责人",
+      "ruling_scope": "长程无人值守：所有待裁定项一律采用文档给出的默认值/建议值，不再逐项等待人工",
+      "post_patch_review_v101_section6": {
+        "item1_M0-04_metric_registry_external_registration": "APPROVED_AS_RECOMMENDED",
+        "item2_M4-P01_design_front_and_M5-P01_collect_front": "APPROVED_AS_RECOMMENDED（调整 2 必须带『M3-P01 已 PASS』触发条件）",
+        "item3_critical_task_L_loop_cap_2_plus_downgrade": "APPROVED_AS_RECOMMENDED",
+        "item4_Q_VERIFY_M0_merge_into_one_dispatch": "APPROVED_AS_RECOMMENDED（flash 采集 + max 判定，合并一次）",
+        "source": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节"
+      },
+      "manual_15_6_ratified": true,
+      "pending_owner_defaults_adopted": [
+        "ADR-003-1",
+        "ADR-003-2",
+        "ADR-003-3",
+        "SRC-1",
+        "Q-VERIFY-M0-01"
+      ],
+      "fonts_noto_cjk": "APPROVED_BY_OWNER：开工前安装；本次接管时 apt 仍在下载 61.2MB，BLK-02 待安装完成 + fc-list 验证 + doctor 复跑后关闭"
+    },
+    "pending_owner_cleared_at": "2026-11-12T22:48:36+08:00"
+  },
+  "acceptance": {
+    "baseline_total": 35,
+    "monthly_total": 12,
+    "total": 47,
+    "monthly_ids": [
+      "AC-MR-01",
+      "AC-MR-02",
+      "AC-MR-03",
+      "AC-MR-04",
+      "AC-MR-05",
+      "AC-MR-06",
+      "AC-MR-07",
+      "AC-MR-08",
+      "AC-MR-09",
+      "AC-MR-10",
+      "AC-MR-11",
+      "AC-MR-12"
+    ],
+    "monthly_source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/CampaignLab-Review-Acceptance-Checklist.append.md"
+  },
+  "contract": {
+    "live_dir": "contracts",
+    "openapi_info_version": "1.0.1",
+    "registry": "contracts/CHANGES.json",
+    "registered_nodes": 12,
+    "gate": "python3 scripts/check_contracts.py check",
+    "ci_job": "contract-gate",
+    "baselines": [
+      {
+        "path": "spec/CampaignLab-SDD-v1.0",
+        "manifest_sha256": "3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91",
+        "zip_sha256": "c8ac004c50f53ea08416807bd43a4b585784b31892513082e4aa635952850d81"
+      },
+      {
+        "path": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+        "manifest": "DELTA-SHA256SUMS",
+        "manifest_items": 21,
+        "zip_sha256": "13b1be8cfa11c8b457f3d66eb3d9431e8238c15b5b0985b15d79dc3a1856c371"
+      },
+      {
+        "path": "spec/frontend-template-spdb-v1.1",
+        "note": "前端设计基线，ADR-003"
+      }
+    ]
+  },
+  "critical_paths": [
+    [
+      "M0-01",
+      "M0-02",
+      "M0-04",
+      "M1-01",
+      "M1-02",
+      "M3-01",
+      "M3-02",
+      "M3-03",
+      "M4-01",
+      "M4-02",
+      "M4-03",
+      "M5-01",
+      "M5-02",
+      "M5-03"
+    ],
+    [
+      "M0-01",
+      "M0-02",
+      "M0-04",
+      "M1-01",
+      "M1-02",
+      "M3-01",
+      "M3-02",
+      "M3-03",
+      "M4-01",
+      "M4-02",
+      "M4-03",
+      "M4-P01",
+      "M5-P01",
+      "M5-03"
+    ],
+    [
+      "M0-01",
+      "M0-02",
+      "M0-04",
+      "M1-01",
+      "M1-02",
+      "M3-01",
+      "M3-02",
+      "M3-03",
+      "M4-01",
+      "M4-02",
+      "M4-03",
+      "M5-01",
+      "M5-P01",
+      "M5-03"
+    ]
+  ],
+  "critical_path_note": "关键路径长度 14，存在 3 条并列链。月报链与原链等长，因此 M4-P01 与 M5-P01 属关键路径任务，不得按「有空再做」处理。",
+  "critical_tasks": [
+    "M0-01",
+    "M0-02",
+    "M0-04",
+    "M1-01",
+    "M1-02",
+    "M3-01",
+    "M3-02",
+    "M3-03",
+    "M4-01",
+    "M4-02",
+    "M4-03",
+    "M4-P01",
+    "M5-01",
+    "M5-02",
+    "M5-03",
+    "M5-P01"
+  ],
   "baselines": [
-   {
-    "path": "spec/CampaignLab-SDD-v1.0",
-    "manifest_sha256": "3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91",
-    "zip_sha256": "c8ac004c50f53ea08416807bd43a4b585784b31892513082e4aa635952850d81"
-   },
-   {
-    "path": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-    "manifest": "DELTA-SHA256SUMS",
-    "manifest_items": 21,
-    "zip_sha256": "13b1be8cfa11c8b457f3d66eb3d9431e8238c15b5b0985b15d79dc3a1856c371"
-   },
-   {
-    "path": "spec/frontend-template-spdb-v1.1",
-    "note": "前端设计基线，ADR-003"
-   }
+    {
+      "path": "spec/CampaignLab-SDD-v1.0",
+      "manifest": "SHA256SUMS",
+      "verify": "cd 后 sha256sum -c",
+      "ci_step": "基线一"
+    },
+    {
+      "path": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+      "manifest": "DELTA-SHA256SUMS",
+      "items": 21,
+      "verify": "cd 后 sha256sum -c",
+      "ci_step": "基线二"
+    },
+    {
+      "path": "spec/frontend-template-spdb-v1.1",
+      "manifest": "README_设计与使用说明.md 第九节（8 项）",
+      "verify": "python3 scripts/check_frontend_baseline.py",
+      "ci_step": "基线三",
+      "defect": "D-002"
+    }
   ]
- },
- "critical_paths": [
-  [
-   "M0-01",
-   "M0-02",
-   "M0-04",
-   "M1-01",
-   "M1-02",
-   "M3-01",
-   "M3-02",
-   "M3-03",
-   "M4-01",
-   "M4-02",
-   "M4-03",
-   "M5-01",
-   "M5-02",
-   "M5-03"
-  ],
-  [
-   "M0-01",
-   "M0-02",
-   "M0-04",
-   "M1-01",
-   "M1-02",
-   "M3-01",
-   "M3-02",
-   "M3-03",
-   "M4-01",
-   "M4-02",
-   "M4-03",
-   "M4-P01",
-   "M5-P01",
-   "M5-03"
-  ],
-  [
-   "M0-01",
-   "M0-02",
-   "M0-04",
-   "M1-01",
-   "M1-02",
-   "M3-01",
-   "M3-02",
-   "M3-03",
-   "M4-01",
-   "M4-02",
-   "M4-03",
-   "M5-01",
-   "M5-P01",
-   "M5-03"
-  ]
- ],
- "critical_path_note": "关键路径长度 14，存在 3 条并列链。月报链与原链等长，因此 M4-P01 与 M5-P01 属关键路径任务，不得按「有空再做」处理。",
- "critical_tasks": [
-  "M0-01",
-  "M0-02",
-  "M0-04",
-  "M1-01",
-  "M1-02",
-  "M3-01",
-  "M3-02",
-  "M3-03",
-  "M4-01",
-  "M4-02",
-  "M4-03",
-  "M4-P01",
-  "M5-01",
-  "M5-02",
-  "M5-03",
-  "M5-P01"
- ],
- "baselines": [
-  {
-   "path": "spec/CampaignLab-SDD-v1.0",
-   "manifest": "SHA256SUMS",
-   "verify": "cd 后 sha256sum -c",
-   "ci_step": "基线一"
-  },
-  {
-   "path": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
-   "manifest": "DELTA-SHA256SUMS",
-   "items": 21,
-   "verify": "cd 后 sha256sum -c",
-   "ci_step": "基线二"
-  },
-  {
-   "path": "spec/frontend-template-spdb-v1.1",
-   "manifest": "README_设计与使用说明.md 第九节（8 项）",
-   "verify": "python3 scripts/check_frontend_baseline.py",
-   "ci_step": "基线三",
-   "defect": "D-002"
-  }
- ]
 }
