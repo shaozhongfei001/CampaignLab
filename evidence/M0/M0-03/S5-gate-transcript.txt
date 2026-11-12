@@ -1,0 +1,134 @@
+M0-03 / S5 出口门禁实测记录（lane F · Round 4 wave1）
+采集时间: 2026-11-13T05:45:29+08:00
+仓库: /home/szf/dev/CampaignLab  分支: m0-framework
+判定口径: 看输出文本（如 'N failed'），不只看管道末端 rc；rc=1 对 rg/grep 表示无匹配＝期望
+
+==============================================================================
+[G1] cmd: npm --prefix web run typecheck
+[G1] rc=0 expect=0 -> OK
+[G1] output:
+> campaignlab-web@0.0.0 typecheck
+> vue-tsc --noEmit -p tsconfig.json
+
+==============================================================================
+[G2] cmd: npm --prefix web run test
+[G2] rc=0 expect=0 -> OK
+[G2] output:
+> campaignlab-web@0.0.0 test
+> vitest run --passWithNoTests
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/szf/dev/CampaignLab/web[39m
+
+[90mstdout[2m | tests/unit/breakpoint-guard.spec.ts[2m > [22m[2m断点变量一致性守卫（token-mapping §3 · Q-S3-C）[2m > [22m[2m汇总：扫描到的 @media 断点条数与变量映射（Shell 布局落地后本表须非空）
+[22m[39m[breakpoint-guard] 扫描文件 11 个（排除 src/api/types.ts）
+[breakpoint-guard] tokens.css 断点变量 --cl-bp-rail-collapse=1100px, --cl-bp-rail-drawer=800px, --cl-content-max=1440px
+[breakpoint-guard] web/src 内 @media 断点条数 = 0
+[breakpoint-guard] 违规条数 = 0
+
+ [32m✓[39m tests/unit/breakpoint-guard.spec.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/api-client.spec.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/unit/tokens-guard.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m tests/unit/project-baseline.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m56 passed[39m[22m[90m (56)[39m
+[2m   Start at [22m 05:45:31
+[2m   Duration [22m 631ms[2m (import 64%, transform 27%, tests 7%, worker 1%)[22m
+
+==============================================================================
+[G3] cmd: npm --prefix web run lint
+[G3] rc=0 expect=0 -> OK
+[G3] output:
+> campaignlab-web@0.0.0 lint
+> eslint .
+
+==============================================================================
+[G4] cmd: npm --prefix web run build
+[G4] rc=0 expect=0 -> OK
+[G4] output:
+> campaignlab-web@0.0.0 build
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 20 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.39 kB │ gzip:  0.27 kB
+dist/assets/index-BuUHsnDS.css  367.50 kB │ gzip: 49.56 kB
+dist/assets/index-Bh3UH9B3.js    75.01 kB │ gzip: 29.43 kB
+
+✓ built in 225ms
+
+==============================================================================
+[G5a] cmd: rg -n '#[0-9a-fA-F]{6}' web/src --glob '!**/styles/tokens.css'
+[G5a] rc=1 expect=1 -> OK
+[G5a] output:
+(无输出)
+
+==============================================================================
+[G5b] cmd: rg -n '#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(' web/src --glob '!**/styles/tokens.css'
+[G5b] rc=1 expect=1 -> OK
+[G5b] output:
+(无输出)
+
+==============================================================================
+[G5c] cmd: grep -rn '300[012]' web/*.config.* web/playwright.config.ts
+[G5c] rc=1 expect=1 -> OK
+[G5c] output:
+(无输出)
+
+==============================================================================
+[G6] cmd: npm --prefix web run test -- tests/unit/breakpoint-guard.spec.ts
+[G6] rc=0 expect=0 -> OK
+[G6] output:
+> campaignlab-web@0.0.0 test
+> vitest run --passWithNoTests tests/unit/breakpoint-guard.spec.ts
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/szf/dev/CampaignLab/web[39m
+
+[90mstdout[2m | tests/unit/breakpoint-guard.spec.ts[2m > [22m[2m断点变量一致性守卫（token-mapping §3 · Q-S3-C）[2m > [22m[2m汇总：扫描到的 @media 断点条数与变量映射（Shell 布局落地后本表须非空）
+[22m[39m[breakpoint-guard] 扫描文件 11 个（排除 src/api/types.ts）
+[breakpoint-guard] tokens.css 断点变量 --cl-bp-rail-collapse=1100px, --cl-bp-rail-drawer=800px, --cl-content-max=1440px
+[breakpoint-guard] web/src 内 @media 断点条数 = 0
+[breakpoint-guard] 违规条数 = 0
+
+ [32m✓[39m tests/unit/breakpoint-guard.spec.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 05:45:34
+[2m   Duration [22m 208ms[2m (transform 67%, import 20%, tests 9%, worker 3%)[22m
+
+==============================================================================
+[G7] cmd: python3 scripts/check_frontend_baseline.py
+[G7] rc=0 expect=0 -> OK
+[G7] output:
+OK   checklist_交付前自检.md sha16=b1c2ca4a8257a46a expect=b1c2ca4a8257a46a bytes=4024 expect=4024
+OK   gallery_组件图鉴.html sha16=4320e095e40121ba expect=4320e095e40121ba bytes=24323 expect=24323
+OK   template_blank.html sha16=aca591120b952542 expect=aca591120b952542 bytes=14103 expect=14103
+OK   template_blank_singlefile.html sha16=4b966e044d3305a1 expect=4b966e044d3305a1 bytes=139725 expect=139725
+OK   css/tokens.css sha16=a4e27cc208ccc428 expect=a4e27cc208ccc428 bytes=3199 expect=3199
+OK   css/youxia-ui.css sha16=7ab1eadff01dc5f8 expect=7ab1eadff01dc5f8 bytes=104677 expect=104677
+OK   js/youxia-charts.js sha16=6d831e1415154721 expect=6d831e1415154721 bytes=10260 expect=10260
+OK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+
+==============================================================================
+[PRE-3] 活契约指纹实算 vs 切片 vs 派单期望
+[PRE-3] actual : sha16=592571099d638251 bytes=443309 info.version=1.0.1
+[PRE-3] slice  : sha16=592571099d638251 bytes=443309 spec_version=1.0.1
+[PRE-3] expect : sha16=592571099d638251 bytes=443309 info.version=1.0.1
+[PRE-3] -> MATCH
+
+==============================================================================
+[APPEND] git diff --numstat -- orchestrator/handoff/M0-03-design.md（removed 必须为 0）
+146	0	orchestrator/handoff/M0-03-design.md
+
+==============================================================================
+SUMMARY: G1:rc=0/0=OK  G2:rc=0/0=OK  G3:rc=0/0=OK  G4:rc=0/0=OK  G5a:rc=1/1=OK  G5b:rc=1/1=OK  G5c:rc=1/1=OK  G6:rc=0/0=OK  G7:rc=0/0=OK
+PRE-3: MATCH
+RESULT: ALL_GATES_OK

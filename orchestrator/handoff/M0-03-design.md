@@ -141,3 +141,149 @@ S5 需在本节补：`web/src/api/http.ts`（cookie credentials、ETag/If-Match�
 | G10 | `git status --porcelain` | 0 | 16 行：` M` 5 项 = `web/{eslint.config.js,playwright.config.ts,tsconfig.json,vite.config.ts,src/main.ts}`；`??` 11 项 = `orchestrator/handoff/M0-03-design.md`、`web/vitest.config.ts`、`web/src/{api,components,composables,features,pages,router,styles}/`、`web/tests/`，**加 1 项非本子任务所为的 `evidence/M0/Q-VERIFY-M0-01/judge/`**（并行 Q lane 产物，文件时间戳 23:55–01:06，本子任务从未写 `evidence/**`）。`web/package.json` 与 `web/package-lock.json` 均无改动。采集期间并行 lane 使 HEAD 由 `ee51f3f` 推进到 `b1f38a9`，同样非本子任务所为（本子任务未执行任何 git 写操作） |
 | G11 | `git ls-files --others --exclude-standard orchestrator/handoff/M0-03-design.md` | 0 | 输出该路径 → 未被 `.gitignore` 忽略、可入库 |
 | G12 | `npx playwright test --list`（在 `web/`） | 1 | `Listing tests: Total: 0 tests in 0 files` + `Error: No tests found`；配置加载成功，rc=1 仅因 S7 未写用例 |
+
+## 10. 状态章节（S5 落地实录 · 2026-11-13 · 纯增量追加）
+
+> **追加纪律自证**：§6「状态章节（S5 填写，本节仅留边界）」是 S2 留下的占位边界，本节按项目纪律
+> 「历史值只加注不改写」**只在其后追加**，§6 与 §1–§9 的既有字节一字未动
+> （`git diff --numstat` 对本文件 removed=0 即为自证）。本节即 §6 点名要 S5 补的全部内容：
+> 接口签名、错误映射、ETag 与幂等处理、切工作区清理策略，外加 token-mapping §3 指定随 S5 落地的
+> **断点变量一致性守卫**。S5 未引入任何新依赖（Q5 裁定：Vue 原生 `reactive` + composable 单例），
+> 未 `import vue-router`（router 属 S6），未改 `web/package.json`、`tokens.css` 令牌值、`api/types.ts`。
+
+### 10.1 落地文件（全部落在 `scope_allow`：`web/src/**`、`web/tests/**`）
+
+| 文件 | 行数 | 职责 |
+|---|---|---|
+| `web/src/api/http.ts` | 554 | 唯一 HTTP 出口：cookie、Problem→ApiError、ETag/If-Match、Idempotency-Key、1 MiB 预检、429 退避、202 轮询骨架、RequestGate（abort + 请求序列） |
+| `web/src/api/endpoints.ts` | 108 | 切片 5 个 operationId 的类型化封装；参数/请求体/响应体全部从 `operations[...]` 抽取，不重抄字段 |
+| `web/src/composables/useWorkspaceScope.ts` | 167 | 工作区作用域 = (workspaceId, epoch, 资源表, gate)；**切工作区清理策略的唯一实现** |
+| `web/src/composables/useSession.ts` | 187 | 会话 store：exchangeSession/getSession、入口令牌一次性、401/403 回合法入口、深链 `pendingRedirect` |
+| `web/src/composables/useWorkspaces.ts` | 275 | 工作区 store：listWorkspaces 游标 25 行、createWorkspace、getHealth→作业受限、revision/ETag 请求缓存 |
+| `web/src/main.ts` | 32（改） | 按 §6 接线 `app.provide(...)`；顺序＝依赖顺序 http ← scope ← session ← workspaces |
+| `web/tests/unit/api-client.spec.ts` | 677 | 29 条纯逻辑用例（node 环境，注入 fetch 替身，不发真实请求、不触碰 DOM） |
+| `web/tests/unit/breakpoint-guard.spec.ts` | 327 | 12 条断点一致性守卫用例（含正/负例夹具自证非空转） |
+
+### 10.2 接口签名（冻结面：S6 只准调用，不得重定义或直接 `fetch`）
+
+```ts
+// web/src/api/http.ts
+type ApiErrorKind = "problem" | "transport" | "aborted" | "payload" | "assertion" | "timeout";
+interface ApiError { kind; status; code; type; title; detail; requestId; issues: readonly Issue[];
+                     payload?: { limitBytes; actualBytes }; cause?: string }
+type ApiResult<T> = ApiOk<T> /* { ok:true, status, data:T, etag, requestId, notModified } */
+                  | { ok:false, error: ApiError };
+interface HttpClient {
+  request<T>(options: HttpRequestOptions): Promise<ApiResult<T>>;   // 不抛异常：失败一律走 ApiResult
+  poll<T>(options: PollOptions): Promise<ApiResult<T>>;             // 202 轮询骨架
+  keyOf(o): string; etagFor(key): string|null; rememberEtag(key, etag): void;
+  devAssertions(): readonly string[]; drainDevAssertions(): string[]; baseUrl: string;
+}
+interface HttpRequestOptions { method; path; query?; body?; headers?; ifMatch?; idempotencyKey?;
+  ifNoneMatch?; accept?; signal?; requireIdempotencyKey?; requireIfMatch? }
+function createHttpClient(config?: HttpClientConfig): HttpClient;   // fetchImpl/clock/sleep 均可注入
+function createRequestGate(): RequestGate;                          // begin/isCurrent/cancelAll/inflightCount
+function newIdempotencyKey(purpose: string): string;                // 8..128，一次用户意图一个
+function isValidIdempotencyKey(key: string): boolean;
+function jsonBodyBytes(body: unknown): number;                      // TextEncoder 实算
+const http: HttpClient;  const httpKey: InjectionKey<HttpClient>;
+
+// web/src/api/endpoints.ts（签名与切片逐一对应）
+exchangeSession(token: string, client?): Promise<ApiResult<Session>>          // POST /session/exchange
+getSession(client?): Promise<ApiResult<Session>>                              // GET  /session
+getHealth(client?): Promise<ApiResult<Health>>                                // GET  /health
+listWorkspaces(query?: ListWorkspacesQuery, client?): Promise<ApiResult<WorkspacePage>>  // GET /workspaces
+createWorkspace(body: CreateWorkspaceBody, o: { idempotencyKey; client? }): Promise<ApiResult<Workspace>>
+
+// web/src/composables/*.ts（单例 + 工厂双出口：工厂供单测隔离，单例供组合根 provide）
+createWorkspaceScope(deps?) / useWorkspaceScope(): WorkspaceScope
+  { state{workspaceId,epoch,resourceCount,lastClearReason,lastClearedAt}, gate,
+    register(kind,label,dispose)=>unregister, list(), setWorkspace(id,reason?)=>changed,
+    clear(reason), isStale(epoch), epochOf() }
+createSessionStore(deps?) / useSession(): SessionStore
+  { state{phase,session,error,entryTokenUsed,pendingRedirect,lastRequestId,lastSignOutReason},
+    bootstrap(entryToken|null)=>phase, exchange(token), verify(), signOut(reason,redirect?),
+    captureRedirect(fullPath), takeRedirect(), hasRole(role), onSignOut(handler)=>off }
+createWorkspacesStore(deps?) / useWorkspaces(): WorkspacesStore
+  { state{phase,items,nextCursor,limit=25,q,error,health,workerRestricted,creating,createError,
+          selectedId,lastRequestId}, revisions,
+    refreshHealth(), loadFirstPage(), loadMore(), setQuery(q), create(body,idempotencyKey),
+    select(id|null)=>changed, revisionOf(id), resetForSignOut() }
+```
+
+### 10.3 错误映射（承接 §5，不重开裁定）
+
+- **单一入口**：所有非 2xx 一律经 `http.ts` 的 `readProblem()` 映射成 `ApiError`；`kind === "problem"` 是唯一可渲染 `title` 的来源（ADR-005 §2.2：`title` 原样透传，前端不另编文案）。
+- **分支键只用 `code`**；`type` 仅做一次一致性校验 `type === "urn:campaignlab:problem:" + code.toLowerCase()`，不一致以 `code` 为准并写 dev 断言水槽（不 `console.*`、不抛出，S8 可断言水槽为空）。§5 所称「dev 下抛断言」在 S5 的落地形态即该水槽 + `drainDevAssertions()`（水槽上限 100 条，生产不无界增长）。
+- **`issues[]` 逐条校验**：四字段（code/location/message/severity）任一残缺即丢弃该条，避免把错误字段定位塞给表单。
+- **非 Problem 的失败**分五类，`title`/`code` 恒为空串，UI 只能用 COMMON.md 通用失败态 + `request_id`：`transport`（网络异常/正文非 Problem/2xx 正文非 JSON）、`aborted`（AbortSignal）、`payload`（1 MiB 预检失败，请求未发出）、`assertion`（缺 If-Match / 缺或非法 Idempotency-Key，属前端缺陷，请求未发出）、`timeout`（202 轮询耗尽上限）。
+- **status → 行为**照 §5 表执行，S5 已在 store 里落地的部分：401 → `session.signOut()`（清会话 + `scope.clear()` + 保深链）；403（会话级）→ `signOut(reason, "/")` 强制回合法入口；409/412/413/422 → `createError` 保留、**不擅清表单输入**；403 与 404 的同一呈现属 S6 视图层。
+- **`getHealth` 的 `Health.status` 是合法响应字段**（READY/DEGRADED），与 CR-002 移除的 `listWorkspaces.status` 查询参数无关；`endpoints.ts` 未提供任何状态筛选入口（CR-002 终态）。
+
+### 10.4 ETag 与幂等处理
+
+- **缓存键**：`keyOf({method,path,query})` = `method + " " + path + "?" + 排序后的 query`；ETag 与请求序列共用同一口径。
+- **响应侧**：任何带 `ETag` 的响应自动入内存缓存；`createWorkspace` 201 的 ETag 与 `Workspace.revision` 一并写进 `revisions[workspaceId]`，后续变更请求经 `ifMatch` 上送 `If-Match`。
+- **请求侧**：`requireIfMatch: true` 时缺 `If-Match` → `kind:"assertion"`，**请求不发出**（对应服务端 428 `PRECONDITION_REQUIRED` 属前端缺陷，在客户端先拦下）。
+- **304 / 条件 GET**：活契约未声明 304，故默认**不发** `If-None-Match`；`ifNoneMatch` 仅作显式开关保留，收到无 `If-None-Match` 的 304 记 dev 断言并判 `transport`（见 R3-Q3）。
+- **幂等键**：`newIdempotencyKey(purpose)` 生成 `<purpose>-<uuid>`（截断至 128）；`isValidIdempotencyKey` 按契约 8..128 且排除空白/控制字符校验；非法或缺失 → `kind:"assertion"`，请求不发出。**409 `IDEMPOTENCY_CONFLICT` 的重试必须沿原 key**：store 不重新生成，键由 S6 按「一次用户意图一个」持有。
+- **1 MiB 预检**：`jsonBodyBytes()` 用 `new TextEncoder().encode(JSON.stringify(body)).length` 实算，超限即 `kind:"payload"` 且带 `{limitBytes, actualBytes}`，**请求不发出**（与文件上传的 8/64 MiB 是不同对象，未混用）。
+- **429 退避**：首次 1s、倍增、上限 3 次（共 4 次尝试），退避期间被取消即返回 `aborted`；耗尽后透传服务端 Problem 的 `title`。
+
+### 10.5 切工作区清理策略（FRONTEND.md:12/13 + UI-01「切换后清除上一个工作区的草稿范围和轮询」）
+
+- **作用域三元组**：`(workspaceId, epoch, 资源表)`。`epoch` 单调递增；任何在 epoch 变更前发出的请求/轮询回来后一律 `isStale()` 判真并丢弃。
+- **资源表**：`register(kind, label, dispose)`，`kind ∈ {poll, temp-query, selection, draft, chart, listener}`；返回注销函数供组件卸载时调用。绑定 `workspaceId === null` 的是**全局资源**（如 app 级监听），只随 `clear()` 释放，不随切换清理。
+- **`setWorkspace(id)` 顺序**：`gate.cancelAll()` → dispose 上一工作区资源 → 写新 id → `epoch+1`。先中止再 dispose 再推进 epoch，保证 dispose 内触发的最后一次回调仍判 stale，不会写回新作用域。
+- **同 id 重复 `setWorkspace` 直接返回 false 且不做任何清理**：刷新、深链回到同一工作区、返回键都不许丢草稿（FRONTEND.md:12）。
+- **`dispose` 抛错不得阻断其余资源释放**（清理是幂等义务，不是事务）；异常被吞掉且不留 `console.*`。
+- **`gate.cancelAll()` 同时递增序列号**（本轮实测修正的关键点）：被取消的请求即使仍以 `aborted` 结果返回，也一律判 stale 而丢弃，否则切工作区/登出瞬间会在 UI 上闪一条假的传输错误。
+- **请求缓存清理粒度**：`select()` 只清上一作用域的 `revisions` 条目，**保留新选中工作区自身那条**（它刚由列表响应给出，删掉等于把服务端已给的 revision 白扔，下次变更请求要多跑一趟 412）；登出路径 `resetForSignOut()` 全清。
+- **入口页搜索词 `q` 不随切换清理**：判定为页面级状态而非对象级临时查询（见 R3-Q5）。
+- **store 间联动用观察者而非互相 import**：`session.onSignOut(handler)`，`useWorkspaces` 创建时注册 `resetForSignOut`，避免 session ↔ workspaces 循环依赖。
+
+### 10.6 断点变量一致性守卫（token-mapping §3 指定随 S5 落地的项）
+
+- **位置**：`web/tests/unit/breakpoint-guard.spec.ts`（12 条用例，`environment: node`，与 `tokens-guard.spec.ts` 同风格、同扫描通道 `import.meta.glob("/src/**/*", { query:"?raw", eager:true })`，不依赖 `node:fs`/`@types/node`，见 Q2）。
+- **三条校验规则**：
+  1. `tokens.css` 必须逐字声明 §3 表格三变量且**各只声明一次**：`--cl-bp-rail-collapse: 1100px`、`--cl-bp-rail-drawer: 800px`、`--cl-content-max: 1440px`；
+  2. `web/src` 内每个 `@media` 断点字面量（`px`/`em`/`rem`，em/rem 按根字号 16px 折算）都必须能在 §3 表格找到**取值相等的同名变量**，否则判违规；表外像素值（如 1024px）必红；
+  3. 该字面量所在行或其上一行必须**写出同名变量名**（可追溯注记），把 §3 的「找到同名变量」变成机器可证明；断点变量不得在 `tokens.css` 之外重声明，也不得出现 §3 之外的第四个断点变量。
+- **实测结果**（`npm --prefix web run test -- tests/unit/breakpoint-guard.spec.ts`，rc=0，12 passed）：扫描 11 个源文件（排除 `src/api/types.ts`）；`tokens.css` 三变量命中 `1100px / 800px / 1440px`；**`web/src` 内 `@media` 断点条数 = 0，违规条数 = 0** —— 与 §3「在 S5 之前不得出现写死像素的媒体查询」一致（Shell 布局属 S6，届时本守卫自动升级为实质校验）。
+- **非空转自证**：6 条夹具用例证明校验逻辑真的会红——正例（注记齐备的 1100px）通过并给出映射；负例一（表外 1024px）判「找不到同名变量」；负例二（800px 值对但未注记变量名）判「未注记同名变量」；`50em` 折算 800px 命中 `--cl-bp-rail-drawer`；跨行 `@media` 前置条件可解析；CSS 块注释与 TS 行注释里的 `@media` 不计入（`tokens.css:96` 注释中的「@media」已作真实文件回归断言）。
+- **给 S6 的硬要求**：写媒体查询时必须在同行或上一行注记变量名，例如
+  `/* --cl-bp-rail-collapse */` 换行 `@media (max-width: 1100px) { … }`；否则守卫判红。
+
+### 10.7 S5 出口门禁实测（WSL 仓库根 `/home/szf/dev/CampaignLab`；判定看输出文本，不只看管道末端 rc）
+
+| # | 命令 | 实测 rc | 关键输出 |
+|---|---|---|---|
+| G1 | `npm --prefix web run typecheck` | 0 | 无输出（首跑 rc=2：`http.ts` 的 `RequestInit.signal` 撞 `exactOptionalPropertyTypes`、用例一处未用形参；按需展开 + `_call` 后 rc=0） |
+| G2 | `npm --prefix web run test` | 0 | `Test Files 4 passed (4)`、`Tests 56 passed (56)`、0 skipped（基线 15 → 新增 41：api-client 29 + breakpoint-guard 12） |
+| G3 | `npm --prefix web run lint` | 0 | 无输出 |
+| G4 | `npm --prefix web run build` | 0 | `vite v8.3.8`、`20 modules transformed`（S1 为 11，+9 即本次接线进图）、`dist/assets/index-Bh3UH9B3.js 75.01 kB` |
+| G5a | `rg -n '#[0-9a-fA-F]{6}' web/src --glob '!**/styles/tokens.css'` | 1 | 无输出（rc=1＝无匹配，属期望） |
+| G5b | `rg -n '#[0-9a-fA-F]{3,8}\b\|\brgba?\(\|\bhsla?\(' web/src --glob '!**/styles/tokens.css'` | 1 | 无输出 |
+| G5c | `grep -rn '300[012]' web/*.config.* web/playwright.config.ts` | 1 | 无输出（源码内亦无 30xx 端口字面量：baseURL 只从 `VITE_API_BASE_URL` 注入） |
+| G6 | `npm --prefix web run test -- tests/unit/breakpoint-guard.spec.ts` | 0 | `12 passed`；`@media 断点条数 = 0`、`违规条数 = 0`（详见 §10.6） |
+| G7 | `python3 scripts/check_frontend_baseline.py` | 0 | `FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）` |
+
+### 10.8 S6 接线须知（不得推翻的口径）
+
+1. 页面/组件**不得直接 `fetch`**，一律经 `endpoints.ts`；需要新 operationId 时在 `endpoints.ts` 追加同风格封装，不要在组件里就地拼 URL。
+2. 组合根已按 `http ← scope ← session ← workspaces` 顺序 `provide`；S6 只在 `main.ts` **追加** `app.use(router)`，不得改这段顺序（后创建的 store 复用前者的单例）。
+3. 深链由 S6 的路由守卫消费：进受保护路由前 `session.captureRedirect(to.fullPath)`；会话失效后 `session.takeRedirect()`（一次性消费，兜底 `/`）。`captureRedirect` 只接受站内绝对路径，外链与 `//host` 一律降级为 `/`（开放重定向防护）。
+4. 需要随工作区释放的东西（轮询定时器、临时查询、图表实例、失效选择、事件监听）**必须** `scope.register(kind, label, dispose)`，并在组件卸载时调用返回的注销函数；不要自己另建清理表。
+5. `exactOptionalPropertyTypes` 保留（Q9）：可选 prop 一律 `:prop="value ?? undefined"`；本层已按此实现（如 `ifMatch: client.etagFor(key) ?? undefined`、`signal` 按需展开）。
+6. 单位与显示：store 只搬运服务端原值（金额＝分整数、比率＝十进制字符串、时间＝带 `+08:00` 的 ISO 串），转元/百分数/百分点/时区呈现一律在显示层做（S6）。
+
+### 10.9 S5 新增未决问题（编号 R3-Q*，交编排器／项目负责人裁定；不自行决定）
+
+| # | 问题 | 影响面 | S5 的临时处置 |
+|---|---|---|---|
+| R3-Q1 | **后端 baseURL 注入方式未定**：`web/*.config.*` 禁出现 30xx 端口（G5c），vite 也未配 `server.proxy`，故 dev 期前端如何指向后端无既定口径。 | S6 联调、S9 Playwright 取证 | `http.ts` 默认同源相对路径，只认 `VITE_API_BASE_URL`。请裁定：dev 走 vite proxy（由编排器改 `web/vite.config.ts`）还是走 `.env.local` 注入 |
+| R3-Q2 | **断点守卫的「变量名注记」规则比 §3 原文更严**：§3 只要求「找到同名变量且取值相等」，S5 另加了「同行或上一行必须写出变量名」以让「同名」可机器证明。 | S6 写 `@media` 的自由度 | 建议保留（否则「同名」只能靠人工走查）。若判过严，删掉 `breakpoint-guard.spec.ts` 里 `未注记同名变量` 那一条分支即可降级 |
+| R3-Q3 | **304 / 条件 GET 无契约依据**：5 个 operationId 的 responses 均未声明 304。 | 请求缓存策略 | 默认不发 `If-None-Match`；`ifNoneMatch` 仅留开关。若后端要支持，须先在活契约声明再重切 |
+| R3-Q4 | **202 轮询默认档（1.5s × 20 = 30s）无契约依据**，UI-01 的 5 个 operationId 也没有 202。 | 后续作业页（UI-25 等） | 作为骨架默认值，`pollIntervalMs`/`pollMaxAttempts` 均可按调用覆写；请各作业任务按自己的 SLA 明确取值 |
+| R3-Q5 | **入口页搜索词 `q` 是否随切工作区清理**：UI-01 只说「清除上一个工作区的草稿范围和轮询」，列表搜索词属页面级还是对象级临时查询无明文。 | UI-01 交互一致性 | S5 判为**页面级**、不清理（回退到 `/` 时保留用户上次的搜索更符合入口页语义）。若 COMMON.md 口径要求清，改一行即可 |
+| R3-Q6 | **`ApiError.kind` 的五个非 problem 取值是前端自有词汇**（transport/aborted/payload/assertion/timeout），不是服务端 `code`。 | S6 文案、S8 断言 | 已严格区分：只有 `kind === "problem"` 才渲染服务端 `title`，其余五类 `title`/`code` 恒空，UI 只能用 COMMON.md 通用失败态；未把任何值伪装成服务端 code（守 Q4 裁定） |
