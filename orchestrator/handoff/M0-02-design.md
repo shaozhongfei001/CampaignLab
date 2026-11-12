@@ -149,3 +149,47 @@ DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝�
 | C3 | `uv run --no-sync ruff check .` | 0 | `All checks passed!` |
 | C4 | `git status --porcelain` | 0 | 只输出一行 `?? orchestrator/handoff/M0-02-design.md`；`git ls-files --others --exclude-standard` 只列该文件、`git diff --name-only` 为空（未改动任何已跟踪文件）。采集期间并行 lane 推进了 HEAD（`33bf5c5` → `c39bd8d` → `e391a7b` → `de550a5`）并一度暂存 D-007 相关 7 个文件，**均非本子任务所为**，现已随 `de550a5` 入库，工作树回到只含本文件 |
 | C5 | `git ls-files --others --exclude-standard orchestrator/handoff/M0-02-design.md` | 0 | 输出该路径 → 未被 `.gitignore` 忽略、可入库 |
+> **【编排器追注 · 2026-11-13T04:12:00+08:00 · M0-02/S2 返回复核 · 只加注不改写】**
+>
+> S2（Galileo，qwen3.8-max high）已返回，编排器独立复跑全部判据后确认交付成立，
+> 并就其上报的 4 条未决问题裁定如下。上文原有字节**一律不改**（手册 15.9 / 项目纪律：
+> 历史测量值绝不重写，只加注）。
+>
+> **① §3 首迁边界 L54「附 5 个显式索引」与 §3 判据④「5 个显式索引名与列序一致」——数量有误，实为 6 个。**
+> 活契约 `contracts/sqlite-v1.sql` 实测 `CREATE INDEX` / `CREATE UNIQUE INDEX` 共 **6** 条：`cases_one_confirmed_child`, `jobs_ready`, `snapshots_lookup`, `rules_activity`, `analysis_snapshot`, `actions_due`。
+> 设计档漏计的是 **`cases_one_confirmed_child`**，它是带 `WHERE` 子句的**部分唯一索引**
+> （`CREATE UNIQUE INDEX`），用朴素的 `grep '^CREATE INDEX'` 会漏掉。
+> S2 已按**活契约**实现 6 个（手册第 7 节：活契约是唯一依据，设计档与之冲突时以活契约为准），
+> 编排器复跑 `compare_schema(ref, mig)` 返回 **`[]`**，等价性成立。
+> 判据④ 的「5 个」自此以本追注的 **6 个**为准；`ddl_compare` 的实现本身是按集合比对、
+> 未写死数量，故无需改代码。
+>
+> **② §5/§7 的 Q7 裁定中「hatchling 进锁」的预期与工具实际行为不符（S2 上报 Q1）。**
+> uv 0.13.7 实测**不**把本地可安装成员的 build-backend 写进 `uv.lock`：`grep -c hatchling uv.lock`
+> → **0 匹配**；`uv.lock` 的唯一变化是 `campaignlab` 的 `source` 由 `{ virtual = "." }`
+> 变为 `{ editable = "." }`（编排器复跑 `git diff --numstat -- uv.lock` = `1 1`）。
+> **裁定**：Q7 的意图（删 `[tool.uv] package = false` 使 `campaignlab` 可导入、gate 命令不再需要
+> `PYTHONPATH=src` 前缀）已达成且经编排器复验 —— `uv run --no-sync python -c "import campaignlab"`
+> rc=0 并解析到 `src/campaignlab/__init__.py`。**AC-035「锁与运行环境清楚可复现」的判定口径为
+> `uv lock --check` rc=0 ＋ `uv sync` 能从锁重建环境**，不以「hatchling 是否出现在锁内」为判据。
+> 锁文件不含 build-backend 属 uv 的设计，不构成缺陷。
+>
+> **③ S2 上报的 Q2（库文件路径约定）、Q4（`downgrade base` 后 `alembic_version` 空表残留）、
+> Q5（`doctor` gate 在 S2 时点必然 rc=1）三条，已统一裁定入
+> [`ADR-005` §2.4](../../docs/decisions/ADR-005-problem-type-and-runtime-defaults.md)。**
+> 要点：**库文件固定 `<data_dir>/state/campaignlab.db`**；解析逻辑必须**单一来源**落在
+> `src/campaignlab/infra/db/paths.py`，`migrations/env.py` 与 S3 的 `engine.py::make_engine`
+> 都 import 它，S3 须附「alembic 侧解析 == 运行期解析」的断言测试；
+> 「完整可逆」= 业务表 0 张 + 仅剩空的 `alembic_version`（不计入 28 表分母、不算额外表）；
+> `doctor` gate 归 **S3**，S2 不记红。
+>
+> **④ S2 自报的一次越界已自证复原**：探测 alembic 默认模板时 `alembic init /tmp/...` 在仓库根
+> 生成了 `alembic.ini`（不在 scope_allow），同脚本内已 `unlink`。编排器独立复核：
+> 仓库根 `alembic.ini` **不存在**；`git ls-files --others --exclude-standard` 中唯一的
+> `alembic.ini` 是 `migrations/alembic.ini`（在 scope 内）；未跟踪且未被忽略的 `*.db` = **0**、
+> 已跟踪 `*.db` = **0**（仓库内 16 个 `*.db` 全在 `.mypy_cache/3.14/`，被 gitignore 覆盖）。
+> 越界已闭合，不计缺陷。
+>
+> **⑤ 本文件自检 §8 的 C1（`wc -l` = 117）与 C2（48 files）继续失效**：本文件因历次追注
+> 已增长，ruff 分母亦随并行 lane 漂移。两者一律以 `state.json →
+> resume.self_check_gates_rc0.counts` 为权威，禁写死（依 D-006 / D-012 / D-014）。

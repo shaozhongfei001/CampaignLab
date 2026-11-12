@@ -30,6 +30,18 @@ type = "urn:campaignlab:problem:" + code.lower()
 - `code` 注册表（公共件，冻结面）：由 `src/campaignlab/domain/errors.py` 单一来源定义，
   任何新增 code 必须先进注册表再使用；注册表变更在 M0-03b 冻结后走 CR。
 
+> **编排器增补（2026-11-13T04:05:00+08:00 · 依 D-019 · 只加注不改写）**：`code` 的**取值集合**并非由本 ADR 或
+> `errors.py` 发明，其唯一权威枚举是 `spec/CampaignLab-SDD-v1.0/architecture/API.md` 的「错误分类」表（第 20–29 行），
+> 编排器逐行提取实测 **20 个**：BAD_REQUEST、BAD_CURSOR、SESSION_EXPIRED、ORIGIN_DENIED、
+> ACCESS_DENIED、RESOURCE_NOT_FOUND、IDEMPOTENCY_CONFLICT、STATE_CONFLICT、VERSION_MISMATCH、
+> STALE_CANDIDATE、SNAPSHOT_CONFLICT、ACTION_REVIEW_REQUIRED、REVISION_CONFLICT、
+> PRECONDITION_REQUIRED、INPUT_TOO_LARGE、VALIDATION_ERROR、INVALID_SCOPE、EVIDENCE_REQUIRED、
+> **JOB_CAPACITY（429）**、INTERNAL_ERROR。
+> `domain/errors.py` 是该表的**代码化副本**：不得新增表外 code，不得改名；确需新增时
+> **先改本 ADR（走 CR，手册第 7 节）再改注册表**。判定「契约缺项」前必须穷尽
+> `spec/**/architecture/*.md`（手册第 0 节优先级第 2 项的「包内领域契约」不只指
+> `contracts/openapi.json`）——429 `JOB_CAPACITY` 曾被误判为缺项，即因未查该表。
+
 ### 2.2 `Problem.title`：固定中文短句表
 
 - `title` 取自与 `code` 一一对应的固定中文短句表（同文件维护），**不得**在调用点现编文案，
@@ -47,6 +59,38 @@ type = "urn:campaignlab:problem:" + code.lower()
 - 三个值必须可注入：测试用小值（如 TTL=1s、正文上限=64B）以在秒级内触发过期与 413，
   禁止在测试里 sleep 到真实 TTL。
 - 领域计算一律用**显式时钟**（不得读系统当前时间），故 TTL 判定必须走注入的 clock。
+
+### 2.4 数据库文件路径约定与「完整可逆」口径（%s 增补 · 依 M0-02/S2 的 Q2、Q4、Q5）
+
+**背景**：`OPERATIONS.md:17` 只规定数据目录由 `CAMPAIGNLAB_DATA_DIR` 指定并含
+`state/raw/snapshots/results/exports/tmp/logs` 七个子目录，**未规定 SQLite 库文件的确切相对路径**。
+S2（Alembic 首迁）已实现一套约定；若 S3（服务入口 `infra/db/engine.py`）另取一套，
+`alembic upgrade` 与运行期会作用于**两个不同的库文件**，`Health.schema_revision` 判定随之失真。
+故在此定为项目级运行参数默认值（项目负责人已授权本次长程无人值守「裁定用默认值」）。
+
+**裁定 1 · 路径约定**：库文件固定在 `<data_dir>/state/campaignlab.db`；
+`<data_dir>` 默认 `~/.local/share/campaignlab`。解析优先级（高 → 低）：
+
+1. alembic `-x db_path=<path>`（仅迁移期显式覆盖）
+2. `alembic.ini` 的 `sqlalchemy.url`（`set_main_option` 注入）
+3. 环境变量 `CAMPAIGNLAB_DATABASE_URL`
+4. 环境变量 `CAMPAIGNLAB_DATA_DIR` + `/state/campaignlab.db`
+5. 默认 `~/.local/share/campaignlab/state/campaignlab.db`
+
+**裁定 2 · 单一来源（硬约束）**：上述解析逻辑必须**只存在一份**，落在
+`src/campaignlab/infra/db/paths.py`；`migrations/env.py` 与 S3 的
+`infra/db/engine.py::make_engine` 都必须 **import 该模块**，禁止各自复制一份优先级链。
+S3 必须附一条测试，断言「alembic 侧解析结果 == 运行期解析结果」（同一组环境变量下逐字相等），
+否则本裁定无法被机器守护。
+
+**裁定 3 · 「完整可逆」口径（回答 Q4）**：`alembic downgrade base` 之后
+**业务表 0 张 + 仅剩空的 `alembic_version`** 即为完整可逆。`alembic_version` 是 alembic 的
+簿记表，**不计入 28 表分母**，也**不算** `Health` 或备份校验里的「额外表」。
+`Health.schema_revision` 的取值来源就是 `alembic_version` 表的当前行。
+
+**裁定 4 · gate 归属（回答 Q5）**：`uv run python -m campaignlab doctor` 依赖
+`src/campaignlab/__main__.py`，属 **S3** 交付物；在 S2 时点必然 rc=1，
+**不得在 S2 记红**，该 gate 的判定归 S3。
 
 ## 3. 被否决的选项
 

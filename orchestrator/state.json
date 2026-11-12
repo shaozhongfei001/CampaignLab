@@ -2,12 +2,12 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T03:01:56+08:00",
+  "updated_at": "2026-11-13T04:40:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.2,
-    "flash_share_tokens": null,
+    "flash_share_tasks": 0.4444,
+    "flash_share_tokens": 0.4356,
     "phase_quotas": {
       "M0": 100,
       "M1": 150,
@@ -124,6 +124,91 @@
         "scope_violation": "NONE（自证 git status --porcelain orchestrator/ spec/ contracts/ scripts/ tests/ = 空；编排器复核 dirty=0）",
         "value_added": "发现 D-011(MAJOR) 与 D-016(MAJOR)、D-012/D-013/D-014/D-015；纠正取证档算术 PASS=17→16；发现 git quotepath 分母陷阱（49≠47 假 FAIL）→ 手册 15.10；独立撞到并证实 D-015 的假 RED 窗口",
         "verdicts": "A=PASS_WITH_TODO；B: D-001..D-009 全 CLOSED；C: D-007 成立；D: A1=MINOR；E: ①MINOR不改 ②MINOR必改CR-001.md:37 ③NIT不改；F=FAIL(MAJOR)；G 无冲突；H=PASS_WITH_TODO；I=PASS@f12dcf8"
+      },
+      {
+        "task": "M0-02",
+        "subtask": "S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock",
+        "subtask_count": 1,
+        "lane": "S",
+        "agent_id": "01a1d11e-9bae-7cd3-acd2-664f6826b738",
+        "nickname": "Galileo",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": 92000,
+        "tokens_note": "子智能体自报 输入≈56k/输出≈36k/合计≈92k（预估 90k，+2%）。L 循环用 1 轮（上限 2）",
+        "returned_at": "2026-11-13T03:55:00+08:00",
+        "outputs": [
+          "migrations/{alembic.ini,env.py,script.py.mako,versions/0001_initial_schema.py}",
+          "src/campaignlab/infra/__init__.py",
+          "src/campaignlab/infra/db/{__init__.py,ddl_compare.py}",
+          "tests/integration/bootstrap/{conftest.py,test_migration_equivalence.py}",
+          "tests/unit/test_migration_schema.py",
+          "evidence/M0/M0-02/{commands.md,migration-diff.md}",
+          "pyproject.toml(-[tool.uv] package=false)",
+          "uv.lock(virtual->editable)"
+        ],
+        "scope_violation": "自报一次并已自证复原（alembic init 探测在仓库根生成 alembic.ini，同脚本 unlink）；编排器独立复核：仓库根无 alembic.ini，未跟踪且未忽略的 *.db=0，已跟踪 *.db=0（16 个 *.db 全在 .mypy_cache/3.14/）",
+        "orchestrator_reverify": "18 条命令逐项复跑吻合：uv lock --check rc=0；import campaignlab rc=0（无 PYTHONPATH=src）；alembic upgrade/current/downgrade/upgrade 四步 rc=0；compare_schema(ref,mig) 返回 []（编排器独立复现）；28 业务表全 strict=1；显式索引 6 个与活契约集合相等；integrity_check=ok；foreign_key_check=0 行；ruff check rc=0；mypy 15 源文件 rc=0；pytest 全量 69 passed rc=0；CR-002 禁实现项 WORKSPACE_STATUS_WHITELIST/INVALID_SCOPE 命中=0",
+        "open_questions_raised": 7,
+        "value_added": "上报 Q1（uv 0.13.7 不把 build-backend 写进锁，与 Q7 裁定文案不符）、Q2（库文件路径约定无契约明文，S3 若另取一套会打到两个库）、Q3（设计档漏计部分唯一索引 cases_one_confirmed_child，实为 6 个非 5 个）、Q4（downgrade base 后 alembic_version 空表口径）；对参考 DDL 注入 10 种单点变异证明 compare_schema 非恒返回空的摆设"
+      },
+      {
+        "task": "M0-03",
+        "subtask": "S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts（含裁定收尾 Round 2）",
+        "subtask_count": 2,
+        "lane": "F",
+        "agent_id": "01a1d11f-b9c0-7653-8eab-f938a68a6a07",
+        "nickname": "Goodall",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 2,
+        "result": "DONE",
+        "tokens": 83000,
+        "over_cap": true,
+        "over_cap_limit": 60000,
+        "tokens_note": "子智能体自报：Round1 ≈54k + Round2（收尾）输入≈12k/输出≈17k 合计≈29k → 累计 83k。**越 flash 单任务 60k 上限 23k（1.38×），如实记账不抹平**（手册 15.5 v1.7）。越限主因是 7 条裁定的收尾轮：守卫重写为 11 条执行态断言（TS 正文≈5.5k 输出）+ 证据档 Round2 段≈5k 输出。",
+        "returned_at": "2026-11-13T03:45:00+08:00",
+        "outputs": [
+          "web/src/styles/{tokens.css,element-theme.css,project.css}",
+          "web/src/api/types.ts",
+          "web/tests/unit/tokens-guard.spec.ts",
+          "evidence/M0/M0-03/S3-S4-commands.md"
+        ],
+        "scope_violation": "NONE（编排器复核 git diff --quiet 对 package.json/package-lock.json/5 个 config/spec/contracts/src/migrations/scripts/docs 全为 rc=0；探针残留 0；未运行任何 uv/pytest/mypy/ruff）",
+        "orchestrator_reverify": "静态项逐条吻合：tokens.css 68 条 --cl-* 声明；element-theme.css 79 条 --el-* 声明（其中 73 绑 var(--cl-*)，6 条未绑恰为 -rgb 三元组且带「换算自」出处注释）；非 --el-* 声明 0；文件内 hex/rgba/hsla 出现 0 次；project.css 0 声明；types.ts 194220B sha256 前16=bddac66ccf9379e9；S3-S4-commands.md 29183B；vitest.config.ts numstat=7/0 且 css:true 在位。执行态：4 条前端门禁由编排器复跑全 rc=0，15 passed / 0 skipped / Test Files 2 passed (2)。编排器另按 WCAG 2.1 公式独立复算 10 个色档对比度，与其 8 个共有档逐位吻合，6 条 -rgb 三元组换算逐字一致",
+        "open_questions_raised": 4,
+        "value_added": "R2-Q1 主动发现编排器回执声称已写入 token-mapping.md 的三处修订在工作树中不存在（rg 零命中、git diff 为空），且恪守 scope 未越界代写 docs/** → 促成 Lane T 补齐文档链；重算出 EP 默认 #909399 为 3.0795/2.8712，更正编排器账本里的 2.85 口径；4 轮探针取证每轮红→还原→绿并用 sha256sum -c 证明逐字节还原"
+      },
+      {
+        "task": "D-016",
+        "subtask": "补卡批次1（8 张：M0-03b/M0-04/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17 + 14 项裁定落地",
+        "subtask_count": 1,
+        "lane": "T",
+        "agent_id": "01a1d121-8cf0-7530-a457-8e6f9f8556fa",
+        "nickname": "Dirac",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 2,
+        "result": "DONE",
+        "tokens": 181000,
+        "over_cap": true,
+        "over_cap_limit": 60000,
+        "tokens_note": "子智能体自报：批次1 ≈119k + 裁定落地轮 输入≈33k/输出≈29k 合计≈62k → 累计 181k。**越 flash 单任务 60k 上限 121k（3.02×），为本轮最严重越限，如实记账不抹平**（手册 15.5 v1.7）。其自述「纯卡片产出部分约 41k 在上限内、62k 中约 21k 是校验返工」——该口径**不采纳**为合规依据，账本只记累计实际值。越限主因：批次1 全文读 5 份权威来源（spec 大文件）。估算方法为其自报的脚本落盘字节折算，非精确计量。",
+        "returned_at": "2026-11-13T04:00:00+08:00",
+        "outputs": [
+          "orchestrator/tasks/{M0-03b,M0-04,M1-01,M1-02,M1-03,M2-01,M2-02,M2-03}.md",
+          "tests/unit/test_task_cards.py（KNOWN_MISSING 25->17）"
+        ],
+        "scope_violation": "NONE（其自检 check-9 首轮 FAIL 是校验器把 git 的未跟踪目录折叠与 glob 误判为越界，改用 -uall + fnmatch 后 PASS；编排器复核：spec/contracts/state.json/既有4卡/docs 均无改动）",
+        "orchestrator_reverify": "编排器独立实测 8 卡结构：head（卡首→档位表表头前）= 34/39/36/36/36/39/43/39，与其自报口径 B 数值 8/8 逐位吻合；档位表表头 8/8 为四列形态；无 CRLF；TASK_TOTAL_DENOMINATOR=29 未动；磁盘 12 卡 + KNOWN_MISSING 17 = 29 双向对账相等。全量 pytest 69 passed（含 test_task_cards 5 例）",
+        "open_questions_raised": 6,
+        "value_added": "N5 主动上报「新口径下 U 项不再受 60 行约束、可无限追加绕过」的治理漏洞 → 促成 D-018 与 tail<=40/total<=200 双上限；N3 拒绝擅自补 runs.py/candidates.py 授权而回报编排器，避免 scope 与 state.json 失配；D14 的 429 上报促成 D-019"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -139,6 +224,43 @@
       "guardrail_checkpoint": "wave2 出口；不足则降档并记理由（首选 M0-03/S10 降 flash + max 复审）",
       "recomputed_at": "2026-11-13T02:05:13+08:00",
       "recomputed_by": "程序化重算（禁手填）"
+    },
+    "flash_share_recomputed_at": "2026-11-13T04:32:00+08:00",
+    "flash_share_detail": {
+      "subtask_entries": 7,
+      "subtask_units_total": 9,
+      "subtask_units_flash": 4,
+      "token_entries_known": 5,
+      "token_entries_null": 2,
+      "tokens_known_total": 606000,
+      "tokens_known_flash": 264000,
+      "over_cap_entries": [
+        {
+          "task": "M0-03",
+          "subtask": "S3 令牌机械落地与守卫 + S4 openapi-ty",
+          "tier_used": "qwen3.8-flash",
+          "tokens": 83000,
+          "limit": 60000
+        },
+        {
+          "task": "D-016",
+          "subtask": "补卡批次1（8 张：M0-03b/M0-04/M1-01",
+          "tier_used": "qwen3.8-flash",
+          "tokens": 181000,
+          "limit": 60000
+        }
+      ]
+    },
+    "guardrail_status": {
+      "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
+      "actual_tasks": 0.4444,
+      "actual_tokens": 0.4356,
+      "tasks_target_met": false,
+      "tokens_target_met": false,
+      "verdict": "**两项护栏当前均未达标**，如实上报不粉饰",
+      "diagnosis": "① 子任务占比 44.4% < 60%：M0 阶段是环境与公共件奠基，手册 6.3 硬规则把 OpenAPI/DDL/状态机/公共冻结件变更全部强制 max，max 子任务天然偏多，属「设计先行」的必然形态而非降档失控；② token 占比 43.6% > 35%：主因是两条 flash 越限（Dirac 181k = 3.02×、Goodall 83k = 1.38×），合计 264k；若剔除越限部分，flash token 占比为 19.5%，说明护栏失效的直接原因是**单批任务过大**，不是档位选错。",
+      "corrective_action": "批次 2/3 补卡降批至每批 4–5 张并**预抽 spec 摘要**（Dirac 自估可压到 35–45k/批）；wave3 起 D lane 的量产型子任务（参数化枚举、样板铺开、证据采集）严格按 6.3 强制 flash 清单派 flash，以程序级占比在 wave3–wave5 回升；护栏检查点仍为 wave2 出口（原 guardrail_checkpoint 不变）。",
+      "checkpoint": "wave2 出口复算；若仍未达标，按手册 6.6「达 120% 暂停非关键路径任务并汇报」升级给项目负责人"
     }
   },
   "tasks": {
@@ -343,7 +465,9 @@
         "pyproject.toml",
         "uv.lock",
         "evidence/M0/M0-02/",
-        "evidence/M0/summaries/M0-02.md"
+        "evidence/M0/summaries/M0-02.md",
+        "src/campaignlab/infra/__init__.py",
+        "tests/unit/test_migration_schema.py"
       ],
       "blockers": [],
       "depth": 2,
@@ -452,7 +576,7 @@
     "M0-03b": {
       "status": "TODO",
       "lane": "F",
-      "tier_planned": "flash",
+      "tier_planned": "max",
       "tier_used": "",
       "attempt": 0,
       "tokens": 0,
@@ -476,13 +600,31 @@
       ],
       "scope": [
         "web/src/components/state/",
-        "web/tests/unit/state/"
+        "web/tests/unit/state/",
+        "orchestrator/handoff/M0-03b-freeze.md",
+        "evidence/M0/M0-03b/",
+        "evidence/M0/summaries/M0-03b.md"
       ],
       "blockers": [],
       "depth": 3,
       "height": 1,
       "slack": 11,
-      "critical": false
+      "critical": false,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M0-03b-freeze.md",
+          "evidence/M0/M0-03b/",
+          "evidence/M0/summaries/M0-03b.md"
+        ],
+        "normalized_equivalent_skipped": [
+          "web/src/components/state/**",
+          "web/tests/unit/state/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      },
+      "tier_override_reason": "C10 裁定：本卡是公共件冻结任务，手册 6.3 硬规则「公共冻结件变更」强制 qwen3.8-max，硬规则优先于任务级默认档；15.5 规定档位表是派单唯一依据、tier_planned 仅默认档。per-subtask 档位不变：S1=max、S2-S4=flash。与 orchestrator/tasks/M0-03b.md:2 记载一致",
+      "tier_override_at": "2026-11-13T04:25:00+08:00"
     },
     "M0-04": {
       "status": "TODO",
@@ -516,13 +658,31 @@
         "src/campaignlab/worker/",
         "src/campaignlab/api/jobs.py",
         "src/campaignlab/infra/artifacts.py",
-        "tests/integration/jobs/"
+        "tests/integration/jobs/",
+        "tests/unit/test_job_dto.py",
+        "orchestrator/handoff/M0-04-design.md",
+        "evidence/M0/M0-04/",
+        "evidence/M0/summaries/M0-04.md"
       ],
       "blockers": [],
       "depth": 3,
       "height": 12,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "tests/unit/test_job_dto.py",
+          "orchestrator/handoff/M0-04-design.md",
+          "evidence/M0/M0-04/",
+          "evidence/M0/summaries/M0-04.md"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/worker/**",
+          "tests/integration/jobs/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M1-01": {
       "status": "TODO",
@@ -572,13 +732,30 @@
         "src/campaignlab/api/imports.py",
         "src/campaignlab/infra/files.py",
         "tests/domain/ingest/",
-        "tests/golden/ingest/"
+        "tests/golden/ingest/",
+        "orchestrator/handoff/M1-01-design.md",
+        "evidence/M1/M1-01/",
+        "evidence/M1/summaries/M1-01.md"
       ],
       "blockers": [],
       "depth": 4,
       "height": 11,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M1-01-design.md",
+          "evidence/M1/M1-01/",
+          "evidence/M1/summaries/M1-01.md"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/ingest/**",
+          "tests/domain/ingest/**",
+          "tests/golden/ingest/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M1-02": {
       "status": "TODO",
@@ -624,13 +801,32 @@
         "src/campaignlab/api/snapshots.py",
         "src/campaignlab/api/definitions.py",
         "tests/domain/snapshot/",
-        "tests/golden/snapshot/"
+        "tests/golden/snapshot/",
+        "orchestrator/handoff/M1-02-design.md",
+        "evidence/M1/M1-02/",
+        "evidence/M1/summaries/M1-02.md",
+        "src/campaignlab/api/imports.py"
       ],
       "blockers": [],
       "depth": 5,
       "height": 10,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M1-02-design.md",
+          "evidence/M1/M1-02/",
+          "evidence/M1/summaries/M1-02.md",
+          "src/campaignlab/api/imports.py"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/snapshot/**",
+          "tests/domain/snapshot/**",
+          "tests/golden/snapshot/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M1-03": {
       "status": "TODO",
@@ -681,13 +877,33 @@
         "src/campaignlab/api/channels.py",
         "src/campaignlab/api/compare.py",
         "tests/domain/caliber/",
-        "tests/golden/caliber/"
+        "tests/golden/caliber/",
+        "orchestrator/handoff/M1-03-design.md",
+        "evidence/M1/M1-03/",
+        "evidence/M1/summaries/M1-03.md",
+        "src/campaignlab/api/evidence.py",
+        "tests/api/evidence/"
       ],
       "blockers": [],
       "depth": 6,
       "height": 2,
       "slack": 7,
-      "critical": false
+      "critical": false,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M1-03-design.md",
+          "evidence/M1/M1-03/",
+          "evidence/M1/summaries/M1-03.md",
+          "src/campaignlab/api/evidence.py"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/caliber/**",
+          "tests/domain/caliber/**",
+          "tests/golden/caliber/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M1-04": {
       "status": "TODO",
@@ -793,13 +1009,30 @@
         "src/campaignlab/api/activities.py",
         "src/campaignlab/api/rules.py",
         "tests/domain/activity/",
-        "tests/api/activities/"
+        "tests/api/activities/",
+        "orchestrator/handoff/M2-01-design.md",
+        "evidence/M2/M2-01/",
+        "evidence/M2/summaries/M2-01.md"
       ],
       "blockers": [],
       "depth": 3,
       "height": 8,
       "slack": 4,
-      "critical": false
+      "critical": false,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M2-01-design.md",
+          "evidence/M2/M2-01/",
+          "evidence/M2/summaries/M2-01.md"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/activity/**",
+          "tests/domain/activity/**",
+          "tests/api/activities/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M2-02": {
       "status": "TODO",
@@ -856,13 +1089,38 @@
         "src/campaignlab/domain/rules/",
         "src/campaignlab/domain/replay/",
         "tests/domain/rules/",
-        "tests/golden/rules/"
+        "tests/golden/rules/",
+        "orchestrator/handoff/M2-02-design.md",
+        "evidence/M2/M2-02/",
+        "evidence/M2/summaries/M2-02.md",
+        "src/campaignlab/api/cases.py",
+        "src/campaignlab/api/runs.py",
+        "src/campaignlab/api/candidates.py",
+        "tests/api/cases/",
+        "tests/api/runs/",
+        "tests/api/candidates/"
       ],
       "blockers": [],
       "depth": 4,
       "height": 7,
       "slack": 4,
-      "critical": false
+      "critical": false,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "orchestrator/handoff/M2-02-design.md",
+          "evidence/M2/M2-02/",
+          "evidence/M2/summaries/M2-02.md",
+          "src/campaignlab/api/cases.py"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/rules/**",
+          "src/campaignlab/domain/replay/**",
+          "tests/domain/rules/**",
+          "tests/golden/rules/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M2-03": {
       "status": "TODO",
@@ -901,13 +1159,32 @@
         "src/campaignlab/domain/preflight/",
         "src/campaignlab/api/preflight.py",
         "tests/domain/preflight/",
-        "tests/integration/preflight/"
+        "tests/integration/preflight/",
+        "src/campaignlab/api/receipts.py",
+        "orchestrator/handoff/M2-03-design.md",
+        "evidence/M2/M2-03/",
+        "evidence/M2/summaries/M2-03.md"
       ],
       "blockers": [],
       "depth": 5,
       "height": 6,
       "slack": 4,
-      "critical": false
+      "critical": false,
+      "scope_synced_from_card": {
+        "at": "2026-11-13T04:25:00+08:00",
+        "added": [
+          "src/campaignlab/api/receipts.py",
+          "orchestrator/handoff/M2-03-design.md",
+          "evidence/M2/M2-03/",
+          "evidence/M2/summaries/M2-03.md"
+        ],
+        "normalized_equivalent_skipped": [
+          "src/campaignlab/domain/preflight/**",
+          "tests/domain/preflight/**",
+          "tests/integration/preflight/**"
+        ],
+        "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      }
     },
     "M2-04": {
       "status": "TODO",
@@ -1248,7 +1525,6 @@
         "src/campaignlab/domain/action/",
         "src/campaignlab/infra/audit/",
         "src/campaignlab/api/actions.py",
-        "src/campaignlab/api/evidence.py",
         "tests/domain/action/",
         "tests/integration/audit/"
       ],
@@ -1256,7 +1532,15 @@
       "depth": 10,
       "height": 5,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "scope_transferred_out": [
+        {
+          "path": "src/campaignlab/api/evidence.py",
+          "to": "M1-03",
+          "at": "2026-11-13T04:25:00+08:00",
+          "reason": "A1 裁定：evidence 的 HTTP 入口归 M1-03；M2-03 相关证据 deferred_to M2-04。双 owner 会导致两 lane 同写一文件"
+        }
+      ]
     },
     "M4-03": {
       "status": "TODO",
@@ -2274,6 +2558,68 @@
         "orchestrator/defects/D-016.md",
         "qa-reports/m0/Q-VERIFY-M0-01.md"
       ]
+    },
+    {
+      "id": "D-017",
+      "task": "M0-03（S3 令牌落地）→ M0-03b 冻结面",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "title": "Element Plus 尺寸/字号令牌无项目对应值（5 个变量保持 EP 默认 + PENDING_OWNER），且 EP 默认 --el-text-color-secondary(#909399) 实测 3.0795/2.8712 不满足 WCAG AA",
+      "found_by": "Goodall（F lane，M0-03/S3 收尾回执 PENDING_OWNER 项）+ 编排器按 WCAG 2.1 公式独立复算确认",
+      "file": "orchestrator/defects/D-017.md",
+      "found_at": "2026-11-13T04:25:00+08:00",
+      "fix_scope": [
+        "web/src/styles/tokens.css",
+        "web/src/styles/element-theme.css",
+        "docs/design/token-mapping.md"
+      ],
+      "regression_guard": "web/tests/unit/tokens-guard.spec.ts：--el-text-color-secondary 绑定态对比度断言 + WCAG 豁免注释在位断言（删注释即红）",
+      "needs_owner": true,
+      "owner_deadline": "M0-03b 公共件冻结前必须关闭；冻结后改值须走 CR",
+      "evidence": [
+        "orchestrator/defects/D-017.md",
+        "docs/design/token-mapping.md",
+        "web/src/styles/element-theme.css"
+      ]
+    },
+    {
+      "id": "D-018",
+      "task": "治理面（手册 3.1 / 6.4 / 15.5 与全部任务卡）",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "任务卡「叙述正文行数」口径不可复跑（自述 55/63 行与任何口径均不符），尾部无上限可绕过该口径，且手册 6.4 示例档位表缺「预估 token」列违反 15.5 四列硬约束",
+      "found_by": "编排器 + Dirac（T lane，N5 主动上报尾部无上限漏洞）",
+      "file": "orchestrator/defects/D-018.md",
+      "found_at": "2026-11-13T04:25:00+08:00",
+      "fix_scope": [
+        "docs/delivery/LONG-HORIZON-ORCHESTRATION.md",
+        "tests/unit/test_task_card_narrative.py"
+      ],
+      "regression_guard": "tests/unit/test_task_card_narrative.py（7 例）：head<=60 / tail<=40 / total<=200 / 表头四列逐字 / 无表卡单调收敛 / 注记不得当豁免 / 卡数分母下限；已做 2 条篡改负例自证会红，还原后卡文件 git diff 为 IDENTICAL",
+      "evidence": [
+        "orchestrator/defects/D-018.md",
+        "tests/unit/test_task_card_narrative.py",
+        "docs/delivery/LONG-HORIZON-ORCHESTRATION.md"
+      ]
+    },
+    {
+      "id": "D-019",
+      "task": "治理面（ADR-005 与全部引用 Problem.code 的任务）",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "ADR-005 §2.1 未指向 Problem.code 的权威枚举表，导致 429 一度被误判为「契约缺项」（实为 architecture/API.md:20-29 的 JOB_CAPACITY）",
+      "found_by": "Dirac（T lane，D14 上报）+ 编排器复核后重新定性",
+      "file": "orchestrator/defects/D-019.md",
+      "found_at": "2026-11-13T04:25:00+08:00",
+      "fix_scope": [
+        "docs/decisions/ADR-005-problem-type-and-runtime-defaults.md"
+      ],
+      "regression_guard": "ADR-005 §2.1 增补块写明权威出处与 20 个 code 逐字清单；引用 code 一律标注 API.md 行号（Dirac 本轮 20 个 code 名逐字命中 API.md:22-29）",
+      "evidence": [
+        "orchestrator/defects/D-019.md",
+        "docs/decisions/ADR-005-problem-type-and-runtime-defaults.md",
+        "spec/CampaignLab-SDD-v1.0/architecture/API.md"
+      ]
     }
   ],
   "change_requests": [
@@ -2415,6 +2761,34 @@
       "resolution": "按手册 4.2 派 Q，且 M0 阶段 5 项复核合并为一次（flash 采集 + max 判定）",
       "resolved_at": "2026-11-12T22:48:36+08:00",
       "resolved_by": "项目负责人（授权用默认值裁定）"
+    },
+    {
+      "id": "D-017-1",
+      "item": "Element Plus 尺寸/字号令牌的项目取值：--el-component-size-large、--el-font-size-extra-small/-medium/-large/-extra-large",
+      "default": "保持 EP 默认值并标 PENDING_OWNER（已落地，不得由任何 lane 自行发明取值）",
+      "status": "PENDING_OWNER",
+      "blocks": "不阻塞开发；但 M0-03b 公共件冻结前必须关闭，冻结后改值须走 CR",
+      "ref": "orchestrator/defects/D-017.md、docs/design/token-mapping.md §5.3",
+      "raised_at": "2026-11-13T04:40:00+08:00"
+    },
+    {
+      "id": "D-017-2",
+      "item": "确认 WCAG 2.1 SC 1.4.3 的两条豁免：--el-text-color-placeholder 与 --el-text-color-disabled 绑 --cl-ink-500（#7a8899，实测 3.6150 白底 / 3.3705 画布，低于 4.5:1）",
+      "default": "按 SC 1.4.3 豁免 disabled 与 incidental 文本，双份留痕（CSS 同行注释 + 守卫断言）；豁免清单只允许这两条",
+      "status": "PENDING_OWNER",
+      "blocks": "不阻塞开发；M0-03b 冻结前确认",
+      "ref": "docs/design/token-mapping.md §4.5、orchestrator/defects/D-017.md",
+      "raised_at": "2026-11-13T04:40:00+08:00"
+    },
+    {
+      "id": "ADR-005-2.4",
+      "item": "追认 ADR-005 新增 §2.4：SQLite 库路径约定 <data_dir>/state/campaignlab.db 与五级解析优先级、paths.py 单一来源硬约束、「完整可逆」口径（业务表 0 张 + 空 alembic_version）、doctor gate 归 S3",
+      "default": "按 §2.4 裁定推进（项目负责人已授权本次长程无人值守「裁定用默认值」）",
+      "status": "RESOLVED_BY_DEFAULT",
+      "resolution": "按 ADR-005 §2.4 推进；S3 必须 import infra/db/paths.py 且附「alembic 侧解析 == 运行期解析」断言测试",
+      "resolved_at": "2026-11-13T04:40:00+08:00",
+      "resolved_by": "编排器（依既有默认值授权）",
+      "ref": "docs/decisions/ADR-005-problem-type-and-runtime-defaults.md#2.4"
     }
   ],
   "resume": {
@@ -2427,7 +2801,7 @@
         "M0-02",
         "M0-03"
       ],
-      "status": "IN_FLIGHT_ROUND3",
+      "status": "ROUND3_RETURNED_PENDING_COMMIT",
       "round": 3,
       "round1_dispatched": [
         "Q-VERIFY-M0-01/collect（flash）",
@@ -2462,55 +2836,29 @@
       ],
       "round3_started_at": "2026-11-13T03:01:56+08:00",
       "round3_parallel_safety": "S lane(Galileo) 只写 migrations/**、pyproject.toml、uv.lock、src/campaignlab/infra/db/**、tests/unit/**（仅新建）、tests/integration/bootstrap/**、evidence/M0/M0-02/**；F lane(Goodall) 只写 web/src/**、web/tests/**、evidence/M0/M0-03/**，并明令禁改 web/package.json（裁定 M0-03-Q8 仅编排器可改）；T lane(Dirac) 只写 orchestrator/tasks/{M0-04,M0-03b,M1-01,M1-02,M1-03,M2-01,M2-02,M2-03}.md 与 tests/unit/test_task_cards.py 的 KNOWN_MISSING。三者路径集合两两交集为空；orchestrator/state.json 与 git 写权限由编排器独占。",
-      "round3_toolchain_isolation": "已明令：Galileo 禁跑任何 npm/node/vite/playwright；Goodall 禁跑任何 uv/pytest/mypy/ruff；Dirac 禁跑 pytest/uv/npm，自检一律用纯 python3。故 uv(.venv/uv.lock) 由 Galileo 独占、npm(web/node_modules) 由 Goodall 独占，无并发假红。"
+      "round3_toolchain_isolation": "已明令：Galileo 禁跑任何 npm/node/vite/playwright；Goodall 禁跑任何 uv/pytest/mypy/ruff；Dirac 禁跑 pytest/uv/npm，自检一律用纯 python3。故 uv(.venv/uv.lock) 由 Galileo 独占、npm(web/node_modules) 由 Goodall 独占，无并发假红。",
+      "round3_result": "三 lane 全部 RETURNED 并经编排器独立复验通过。M0-02/S2：compare_schema()=[]、28 表全 strict=1、6 显式索引、alembic 四步 rc=0、integrity_check=ok、foreign_key_check=0、CR-002 禁实现项命中 0、全量 pytest 69 passed / mypy 15 源文件 / ruff check+format rc=0（83 files）。M0-03/S3+S4：tokens.css 68 条 --cl-*、element-theme.css 79 条 --el-*（73 绑 var(--cl-*)，6 条 -rgb 三元组带出处注释）、4 条前端门禁 rc=0 / 15 passed / 0 skipped、types.ts 194220B。D-016 批次1：8 卡落盘，KNOWN_MISSING 25->17，磁盘 12 + 缺口 17 = 29。",
+      "round3_returned_at": "2026-11-13T04:40:00+08:00",
+      "round4_planned": [
+        "M0-02/S3（max：服务入口 + engine.py + paths.py 单一来源 + session/workspaces 路由）",
+        "M0-02/S4+S5（flash：契约测试参数化 + AC-001/034/035 证据）",
+        "M0-03/S5（max：Shell 布局与响应式，落地 §3 断点变量一致性断言）",
+        "M0-04/S1（max：worker 与 jobs 设计，deps=M0-02 已满足，wave2 可先行）",
+        "D-016 批次2（flash：4–5 张关键路径卡，预抽 spec 摘要降本）"
+      ],
+      "round4_blockers": "M0-03b 被 BLK-09 阻塞（缺 handoff/M0-03-public-components.md，须待 M0-03/S10 产出）；wave2 只能先走 M0-04"
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
-      "0..7 【已完成】见 git log（owner_gate=GO、PRE-1/2/3、POST-PATCH-REVIEW、fonts-noto-cjk、wave1 Round1、8 条裁定、Round2 派单）",
-      "8 【已完成】Ohm(M0-03/S1+S2) 返回并入库 f12dcf8；9 条未决问题全部裁定",
-      "9 【已完成】Plato(Q-VERIFY-M0-01 judge) 返回并入库；M0-01 判 PASS_WITH_TODO；D-001..D-009 全 CLOSED；新立 D-011..D-016",
-      "10 【已完成】BLK-Q1(MAJOR)/BLK-Q2 修净；CR-001.md:37 措辞精确化；手册升 v1.6 加 15.9/15.10；BLOCKERS 加 BLK-08/NOTE-08/NOTE-09",
-      "11 【已完成】CR-002 选项 B 原子提交：ADR-006 新建、契约移除 listWorkspaces.status（parameters 4→3）、CHANGES.json 登记 12→13、契约门禁 check/--validate rc=0、两切片重切（592571099d638251/443309B）、基准文本二分同步（前瞻改/历史只加注）、16 项 G 全 rc==expected、分母 63→64；并提交前修复 contract 块整块替换的数据丢失、补 4 处漏加注的历史指纹、修正 Q4/Q7 追注的表格结构（CR-002.md §7 第 9/10/11 行）",
-      "12 【下一步·最高优先】M0-02/S2（max high，首迁 28 表 + 删 [tool.uv] package=false + uv lock，禁再带 PYTHONPATH=src）∥ M0-03/S3+S4（flash，tokens.css 机械落地 + openapi-typescript 生成 types.ts）",
-      "13 【并行·补卡】D-016：分批撰写 25 张任务卡（先 wave2 的 M0-04/M0-03b，再 wave3 的 M1-01..03/M2-01..03）；每批提交后 KNOWN_MISSING 单调收敛",
-      "14 wave2 出口冻结公共件前：指标注册表预留月报扩展点、ADR-005 的 Problem code 注册表冻结留痕、flash_share dev 口径 ≥0.60",
-      "15 【需项目负责人】ADR-005 追认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
+      "0..11 【已完成】见 git log 与 recovery_history",
+      "12 【已完成】Round3 三 lane 全部返回并独立复验通过（M0-02/S2 max、M0-03/S3+S4 flash、D-016 批次1 flash）；24+17 条裁定全部落点复核",
+      "13 【已完成】Lane T 治理同步：token-mapping.md 补 §1.1/§3/§4.5/§5；ADR-005 增补 §2.1 权威 code 指向与 §2.4 库路径/可逆/gate 归属；M0-02-design.md 追注（索引 5→6、hatchling、ADR-005 指向、越界复原、C1/C2 失效）；手册升 v1.7（§2 lane=R、§3.1 三段口径、§6.4 四列、§15.5 档位表唯一依据）；D-017/D-018/D-019 立单；BLOCKERS 加 BLK-09/NOTE-10 并更新 BLK-08 进展；上线 tests/unit/test_task_card_narrative.py（7 例 + 2 篡改负例）；state.json 同步 scope/primary_owner/tier/账本/card_gap",
+      "14 【下一步·最高优先】分任务提交 Round3 三 lane 产物 + Lane T 治理（一任务一提交、显式路径、commit -F）；每次提交前复跑受影响门禁 + 双口径分母 + git add 后恒等式",
+      "15 Round4 派单：M0-02/S3（max）∥ M0-04/S1（max，deps 已满足）∥ M0-03/S5（max）∥ D-016 批次2（flash，4–5 张/批 + 预抽 spec 摘要）；写权限不相交论证与工具链隔离必须写进派单记录",
+      "16 wave2 出口冻结公共件前：M0-03 须排完 S5–S10 产出 handoff/M0-03-public-components.md（BLK-09 解除条件）；D-017 须关闭；指标注册表预留月报扩展点；flash_share 护栏复算（当前 tasks 0.4444 / tokens 0.4356 均未达标）",
+      "17 【需项目负责人】ADR-005 追认（含新增 §2.4）；D-017 的 EP 尺寸/字号取值与两条 AA 豁免确认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
     ],
-    "in_flight_agents": [
-      {
-        "agent_id": "01a1d11e-9bae-7cd3-acd2-664f6826b738",
-        "nickname": "Galileo",
-        "lane": "S",
-        "task": "M0-02",
-        "subtask": "S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock",
-        "tier": "qwen3.8-max",
-        "reasoning_effort": "high",
-        "est_tokens_planned": 90000,
-        "dispatched_at": "2026-11-13T03:01:56+08:00"
-      },
-      {
-        "agent_id": "01a1d11f-b9c0-7653-8eab-f938a68a6a07",
-        "nickname": "Goodall",
-        "lane": "F",
-        "task": "M0-03",
-        "subtask": "S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts",
-        "tier": "qwen3.8-flash",
-        "subtask_count": 2,
-        "est_tokens_planned": 15000,
-        "dispatched_at": "2026-11-13T03:01:56+08:00"
-      },
-      {
-        "agent_id": "01a1d121-8cf0-7530-a457-8e6f9f8556fa",
-        "nickname": "Dirac",
-        "lane": "T",
-        "task": "D-016",
-        "subtask": "补卡批次1（8 张：M0-04/M0-03b/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17",
-        "tier": "qwen3.8-flash",
-        "est_tokens_planned": null,
-        "est_tokens_note": "卡片撰写属文档生成，token 量与卡数强相关；派单未给预估，待子智能体自报后回填，缺失记 null 禁估算",
-        "dispatched_at": "2026-11-13T03:01:56+08:00"
-      }
-    ],
+    "in_flight_agents": [],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -2747,9 +3095,9 @@
         "expected": 0
       },
       "counts": {
-        "pytest_passed": 43,
-        "mypy_source_files": 9,
-        "ruff_formatted_files": 64,
+        "pytest_passed": 76,
+        "mypy_source_files": 16,
+        "ruff_formatted_files": 87,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -2758,25 +3106,33 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 64,
-          "in_scope_py": 9,
-          "in_scope_md": 55,
+          "total": 87,
+          "in_scope_py": 18,
+          "in_scope_md": 69,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T02:46:54+08:00：CR-002 选项 B 原子提交前重测。相对上一次（63）+1 md ＝ 新增 docs/decisions/ADR-006-remove-listworkspaces-status.md；其余为纯内容编辑，不改变文件数。",
-          "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）",
-          "identity": "tracked_in_scope(64) + untracked_not_ignored_in_scope(0) == ruff_total(64) -> True",
+          "measured_after": "2026-11-13T04:48:00+08:00：Round3 三 lane 产物与 Lane T 治理文件入库前刷新（文件尚为未跟踪态，恒等式按 tracked+untracked 计）",
+          "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
+          "identity": "tracked_in_scope(64) + untracked_not_ignored_in_scope(23) == ruff_total(87) -> True",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
-          "untracked_component": [],
+          "untracked_component": [
+            "+8 py（M0-02/S2：migrations/env.py、migrations/versions/0001_initial_schema.py、src/campaignlab/infra/__init__.py、src/campaignlab/infra/db/{__init__.py,ddl_compare.py}、tests/integration/bootstrap/{conftest.py,test_migration_equivalence.py}、tests/unit/test_migration_schema.py）",
+            "+1 py（Lane T：tests/unit/test_task_card_narrative.py，D-018 守护）",
+            "+8 md（D-016 批次1 任务卡 M0-03b/M0-04/M1-01..03/M2-01..03）",
+            "+3 md（缺陷单 D-017/D-018/D-019）",
+            "+1 md（evidence/M0/M0-03/S3-S4-commands.md）",
+            "+2 md（evidence/M0/M0-02/{commands.md,migration-diff.md}）"
+          ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "git add 显式 13 路径后复测：untracked_in_scope=0（ADR-006 已入暂存区）。add 前的中间态曾为 tracked 63 + untracked 1（ADR-006）= 64，两口径均等于 ruff_total。",
-          "counting_method": "手册 15.10：-z NUL 分隔与 -c core.quotepath=false 双口径互验一致（64==64）才可写入 counts；本次两口径逐项全等。",
-          "prev_total": 63
+          "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
+          "prev_total": 64,
+          "untracked_component_sum_check": "9 py + 14 md = 23，与 untracked_in_scope 实测 23 相等"
         },
-        "ruff_lint_scope_files": 9,
+        "ruff_lint_scope_files": 18,
         "ruff_format_check_rc_after_governance_files": 0,
         "counts_refreshed_at": "2026-11-13T02:46:54+08:00",
         "counts_refresh_reason": "CR-002/ADR-006 原子提交前刷新：+1 md（ADR-006）使 ruff 分母 63→64；pytest/mypy 复跑仍为 43 passed / 9 源文件；contract_registered_nodes 12→13；live_openapi_sha16/bytes 随移除 listWorkspaces.status 变为 592571099d638251 / 443309。",
@@ -2869,6 +3225,42 @@
             "consistent": true
           },
           "commit": "本次提交（CR-002；见 git log -1）"
+        },
+        {
+          "at": "2026-11-13T04:48:00+08:00",
+          "ruff_total": 87,
+          "in_scope_py": 18,
+          "in_scope_md": 69,
+          "pytest_passed": 76,
+          "mypy_source_files": 16,
+          "ruff_lint_scope_files": 18,
+          "cause": "Round3 三 lane 产物（M0-02/S2、M0-03/S3+S4、D-016 批次1）+ Lane T 治理（手册 v1.7、token-mapping §1.1/§3/§4.5/§5、ADR-005 §2.1/§2.4、D-017/018/019、BLK-09/NOTE-10、test_task_card_narrative）",
+          "prev": {
+            "ruff_total": 64,
+            "in_scope_py": 9,
+            "in_scope_md": 55,
+            "pytest_passed": 43,
+            "mypy_source_files": 9,
+            "ruff_lint_scope_files": 9
+          },
+          "note": "演进链 51→53(D-009)→54→56(M0-03 S1+S2)→63(Q 判定档)→64(CR-002)→87(本次 Round3+LaneT)；pytest 32→38→43→69→76；mypy 7→8→9→15→16；稳定分母 ruff_lint_scope_files 9→18",
+          "dual_method": {
+            "z_nul": {
+              "tracked_in_scope": 64,
+              "untracked_in_scope": 23,
+              "py": 18,
+              "md": 69,
+              "identity_sum": 87
+            },
+            "quotepath_false": {
+              "tracked_in_scope": 64,
+              "untracked_in_scope": 23,
+              "identity_sum": 87
+            },
+            "ruff_reported": 87,
+            "identity_holds": true
+          },
+          "post_commit_expectation": "提交后 untracked_in_scope 归 0、tracked_in_scope 升至 87，恒等式仍为 87；提交前须再实测一次并回填"
         }
       ],
       "post_write_confirmation": {
@@ -2928,7 +3320,9 @@
         },
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
-      }
+      },
+      "counts_refreshed_at": "2026-11-13T04:48:00+08:00",
+      "counts_refresh_reason": "Round3 三 lane 返回 + Lane T 治理同步后刷新（实测，禁写死）：ruff 64→87（+9 py：Galileo S2 的 8 个 + 新守护测试 1 个；+14 md：8 张任务卡 + 3 张缺陷单 + 3 份证据档）；pytest 43→76（+26 迁移等价与 schema 测试、+7 test_task_card_narrative）；mypy 9→16（+7，实测口径；Galileo 的 8 个 py 中 migrations/env.py 等未计入 mypy 作用域）；contract_registered_nodes 13 不变；acceptance_denominator 47 不变；live_openapi_sha16/bytes 未变（本轮未动契约）"
     },
     "post_patch_review": {
       "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
@@ -3219,22 +3613,14 @@
       }
     ],
     "card_gap": {
-      "recorded_at": "2026-11-13T02:05:13+08:00",
+      "recorded_at": "2026-11-13T04:40:00+08:00",
       "source": "D-016 / Q-VERIFY-M0-01 F 项",
       "tasks_in_state": 29,
-      "cards_on_disk": 4,
-      "missing": 25,
+      "cards_on_disk": 12,
+      "missing": 17,
       "missing_ids": [
-        "M0-03b",
-        "M0-04",
-        "M1-01",
-        "M1-02",
-        "M1-03",
         "M1-04",
         "M1-P01",
-        "M2-01",
-        "M2-02",
-        "M2-03",
         "M2-04",
         "M3-01",
         "M3-02",
@@ -3251,26 +3637,23 @@
         "M5-03",
         "M5-P01"
       ],
-      "missing_critical": 14,
+      "missing_critical": 11,
       "missing_critical_ids": [
-        "M0-04",
-        "M1-01",
-        "M1-02",
         "M3-01",
         "M3-02",
         "M3-03",
         "M4-01",
         "M4-02",
         "M4-03",
+        "M4-P01",
         "M5-01",
         "M5-02",
         "M5-03",
-        "M4-P01",
         "M5-P01"
       ],
       "blocking": "手册 15.5 无拆解表不得 spawn → wave2 起整条 DAG 实质停摆",
-      "guard": "tests/unit/test_task_cards.py（KNOWN_MISSING 必须单调收敛；任务总数分母钉死 29）",
-      "plan": "按 wave 顺序补卡：wave2(M0-04,M0-03b) → wave3(M1-01..03,M2-01..03) → 其余；max 起草 + flash 机械铺开；每批提交后 KNOWN_MISSING 单调收敛并重算 card_gap",
+      "guard": "tests/unit/test_task_cards.py（KNOWN_MISSING 必须单调收敛；总数钉死 29）+ tests/unit/test_task_card_narrative.py（head<=60/tail<=40/total<=200/表头四列，D-018）",
+      "plan": "批次 2/3 补剩余 17 张：**降批至每批 4–5 张**并预抽 spec 摘要以压输入侧成本（Dirac 自估可压到 35–45k/批）；优先关键路径 11 张",
       "batch1": {
         "dispatched_at": "2026-11-13T03:01:56+08:00",
         "agent": "Dirac（qwen3.8-flash）",
@@ -3285,10 +3668,63 @@
           "M2-03"
         ],
         "expected_known_missing_after": "25 -> 17",
-        "status": "IN_FLIGHT",
-        "note": "编排器在 Dirac 返回后统一复跑 tests/unit/test_task_cards.py 与全量门禁，并据实重算 card_gap；不采信自报"
+        "status": "RETURNED_VERIFIED",
+        "returned_at": "2026-11-13T04:00:00+08:00",
+        "actual_known_missing_after": 17,
+        "orchestrator_reverify": "编排器独立实测：磁盘 12 卡 + 缺口 17 = 29 双向对账相等；8 卡 head（卡首→档位表表头前）= 34/39/36/36/36/39/43/39 与其自报口径 B 8/8 逐位吻合；档位表表头 8/8 四列；无 CRLF；全量 pytest 69 passed",
+        "cost_breach": "自报累计 181k，越 flash 60k 上限 3.02×，已入 budget.subtask_log 并标 over_cap=true"
       },
-      "plan_updated_at": "2026-11-13T03:01:56+08:00"
+      "plan_updated_at": "2026-11-13T04:40:00+08:00",
+      "previous": {
+        "recorded_at": "2026-11-13T02:05:13+08:00",
+        "cards_on_disk": 4,
+        "missing": 25,
+        "missing_ids": [
+          "M0-03b",
+          "M0-04",
+          "M1-01",
+          "M1-02",
+          "M1-03",
+          "M1-04",
+          "M1-P01",
+          "M2-01",
+          "M2-02",
+          "M2-03",
+          "M2-04",
+          "M3-01",
+          "M3-02",
+          "M3-03",
+          "M3-04",
+          "M3-P01",
+          "M3-P02",
+          "M4-01",
+          "M4-02",
+          "M4-03",
+          "M4-P01",
+          "M5-01",
+          "M5-02",
+          "M5-03",
+          "M5-P01"
+        ],
+        "missing_critical": 14,
+        "missing_critical_ids": [
+          "M0-04",
+          "M1-01",
+          "M1-02",
+          "M3-01",
+          "M3-02",
+          "M3-03",
+          "M4-01",
+          "M4-02",
+          "M4-03",
+          "M5-01",
+          "M5-02",
+          "M5-03",
+          "M4-P01",
+          "M5-P01"
+        ]
+      },
+      "known_missing_in_guard": 17
     },
     "cr002_merge": {
       "cr": "CR-002",
@@ -3339,6 +3775,104 @@
       "commit_full": "42079fa1162755c4d940da6fe959049918b4cd62",
       "pushed": true,
       "push_verified": "HEAD == origin/m0-framework == 42079fa1162755c4d940da6fe959049918b4cd62；behind/ahead=0/0；worktree CLEAN"
+    },
+    "in_flight_agents_previous": [
+      {
+        "agent_id": "01a1d11e-9bae-7cd3-acd2-664f6826b738",
+        "nickname": "Galileo",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "est_tokens_planned": 90000,
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      },
+      {
+        "agent_id": "01a1d11f-b9c0-7653-8eab-f938a68a6a07",
+        "nickname": "Goodall",
+        "lane": "F",
+        "task": "M0-03",
+        "subtask": "S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts",
+        "tier": "qwen3.8-flash",
+        "subtask_count": 2,
+        "est_tokens_planned": 15000,
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      },
+      {
+        "agent_id": "01a1d121-8cf0-7530-a457-8e6f9f8556fa",
+        "nickname": "Dirac",
+        "lane": "T",
+        "task": "D-016",
+        "subtask": "补卡批次1（8 张：M0-04/M0-03b/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17",
+        "tier": "qwen3.8-flash",
+        "est_tokens_planned": null,
+        "est_tokens_note": "卡片撰写属文档生成，token 量与卡数强相关；派单未给预估，待子智能体自报后回填，缺失记 null 禁估算",
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      }
+    ],
+    "round3_returns": {
+      "at": "2026-11-13T04:40:00+08:00",
+      "all_returned": true,
+      "count": 3,
+      "lanes": [
+        {
+          "agent": "Galileo",
+          "task": "M0-02/S2",
+          "tier": "qwen3.8-max",
+          "tokens": 92000,
+          "over_cap": false,
+          "result": "DONE",
+          "open_questions": 7,
+          "verdict": "编排器 18 条命令逐项复跑吻合，compare_schema 独立复现 []"
+        },
+        {
+          "agent": "Goodall",
+          "task": "M0-03/S3+S4",
+          "tier": "qwen3.8-flash",
+          "tokens": 83000,
+          "over_cap": true,
+          "result": "DONE",
+          "open_questions": 4,
+          "verdict": "静态项逐条吻合 + 4 条前端门禁编排器复跑 rc=0 / 15 passed / 0 skipped；对比度独立复算逐位吻合"
+        },
+        {
+          "agent": "Dirac",
+          "task": "D-016 批次1",
+          "tier": "qwen3.8-flash",
+          "tokens": 181000,
+          "over_cap": true,
+          "result": "DONE",
+          "open_questions": 6,
+          "verdict": "8 卡结构实测与其自报口径 B 8/8 逐位吻合"
+        }
+      ],
+      "adjudications_issued": {
+        "galileo": [
+          "Q1 hatchling 不进锁→AC-035 判定口径改以 uv lock --check + uv sync 为准",
+          "Q2 库路径约定→ADR-005 §2.4 裁定 1/2（单一来源 infra/db/paths.py）",
+          "Q3 索引 5→6→设计档追注，以活契约为准",
+          "Q4 完整可逆口径→ADR-005 §2.4 裁定 3",
+          "Q5 doctor gate 归 S3→ADR-005 §2.4 裁定 4",
+          "Q6 ruff 分母→编排器刷新",
+          "Q7 报备已确认（CR-002 禁实现项命中=0）"
+        ],
+        "goodall": [
+          "R2-Q1 token-mapping.md 三处修订确不在工作树→Lane T 已补齐 §1.1/§3/§4.5/§5",
+          "R2-Q2 WCAG 豁免清单→裁定以 token-mapping §4.5 留痕（CSS 同行注释 + 守卫断言双份并存，无需返工）",
+          "R2-Q3 getComputedStyle 型断言→归 M0-03/S8，S3 不改 environment",
+          "PENDING_OWNER→立 D-017，M0-03b 冻结前关闭",
+          "#909399 对比度口径→账本已更正为 3.0795/2.8712"
+        ],
+        "dirac": [
+          "N1 补授权 tests/api/evidence/ 给 M1-03",
+          "N2/N3 补授权 api/runs.py+api/candidates.py+三个 tests/api/ 目录给 M2-02（契约实测 80 个 operationId，runs/candidates 全挂 /runs/** 与 /candidates，后端只能由独占 domain/replay+domain/rules 的 M2-02 承担）",
+          "N4 M1-02 allow 含 api/imports.py、deny 不含",
+          "N5 采三段口径 head<=60/tail<=40/total<=200，立 D-018 并上线守护测试（其上报的漏洞成立）",
+          "N6 M0-03b.md:2「并行对象: M0-04」保留不改，BLK-09 已写明门禁关系",
+          "成本越限 181k 如实入账，批次 2/3 降批"
+        ]
+      }
     }
   },
   "acceptance": {
@@ -3359,7 +3893,474 @@
       "AC-MR-11",
       "AC-MR-12"
     ],
-    "monthly_source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/CampaignLab-Review-Acceptance-Checklist.append.md"
+    "monthly_source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/CampaignLab-Review-Acceptance-Checklist.append.md",
+    "primary_owner": {
+      "AC-001": {
+        "primary": "M0-02",
+        "cross_ref": [
+          "M0-03"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "HTTP 与 Playwright",
+        "basis": "主证据「HTTP 与 Playwright」：HTTP 侧为判定主体，M0-03 的 gate 自述为「AC-001 页面侧」→ cross_ref"
+      },
+      "AC-002": {
+        "primary": "M2-01",
+        "cross_ref": [
+          "M2-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "API 和页面",
+        "basis": "主证据所指权威工件由 M2-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-003": {
+        "primary": "M2-01",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "API、审计",
+        "basis": "主证据所指权威工件由 M2-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-004": {
+        "primary": "M2-01",
+        "cross_ref": [
+          "M2-04"
+        ],
+        "confidence": "ADJUDICATED",
+        "evidence_column": "规则检查、页面",
+        "basis": "B6 裁定：M2-02 只提供 ±1 分数值反例证据，判定主体是 M2-01 的规则检查（主证据「规则检查、页面」）"
+      },
+      "AC-005": {
+        "primary": "M1-01",
+        "cross_ref": [
+          "M1-04",
+          "M1-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "导入 API、数据库",
+        "basis": "主证据所指权威工件由 M1-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-006": {
+        "primary": "M1-01",
+        "cross_ref": [
+          "M1-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "DB、制品、页面",
+        "basis": "主证据所指权威工件由 M1-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-007": {
+        "primary": "M1-02",
+        "cross_ref": [
+          "M1-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "快照及复算",
+        "basis": "主证据所指权威工件由 M1-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-008": {
+        "primary": "M1-02",
+        "cross_ref": [
+          "M3-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "API、页面",
+        "basis": "主证据「API、页面」：比率的分子分母来自 listDefinitions 的口径定义（M1-02 scope 含 api/definitions.py）；M3-P01 为月报侧复算 cross_ref"
+      },
+      "AC-009": {
+        "primary": "M1-03",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "对账、页面",
+        "basis": "主证据所指权威工件由 M1-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-010": {
+        "primary": "M1-03",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "通道向量",
+        "basis": "主证据所指权威工件由 M1-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-011": {
+        "primary": "M1-03",
+        "cross_ref": [
+          "M1-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "关联输出",
+        "basis": "主证据所指权威工件由 M1-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-012": {
+        "primary": "M2-02",
+        "cross_ref": [
+          "M2-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "API、案例页",
+        "basis": "主证据所指权威工件由 M2-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-013": {
+        "primary": "M2-02",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "运行结果及失败样本",
+        "basis": "主证据所指权威工件由 M2-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-014": {
+        "primary": "M2-02",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "轨迹及账本",
+        "basis": "主证据所指权威工件由 M2-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-015": {
+        "primary": "M2-02",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "状态与动作",
+        "basis": "主证据所指权威工件由 M2-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-016": {
+        "primary": "M2-03",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "预发与差异",
+        "basis": "主证据所指权威工件由 M2-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-017": {
+        "primary": "M2-03",
+        "cross_ref": [
+          "M2-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "回执和审计",
+        "basis": "主证据所指权威工件由 M2-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-018": {
+        "primary": "M3-01",
+        "cross_ref": [
+          "M3-04",
+          "M3-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "复盘及证据",
+        "basis": "主证据所指权威工件由 M3-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-019": {
+        "primary": "M3-01",
+        "cross_ref": [
+          "M3-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "查询与 CSV",
+        "basis": "主证据所指权威工件由 M3-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-020": {
+        "primary": "M3-01",
+        "cross_ref": [
+          "M1-02",
+          "M1-04",
+          "M3-P01"
+        ],
+        "confidence": "ADJUDICATED",
+        "evidence_column": "Review 与导出",
+        "basis": "B7 裁定：主证据「Review 与导出」属 M3-01 分析域；M1-02 只交付快照侧前提，M1-04/M3-P01 为页面与月报侧 cross_ref"
+      },
+      "AC-021": {
+        "primary": "M3-02",
+        "cross_ref": [
+          "M3-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "诊断和策略",
+        "basis": "主证据所指权威工件由 M3-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-022": {
+        "primary": "M3-02",
+        "cross_ref": [
+          "M3-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "数值断言",
+        "basis": "主证据所指权威工件由 M3-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-023": {
+        "primary": "M3-03",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "计划和结果",
+        "basis": "主证据所指权威工件由 M3-03 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-024": {
+        "primary": "M3-02",
+        "cross_ref": [
+          "M3-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "API、试算页",
+        "basis": "主证据所指权威工件由 M3-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-025": {
+        "primary": "M4-01",
+        "cross_ref": [
+          "M4-03",
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "报告及下载",
+        "basis": "主证据所指权威工件由 M4-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-026": {
+        "primary": "M4-01",
+        "cross_ref": [
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "报告链、制品",
+        "basis": "主证据所指权威工件由 M4-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-027": {
+        "primary": "M4-02",
+        "cross_ref": [
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "动作状态和审计",
+        "basis": "主证据所指权威工件由 M4-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-028": {
+        "primary": "M4-02",
+        "cross_ref": [
+          "M4-03",
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "复核记录",
+        "basis": "主证据所指权威工件由 M4-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-029": {
+        "primary": "M0-04",
+        "cross_ref": [
+          "M5-01",
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "作业与 DB",
+        "basis": "主证据「作业与 DB」：M0-04 实现作业状态机与租约语义，M5-01 复验、M4-P01 页面侧 → cross_ref"
+      },
+      "AC-030": {
+        "primary": "M4-02",
+        "cross_ref": [
+          "M4-03",
+          "M4-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "下载制品及校验",
+        "basis": "主证据所指权威工件由 M4-02 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-031": {
+        "primary": "M5-01",
+        "cross_ref": [
+          "M0-04"
+        ],
+        "confidence": "ADJUDICATED",
+        "evidence_column": "日志、SHA、数据库",
+        "basis": "B8 裁定：主证据「日志、SHA、数据库」= 停受理备份/恢复/迁移校核，判定主体是 M5-01（其 scope 含 scripts/ 与 tests/recovery/）；M0-04 提供作业中断前提"
+      },
+      "AC-032": {
+        "primary": "M5-01",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "截图、键盘轨迹",
+        "basis": "主证据所指权威工件由 M5-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-033": {
+        "primary": "M3-01",
+        "cross_ref": [
+          "M3-04"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "计算和问答",
+        "basis": "主证据所指权威工件由 M3-01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-034": {
+        "primary": "M0-02",
+        "cross_ref": [
+          "M0-03"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "HTTP 负例",
+        "basis": "主证据「HTTP 负例」：401/403/404/413/422 由服务端产生 → M0-02；M0-03 为页面侧呈现"
+      },
+      "AC-035": {
+        "primary": "M5-01",
+        "cross_ref": [
+          "M0-02"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "命令、锁和报告",
+        "basis": "主证据「命令、锁和报告」= verify_package.py + DDL 等价 + OpenAPI + 前端类型 + 锁清楚，跨 M0-01/02/03 四方，唯一能整体验证的是 M5-01（scope 含 scripts/）；M0-02 只交付 DDL 等价前提"
+      },
+      "AC-MR-01": {
+        "primary": "M1-P01",
+        "cross_ref": [
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M1-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-02": {
+        "primary": "M1-P01",
+        "cross_ref": [
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M1-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-03": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-04": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-05": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-06": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-07": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-08": {
+        "primary": "M3-P01",
+        "cross_ref": [
+          "M3-P02",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M3-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-09": {
+        "primary": "M4-P01",
+        "cross_ref": [
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M4-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-10": {
+        "primary": "M4-P01",
+        "cross_ref": [
+          "M1-P01",
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "三声明者中主体是「报告修订链 + 签认 409 SNAPSHOT_SUPERSEDED + 制品 SHA + 恢复审计」→ M4-P01；M1-P01 提供 03 更正导入前提，M5-P01 为独立 QA"
+      },
+      "AC-MR-11": {
+        "primary": "M4-P01",
+        "cross_ref": [
+          "M5-P01"
+        ],
+        "confidence": "ARCHITECT_DERIVED",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M4-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      },
+      "AC-MR-12": {
+        "primary": "M5-P01",
+        "cross_ref": [],
+        "confidence": "SOLO",
+        "evidence_column": "",
+        "basis": "主证据所指权威工件由 M5-P01 产出；纯验证任务（M5-02/M5-P01/M5-03）与页面呈现面一律记 cross_ref"
+      }
+    },
+    "primary_owner_meta": {
+      "at": "2026-11-13T04:32:00+08:00",
+      "total": 47,
+      "confidence_breakdown": {
+        "ARCHITECT_DERIVED": 34,
+        "SOLO": 10,
+        "ADJUDICATED": 3
+      },
+      "rule": "primary = 产出该 AC「主证据」列所指权威工件的任务。纯验证任务（M5-02 独立 QA、M5-P01 月度独立 QA、M5-03 人工交付确认）与仅做页面呈现的任务一律记 cross_ref，不得作为 primary。冲突（47 条中 37 条被多任务声明）由架构师按主证据主体逐条判定，不用 wave 序或 lane 序机械推导 —— 反例：AC-020 最早波次声明者是 M1-02，但主证据「Review 与导出」属 M3-01，机械取最早会判错。",
+      "needs_q_confirmation": [
+        "AC-001",
+        "AC-002",
+        "AC-005",
+        "AC-006",
+        "AC-007",
+        "AC-008",
+        "AC-011",
+        "AC-012",
+        "AC-017",
+        "AC-018",
+        "AC-019",
+        "AC-021",
+        "AC-022",
+        "AC-024",
+        "AC-025",
+        "AC-026",
+        "AC-027",
+        "AC-028",
+        "AC-029",
+        "AC-030",
+        "AC-033",
+        "AC-034",
+        "AC-035",
+        "AC-MR-01",
+        "AC-MR-02",
+        "AC-MR-03",
+        "AC-MR-04",
+        "AC-MR-05",
+        "AC-MR-06",
+        "AC-MR-07",
+        "AC-MR-08",
+        "AC-MR-09",
+        "AC-MR-10",
+        "AC-MR-11"
+      ],
+      "authority": "AC 编号与主证据列一律引 spec/**/qa/ACCEPTANCE.md 与月度 append 原文，禁转述（D-011）"
+    }
   },
   "contract": {
     "live_dir": "contracts",
@@ -3492,7 +4493,60 @@
       "defect": "D-002"
     }
   ],
-  "docs": {},
+  "docs": {
+    "orchestration_manual": {
+      "ref": "docs/delivery/LONG-HORIZON-ORCHESTRATION.md",
+      "version": "v1.7",
+      "at": "2026-11-13T04:40:00+08:00",
+      "authority": "编排器系统提示词与全部流程纪律的唯一权威；子智能体派单文本必须引用其条款号",
+      "v1.7_changes": [
+        "§2 补 lane=R 有意并入 D/S 的说明",
+        "§3.1 固化 head<=60/tail<=40/total<=200 三段口径并删除不可复跑的 55/63 自述",
+        "§6.4 三个示例档位表补齐「预估 token」列（符合 §15.5 四列硬约束）+ 三条读法说明",
+        "§15.5 补「档位表是派单唯一依据、tier_planned 仅默认档」「禁止为凑配比降档或机械拆分」「越限必须如实记账不得抹平」"
+      ]
+    },
+    "token_mapping": {
+      "ref": "docs/design/token-mapping.md",
+      "at": "2026-11-13T04:40:00+08:00",
+      "authority": "ADR-003 的实施面：项目 CSS 变量（唯一真值）→ Element Plus 主题变量 → ECharts 色板",
+      "sections_added": [
+        "§1.1 令牌展开规则（Q-S3-D）",
+        "§3 三个断点变量名（Q-S3-C）",
+        "§4.4 对比度断言归属（Q-S3-F）",
+        "§4.5 WCAG 1.4.3 豁免清单（Q-S3-E(b)/R2-Q2）",
+        "§5.1 error 族归 danger（Q-S3-E(a)）",
+        "§5.2 -rgb 三元组唯一有记录例外（Q-S3-E(c)）",
+        "§5.3 未覆盖项 PENDING_OWNER（Q-S3-E(d)/D-017）",
+        "§5.4 对比度复算公式"
+      ]
+    },
+    "blockers": {
+      "ref": "orchestrator/BLOCKERS.md",
+      "at": "2026-11-13T04:40:00+08:00",
+      "open_blockers": [
+        "BLK-03",
+        "BLK-04",
+        "BLK-05",
+        "BLK-08",
+        "BLK-09"
+      ],
+      "notes_count": 10
+    },
+    "monthly_delta_plan": {
+      "ref": "docs/delivery/MONTHLY-DELTA-PLAN.md",
+      "at": "2026-11-13T04:40:00+08:00",
+      "authority": "v1.0.1 月报增量的 12 个节点落地计划"
+    },
+    "frontend_pitfalls": {
+      "ref": "docs/design/frontend-pitfalls.md",
+      "at": "2026-11-13T04:40:00+08:00"
+    },
+    "page_component_map": {
+      "ref": "docs/design/page-component-map.md",
+      "at": "2026-11-13T04:40:00+08:00"
+    }
+  },
   "decisions": {
     "ADR-005": {
       "title": "Problem.type 的 URN 方案与 M0 运行参数默认值",
@@ -3504,8 +4558,72 @@
         "problem_type_scheme": "urn:campaignlab:problem:<code.lower()>",
         "session_ttl_seconds": 3600,
         "MAX_JSON_BODY_BYTES": 1048576,
-        "WORKER_HEARTBEAT_TTL_SECONDS": 15
+        "WORKER_HEARTBEAT_TTL_SECONDS": 15,
+        "database_path_convention": "<data_dir>/state/campaignlab.db",
+        "data_dir_default": "~/.local/share/campaignlab",
+        "db_path_resolution_priority": [
+          "alembic -x db_path=",
+          "alembic.ini sqlalchemy.url(set_main_option)",
+          "CAMPAIGNLAB_DATABASE_URL",
+          "CAMPAIGNLAB_DATA_DIR + /state/campaignlab.db",
+          "默认 ~/.local/share/campaignlab/state/campaignlab.db"
+        ],
+        "db_path_single_source": "src/campaignlab/infra/db/paths.py（migrations/env.py 与 S3 的 engine.py::make_engine 都必须 import，禁各写一份）",
+        "downgrade_reversible_caliber": "业务表 0 张 + 仅剩空的 alembic_version 即完整可逆；alembic_version 不计入 28 表分母、不算额外表",
+        "health_schema_revision_source": "alembic_version 表当前行"
+      },
+      "amended_at": "2026-11-13T04:40:00+08:00",
+      "amendment": "§2.1 增补 code 权威枚举指向（依 D-019）；新增 §2.4 数据库路径约定与「完整可逆」口径（依 M0-02/S2 的 Q2/Q4/Q5）",
+      "code_registry": {
+        "authority": "spec/CampaignLab-SDD-v1.0/architecture/API.md 错误分类表（第 20–29 行）",
+        "code_count": 20,
+        "codes": [
+          "BAD_REQUEST",
+          "BAD_CURSOR",
+          "SESSION_EXPIRED",
+          "ORIGIN_DENIED",
+          "ACCESS_DENIED",
+          "RESOURCE_NOT_FOUND",
+          "IDEMPOTENCY_CONFLICT",
+          "STATE_CONFLICT",
+          "VERSION_MISMATCH",
+          "STALE_CANDIDATE",
+          "SNAPSHOT_CONFLICT",
+          "ACTION_REVIEW_REQUIRED",
+          "REVISION_CONFLICT",
+          "PRECONDITION_REQUIRED",
+          "INPUT_TOO_LARGE",
+          "VALIDATION_ERROR",
+          "INVALID_SCOPE",
+          "EVIDENCE_REQUIRED",
+          "JOB_CAPACITY",
+          "INTERNAL_ERROR"
+        ],
+        "http_429": "JOB_CAPACITY（曾被误判为契约缺项，见 D-019）",
+        "rule": "domain/errors.py 是该表的代码化副本，不得新增表外 code；确需新增先改 ADR（走 CR）再改注册表",
+        "count_reproduce": "python3 逐行提取 API.md 第 22–29 行第 2 列并按「、」切分，实测 20 个"
       }
+    },
+    "ADR-003": {
+      "ref": "docs/decisions/ADR-003-frontend-design-baseline.md",
+      "registered_at": "2026-11-13T04:40:00+08:00",
+      "note": "补登记：文件早已入库（ADR-006 随 CR-002 原子提交 42079fa），此前 decisions 注册表只收了 ADR-005，属注册表不完整，本次补全",
+      "title": "前端设计基线（浦发风格模板 v1.1）",
+      "status": "ACCEPTED"
+    },
+    "ADR-004": {
+      "ref": "docs/decisions/ADR-004-monthly-review-delta-v1.0.1.md",
+      "registered_at": "2026-11-13T04:40:00+08:00",
+      "note": "补登记：文件早已入库（ADR-006 随 CR-002 原子提交 42079fa），此前 decisions 注册表只收了 ADR-005，属注册表不完整，本次补全",
+      "title": "v1.0.1 月报增量（Monthly Review Delta）纳入交付范围",
+      "status": "ACCEPTED"
+    },
+    "ADR-006": {
+      "ref": "docs/decisions/ADR-006-remove-listworkspaces-status.md",
+      "registered_at": "2026-11-13T04:40:00+08:00",
+      "note": "补登记：文件早已入库（ADR-006 随 CR-002 原子提交 42079fa），此前 decisions 注册表只收了 ADR-005，属注册表不完整，本次补全",
+      "title": "CR-002 选项 B：从活契约移除 listWorkspaces.status 查询参数",
+      "status": "ACCEPTED"
     }
   }
 }
