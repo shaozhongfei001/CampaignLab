@@ -1,0 +1,141 @@
+### S1
+CMD: python3 scripts/contract_slice.py --all-tables --out /tmp/qverify_all.json
+spec_version=1.0.1 slice_bytes=18769 slice_lines=61 sections=['spec_version', 'source', 'ddl'] missing=[]
+RC=0
+
+all-tables: tables=34 not_found=0 spec_version=1.0.1
+### S2
+CMD: python3 scripts/contract_slice.py --tables no_such_table --out /tmp/qverify_ns.json
+spec_version=1.0.1 slice_bytes=594 slice_lines=16 sections=['spec_version', 'source', 'ddl'] missing=['ddl:no_such_table']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['ddl:no_such_table']
+RC=2
+
+### S3
+CMD: python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/qverify_noop.json
+spec_version=1.0.1 slice_bytes=596 slice_lines=16 sections=['spec_version', 'source', 'operations'] missing=['operations:noSuchOp']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']
+RC=2
+
+noop-file-exists-after-rc2:
+ls: cannot access '/tmp/qverify_noop.json': No such file or directory
+LS_RC=2
+### S4
+CMD: python3 scripts/contract_slice.py --ops getHealth --ac AC-001,AC-MR-01 --out /tmp/qverify_ok.json
+spec_version=1.0.1 slice_bytes=3542 slice_lines=137 sections=['spec_version', 'source', 'operations', 'acceptance_rows'] missing=[]
+RC=0
+
+ok-slice: spec_version= 1.0.1  ac_rows= ['AC-001', 'AC-MR-01']
+### S5
+CMD: python3 scripts/contract_slice.py --ops getHealth --ac AC-MR-99 --out /tmp/qverify_ac99.json
+spec_version=1.0.1 slice_bytes=2800 slice_lines=124 sections=['spec_version', 'source', 'operations', 'acceptance_rows'] missing=['acceptance_rows:AC-MR-99']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']
+RC=2
+
+### F1
+CMD: python3 scripts/check_frontend_baseline.py
+OK   checklist_交付前自检.md sha16=b1c2ca4a8257a46a expect=b1c2ca4a8257a46a bytes=4024 expect=4024
+OK   gallery_组件图鉴.html sha16=4320e095e40121ba expect=4320e095e40121ba bytes=24323 expect=24323
+OK   template_blank.html sha16=aca591120b952542 expect=aca591120b952542 bytes=14103 expect=14103
+OK   template_blank_singlefile.html sha16=4b966e044d3305a1 expect=4b966e044d3305a1 bytes=139725 expect=139725
+OK   css/tokens.css sha16=a4e27cc208ccc428 expect=a4e27cc208ccc428 bytes=3199 expect=3199
+OK   css/youxia-ui.css sha16=7ab1eadff01dc5f8 expect=7ab1eadff01dc5f8 bytes=104677 expect=104677
+OK   js/youxia-charts.js sha16=6d831e1415154721 expect=6d831e1415154721 bytes=10260 expect=10260
+OK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+RC=0
+
+### F2
+CMD: python3 qa/verify_package.py
+python3: can't open file '/home/szf/dev/CampaignLab/qa/verify_package.py': [Errno 2] No such file or directory
+RC=2
+
+### F3
+CMD: python3 -m pytest -q -k live_contract or all_47_acceptance_ids_resolve or frontend_baseline
+/usr/bin/python3: No module named pytest
+RC=1
+
+COUNT_BASELINE=35 RC=0
+RC=0
+
+check-ignore evidence/monthly/M0-P01/run-01/precheck-base.log rc=1 out=
+check-ignore evidence/monthly/M0-P01/run-01/post-merge-precheck.log rc=1 out=
+check-ignore evidence/monthly/M0-P01/run-01/merged-diff.log rc=1 out=
+check-ignore evidence/monthly/M0-P01/run-01/check-validate.log rc=1 out=
+check-ignore evidence/monthly/M0-P01/run-02/frontend-baseline.log rc=1 out=
+EVIDENCE_TRACKED=16
+17:# gates[].evidence 的指针会指向仓库中不存在的文件，Q lane 无法复核，宿主重置即永久丢失。
+18:!evidence/**/*.log
+PY_COUNT=6
+MD_TRACKED_COUNT=33
+MD_ONDISK_COUNT=34
+CMD: python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+
+### F2R rerun
+CMD: python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+PASS 清单与逐文件 SHA-256 共 89 项
+PASS 接口和本地 Schema 引用共 80 个操作
+PASS 26 个页面、35 个验收用例、55 个材料点位、47 个手册操作点及文档链接
+PASS SQLite DDL 可执行，共 28 表，含完整性与外键负例
+PASS 甲乙各 510 切片、元分与六行 CSV/JSON、分母、量率、估算、补数及 60 个问法条目
+PASS 四版规则、15 个案例双版本、五种预发状态
+PACKAGE PASS 6/6
+RC=0
+
+### F3R rerun pytest -k
+CMD: uv run --no-sync python -m pytest -q -k "live_contract or all_47_acceptance_ids_resolve or frontend_baseline"
+........                                                                 [100%]
+8 passed, 20 deselected in 0.02s
+RC=0
+counts keys: ['acceptance_denominator', 'acceptance_resolvable', 'contract_registered_nodes', 'frontend_baseline_rows', 'live_openapi_info_version', 'live_openapi_sha16', 'mypy_source_files', 'pytest_passed', 'ruff_format_check_rc_after_governance_files', 'ruff_formatted_files', 'ruff_formatted_files_composition', 'ruff_lint_scope_files']
+ruff_formatted_files = 39
+ruff_lint_scope_files = 6
+composition: {
+ "cmd": "uv run --no-sync ruff format --check .",
+ "total": 39,
+ "in_scope_py": 6,
+ "in_scope_md": 33,
+ "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
+ "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
+ "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
+ "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
+ "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
+ "measured_after": "本次治理提交新增 run-04 证据与 D-006 两个 .md 后复测：37 -> 39，ruff format --check . 仍 rc=0"
+}
+gates_container: dict
+count acceptance_denominator = 47
+count acceptance_resolvable = 47
+count contract_registered_nodes = 12
+count frontend_baseline_rows = 8
+count live_openapi_info_version = 1.0.1
+count live_openapi_sha16 = 01bd28f0772f506e
+count mypy_source_files = 6
+count pytest_passed = 28
+count ruff_format_check_rc_after_governance_files = 0
+count ruff_formatted_files = 39
+count ruff_lint_scope_files = 6
+gates type=list? False len= 16
+GATEKEY G10_pytest {"cmd": "uv run --no-sync pytest -q", "rc": 0, "expected": 0, "elapsed_s": 1, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G11_prototype_verify {"cmd": "bash scripts/verify.sh", "rc": 0, "expected": 0, "elapsed_s": 1, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G12_package_verify {"cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G13_npm_ci_and_build {"cmd": "npm --prefix web ci && npm --prefix web run build", "rc": 0, "expected": 0, "elapsed_s": 9, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G14_doctor {"cmd": "bash scripts/doctor.sh", "rc": 0, "expected": 0, "elapsed_s": 1, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G1_baseline_v1.0 {"cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G2_baseline_v1.0.1_patch {"cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )", "rc": 0, "expected": 0, "elapsed_s": 1, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G3_frontend_baseline {"cmd": "python3 scripts/check_frontend_baseline.py", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G4_slice_unknown_op_negative {"cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json", "rc": 2, "expected": 2, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G4b_slice_unknown_ac_negative {"cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json", "rc": 2, "expected": 2, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G4c_frontend_tamper_negative {"cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py", "rc": 1, "expected": 1, "note": "本轮已真实执行篡改负例：cp 备份 -> printf 追加换行 -> 实测 rc=1 ->
+GATEKEY G5_contract_gate {"cmd": "python3 scripts/check_contracts.py check", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G6_contract_meta_validate {"cmd": "uv run --no-sync python scripts/check_contracts.py check --validate", "rc": 0, "expected": 0, "elapsed_s": 2, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G7_ruff_check {"cmd": "uv run --no-sync ruff check .", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G8_ruff_format {"cmd": "uv run --no-sync ruff format --check .", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+GATEKEY G9_mypy {"cmd": "uv run --no-sync mypy", "rc": 0, "expected": 0, "elapsed_s": 0, "measured_at": "2026-11-12T22:48:36+08:00"}
+tables= 34 head16= 'CREATE TABLE wor' tail8= ' STRICT;' NOT_FOUND_any= False
+all_tables_names= ['action_followups', 'actions', 'actions__indexes', 'activities', 'activity_bindings', 'analysis_results', 'analysis_results__indexes', 'artifacts', 'audit', 'candidates', 'cases', 'cases__indexes', 'evidence', 'exports', 'idempotency', 'import_files', 'imports', 'jobs', 'jobs__indexes', 'object_evidence', 'preflight_rows', 'preflights', 'receipts', 'report_actions', 'reports', 'rule_versions', 'rule_versions__indexes', 'run_cases', 'runs', 'snapshots', 'snapshots__indexes', 'source_mappings', 'thresholds', 'workspaces']
+
+### D001_extra all-tables count probe
+ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e  contracts/sqlite-v1.sql
+ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e  spec/CampaignLab-SDD-v1.0/contracts/sqlite-v1.sql
+CREATE_TABLE_COUNT=0
+28

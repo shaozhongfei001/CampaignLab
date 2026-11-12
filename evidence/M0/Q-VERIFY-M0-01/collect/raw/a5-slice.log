@@ -1,0 +1,24 @@
+openapi.json sha256_full= 01bd28f0772f506e15fb70f07a37479ab9c33c4a3c9a39651445e6fa435cf583
+sha16= 01bd28f0772f506e bytes= 443552 info.version= 1.0.1
+--- M0-02 top keys: ['acceptance_rows', 'operations', 'source', 'spec_version']
+source.openapi: {'path': 'contracts/openapi.json', 'bytes': 443552, 'sha16': '01bd28f0772f506e'}
+spec_version: 1.0.1
+counts: operations= 5 acceptance_rows= 3 pages= 0 ddl= 0
+operationIds: ['createWorkspace', 'exchangeSession', 'getHealth', 'getSession', 'listWorkspaces']
+ac_ids: ['AC-001', 'AC-034', 'AC-035']
+page_keys: []
+--- M0-03 top keys: ['operations', 'pages', 'source', 'spec_version']
+source.openapi: {'path': 'contracts/openapi.json', 'bytes': 443552, 'sha16': '01bd28f0772f506e'}
+spec_version: 1.0.1
+counts: operations= 5 acceptance_rows= 0 pages= 1 ddl= 0
+operationIds: ['createWorkspace', 'exchangeSession', 'getHealth', 'getSession', 'listWorkspaces']
+ac_ids: []
+page_keys: ['UI-01']
+SPOT getHealth live= ('/health', 'get', ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500']) slice_responses= None
+SPOT listWorkspaces live= ('/workspaces', 'get', ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500']) slice_responses= None
+getHealth slice entry type: dict keys: ['method', 'path', 'operation', 'schemas']
+slice responses: []
+SPOT2 getHealth live= ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500'] slice= ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500'] MATCH= True path/method一致= False
+SPOT2 listWorkspaces live= ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500'] slice= ['200', '400', '401', '403', '404', '409', '412', '413', '422', '428', '429', '500'] MATCH= True path/method一致= False
+PATHMETHOD getHealth slice_path= '/health' slice_method= 'GET' live_path= '/health' live_method= 'get'
+PATHMETHOD listWorkspaces slice_path= '/workspaces' slice_method= 'GET' live_path= '/workspaces' live_method= 'get'

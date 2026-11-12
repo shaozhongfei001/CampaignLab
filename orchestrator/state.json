@@ -2,12 +2,12 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-12T23:01:00+08:00",
+  "updated_at": "2026-11-12T23:25:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.0,
-    "flash_share_tokens": 0.0,
+    "flash_share_tasks": 1.0,
+    "flash_share_tokens": null,
     "phase_quotas": {
       "M0": 100,
       "M1": 150,
@@ -17,10 +17,34 @@
       "M5": 110
     },
     "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额",
-    "subtask_log": [],
+    "subtask_log": [
+      {
+        "task": "Q-VERIFY-M0-01",
+        "subtask": "collect",
+        "lane": "Q",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": null,
+        "tokens_note": "子智能体未回传用量；本轮起派单提示词要求自报 token 估算，缺失即记 null，禁止估算填数",
+        "returned_at": "2026-11-12T23:25:00+08:00",
+        "outputs": [
+          "evidence/M0/Q-VERIFY-M0-01/collect/00-index.md",
+          "01-m0-01-gates.md",
+          "02-contract-gate.md",
+          "03-cr-adr-changes.md",
+          "04-defects.md",
+          "05-slice-consistency.md",
+          "raw/a1..a5.log"
+        ],
+        "scope_violation": "NONE（git status 仅出现 evidence/M0/Q-VERIFY-M0-01/）"
+      }
+    ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
-    "accounting_status": "IN_FLIGHT（已派 2 个子任务：Q-VERIFY-M0-01/collect=qwen3.8-flash、M0-02/S1=qwen3.8-max high；按手册 15.5，subtask_log 在**回收后**写回 tier_planned/tier_used/tokens/attempt/result，flash_share_tasks 与 flash_share_tokens 届时由 subtask_log 程序化重算，禁止手填）",
-    "dispatched_not_yet_returned": 2
+    "accounting_status": "PARTIAL（subtask_log 1 条真值：Q/collect=flash DONE；tokens 缺失故 flash_share_tokens=null，flash_share_tasks=1.0 由 subtask_log 程序化重算）在飞 1 个：M0-02/S1=max",
+    "dispatched_not_yet_returned": 1
   },
   "tasks": {
     "M0-01": {
@@ -1967,7 +1991,10 @@
           "整读 contracts/openapi.json(443552B) 与 bank-b.json(284KB)",
           "篡改 spec/ 做负例"
         ],
-        "next_step_after_return": "由 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，再置 M0-01 PASS/PASS_WITH_TODO 并把 D-001..D-006 置 CLOSED"
+        "next_step_after_return": "由 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，再置 M0-01 PASS/PASS_WITH_TODO 并把 D-001..D-006 置 CLOSED",
+        "status": "RETURNED",
+        "returned_at": "2026-11-12T23:25:00+08:00",
+        "return_verdict": "取证完成，11 个文件全部可入库；无越界写入；新发现 F-A4-1（doctor.sh:246 SIGPIPE 假 WARN）已转 D-007"
       },
       {
         "agent_id": "01a1d045-4d5b-7973-8755-63e16110aba6",
@@ -2396,7 +2423,23 @@
           "verdict": "PASS（手册 15.4 第 5 条：切片 sha16 与活契约实算值一致，可直接派单，无需重切）"
         }
       }
-    ]
+    ],
+    "q_verify": {
+      "task": "Q-VERIFY-M0-01",
+      "stage": "COLLECT_DONE_AWAIT_JUDGE",
+      "collect_evidence": "evidence/M0/Q-VERIFY-M0-01/collect/",
+      "collected_at": "2026-11-12T23:25:00+08:00",
+      "collector_tier": "qwen3.8-flash",
+      "key_findings": [
+        "A1 九项门禁：准确清单出处是 evidence/M0/summaries/M0-01.md（9 条）；orchestrator-verification.md 只有 8 行且集合不同（文档不一致，待判定档裁定）；逐项重跑 11 项全 rc=0",
+        "A2 契约门禁：check=0、check --validate=0，登记项==实测==12 成立",
+        "A3 三方一致性：CR-001 与 CHANGES.json 12 节点交集 12/12、差集空；ADR-004 不枚举节点但交叉数字一致；措辞级不一致 3 条",
+        "A4 D-001..D-006 验证命令全部复跑通过；D-006 复现命令实跑 py=6/md=33/ruff=39 与 state 当前值一致",
+        "A4 新发现 F-A4-1 -> 已立 D-007：doctor.sh:246 在 pipefail 下 grep -qi 提前退管触发 SIGPIPE(141)，字体已装却恒判 WARN（编排器复现 30 次：rc0=2 / rc141=28）",
+        "A5 切片一致性：独立复算 sha16=01bd28f0772f506e/bytes=443552/info.version=1.0.1 与两切片一致；重切逐字节一致；抽查 getHealth/listWorkspaces 12 个响应码两侧一致"
+      ],
+      "next": "派 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，裁定 A1 文档不一致与 A3 三条措辞级不一致的严重度，并给出 M0-01 PASS/PASS_WITH_TODO 与 D-001..D-007 CLOSED 与否"
+    }
   },
   "acceptance": {
     "baseline_total": 35,

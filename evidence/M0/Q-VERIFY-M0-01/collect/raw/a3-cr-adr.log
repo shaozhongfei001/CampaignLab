@@ -1,0 +1,43 @@
+### A3_pointer_probe ts=2026-11-12T23:14:17+08:00
+/tmp/q.sh: line 5: defs: unbound variable
+PY_RC=1
+--- contracts dir file list ---
+13
+CHANGES.json
+PROVENANCE.md
+case-input.schema.json
+dependencies.json
+openapi.json
+operations.json
+pages.json
+rule-set.schema.json
+source-json.schema.json
+source-mapping.schema.json
+source-metadata.schema.json
+sqlite-v1.sql
+traceability.json
+### A3_pointer_probe_retry ts=2026-11-12T23:14:37+08:00
+POINTER openapi /components/schemas/MonthlyCapacity = EXISTS
+POINTER openapi /components/schemas/MonthlyComparison = EXISTS
+POINTER openapi /components/schemas/MonthlyOriginOverlap = EXISTS
+POINTER openapi /components/schemas/MonthlyParticipation = EXISTS
+POINTER openapi /components/schemas/MonthlyProduction = EXISTS
+POINTER openapi /components/schemas/MonthlyReview = EXISTS
+POINTER openapi /components/schemas/MonthlyTrend = EXISTS
+POINTER openapi /components/schemas/Review/properties/monthly_review = EXISTS
+POINTER openapi /components/schemas/ReviewCreate/properties/profile = EXISTS
+POINTER openapi /info/version = 1.0.1
+POINTER source-json /$defs/SourceMetadata/properties/monthly_review = EXISTS
+POINTER source-metadata /properties/monthly_review = EXISTS
+ReviewCreate.required = ['scope']
+Review.required len = 17 has_monthly_review = False
+source-json SourceMetadata.required len = 9 has_monthly_review = False
+source-metadata.required len = 9 has_monthly_review = False
+PY_RC=0
+--- baseline contracts file count ---
+11
+--- live vs baseline byte compare (excl. 3 changed) ---
+DIFFERS: openapi.json
+DIFFERS: source-json.schema.json
+DIFFERS: source-metadata.schema.json
+SAME=8 DIFFERS=3

@@ -1,0 +1,246 @@
+### G0a
+CMD: npm --prefix web ci
+
+added 218 packages, and audited 219 packages in 14s
+
+49 packages are looking for funding
+  run `npm fund` for details
+
+5 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+RC=0
+
+### G1
+CMD: uv lock --check
+Resolved 52 packages in 2ms
+RC=0
+
+### G2
+CMD: uv sync --locked
+Resolved 52 packages in 2ms
+Checked 50 packages in 0.64ms
+RC=0
+
+### G3
+CMD: uv run --no-sync ruff check .
+All checks passed!
+RC=0
+
+### G4
+CMD: uv run --no-sync ruff format --check .
+39 files already formatted
+RC=0
+
+### G5
+CMD: uv run --no-sync mypy
+Success: no issues found in 6 source files
+RC=0
+
+### G6
+CMD: uv run --no-sync pytest -q
+............................                                             [100%]
+28 passed in 0.46s
+RC=0
+
+### G7
+CMD: npm --prefix web run build
+
+> campaignlab-web@0.0.0 build
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 11 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                 0.32 kB │ gzip:  0.23 kB
+dist/assets/index-BLIIWH5l.js  62.82 kB │ gzip: 24.88 kB
+
+✓ built in 152ms
+RC=0
+
+### G8
+CMD: bash scripts/doctor.sh
+CampaignLab doctor @ 2026-11-12T23:01:43+08:00
+host: Linux 6.18.58.1-microsoft-standard-WSL2 x86_64 GNU/Linux | Ubuntu 24.04.2 LTS
+
+== 1. 仓库与分支 ==
+  path   : /home/szf/dev/CampaignLab
+  branch : m0-framework
+  head   : c39bd8d
+  [WARN] 工作树存在 1 项未提交改动
+         ?? evidence/M0/Q-VERIFY-M0-01/
+
+== 2. CPython 与 SQLite JSON 能力 ==
+  python : 3.14.10
+  path   : /home/szf/dev/CampaignLab/.venv/bin/python -> /home/szf/.local/share/uv/python/cpython-3.14.10-linux-x86_64-gnu/bin/python3.14
+  [ OK ] CPython 3.14.10 满足 >=3.14,<3.15
+  sqlite : 3.53.1 [3, 53, 1]
+  json1  : json_extract=1 json_valid=1 json_type=object
+           json_each_rows=3 json_group_array=[1,[10,20,30],{"d":"x"}]
+  note   : SQLite>=3.38 起 JSON 内建，SQLITE_ENABLE_JSON1 已非独立编译选项
+  [ OK ] sqlite_version >= 3.38
+  [ OK ] JSON 函数实测可用（json_extract/json_valid/json_type/json_each/json_group_array）
+
+== 3. Node / npm（含 ELF 取证） ==
+  node   : v24.22.3
+  path   : /home/szf/.local/bin/node -> /home/szf/.local/share/node-v24/bin/node
+  [ OK ] node 位于 Linux 文件系统（非 /mnt/*）：/home/szf/.local/share/node-v24/bin/node
+  elf    : ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), 
+  [ OK ] node 为 Linux ELF 可执行文件
+  [ OK ] Node v24.22.3 满足 >=24,<25
+  [ OK ] npm 11.19.1 @ /home/szf/.local/share/node-v24/lib/node_modules/npm/bin/npm-cli.js
+
+== 4. uv 与 Python 依赖锁 ==
+  [ OK ] uv uv 0.13.7 (x86_64-unknown-linux-gnu) @ /home/szf/.local/bin/uv
+         .python-version = 3.14.10
+         requires-python = ">=3.14,<3.15"
+  uv lock --check 退出码: 0
+  [ OK ] uv lock --check 通过（uv.lock 与 pyproject.toml 一致）
+         uv.lock 包条目数：52
+  [ OK ] uv sync --locked --dry-run 通过（虚拟环境与锁一致）
+
+== 5. 前端依赖（web/） ==
+  [ OK ] web/package-lock.json 存在（122775 字节）
+  npm ci --dry-run 退出码: 0
+  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+         up to date in 491ms
+         web/node_modules 已安装（顶层 159 项）
+
+== 6. 构建与工具版本 ==
+  git        : git version 2.43.0
+  docker     : Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2
+  make       : GNU Make 4.3
+  rg         : ripgrep 14.1.0
+  curl       : curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3
+  sha256sum  : sha256sum (GNU coreutils) 9.4
+  fc-list    : fontconfig version 2.15.0
+
+== 7. 原型基线 scripts/verify.sh（四步结论） ==
+  env: node=v24.22.3 python=Python 3.12.3
+  ==> 1/4 交付件完整性
+  SHA256SUMS OK
+  ==> 2/4 计算与问法断言
+  79/79 PASS
+  ==> 3/4 确定性数据生成
+  ==> 4/4 字节级复现
+  PASS: 字节级复现
+  [ OK ] verify.sh 退出码 0（原型基线通过）
+
+== 8. 浏览器与字体（信息项，不判 FAIL） ==
+         cached: chromium-1234
+         cached: chromium-1254
+         cached: chromium_headless_shell-1234
+         cached: chromium_headless_shell-1254
+  [ OK ] Playwright 浏览器缓存存在：/home/szf/.cache/ms-playwright
+         web/node_modules/@playwright/test 已安装
+  [ OK ] 存在中文字体（fc-list :lang=zh = 37 条）
+  [WARN] 未安装 Noto Sans CJK（BLK-02 未解除，字体度量可能与行内设计基线不一致）
+
+== 摘要 ==
+  PASS=15  WARN=2  FAIL=0
+  RESULT: HEALTHY
+RC=0
+
+### G9
+CMD: bash scripts/verify.sh
+env: node=v24.22.3 python=Python 3.12.3
+==> 1/4 交付件完整性
+SHA256SUMS OK
+==> 2/4 计算与问法断言
+79/79 PASS
+==> 3/4 确定性数据生成
+==> 4/4 字节级复现
+PASS: 字节级复现
+RC=0
+
+### G10
+CMD: uv run --no-sync python -c import fastapi,duckdb,pydantic,sqlalchemy,alembic,uvicorn; print(duckdb.__version__, pydantic.VERSION, sqlalchemy.__version__)
+2.0.0 2.14.3 2.0.57
+RC=0
+
+### DOCTOR_RERUN ts=2026-11-12T23:03:25+08:00
+CampaignLab doctor @ 2026-11-12T23:03:25+08:00
+host: Linux 6.18.58.1-microsoft-standard-WSL2 x86_64 GNU/Linux | Ubuntu 24.04.2 LTS
+
+== 1. 仓库与分支 ==
+  path   : /home/szf/dev/CampaignLab
+  branch : m0-framework
+  head   : c39bd8d
+  [WARN] 工作树存在 1 项未提交改动
+         ?? evidence/M0/Q-VERIFY-M0-01/
+
+== 2. CPython 与 SQLite JSON 能力 ==
+  python : 3.14.10
+  path   : /home/szf/dev/CampaignLab/.venv/bin/python -> /home/szf/.local/share/uv/python/cpython-3.14.10-linux-x86_64-gnu/bin/python3.14
+  [ OK ] CPython 3.14.10 满足 >=3.14,<3.15
+  sqlite : 3.53.1 [3, 53, 1]
+  json1  : json_extract=1 json_valid=1 json_type=object
+           json_each_rows=3 json_group_array=[1,[10,20,30],{"d":"x"}]
+  note   : SQLite>=3.38 起 JSON 内建，SQLITE_ENABLE_JSON1 已非独立编译选项
+  [ OK ] sqlite_version >= 3.38
+  [ OK ] JSON 函数实测可用（json_extract/json_valid/json_type/json_each/json_group_array）
+
+== 3. Node / npm（含 ELF 取证） ==
+  node   : v24.22.3
+  path   : /home/szf/.local/bin/node -> /home/szf/.local/share/node-v24/bin/node
+  [ OK ] node 位于 Linux 文件系统（非 /mnt/*）：/home/szf/.local/share/node-v24/bin/node
+  elf    : ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), 
+  [ OK ] node 为 Linux ELF 可执行文件
+  [ OK ] Node v24.22.3 满足 >=24,<25
+  [ OK ] npm 11.19.1 @ /home/szf/.local/share/node-v24/lib/node_modules/npm/bin/npm-cli.js
+
+== 4. uv 与 Python 依赖锁 ==
+  [ OK ] uv uv 0.13.7 (x86_64-unknown-linux-gnu) @ /home/szf/.local/bin/uv
+         .python-version = 3.14.10
+         requires-python = ">=3.14,<3.15"
+  uv lock --check 退出码: 0
+  [ OK ] uv lock --check 通过（uv.lock 与 pyproject.toml 一致）
+         uv.lock 包条目数：52
+  [ OK ] uv sync --locked --dry-run 通过（虚拟环境与锁一致）
+
+== 5. 前端依赖（web/） ==
+  [ OK ] web/package-lock.json 存在（122775 字节）
+  npm ci --dry-run 退出码: 0
+  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+         up to date in 463ms
+         web/node_modules 已安装（顶层 159 项）
+
+== 6. 构建与工具版本 ==
+  git        : git version 2.43.0
+  docker     : Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2
+  make       : GNU Make 4.3
+  rg         : ripgrep 14.1.0
+  curl       : curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3
+  sha256sum  : sha256sum (GNU coreutils) 9.4
+  fc-list    : fontconfig version 2.15.0
+
+== 7. 原型基线 scripts/verify.sh（四步结论） ==
+  env: node=v24.22.3 python=Python 3.12.3
+  ==> 1/4 交付件完整性
+  SHA256SUMS OK
+  ==> 2/4 计算与问法断言
+  79/79 PASS
+  ==> 3/4 确定性数据生成
+  ==> 4/4 字节级复现
+  PASS: 字节级复现
+  [ OK ] verify.sh 退出码 0（原型基线通过）
+
+== 8. 浏览器与字体（信息项，不判 FAIL） ==
+         cached: chromium-1234
+         cached: chromium-1254
+         cached: chromium_headless_shell-1234
+         cached: chromium_headless_shell-1254
+  [ OK ] Playwright 浏览器缓存存在：/home/szf/.cache/ms-playwright
+         web/node_modules/@playwright/test 已安装
+  [ OK ] 存在中文字体（fc-list :lang=zh = 37 条）
+  [WARN] 未安装 Noto Sans CJK（BLK-02 未解除，字体度量可能与行内设计基线不一致）
+
+== 摘要 ==
+  PASS=15  WARN=2  FAIL=0
+  RESULT: HEALTHY
+RC=0

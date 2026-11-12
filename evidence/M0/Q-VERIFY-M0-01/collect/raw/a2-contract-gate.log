@@ -1,0 +1,9 @@
+### C1 ts=2026-11-12T23:05:06+08:00
+CMD: python3 scripts/check_contracts.py check
+CONTRACT CHECK PASS 登记项=12 实测差异=12 元校验=skipped
+RC=0
+
+### C2 ts=2026-11-12T23:05:06+08:00
+CMD: uv run --no-sync python scripts/check_contracts.py check --validate
+CONTRACT CHECK PASS 登记项=12 实测差异=12 元校验=6
+RC=0
