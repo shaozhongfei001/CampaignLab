@@ -1,8 +1,8 @@
 {
   "schema": "1.0",
   "phase": "M0",
-  "wave": 0,
-  "updated_at": "2026-11-12T22:56:48+08:00",
+  "wave": 1,
+  "updated_at": "2026-11-12T23:01:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -19,7 +19,8 @@
     "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额",
     "subtask_log": [],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
-    "accounting_status": "NOT_STARTED（已派子任务数=0，故占比暂不可测；wave1 起必须有真值）"
+    "accounting_status": "IN_FLIGHT（已派 2 个子任务：Q-VERIFY-M0-01/collect=qwen3.8-flash、M0-02/S1=qwen3.8-max high；按手册 15.5，subtask_log 在**回收后**写回 tier_planned/tier_used/tokens/attempt/result，flash_share_tasks 与 flash_share_tokens 届时由 subtask_log 程序化重算，禁止手填）",
+    "dispatched_not_yet_returned": 2
   },
   "tasks": {
     "M0-01": {
@@ -1895,7 +1896,27 @@
   "resume": {
     "recovered_at": "2026-11-12T22:48:36+08:00",
     "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
-    "wave": 0,
+    "wave": {
+      "wave": 1,
+      "mode": "parallel",
+      "tasks": [
+        "M0-02",
+        "M0-03"
+      ],
+      "status": "IN_FLIGHT_ROUND1",
+      "round": 1,
+      "round1_dispatched": [
+        "Q-VERIFY-M0-01/collect（flash）",
+        "M0-02/S1（max high）"
+      ],
+      "round2_planned": [
+        "Q-VERIFY-M0-01/judge（max）",
+        "M0-03/S1+S2（max）"
+      ],
+      "round2_defer_reason": "刻意延后 M0-03：避免其改 web/ 时与 Q 取证的 G13（npm ci && npm run build）撞并发假红",
+      "started_at": "2026-11-12T23:01:00+08:00",
+      "previous_value": 0
+    },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
       "0 【已完成】owner_gate=GO：项目负责人明确下达『确认开工』并授权长程无人值守、裁定用默认值（见 resume.owner_decisions）",
@@ -1908,7 +1929,86 @@
       "7 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001..D-006 由 FIXED_PENDING_Q 置 CLOSED",
       "8 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d044-b569-71c1-bd02-8cb68cad2d74",
+        "nickname": "Kierkegaard",
+        "lane": "Q",
+        "task": "Q-VERIFY-M0-01",
+        "subtask": "collect（M0 阶段 5 项复核合并取证的采集档）",
+        "tier_planned": "qwen3.8-flash",
+        "model_explicitly_set": true,
+        "fork_context": false,
+        "dispatched_at": "2026-11-12T23:01:00+08:00",
+        "scope_write": [
+          "evidence/M0/Q-VERIFY-M0-01/collect/**"
+        ],
+        "scope_write_deny": [
+          "qa-reports/**",
+          "spec/**",
+          "contracts/**",
+          "orchestrator/state.json",
+          "web/**",
+          "docs/**"
+        ],
+        "expected_outputs": [
+          "00-index.md",
+          "01-m0-01-gates.md",
+          "02-contract-gate.md",
+          "03-cr-adr-changes.md",
+          "04-defects.md",
+          "05-slice-consistency.md",
+          "raw/*"
+        ],
+        "forbidden": [
+          "git 写操作",
+          "sudo",
+          "再 spawn",
+          "整读 contracts/openapi.json(443552B) 与 bank-b.json(284KB)",
+          "篡改 spec/ 做负例"
+        ],
+        "next_step_after_return": "由 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，再置 M0-01 PASS/PASS_WITH_TODO 并把 D-001..D-006 置 CLOSED"
+      },
+      {
+        "agent_id": "01a1d045-4d5b-7973-8755-63e16110aba6",
+        "nickname": "Helmholtz",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S1 契约抽取与设计",
+        "tier_planned": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "model_explicitly_set": true,
+        "fork_context": false,
+        "dispatched_at": "2026-11-12T23:01:00+08:00",
+        "est_tokens_planned": 55000,
+        "scope_write": [
+          "orchestrator/handoff/M0-02-design.md"
+        ],
+        "scope_write_deny": [
+          "spec/**",
+          "contracts/**",
+          "orchestrator/state.json",
+          "orchestrator/tasks/**",
+          "orchestrator/handoff/*.slice.json",
+          "src/**",
+          "web/**",
+          "migrations/**",
+          "tests/**"
+        ],
+        "expected_outputs": [
+          "M0-02-design.md（≤120 行，7 节：接口签名/数据结构/首迁边界/边界清单/验证清单/S3-S5 文件白名单/未决问题）"
+        ],
+        "forbidden": [
+          "git 写操作",
+          "sudo",
+          "再 spawn",
+          "整读 contracts/openapi.json",
+          "写任何实现代码",
+          "自行裁定未决问题"
+        ],
+        "next_step_after_return": "编排器审阅设计与白名单 -> 派 S2（max，首迁实现）；S3/S4/S5（flash）只能在 S1 白名单内工作"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -2249,7 +2349,54 @@
         "at": "2026-11-12T22:56:48+08:00"
       },
       "blk01_status": "OPEN_TASK_LEVEL：doctor 判 OK（缓存+包存在），但需 M0-03 用真实 spec 启动一次才能关闭"
-    }
+    },
+    "dispatch_log": [
+      {
+        "at": "2026-11-12T23:01:00+08:00",
+        "wave": 1,
+        "round": 1,
+        "mode": "parallel",
+        "dispatched": [
+          {
+            "agent_id": "01a1d044-b569-71c1-bd02-8cb68cad2d74",
+            "lane": "Q",
+            "task": "Q-VERIFY-M0-01",
+            "subtask": "collect",
+            "tier": "qwen3.8-flash"
+          },
+          {
+            "agent_id": "01a1d045-4d5b-7973-8755-63e16110aba6",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S1",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "disjoint_proof": "Q 只写 evidence/M0/Q-VERIFY-M0-01/collect/**；S1 只写 orchestrator/handoff/M0-02-design.md；两者与编排器保留的 git/state 写权限均不相交",
+        "predispatch_slice_check": {
+          "contracts/openapi.json": {
+            "bytes": 443552,
+            "sha16": "01bd28f0772f506e",
+            "info.version": "1.0.1"
+          },
+          "M0-02.slice.json": {
+            "spec_version": "1.0.1",
+            "source.openapi.sha16": "01bd28f0772f506e",
+            "bytes": 443552,
+            "match": true
+          },
+          "M0-03.slice.json": {
+            "spec_version": "1.0.1",
+            "source.openapi.sha16": "01bd28f0772f506e",
+            "bytes": 443552,
+            "match": true
+          },
+          "verdict": "PASS（手册 15.4 第 5 条：切片 sha16 与活契约实算值一致，可直接派单，无需重切）"
+        }
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,
