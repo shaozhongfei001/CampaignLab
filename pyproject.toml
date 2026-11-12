@@ -33,11 +33,12 @@ build-backend = "hatchling.build"
 packages = ["src/campaignlab"]
 
 [tool.uv]
-# wave0 只落地 src/campaignlab 骨架（__init__.py 与 py.typed），目的是让 mypy/pytest
-# 从 wave0 起就有真实目标目录，而不是空跑或报「目录不存在」。
-# M0-02 交付 CLI 与 __main__ 后删除 package = false，即恢复为可安装项目
-# （届时 uv 需要把构建后端 hatchling 纳入锁文件）。
-package = false
+# 历史留痕（M0-01 / wave0）：此处曾设 `package = false`，因为当时 src/campaignlab 只有
+# __init__.py 与 py.typed 骨架，装成包会让 mypy/pytest 的目标目录失真。
+# M0-02 · S2 依裁定 Q7（RULING_SCOPE_EXTENDED，2026-11-12T23:41:32+08:00）删除该项：
+# 项目恢复为可安装包，构建后端 hatchling 随之进入 uv.lock。
+# 因此 gate 命令一律用**原文**（`uv run python -m campaignlab ...`），
+# 不得再加 `PYTHONPATH=src` 前缀（缺陷 D-014 的修复要求）。
 
 [tool.ruff]
 line-length = 100
