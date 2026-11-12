@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T21:19:36+08:00",
+ "updated_at": "2026-11-12T21:21:58+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1878,9 +1878,11 @@
    "head_full": "29be319316178f75a5323af395c1dbd405ae5ef8",
    "remote_head": "29be319",
    "remote_ref": "origin/m0-framework",
-   "note": "HEAD == origin/m0-framework == 29be319；git status --porcelain 为空。本次提交含 D-002/D-003 收口、6 个单测、6 个证据文件、手册 v1.2 第 15 节、BLOCKERS NOTE-04/05 与补丁后评审文档。"
+   "note": "HEAD == origin/m0-framework == f496551；git status --porcelain 为空。29be319 含 D-002/D-003 收口、6 例单测、6 个证据文件、手册 v1.2 第 15 节、BLOCKERS NOTE-04/05 与补丁后评审文档；f496551 为本次 state 恢复指针同步。",
+   "head_semantics": "head/head_full 指最近一次**交付提交**（29be319，含 D-002/D-003 收口与手册 v1.2）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
+   "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。"
   },
-  "context": "驱动模型已于 2026-11-12T19:21:36+08:00 切换（新实例接管）；接管时已从磁盘重新核验全部门禁，未采信上一任会话自述。任何新实例接管必须重跑本节 self_check_gates_rc0 后才能派单。",
+  "context": "驱动模型已于 2026-11-12 两次切换（宿主重启一次、模型切换一次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；重跑通过后**先确认 resume.owner_gate.status == GO** 才允许派单（手册 15.1），否则只可做只读自检、门禁复跑、治理与证据修复、计划与评审文档编写。",
   "patch": {
    "id": "v1.0.1-monthly-review-delta",
    "task": "M0-P01",
