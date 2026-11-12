@@ -10,4 +10,5 @@
 | BLK-06 | 已关闭 | duckdb 或 pydantic-core 若无 cp314 wheel | — | M0-01 实测 CPython 3.14.10 全部安装成功，无需回退 |
 | BLK-07 | 编排机制（新增） | 宿主机重启会销毁全部子智能体实例；恢复时不得假设实例还在，需按 state.json 重新 spawn，并用 send_input 语义在新实例上续做 | 编排器自检 | 恢复协议第 2 步已加「实例丢失」判定；开工前先读 state.json 的 resume 块 |
 | NOTE-01 | M0-03、M5-01（非阻塞） | 宿主占用 TCP 3000/3001/3002（WSL 镜像网络可见）；vite 默认 5173 空闲 | 编排器 | 前端 dev server 固定用 5173 或在 playwright.config 显式指定端口，勿绑 3000 段 |
-| NOTE-02 | 全体（新增，操作纪律） | 经 PowerShell→bash 通道写多行文件有两类自伤：heredoc 字面写入使反斜杠翻倍；`sed` 模式串含 `/` 会提前终止定界符 | 编排器与全部子智能体 | 一律用「PowerShell 字面 here-string → base64 → WSL 解码」整文件写入；改配置优先整写或 `python3 -c` 定点替换，禁止含 `/` 的 sed 模式串。详见 LONG-HORIZON-ORCHESTRATION.md 第 10.1 节 || NOTE-03 | 编排器自身（新增） | 提交 2fcfb8e 的标题含未转义的 `\uXXXX` 字面量：`git commit -m` 里嵌转义序列时 bash 不解释。因禁止 force-push，不改写历史，仅留痕 | 编排器 | 后续一律 `git commit -F 文件`，文件用 here-string→base64 通道写入（见手册 13.2） |
+| NOTE-02 | 全体（新增，操作纪律） | 经 PowerShell→bash 通道写多行文件有两类自伤：heredoc 字面写入使反斜杠翻倍；`sed` 模式串含 `/` 会提前终止定界符 | 编排器与全部子智能体 | 一律用「PowerShell 字面 here-string → base64 → WSL 解码」整文件写入；改配置优先整写或 `python3 -c` 定点替换，禁止含 `/` 的 sed 模式串。详见 LONG-HORIZON-ORCHESTRATION.md 第 13.2 节 |
+| NOTE-03 | 编排器自身（新增） | 提交 2fcfb8e 的标题含未转义的 `\uXXXX` 字面量：`git commit -m` 里嵌转义序列时 bash 不解释。因禁止 force-push，不改写历史，仅留痕 | 编排器 | 后续一律 `git commit -F 文件`，文件用 here-string→base64 通道写入（见手册 13.2） |
