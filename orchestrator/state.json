@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T04:58:57+08:00",
+  "updated_at": "2026-11-13T05:13:29+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -213,7 +213,7 @@
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 0,
+    "dispatched_not_yet_returned": 4,
     "flash_share_dev_lanes": 0.0,
     "flash_share_口径": {
       "all_lanes": "1/5=0.2",
@@ -2907,11 +2907,60 @@
       "12 【已完成】Round3 三 lane 全部返回并独立复验通过（M0-02/S2 max、M0-03/S3+S4 flash、D-016 批次1 flash）；24+17 条裁定全部落点复核",
       "13 【已完成】Lane T 治理同步：token-mapping.md 补 §1.1/§3/§4.5/§5；ADR-005 增补 §2.1 权威 code 指向与 §2.4 库路径/可逆/gate 归属；M0-02-design.md 追注（索引 5→6、hatchling、ADR-005 指向、越界复原、C1/C2 失效）；手册升 v1.7（§2 lane=R、§3.1 三段口径、§6.4 四列、§15.5 档位表唯一依据）；D-017/D-018/D-019 立单；BLOCKERS 加 BLK-09/NOTE-10 并更新 BLK-08 进展；上线 tests/unit/test_task_card_narrative.py（7 例 + 2 篡改负例）；state.json 同步 scope/primary_owner/tier/账本/card_gap",
       "14 【已完成】分任务提交 Round3 三 lane 产物 + Lane T 治理：08d0b5c(M0-02/S2) → 052a492(M0-03/S3+S4) → 234864b(D-016 批次1) → 00a04a1(Lane T 治理)，HEAD==origin、behind/ahead=0/0、worktree CLEAN",
-      "15 【进行中】Round4 派单前置已由编排器完成：预生成 5 份切片（M0-04 + M3-01/02/03 + M4-01）、D-016 批次2 预抽上下文、M0-02 卡 R4-1 拆分追注（S3→S3a max/S3b flash）、counts 87→88 刷新、10 项门禁复跑全 rc=0；下一步＝spawn 四 lane（M0-02/S3a max ∥ M0-03/S5 max ∥ M0-04/S1 max ∥ D-016 批次2 flash），写权限不相交论证与工具链隔离必须写进 dispatch_log 第 4 条",
+      "15 【进行中】Round4 四 lane 已 spawn（Gauss=M0-02/S3a max-high ∥ Aquinas=M0-03/S5 max ∥ Heisenberg=M0-04/S1 max-high 仅设计 ∥ Archimedes=D-016 批次2 flash）；派单前置已由提交 134b7c1 落盘。下一步＝wait_agent 回收 → **逐 lane 独立复验（不采信自述）** → 分任务提交（一任务一提交、显式路径、commit -F、staged 集合断言）→ 推进账本与 counts → Round 5",
       "16 wave2 出口冻结公共件前：M0-03 须排完 S5–S10 产出 handoff/M0-03-public-components.md（BLK-09 解除条件）；D-017 须关闭；指标注册表预留月报扩展点；flash_share 护栏复算（当前 tasks 0.4444 / tokens 0.4356 均未达标）",
-      "17 【需项目负责人】ADR-005 追认（含新增 §2.4）；D-017 的 EP 尺寸/字号取值与两条 AA 豁免确认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
+      "17 【需项目负责人】ADR-005 追认（含新增 §2.4）；D-017 的 EP 尺寸/字号取值与两条 AA 豁免确认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）",
+      "18 【编排器standing rule】每轮派单前必须先 close_agent 关闭上一轮已返回实例（completed 仍占并发槽，本轮实测 spawn 返回 `agent thread limit reached`）；待写入手册 §15.11"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d193-43f8-7c91-a06c-a04422da79f1",
+        "nickname": "Gauss",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S3a 路径单一来源(paths.py)+engine.py+api/common.py(Problem/ETag/幂等)+application 入口+重构 migrations/env.py+test_db_paths.py",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "est_tokens_planned": 32000,
+        "dispatched_at": "2026-11-13T05:13:29+08:00",
+        "instance": "NEW（Round3 的 Galileo 已用 92k 达单任务上限，按纪律不得续用）"
+      },
+      {
+        "agent_id": "01a1d194-3b01-7ae0-8480-3fc3e145dd26",
+        "nickname": "Aquinas",
+        "lane": "F",
+        "task": "M0-03",
+        "subtask": "S5 会话/工作区 store 与 API 客户端设计（接口签名、错误映射、ETag 与幂等、切工作区清理）+ store 骨架 + 断点变量一致性守卫（token-mapping §3 明载随 S5 落地）",
+        "tier": "qwen3.8-max",
+        "est_tokens_planned": 32000,
+        "dispatched_at": "2026-11-13T05:13:29+08:00",
+        "instance": "NEW（Round3 的 Goodall 83k over_cap，不得续用）"
+      },
+      {
+        "agent_id": "01a1d198-24b3-7c20-98af-0b98e9207130",
+        "nickname": "Heisenberg",
+        "lane": "S",
+        "task": "M0-04",
+        "subtask": "S1 契约抽取与 Job 状态机设计（9 条迁移→接口签名/事务边界/错误码映射/文件级 TODO），仅设计、禁实现代码",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "est_tokens_planned": 45000,
+        "dispatched_at": "2026-11-13T05:13:29+08:00",
+        "instance": "NEW",
+        "deps_precondition": "名义 deps=M0-02（未完成）；依手册 §15.6 关键路径前置策略，S1 设计只依赖 M0-02-design.md 已冻结签名（M0-02/S1=DONE），故可先行；实现 S2-S8 须待 M0-02 交付后再派"
+      },
+      {
+        "agent_id": "01a1d199-1bed-7183-a022-b211895d7865",
+        "nickname": "Archimedes",
+        "lane": "T",
+        "task": "D-016",
+        "subtask": "补卡批次2（4 张关键路径卡：M3-01/M3-02/M3-03/M4-01）+ KNOWN_MISSING 17->13",
+        "tier": "qwen3.8-flash",
+        "est_tokens_planned": 45000,
+        "dispatched_at": "2026-11-13T05:13:29+08:00",
+        "instance": "NEW（Round3 的 Dirac 181k over_cap 3.02x，不得续用）"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -2928,15 +2977,16 @@
       "remote_ref": "origin/m0-framework",
       "head_semantics": "head/head_full 指最近一次**交付提交**（42079fa：CR-002 选项 B 落地——移除 listWorkspaces.status、ADR-006、登记 12->13、两切片重切、基准文本二分同步，并修复提交前复核检出的 3 类问题）。state.json 自身的提交号无法自包含，故不记录。",
       "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。",
-      "note": "00a04a1（Lane T 治理同步）已推送并验证 HEAD==origin/m0-framework、behind/ahead=0/0。本次为 Round 4 的**派单前置治理提交**（编排器产物：5 份契约切片 + D-016 批次2 预抽上下文 + M0-02 卡 R4-1 拆分追注 + state.json），提交时工作树含 8 个编排器路径、无 lane 在飞产物（Round 4 尚未 spawn）。head 仍指最近一次交付提交 00a04a1：治理提交不自记其号（无法自包含）。",
+      "note": "00a04a1（Lane T 治理）与 134b7c1（Round 4 派单前置治理提交，8 路径）均已推送，HEAD==origin/m0-framework、behind/ahead=0/0、dirty=0。head 仍指最近一次**交付**提交 00a04a1：134b7c1 与本次派单记录提交均属编排器治理提交，按 head_semantics 不自记为 head。Round 4 四 lane 已 spawn（Gauss/Aquinas/Heisenberg/Archimedes），工作树预期出现四 lane 的在飞产物，回收后由编排器逐 lane 独立复验并**分任务提交**。",
       "governance_head_at_takeover": "07ab3ca",
       "remote_sync_verified": {
         "cmd": "git rev-list --left-right --count '@{u}...HEAD'",
         "result": "0\t0",
-        "at": "2026-11-13T04:58:57+08:00"
+        "at": "2026-11-13T05:13:29+08:00"
       },
       "governance_head_at_round3": "42079fa",
-      "governance_head_at_round4_pre": "本次治理提交的自身号无法自包含；其父提交为 00a04a1，提交后以 git log --oneline -1 实测为准并记入下一条 dispatch_log。"
+      "governance_head_at_round4_pre": "134b7c1",
+      "governance_head_at_round4_pre_full": "134b7c18b4ffe3c05b832166f3cac8fa9ae16d77"
     },
     "context": "驱动模型已于 2026-11-12 三次接管（宿主重启一次、模型切换两次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；本轮已于 run-04 全表重跑通过，且 resume.owner_gate.status == GO（项目负责人明确下达『确认开工』），故允许按 next_actions 派单。sudo 免密策略见手册 15.7 与 resume.owner_gate.sudo_policy；任何实例不得再等待密码输入，也不得把密码写入任何文件。",
     "patch": {
@@ -3632,6 +3682,153 @@
         "cr002_notice_given": "三份派单提示词均显式告知：listWorkspaces.status 已由 CR-002 选项 B 从活契约移除（ADR-006），M0-02 设计 Q4 的 WORKSPACE_STATUS_WHITELIST 与 422 INVALID_SCOPE 过渡分支已取消、不得实现、不得写测试；M0-03 设计 Q7 的「UI-01 不提供状态筛选控件」已转终态；getHealth.Health.properties.status 是合法响应字段不得误删。",
         "token_selfreport_required": "三份派单均硬性要求自报 token（唯一内容口径），用于回填 budget.subtask_log；缺失记 null 禁估算",
         "flash_share_projection": "本轮 3 个 lane 中 2 个为 flash（Goodall/Dirac），按 lane 计 flash_share=2/3=0.667；其中开发 lane（排除 Q/治理）只有 Galileo(max) 与 Goodall(flash) → dev flash_share=1/2=0.500，低于 0.60 护栏。wave1 累计 dev lane 为 M0-02/S1(max)、M0-03/S1+S2(max)、M0-02/S2(max)、M0-03/S3+S4(flash) → 1/4=0.250。**复核点＝wave2 出口**：若仍不足 0.60，按手册 15.5 降档并记理由，首选把 M0-03/S10 降 flash + max 复审。"
+      },
+      {
+        "at": "2026-11-13T05:13:29+08:00",
+        "wave": 1,
+        "round": 4,
+        "mode": "parallel-4-lanes",
+        "predispatch_commit": "134b7c1",
+        "predispatch_commit_note": "派单前置治理提交 134b7c1 已推送（8 路径：5 份切片 + D-016-batch2-context.md + M0-02.md 的 R4-1 追注 + state.json），提交前 10 项门禁全 rc=0、恒等式 tracked(87)+untracked(1)==88==ruff_total 成立；push 后复测 tracked(18py+70md=88)+untracked(0)==88、behind/ahead=0/0、dirty 空。",
+        "dispatched": [
+          {
+            "agent_id": "01a1d193-43f8-7c91-a06c-a04422da79f1",
+            "nickname": "Gauss",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S3a 路径单一来源(paths.py)+engine.py+api/common.py(Problem/ETag/幂等)+application 入口+重构 migrations/env.py+test_db_paths.py",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high",
+            "est_tokens_planned": 32000,
+            "dispatched_at": "2026-11-13T05:13:29+08:00",
+            "instance": "NEW（Round3 的 Galileo 已用 92k 达单任务上限，按纪律不得续用）"
+          },
+          {
+            "agent_id": "01a1d194-3b01-7ae0-8480-3fc3e145dd26",
+            "nickname": "Aquinas",
+            "lane": "F",
+            "task": "M0-03",
+            "subtask": "S5 会话/工作区 store 与 API 客户端设计（接口签名、错误映射、ETag 与幂等、切工作区清理）+ store 骨架 + 断点变量一致性守卫（token-mapping §3 明载随 S5 落地）",
+            "tier": "qwen3.8-max",
+            "est_tokens_planned": 32000,
+            "dispatched_at": "2026-11-13T05:13:29+08:00",
+            "instance": "NEW（Round3 的 Goodall 83k over_cap，不得续用）"
+          },
+          {
+            "agent_id": "01a1d198-24b3-7c20-98af-0b98e9207130",
+            "nickname": "Heisenberg",
+            "lane": "S",
+            "task": "M0-04",
+            "subtask": "S1 契约抽取与 Job 状态机设计（9 条迁移→接口签名/事务边界/错误码映射/文件级 TODO），仅设计、禁实现代码",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high",
+            "est_tokens_planned": 45000,
+            "dispatched_at": "2026-11-13T05:13:29+08:00",
+            "instance": "NEW",
+            "deps_precondition": "名义 deps=M0-02（未完成）；依手册 §15.6 关键路径前置策略，S1 设计只依赖 M0-02-design.md 已冻结签名（M0-02/S1=DONE），故可先行；实现 S2-S8 须待 M0-02 交付后再派"
+          },
+          {
+            "agent_id": "01a1d199-1bed-7183-a022-b211895d7865",
+            "nickname": "Archimedes",
+            "lane": "T",
+            "task": "D-016",
+            "subtask": "补卡批次2（4 张关键路径卡：M3-01/M3-02/M3-03/M4-01）+ KNOWN_MISSING 17->13",
+            "tier": "qwen3.8-flash",
+            "est_tokens_planned": 45000,
+            "dispatched_at": "2026-11-13T05:13:29+08:00",
+            "instance": "NEW（Round3 的 Dirac 181k over_cap 3.02x，不得续用）"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "disjoint_proof": "S lane(Gauss) 只写 src/campaignlab/infra/db/{paths.py,engine.py,__init__.py}、src/campaignlab/api/common.py、src/campaignlab/application/、migrations/env.py、tests/unit/test_db_paths.py（新建）、evidence/M0/M0-02/；F lane(Aquinas) 只写 web/src/**、web/tests/**、orchestrator/handoff/M0-03-design.md（仅纯增量追加状态章节）、evidence/M0/M0-03/**；S lane(Heisenberg) **只写** orchestrator/handoff/M0-04-design.md 一个文件；T lane(Archimedes) 只写 orchestrator/tasks/{M3-01,M3-02,M3-03,M4-01}.md 与 tests/unit/test_task_cards.py 的 KNOWN_MISSING 集合。四者路径集合两两交集为空（Gauss 写 tests/unit/test_db_paths.py 为新文件，与 Archimedes 改的 tests/unit/test_task_cards.py 不同文件）；orchestrator/state.json、orchestrator/handoff/*.slice.json 与 git 写权限由编排器独占。",
+        "toolchain_isolation": "已明令：Gauss **独占** Python 工具链（uv/pytest/mypy/ruff），禁跑任何 npm/node/vite/vitest/vue-tsc/playwright；Aquinas **独占** npm 工具链，禁跑任何 uv/pytest/mypy/ruff；Heisenberg 与 Archimedes **禁跑全部构建/测试工具链**，自检一律用纯 python3（标准库）。故 .venv 由 Gauss 独占、web/node_modules 由 Aquinas 独占，无并发争用假红（NOTE-10）。",
+        "known_transient_red": "已告知 Gauss：tests/unit/test_task_cards.py 与 test_task_card_narrative.py 可能因 Archimedes 并发新建 4 张卡 / 改 KNOWN_MISSING 而在全量 pytest 的瞬间报红，属并行 lane 归属、不计入 M0-02/S3a 判定，且明令不得去修改这两个文件。已告知 Archimedes：禁跑 pytest，须用纯 python3 等价复现守护测试逻辑自证。全量套件由编排器在四 lane 全部返回后统一复跑。",
+        "predispatch_slice_check": {
+          "contracts/openapi.json": {
+            "bytes": 443309,
+            "sha16": "592571099d638251",
+            "info.version": "1.0.1",
+            "operation_id_total": 80,
+            "measured_by": "编排器实算"
+          },
+          "M0-02.slice.json": {
+            "own_file_sha16": "a06b4941fd35b39d",
+            "own_file_bytes": 14493,
+            "spec_version": "1.0.1",
+            "match": true
+          },
+          "M0-03.slice.json": {
+            "own_file_sha16": "b2aaba68adef8747",
+            "own_file_bytes": 16165,
+            "spec_version": "1.0.1",
+            "match": true
+          },
+          "M0-04.slice.json": {
+            "own_file_sha16": "8dc116f109a51c14",
+            "own_file_bytes": 23095,
+            "spec_version": "1.0.1",
+            "match": true,
+            "generated_this_round": true,
+            "ops": 5,
+            "ddl_keys": 5,
+            "acs": [
+              "AC-029",
+              "AC-031"
+            ]
+          },
+          "M3-01.slice.json": {
+            "own_file_sha16": "64d79b599bfe60d9",
+            "own_file_bytes": 15681,
+            "spec_version": "1.0.1",
+            "match": true,
+            "generated_this_round": true
+          },
+          "M3-02.slice.json": {
+            "own_file_sha16": "3d55ec5497916343",
+            "own_file_bytes": 27184,
+            "spec_version": "1.0.1",
+            "match": true,
+            "generated_this_round": true
+          },
+          "M3-03.slice.json": {
+            "own_file_sha16": "ea5be2b20dc1d21f",
+            "own_file_bytes": 15284,
+            "spec_version": "1.0.1",
+            "match": true,
+            "generated_this_round": true
+          },
+          "M4-01.slice.json": {
+            "own_file_sha16": "152c5fd4951eb584",
+            "own_file_bytes": 26466,
+            "spec_version": "1.0.1",
+            "match": true,
+            "generated_this_round": true
+          },
+          "verdict": "PASS（手册 15.4 第 5 条）：本轮新切 5 份，5/5 rc=0、missing=[]、source.openapi 段 bytes/sha16 与活契约实算值逐字一致；两份既有切片（M0-02/M0-03）沿用 02:17:03 的 CR-002/ADR-006 重切版本，指纹未变。四份派单提示词均要求 lane 侧自行复算比对，不得直接采信编排器给值。"
+        },
+        "cr002_notice_given": "四份派单均显式告知：listWorkspaces.status 已由 CR-002 选项 B 从活契约移除（ADR-006）；M0-02 设计 Q4 的 WORKSPACE_STATUS_WHITELIST 与 422 INVALID_SCOPE（/query/status）过渡分支已取消、不得实现、不得写测试或用例期望；M0-03 的「UI-01 不提供状态筛选控件」已转终态；getHealth.Health.properties.status 是合法响应字段不得误删。",
+        "token_selfreport_required": "四份派单均硬性要求自报 token（唯一内容口径），用于回填 budget.subtask_log；缺失记 null 禁估算",
+        "loop_caps": {
+          "Gauss": "2 轮（M0-02 critical=true/slack=0）",
+          "Aquinas": "3 轮（M0-03 critical=false/slack=8），但同一失败连续 2 轮无进展即停并回报已排除假设",
+          "Heisenberg": "2 轮（M0-04 critical=true/slack=0）",
+          "Archimedes": "2 轮（4 卡均 critical=true/slack=0）"
+        },
+        "lane_d_cost_correction": "批次1 实测 181k（越 flash 60k 上限 3.02x）的纠正措施本轮落地：① 批量 8 张 -> 4 张；② 编排器预抽 orchestrator/handoff/D-016-batch2-context.md（16828B/198 行）作为**唯一 spec/手册入口**，内含 AC 原文行号、primary_owner 10 条、spec 架构文件小节行号图、fixtures 字节数与禁整读清单、两个守护测试的机器判定项、7 类已知陷阱；③ 预生成 4 份契约切片，手册由整册 758 行收窄为 5 段约 142 行；④ 明令禁跑 pytest/uv/npm，自检用纯 python3 等价复现守护逻辑。本批目标 <=45k。",
+        "agent_thread_limit_lesson": {
+          "incident": "首次并发 spawn 4 个实例时，前 2 个成功（Gauss/Aquinas），后 2 个返回 `collab spawn failed: agent thread limit reached`。",
+          "root_cause": "Round 3 的三个实例（Galileo/Goodall/Dirac）与更早的 Plato 虽已 completed，但按工具语义「Completed agents remain open and count toward the concurrency limit until closed」，仍占用并发槽；交接摘要记为「已关闭」与实际状态不符。",
+          "resolution": "close_agent 关闭 4 个历史实例（01a1d11e/01a1d11f/01a1d121/01a1d072）后补派成功（Heisenberg/Archimedes）。关闭返回的 previous_status 与账本已记录的 Round3 回执一致，无信息丢失。",
+          "standing_rule": "**每轮派单前必须先 close 上一轮已返回的实例**（编排器动作，先于 spawn）；spawn 若返回 thread limit，不得降级为串行等待，应先 close 再补派，以保住并行度。本条待写入手册 §15.11（下一次 Lane T 治理提交）。",
+          "closed_this_round": [
+            "01a1d11e-9bae-7cd3-acd2-664f6826b738 (Galileo)",
+            "01a1d11f-b9c0-7653-8eab-f938a68a6a07 (Goodall)",
+            "01a1d121-8cf0-7530-a457-8e6f9f8556fa (Dirac)",
+            "01a1d072-960c-7ef3-a89c-7b9dde7289e3 (Plato)"
+          ]
+        },
+        "flash_share_projection": "本轮 4 lane 中仅 1 个 flash（Archimedes/T lane 治理）：按 lane 计 1/4=0.250；**开发 lane（排除 T 治理）为 Gauss(max)/Aquinas(max)/Heisenberg(max) -> dev flash_share=0/3=0.000**。wave1 累计 dev lane：M0-02/S1(max)、M0-03/S1+S2(max)、M0-02/S2(max)、M0-03/S3+S4(flash)、M0-02/S3a(max)、M0-03/S5(max)、M0-04/S1(max) -> 1/7=0.143，**远低于 0.60 护栏，如实入账不粉饰**。定性：wave1 是 M0 框架与公共件奠基期，手册 §6.3 把 OpenAPI/DDL/状态机/公共冻结件变更/跨模块一致性不变量全部强制 max，属「设计先行」的必然形态，非降档失控；且 R4-1 拆分使 M0-02 子任务分母 5->6 而 flash 数不变。回补路径（Round 5 起）：M0-02/S3b+S4+S5(flash 44k)、M0-03/S6-S9(4 个 flash 30k)、M0-04/S4-S8(5 个 flash 53k)、D-016 批次3(flash)。**检查点仍为 wave2 出口**；若仍不达标，按手册 6.6 升级给项目负责人，禁为凑配比降档。",
+        "round5_plan_preview": "S3b+S4+S5(flash, 约 44k) ∥ M0-03/S6-S9(flash 批, 约 30k) ∥ M0-04/S2(max high, 50k) ∥ D-016 批次3(flash, 4-5 张 + 预抽摘要)；前置条件：M0-02/S3a 与 M0-04/S1 设计均已交付并复验。"
       }
     ],
     "q_verify": {
