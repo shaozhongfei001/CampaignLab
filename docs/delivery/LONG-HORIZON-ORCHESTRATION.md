@@ -518,3 +518,8 @@ evidence/M<n>/<task_id>/
 3. 改动这类脚本时做**差分回归**：与改动前版本对同一组入参比对输出字节，一致才算行为保持；
    不一致必须解释清楚是「修复」还是「回归」，并更新金样本与 `contracts/PROVENANCE.md`。
 4. 每个自建工具在 `tests/unit/` 至少有一条用例钉住它的核心不变量，纳入 `pytest` 门禁。
+
+### 13.2.1 提交信息写入纪律（v1.1 补记，NOTE-03）
+- 含中文或多行的提交信息**一律** `git commit -F <file>`，file 由 here-string→base64 通道写入；
+  禁止在 `git commit -m "..."` 里嵌 `\uXXXX` 转义序列（bash 不解释，会原样入库且不可 force-push 修正）。
+- 已发生的字面量化提交：2fcfb8e，保留并在 `orchestrator/BLOCKERS.md` NOTE-03 留痕。
