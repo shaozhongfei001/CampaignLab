@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-12T23:44:54+08:00",
+  "updated_at": "2026-11-12T23:51:06+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -63,7 +63,7 @@
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 0
+    "dispatched_not_yet_returned": 2
   },
   "tasks": {
     "M0-01": {
@@ -1959,8 +1959,8 @@
         "M0-02",
         "M0-03"
       ],
-      "status": "IN_FLIGHT_ROUND1",
-      "round": 1,
+      "status": "IN_FLIGHT_ROUND2",
+      "round": 2,
       "round1_dispatched": [
         "Q-VERIFY-M0-01/collect（flash）",
         "M0-02/S1（max high）"
@@ -1971,7 +1971,18 @@
       ],
       "round2_defer_reason": "刻意延后 M0-03：避免其改 web/ 时与 Q 取证的 G13（npm ci && npm run build）撞并发假红",
       "started_at": "2026-11-12T23:01:00+08:00",
-      "previous_value": 0
+      "previous_value": 0,
+      "round1_result": "双双 RETURNED：Q 取证（flash）11 文件入库；M0-02/S1（max）设计 117 行入库，8 条未决问题已全部裁定（ADR-005/CR-002/D-008）",
+      "round2_dispatched": [
+        "Q-VERIFY-M0-01/judge（max high）",
+        "M0-03/S1+S2（max high）"
+      ],
+      "round2_parallel_safety": "写路径不相交：judge 只写 qa-reports/m0 与 evidence/.../judge；M0-03 只写 web 配置与其设计文档。已明令 judge 禁跑任何 npm/node/vite/playwright，避免与 M0-03 改 web/ 撞出假红",
+      "round3_planned": [
+        "M0-02/S2（max：首迁 28 表 + 删 pyproject 的 package=false + uv lock）",
+        "M0-03/S3+S4（flash：tokens.css 机械落地 + openapi-typescript 生成）"
+      ],
+      "round2_started_at": "2026-11-12T23:51:06+08:00"
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
@@ -1989,88 +2000,89 @@
     ],
     "in_flight_agents": [
       {
-        "agent_id": "01a1d044-b569-71c1-bd02-8cb68cad2d74",
-        "nickname": "Kierkegaard",
+        "agent_id": "01a1d072-960c-7ef3-a89c-7b9dde7289e3",
+        "nickname": "Plato",
         "lane": "Q",
         "task": "Q-VERIFY-M0-01",
-        "subtask": "collect（M0 阶段 5 项复核合并取证的采集档）",
-        "tier_planned": "qwen3.8-flash",
-        "model_explicitly_set": true,
-        "fork_context": false,
-        "dispatched_at": "2026-11-12T23:01:00+08:00",
-        "scope_write": [
-          "evidence/M0/Q-VERIFY-M0-01/collect/**"
-        ],
-        "scope_write_deny": [
-          "qa-reports/**",
-          "spec/**",
-          "contracts/**",
-          "orchestrator/state.json",
-          "web/**",
-          "docs/**"
-        ],
-        "expected_outputs": [
-          "00-index.md",
-          "01-m0-01-gates.md",
-          "02-contract-gate.md",
-          "03-cr-adr-changes.md",
-          "04-defects.md",
-          "05-slice-consistency.md",
-          "raw/*"
-        ],
-        "forbidden": [
-          "git 写操作",
-          "sudo",
-          "再 spawn",
-          "整读 contracts/openapi.json(443552B) 与 bank-b.json(284KB)",
-          "篡改 spec/ 做负例"
-        ],
-        "next_step_after_return": "由 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，再置 M0-01 PASS/PASS_WITH_TODO 并把 D-001..D-006 置 CLOSED",
-        "status": "RETURNED",
-        "returned_at": "2026-11-12T23:25:00+08:00",
-        "return_verdict": "取证完成，11 个文件全部可入库；无越界写入；新发现 F-A4-1（doctor.sh:246 SIGPIPE 假 WARN）已转 D-007"
-      },
-      {
-        "agent_id": "01a1d045-4d5b-7973-8755-63e16110aba6",
-        "nickname": "Helmholtz",
-        "lane": "S",
-        "task": "M0-02",
-        "subtask": "S1 契约抽取与设计",
+        "subtask": "judge（判定档）",
         "tier_planned": "qwen3.8-max",
         "reasoning_effort": "high",
         "model_explicitly_set": true,
         "fork_context": false,
-        "dispatched_at": "2026-11-12T23:01:00+08:00",
-        "est_tokens_planned": 55000,
+        "dispatched_at": "2026-11-12T23:51:06+08:00",
         "scope_write": [
-          "orchestrator/handoff/M0-02-design.md"
+          "qa-reports/m0/**",
+          "evidence/M0/Q-VERIFY-M0-01/judge/**"
         ],
-        "scope_write_deny": [
-          "spec/**",
-          "contracts/**",
-          "orchestrator/state.json",
-          "orchestrator/tasks/**",
-          "orchestrator/handoff/*.slice.json",
-          "src/**",
-          "web/**",
-          "migrations/**",
-          "tests/**"
-        ],
-        "expected_outputs": [
-          "M0-02-design.md（≤120 行，7 节：接口签名/数据结构/首迁边界/边界清单/验证清单/S3-S5 文件白名单/未决问题）"
+        "remits": [
+          "A M0-01 总判定",
+          "B D-001..D-008 逐个 CLOSED 与否",
+          "C 独立复核 D-007（doctor 3 次摘要一致性 + 原写法 20 次 rc 分布 + 定向 pytest）",
+          "D A1 文档不一致严重度",
+          "E A3 三条措辞级不一致严重度",
+          "F 全量核对 29 张任务卡的 AC 转述（D-008 回归防护的临时手段）+ 断言 AC 分母=47",
+          "G 裁定 ADR-005 与 CR-002 是否与 spec/活契约冲突",
+          "H 裁定 M0-02/S1 设计的可执行性与白名单合规",
+          "I 分母核对（ruff 51 / pytest 32 / mypy 7）"
         ],
         "forbidden": [
           "git 写操作",
           "sudo",
           "再 spawn",
-          "整读 contracts/openapi.json",
-          "写任何实现代码",
-          "自行裁定未决问题"
+          "任何 npm/node/vite/playwright/openapi-typescript 命令（并发 lane 正在改 web/，G13 只能引用 collect 的 rc）",
+          "整读 openapi.json"
         ],
-        "next_step_after_return": "编排器审阅设计与白名单 -> 派 S2（max，首迁实现）；S3/S4/S5（flash）只能在 S1 白名单内工作",
-        "status": "RETURNED",
-        "returned_at": "2026-11-12T23:44:54+08:00",
-        "return_verdict": "S1 完成：M0-02-design.md 117 行、7 节齐、5 条自检全 rc=0；提出 8 条未决问题且未自行决定；已全部裁定（见任务卡文末与 ADR-005/CR-002/D-008）"
+        "token_self_report": "REQUIRED（新增硬性要求）"
+      },
+      {
+        "agent_id": "01a1d073-8c2a-78a0-b7ea-5a15a5e350c8",
+        "nickname": "Ohm",
+        "lane": "F",
+        "task": "M0-03",
+        "subtask": "S1 工程骨架与严格模式基线 + S2 令牌体系设计",
+        "tier_planned": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "model_explicitly_set": true,
+        "fork_context": false,
+        "dispatched_at": "2026-11-12T23:51:06+08:00",
+        "est_tokens_planned": 52000,
+        "scope_write": [
+          "web/*.config.*",
+          "web/tsconfig*.json",
+          "web/index.html",
+          "web/src/main.ts",
+          "web/src/App.vue",
+          "web/src/ 目录骨架",
+          "web/tests/**",
+          "orchestrator/handoff/M0-03-design.md"
+        ],
+        "scope_write_deny": [
+          "web/package.json",
+          "web/package-lock.json",
+          "spec/**",
+          "contracts/**",
+          "src/**",
+          "migrations/**",
+          "scripts/**",
+          "orchestrator/state.json",
+          "evidence/**",
+          "qa-reports/**"
+        ],
+        "constraints": [
+          "dev server 与 playwright 固定 5173（NOTE-01 实测 3000/3001/3002 BUSY）",
+          "不得 import 模板 CSS/JS",
+          "web/src 内除 styles/tokens.css 外不得出现六位十六进制色值",
+          "PRE-3 门禁自证：活契约 info.version=1.0.1、切片 sha16 与实算一致",
+          "S1/S2 不做 S3 tokens.css、S4 类型生成、S9 截图"
+        ],
+        "forbidden": [
+          "git 写操作",
+          "sudo",
+          "再 spawn",
+          "改 package.json/package-lock.json（需新增依赖先回报裁定）",
+          "整读 openapi.json"
+        ],
+        "token_self_report": "REQUIRED（新增硬性要求）"
       }
     ],
     "dispatch_requirements": [
@@ -2472,6 +2484,30 @@
           },
           "verdict": "PASS（手册 15.4 第 5 条：切片 sha16 与活契约实算值一致，可直接派单，无需重切）"
         }
+      },
+      {
+        "at": "2026-11-12T23:51:06+08:00",
+        "wave": 1,
+        "round": 2,
+        "mode": "parallel",
+        "dispatched": [
+          {
+            "agent_id": "01a1d072-960c-7ef3-a89c-7b9dde7289e3",
+            "lane": "Q",
+            "task": "Q-VERIFY-M0-01",
+            "subtask": "judge",
+            "tier": "qwen3.8-max"
+          },
+          {
+            "agent_id": "01a1d073-8c2a-78a0-b7ea-5a15a5e350c8",
+            "lane": "F",
+            "task": "M0-03",
+            "subtask": "S1+S2",
+            "tier": "qwen3.8-max"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "new_requirement": "自本轮起，派单提示词强制要求子智能体自报 token 估算，用于回填 budget.subtask_log（前两档缺失，已记 null）"
       }
     ],
     "q_verify": {
@@ -2489,7 +2525,18 @@
         "A5 切片一致性：独立复算 sha16=01bd28f0772f506e/bytes=443552/info.version=1.0.1 与两切片一致；重切逐字节一致；抽查 getHealth/listWorkspaces 12 个响应码两侧一致"
       ],
       "next": "派 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，裁定 A1 文档不一致与 A3 三条措辞级不一致的严重度，并给出 M0-01 PASS/PASS_WITH_TODO 与 D-001..D-007 CLOSED 与否"
-    }
+    },
+    "commit_message_corrections": [
+      {
+        "commit": "ee51f3f",
+        "at": "2026-11-12T23:51:06+08:00",
+        "wrong": "提交信息写「ruff format --check 52 files rc=0（分母恒等式 tracked+untracked==52 已断言）」",
+        "correct": "实测为 51 files；恒等式 tracked=51 + untracked=0 == ruff=51 成立",
+        "cause": "提交信息文本在实测之前手写，未回填实测值",
+        "handling": "禁止 force-push，不改写历史；在此留痕（同 NOTE-03 口径）。改进：提交信息里的数字一律由脚本回填实测值后再写文件",
+        "rule_added": "后续所有提交信息中的计数必须由同一次运行的实测变量插入，禁止手写数字"
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,
