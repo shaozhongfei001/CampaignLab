@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T21:21:58+08:00",
+ "updated_at": "2026-11-12T21:50:08+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1811,6 +1811,15 @@
    "status": "FIXED_PENDING_Q",
    "file": "orchestrator/defects/D-003.md",
    "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库"
+  },
+  {
+   "id": "D-004",
+   "task": "M0-P01",
+   "severity": "MAJOR",
+   "status": "OPEN",
+   "file": "orchestrator/defects/D-004.md",
+   "summary": "scripts/contract_slice.py 的 openapi/pages/DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码为 1.0.0；活契约已是 1.0.1。wave1 内容经实测字节等价不受影响，但 5 个月报任务（M1-P01/M3-P01/M3-P02/M4-P01/M5-P01）会被静默提供过期契约。",
+   "blocks": "wave1 派单前置条件之一（见 resume.dispatch_preconditions）"
   }
  ],
  "change_requests": [
@@ -1855,14 +1864,15 @@
   "recovered_at": "2026-11-12T21:19:36+08:00",
   "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
   "wave": 0,
-  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + AWAIT_OWNER_GO",
+  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_OPEN + AWAIT_OWNER_GO",
   "next_actions": [
    "0 【闸门】owner_gate=AWAIT_OWNER_GO：在项目负责人明确下达「开工」之前，不得 spawn 任何开发子智能体（手册 15.1）",
-   "1 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事（M0-04 加验收项 / M4-P01 与 M5-P01 设计前置 / 关键任务 L 循环 2 轮上限 / M0 阶段 Q 复核合并为一次）",
-   "2 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001、D-002、D-003；证据已备于 evidence/monthly/M0-P01/run-01|run-02 与 evidence/M0/M0-01/",
-   "3 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001/D-002/D-003 由 FIXED_PENDING_Q 置 CLOSED",
-   "4 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01，类型客户端按 openapi 1.0.1 生成）；两卡均须先出「子任务档位表」（手册 15.5），无拆解表不得 spawn",
-   "5 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），否则 wave5 的 L3 lane 会被推成关键路径"
+   "1 【派单前置】清空 resume.dispatch_preconditions：PRE-1 修 D-004（切片工具改读活契约）、PRE-2 两张 wave1 任务卡补子任务档位表、PRE-3 M0-03 补 info.version=1.0.1 门禁。三项均属闸门允许的治理修复",
+   "2 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事（M0-04 加验收项 / M4-P01 与 M5-P01 设计前置 / 关键任务 L 循环 2 轮上限 / M0 阶段 Q 复核合并为一次）",
+   "3 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001、D-002、D-003；证据已备于 evidence/monthly/M0-P01/run-01|run-02 与 evidence/M0/M0-01/",
+   "4 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001/D-002/D-003 由 FIXED_PENDING_Q 置 CLOSED",
+   "5 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01，类型客户端按 openapi 1.0.1 生成）；两卡均须先出「子任务档位表」（手册 15.5），无拆解表不得 spawn",
+   "6 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），否则 wave5 的 L3 lane 会被推成关键路径"
   ],
   "in_flight_agents": [],
   "dispatch_requirements": [
@@ -2033,6 +2043,37 @@
     ".gitignore 证据否定规则（D-003）",
     "check_frontend_baseline.py 的 6 条单测（手册 13.3 第 4 条）"
    ]
+  },
+  "dispatch_preconditions": {
+   "note": "手册 15.1 的 owner_gate 放行后，仍必须逐项清空本表才允许 spawn wave1 子智能体。每项完成后置 status=DONE 并记 commit。",
+   "items": [
+    {
+     "id": "PRE-1",
+     "status": "OPEN",
+     "severity": "MAJOR",
+     "item": "修 D-004：contract_slice.py 改读活契约 contracts/，spec_version 从 info.version 取，补差分回归 + 篡改负例 + 单测，并重切 M0-02/M0-03 切片入库（spec_version 应为 1.0.1）",
+     "ref": "orchestrator/defects/D-004.md",
+     "allowed_under_owner_gate": true,
+     "reason_allowed": "属治理与工具修复，非业务开发；且它是派单前置，绕不过去"
+    },
+    {
+     "id": "PRE-2",
+     "status": "OPEN",
+     "severity": "MINOR",
+     "item": "M0-02.md / M0-03.md 任务卡补「子任务档位表」（手册 15.5：无拆解表不得 spawn）；两卡写于 02:51，早于 15.5 生效",
+     "ref": "orchestrator/tasks/M0-02.md, orchestrator/tasks/M0-03.md",
+     "allowed_under_owner_gate": true
+    },
+    {
+     "id": "PRE-3",
+     "status": "OPEN",
+     "severity": "MINOR",
+     "item": "M0-03.md 增一条显式门禁：活契约 info.version 必须为 1.0.1，使「openapi-typescript 产物 diff 为空」有明确版本基准",
+     "ref": "orchestrator/tasks/M0-03.md, docs/delivery/MONTHLY-DELTA-PLAN.md 第 1 节",
+     "allowed_under_owner_gate": true
+    }
+   ],
+   "wave1_slice_content_verdict": "M0-02/M0-03 现有切片内容经差分回归实测与活契约重切结果字节等价（v1.0.1 的 12 个节点与这 5 个 operationId 无交集），故内容不需重做，只需重切以修正 spec_version 与来源标记。"
   }
  },
  "acceptance": {
