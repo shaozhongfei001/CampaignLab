@@ -1,0 +1,997 @@
+{
+ "spec_version": "1.0.1",
+ "source": {
+  "live_contracts": "contracts",
+  "openapi": {
+   "path": "contracts/openapi.json",
+   "bytes": 443309,
+   "sha16": "592571099d638251"
+  },
+  "readonly_originals": "spec/CampaignLab-SDD-v1.0",
+  "monthly_delta": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+  "rule": "活契约 contracts/ 是实现唯一依据（手册第 7 节）；BASE 仅供活契约中不存在的只读原件（qa/ACCEPTANCE.md、ui/*.md）；spec_version 从活契约 info.version 动态读取，禁止硬编码。"
+ },
+ "operations": {
+  "listJobs": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/jobs",
+   "operation": {
+    "operationId": "listJobs",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "cursor",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 300
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100,
+       "default": 25
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 100
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 60
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "JobPage"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "JobPage": {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "items": {
+        "$schema": "Job"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      },
+      "next_cursor": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 300
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "items",
+      "next_cursor"
+     ],
+     "additionalProperties": false
+    },
+    "Job": "TRUNCATED"
+   }
+  },
+  "getJob": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/jobs/{job_id}",
+   "operation": {
+    "operationId": "getJob",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": "TRUNCATED",
+    "Problem": "TRUNCATED"
+   }
+  },
+  "cancelJob": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/jobs/{job_id}/cancel",
+   "operation": {
+    "operationId": "cancelJob",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     },
+     {
+      "name": "If-Match",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 3,
+       "maxLength": 32,
+       "pattern": "^\"[1-9][0-9]*\"$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": "TRUNCATED",
+    "Problem": "TRUNCATED"
+   }
+  },
+  "retryJob": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/jobs/{job_id}/retry",
+   "operation": {
+    "operationId": "retryJob",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     },
+     {
+      "name": "If-Match",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 3,
+       "maxLength": 32,
+       "pattern": "^\"[1-9][0-9]*\"$"
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "Location": {
+        "description": "返回作业的状态 URL",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": "TRUNCATED",
+    "Problem": "TRUNCATED"
+   }
+  },
+  "getHealth": {
+   "method": "GET",
+   "path": "/health",
+   "operation": {
+    "operationId": "getHealth",
+    "parameters": [],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Health"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "security": []
+   },
+   "schemas": {
+    "Health": {
+     "type": "object",
+     "properties": {
+      "status": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "DEGRADED"
+       ]
+      },
+      "app_version": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      },
+      "contract_version": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      },
+      "worker": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "OFFLINE"
+       ]
+      },
+      "schema_revision": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 48
+      }
+     },
+     "required": [
+      "status",
+      "app_version",
+      "contract_version",
+      "worker",
+      "schema_revision"
+     ],
+     "additionalProperties": false
+    }
+   }
+  }
+ },
+ "acceptance_rows": {
+  "AC-029": [
+   "AC-029",
+   "重复提交、两个执行者争用、运行中断、取消和重试",
+   "同键同请求同对象，异请求 409。失效租约不能提交。中断后可重试。取消/完成只有一个终态",
+   "作业与 DB"
+  ],
+  "AC-031": [
+   "AC-031",
+   "停受理备份，恢复至新目录，运行迁移校核",
+   "数据库和制品摘要一致。历史报告和原规则仍能回查。快照缺件可定位并阻止错误切换",
+   "日志、SHA、数据库"
+  ]
+ },
+ "ddl": {
+  "jobs": "CREATE TABLE jobs (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    state TEXT NOT NULL CHECK(state IN ('QUEUED','RUNNING','CANCEL_REQUESTED','SUCCEEDED','FAILED','CANCELLED')),\n    attempt INTEGER NOT NULL CHECK(attempt>=0), progress INTEGER NOT NULL CHECK(progress BETWEEN 0 AND 100),\n    stage TEXT NOT NULL, lease_token TEXT, lease_until TEXT, retry_of TEXT, retryable INTEGER NOT NULL CHECK(retryable IN (0,1)),\n    input_json TEXT NOT NULL CHECK(json_valid(input_json)), input_digest TEXT NOT NULL CHECK(length(input_digest)=64),\n    result_json TEXT CHECK(result_json IS NULL OR json_valid(result_json)), problem_json TEXT CHECK(problem_json IS NULL OR json_valid(problem_json)),\n    revision INTEGER NOT NULL CHECK(revision>=1), created_at TEXT NOT NULL,\n    CHECK((state IN ('RUNNING','CANCEL_REQUESTED'))=(lease_token IS NOT NULL AND lease_until IS NOT NULL)),\n    CHECK((state='SUCCEEDED')=(result_json IS NOT NULL)),\n    PRIMARY KEY(workspace_id,id), FOREIGN KEY(workspace_id,retry_of) REFERENCES jobs(workspace_id,id)\n) STRICT;",
+  "jobs__indexes": [
+   "CREATE INDEX jobs_ready ON jobs(state,created_at,workspace_id,id);"
+  ],
+  "artifacts": "CREATE TABLE artifacts (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    sha256 TEXT NOT NULL CHECK(length(sha256)=64), relative_path TEXT NOT NULL UNIQUE,\n    byte_size INTEGER NOT NULL CHECK(byte_size>=0), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,kind,sha256)\n) STRICT;",
+  "idempotency": "CREATE TABLE idempotency (\n    scope_key TEXT NOT NULL, actor_id TEXT NOT NULL, operation TEXT NOT NULL, idem_key TEXT NOT NULL,\n    request_digest TEXT NOT NULL CHECK(length(request_digest)=64), response_status INTEGER NOT NULL,\n    response_json TEXT NOT NULL CHECK(json_valid(response_json)), created_at TEXT NOT NULL,\n    PRIMARY KEY(scope_key,actor_id,operation,idem_key)\n) STRICT;",
+  "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
+ }
+}

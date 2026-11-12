@@ -1,0 +1,583 @@
+{
+ "spec_version": "1.0.1",
+ "source": {
+  "live_contracts": "contracts",
+  "openapi": {
+   "path": "contracts/openapi.json",
+   "bytes": 443309,
+   "sha16": "592571099d638251"
+  },
+  "readonly_originals": "spec/CampaignLab-SDD-v1.0",
+  "monthly_delta": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+  "rule": "活契约 contracts/ 是实现唯一依据（手册第 7 节）；BASE 仅供活契约中不存在的只读原件（qa/ACCEPTANCE.md、ui/*.md）；spec_version 从活契约 info.version 动态读取，禁止硬编码。"
+ },
+ "operations": {
+  "runReview": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/reviews",
+   "operation": {
+    "operationId": "runReview",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "Location": {
+        "description": "返回作业的状态 URL",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "ReviewCreate"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": "TRUNCATED",
+    "Problem": "TRUNCATED",
+    "ReviewCreate": {
+     "type": "object",
+     "properties": {
+      "scope": {
+       "$schema": "Scope"
+      },
+      "group_by": {
+       "type": "string",
+       "enum": [
+        "branch",
+        "group",
+        "channel",
+        "subbranch",
+        "segment",
+        "origin",
+        "strategy",
+        "deposit_type"
+       ]
+      },
+      "profile": {
+       "type": "string",
+       "enum": [
+        "BANK_MONTHLY_V1"
+       ]
+      }
+     },
+     "required": [
+      "scope"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": "TRUNCATED"
+   }
+  },
+  "getReview": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/reviews/{review_id}",
+   "operation": {
+    "operationId": "getReview",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "review_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Review"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Review": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "scope": {
+       "$schema": "Scope"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "reasons": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "included_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "MetricComparison"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "participation_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "detail_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "detail_count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "origin_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "topic_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "worst_layer_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "missing_requirements": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "monthly_review": {
+       "$schema": "MonthlyReview"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "scope",
+      "state",
+      "reasons",
+      "included_channels",
+      "metrics",
+      "participation_rows",
+      "detail_rows",
+      "detail_count",
+      "origin_rows",
+      "topic_rows",
+      "worst_layer_id",
+      "missing_requirements",
+      "evidence_ids",
+      "digest"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": "TRUNCATED",
+    "Issue": "TRUNCATED",
+    "MetricComparison": "TRUNCATED",
+    "AnalysisRow": "TRUNCATED",
+    "MonthlyReview": "TRUNCATED"
+   }
+  }
+ },
+ "acceptance_rows": {
+  "AC-018": [
+   "AC-018",
+   "选择 A-001 东岚 2026-10 对 2026-09 远程",
+   "五层分别 12000/11520/8640/3456/1728 和 10000/9600/7680/3840/1920。经营与层间率、优先层和 −192 正确",
+   "复盘及证据"
+  ],
+  "AC-019": [
+   "AC-019",
+   "切分行、分组、渠道、支行、客群口径与策略来源，导出明细",
+   "本次/全行/东部/西部部署分行数为 1/5/3/2。全渠道人数不直接相加。部署与标签不同。来源和作用域与导出一致",
+   "查询与 CSV"
+  ],
+  "AC-020": [
+   "AC-020",
+   "10 月全渠道对 9 月，1 月环比，青屿 AI 零分母",
+   "恢复采集企微时仅共同子集变化。缺基准保留本期可得原值，取数清单可读。零分母 null",
+   "Review 与导出"
+  ],
+  "AC-033": [
+   "AC-033",
+   "逐项验证环比、同比、同组、全行、总行、目标、年度已选月份和自选",
+   "参照标签、同组剔除自身、分行等权、年度缺月与目标仅有指标正确",
+   "计算和问答"
+  ]
+ },
+ "ddl": {
+  "analysis_results": "CREATE TABLE analysis_results (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK(kind IN ('comparison','review','diagnosis','question')),\n    input_json TEXT NOT NULL CHECK(json_valid(input_json)), artifact_id TEXT NOT NULL, digest TEXT NOT NULL CHECK(length(digest)=64),\n    snapshot_id TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(workspace_id,id),\n    FOREIGN KEY(workspace_id,artifact_id) REFERENCES artifacts(workspace_id,id),\n    FOREIGN KEY(workspace_id,snapshot_id) REFERENCES snapshots(workspace_id,id)\n) STRICT;",
+  "analysis_results__indexes": [
+   "CREATE INDEX analysis_snapshot ON analysis_results(workspace_id,snapshot_id,kind);"
+  ],
+  "snapshots": "CREATE TABLE snapshots (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, bank_id TEXT NOT NULL, snapshot_code TEXT NOT NULL,\n    mapping_id TEXT NOT NULL, import_id TEXT, correction_of TEXT, row_count INTEGER NOT NULL CHECK(row_count>=0),\n    artifact_id TEXT NOT NULL, metadata_json TEXT NOT NULL CHECK(json_valid(metadata_json)),\n    digest TEXT NOT NULL CHECK(length(digest)=64), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,bank_id,snapshot_code),\n    FOREIGN KEY(workspace_id,import_id) REFERENCES imports(workspace_id,id),\n    FOREIGN KEY(workspace_id,mapping_id) REFERENCES source_mappings(workspace_id,id),\n    FOREIGN KEY(workspace_id,correction_of) REFERENCES snapshots(workspace_id,id),\n    FOREIGN KEY(workspace_id,artifact_id) REFERENCES artifacts(workspace_id,id)\n) STRICT;",
+  "snapshots__indexes": [
+   "CREATE INDEX snapshots_lookup ON snapshots(workspace_id,bank_id,created_at);"
+  ],
+  "evidence": "CREATE TABLE evidence (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('SOURCE','CLAUSE','COMPUTATION','TRACE','PREFLIGHT','RECEIPT','SIGNATURE','EXPERIMENT','REVIEW_NOTE')),\n    source_id TEXT NOT NULL, locator TEXT NOT NULL, label TEXT NOT NULL, source_class TEXT NOT NULL,\n    content_digest TEXT NOT NULL CHECK(length(content_digest)=64), artifact_id TEXT NOT NULL, created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), FOREIGN KEY(workspace_id,artifact_id) REFERENCES artifacts(workspace_id,id)\n) STRICT;",
+  "object_evidence": "CREATE TABLE object_evidence (\n    workspace_id TEXT NOT NULL, object_kind TEXT NOT NULL, object_id TEXT NOT NULL, evidence_id TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,object_kind,object_id,evidence_id),\n    FOREIGN KEY(workspace_id,evidence_id) REFERENCES evidence(workspace_id,id)\n) STRICT;",
+  "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
+ }
+}

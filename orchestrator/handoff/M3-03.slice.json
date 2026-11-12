@@ -1,0 +1,648 @@
+{
+ "spec_version": "1.0.1",
+ "source": {
+  "live_contracts": "contracts",
+  "openapi": {
+   "path": "contracts/openapi.json",
+   "bytes": 443309,
+   "sha16": "592571099d638251"
+  },
+  "readonly_originals": "spec/CampaignLab-SDD-v1.0",
+  "monthly_delta": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+  "rule": "活契约 contracts/ 是实现唯一依据（手册第 7 节）；BASE 仅供活契约中不存在的只读原件（qa/ACCEPTANCE.md、ui/*.md）；spec_version 从活契约 info.version 动态读取，禁止硬编码。"
+ },
+ "operations": {
+  "executeQuestion": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/questions",
+   "operation": {
+    "operationId": "executeQuestion",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "Location": {
+        "description": "返回作业的状态 URL",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "QuestionExecute"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": "TRUNCATED",
+    "Problem": "TRUNCATED",
+    "QuestionExecute": {
+     "type": "object",
+     "properties": {
+      "plan": {
+       "$schema": "QuestionPlan"
+      },
+      "threshold_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "plan",
+      "threshold_id"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionPlan": "TRUNCATED"
+   }
+  },
+  "interpretQuestion": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/questions/interpret",
+   "operation": {
+    "operationId": "interpretQuestion",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "QuestionInterpretation"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "QuestionInput"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "QuestionInterpretation": {
+     "type": "object",
+     "properties": {
+      "state": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "CLARIFY"
+       ]
+      },
+      "plan": {
+       "anyOf": [
+        {
+         "$schema": "QuestionPlan"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "state",
+      "plan",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionPlan": "TRUNCATED",
+    "Issue": "TRUNCATED",
+    "QuestionInput": {
+     "type": "object",
+     "properties": {
+      "question": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 300
+      },
+      "context": {
+       "$schema": "Scope"
+      }
+     },
+     "required": [
+      "question",
+      "context"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": "TRUNCATED"
+   }
+  },
+  "getQuestion": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/questions/{question_id}",
+   "operation": {
+    "operationId": "getQuestion",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "question_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "QuestionResult"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "QuestionResult": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "plan": {
+       "$schema": "QuestionPlan"
+      },
+      "rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "alerts": {
+       "type": "array",
+       "items": {
+        "$schema": "Alert"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "definitions": {
+       "type": "array",
+       "items": {
+        "$schema": "Definition"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "review_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "diagnosis_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "topic_ready": {
+       "type": "boolean"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "plan",
+      "rows",
+      "alerts",
+      "definitions",
+      "review_id",
+      "diagnosis_id",
+      "topic_ready",
+      "issues",
+      "evidence_ids",
+      "digest"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionPlan": "TRUNCATED",
+    "AnalysisRow": "TRUNCATED",
+    "Alert": "TRUNCATED",
+    "Definition": "TRUNCATED",
+    "Issue": "TRUNCATED"
+   }
+  }
+ },
+ "acceptance_rows": {
+  "AC-023": [
+   "AC-023",
+   "运行 60 个登记问法，追加歧义和未知机构",
+   "计划、行数、指标及主要值与夹具一致。Q03/04 澄清，R08 两分行，R54 五分行专题。题述值仅作 claims",
+   "计划和结果"
+  ]
+ },
+ "ddl": {
+  "analysis_results": "CREATE TABLE analysis_results (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK(kind IN ('comparison','review','diagnosis','question')),\n    input_json TEXT NOT NULL CHECK(json_valid(input_json)), artifact_id TEXT NOT NULL, digest TEXT NOT NULL CHECK(length(digest)=64),\n    snapshot_id TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(workspace_id,id),\n    FOREIGN KEY(workspace_id,artifact_id) REFERENCES artifacts(workspace_id,id),\n    FOREIGN KEY(workspace_id,snapshot_id) REFERENCES snapshots(workspace_id,id)\n) STRICT;",
+  "analysis_results__indexes": [
+   "CREATE INDEX analysis_snapshot ON analysis_results(workspace_id,snapshot_id,kind);"
+  ],
+  "artifacts": "CREATE TABLE artifacts (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    sha256 TEXT NOT NULL CHECK(length(sha256)=64), relative_path TEXT NOT NULL UNIQUE,\n    byte_size INTEGER NOT NULL CHECK(byte_size>=0), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,kind,sha256)\n) STRICT;",
+  "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
+ }
+}
