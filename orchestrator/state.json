@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T02:40:24+08:00",
+ "updated_at": "2026-11-12T12:28:41+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -11,34 +11,68 @@
  },
  "tasks": {
   "M0-01": {
-   "status": "RUNNING",
+   "status": "VERIFYING",
    "lane": "T",
    "tier_planned": "max",
-   "tier_used": "qwen3.8-max",
+   "tier_used": "max",
    "attempt": 0,
    "tokens": 0,
-   "commit": "",
+   "commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
    "branch": "m0-framework",
    "gates": [
     {
-     "id": "uv sync --locked 成功",
-     "rc": null,
-     "evidence": ""
+     "id": "uv lock --check",
+     "cmd": "uv lock --check",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/commands.md"
     },
     {
-     "id": "npm ci 成功",
-     "rc": null,
-     "evidence": ""
+     "id": "uv sync --locked",
+     "cmd": "uv sync --locked",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/commands.md"
     },
     {
-     "id": "doctor 记录 CPython patch/sqlite_version/Node/浏览器",
-     "rc": null,
-     "evidence": ""
+     "id": "npm ci",
+     "cmd": "npm --prefix web ci",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/npm.md"
     },
     {
-     "id": "锁文件入库",
-     "rc": null,
-     "evidence": ""
+     "id": "npm run build",
+     "cmd": "npm --prefix web run build",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/npm.md"
+    },
+    {
+     "id": "doctor HEALTHY",
+     "cmd": "bash scripts/doctor.sh",
+     "rc": 0,
+     "evidence": "evidence/M0/env.md"
+    },
+    {
+     "id": "prototype baseline",
+     "cmd": "bash scripts/verify.sh",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/orchestrator-verification.md"
+    },
+    {
+     "id": "python quality gates",
+     "cmd": "ruff check . ; ruff format --check . ; mypy ; pytest -q",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/recovery-2026-11-12.md"
+    },
+    {
+     "id": "cp314 wheels (BLK-06 closed)",
+     "cmd": "uv sync (duckdb 2.0.0 / pydantic-core 2.50.4 / fastapi 0.162.4 / sqlalchemy 2.0.57 / alembic 1.20.1)",
+     "rc": 0,
+     "evidence": "evidence/M0/M0-01/wheels.md"
+    },
+    {
+     "id": "contract slice tool D-001 fix",
+     "cmd": "contract_slice.py --all-tables ; diff vs legacy ; pytest",
+     "rc": 0,
+     "evidence": "orchestrator/defects/D-001.md"
     }
    ],
    "acs": [],
@@ -54,7 +88,14 @@
     "contracts/PROVENANCE.md"
    ],
    "blockers": [],
-   "agent": "01a1cbe8-fca4-7ee3-93f9-60d3bd4d1f20"
+   "agent": "01a1cbe8-fca4-7ee3-93f9-60d3bd4d1f20",
+   "escalated": false,
+   "evidence": [
+    "evidence/M0/env.md",
+    "evidence/M0/M0-01/",
+    "evidence/M0/summaries/M0-01.md"
+   ],
+   "note": "wave0 出口自验全绿；断电恢复后 mypy 与 pytest 由不可用转绿（强于中断前）。待 Q 交叉验证判 PASS / PASS_WITH_TODO。"
   },
   "M0-02": {
    "status": "TODO",
@@ -1189,7 +1230,15 @@
   "M5-02",
   "M5-03"
  ],
- "defects": [],
+ "defects": [
+  {
+   "id": "D-001",
+   "task": "M0-01",
+   "severity": "MAJOR",
+   "status": "FIXED_PENDING_Q",
+   "file": "orchestrator/defects/D-001.md"
+  }
+ ],
  "change_requests": [],
  "pending_owner": [
   {
@@ -1212,5 +1261,25 @@
    "item": "CampaignLab-Bank-Strategy-Review-Source-Extract.md 未随包提供",
    "default": "用 docx/pptx 重建 extract"
   }
- ]
+ ],
+ "resume": {
+  "recovered_at": "2026-11-12T12:28:41+08:00",
+  "incident": "host reboot by Windows Update; all subagent instances destroyed; zero data loss confirmed",
+  "wave": 0,
+  "gate": "WAVE0_EXIT_PENDING_Q",
+  "next_actions": [
+   "1 提交 wave0 交付物与证据（显式路径，禁 git add -A）并推送",
+   "2 派 Q：flash 采集 + max 判定，独立上下文交叉验证 M0-01 九项门禁",
+   "3 依判定置 M0-01 为 PASS 或 PASS_WITH_TODO，回填 commit 与 rc",
+   "4 并行派发 wave1：M0-02（max）与 M0-03（max），写权限已确认不相交"
+  ],
+  "in_flight_agents": [],
+  "dispatch_requirements": [
+   "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
+   "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
+   "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
+   "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串"
+  ],
+  "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a"
+ }
 }
