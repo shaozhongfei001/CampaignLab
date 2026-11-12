@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-12T23:33:03+08:00",
+  "updated_at": "2026-11-12T23:44:54+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 1.0,
+    "flash_share_tasks": 0.5,
     "flash_share_tokens": null,
     "phase_quotas": {
       "M0": 100,
@@ -40,11 +40,30 @@
           "raw/a1..a5.log"
         ],
         "scope_violation": "NONE（git status 仅出现 evidence/M0/Q-VERIFY-M0-01/）"
+      },
+      {
+        "task": "M0-02",
+        "subtask": "S1 契约抽取与设计",
+        "lane": "S",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": null,
+        "tokens_note": "子智能体未回传用量；下一轮起派单提示词强制要求自报，缺失记 null，禁止估算填数",
+        "returned_at": "2026-11-12T23:44:54+08:00",
+        "outputs": [
+          "orchestrator/handoff/M0-02-design.md（117 行）"
+        ],
+        "scope_violation": "NONE（git status 仅该文件）",
+        "value_added": "发现 D-008（任务卡 AC 抄错 + scope 缺项）与 CR-002（契约自身不一致），避免 S3-S5 实现错的验收标准"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
-    "accounting_status": "PARTIAL（subtask_log 1 条真值：Q/collect=flash DONE；tokens 缺失故 flash_share_tokens=null，flash_share_tasks=1.0 由 subtask_log 程序化重算）在飞 1 个：M0-02/S1=max",
-    "dispatched_not_yet_returned": 1
+    "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
+    "dispatched_not_yet_returned": 0
   },
   "tasks": {
     "M0-01": {
@@ -156,12 +175,16 @@
         {
           "id": "AC-034",
           "rc": null,
-          "evidence": ""
+          "evidence": "",
+          "authoritative": "过期会话、错误 Host/Origin、跨工作区 ID、上传失败 -> 401/403/404/413 或 422；隔离/路径/日志/ETag 证据可查（spec ACCEPTANCE.md 第 42 行）",
+          "note": "D-008：任务卡原措辞「深链与刷新」属 M0-03/UI-01，已修正"
         },
         {
           "id": "AC-035",
           "rc": null,
-          "evidence": ""
+          "evidence": "",
+          "authoritative": "按 M0 锁版本、迁移、核对包与 API -> verify_package.py、DDL 等价、OpenAPI 请求响应及前端生成类型通过；锁与运行环境清楚（spec ACCEPTANCE.md 第 43 行）",
+          "note": "D-008：任务卡原措辞「并发与重启语义」不属 AC-035，会话过期/重启归 AC-001+AC-034"
         },
         {
           "id": "alembic 首迁与 sqlite-v1.sql 结构比对通过",
@@ -169,9 +192,10 @@
           "evidence": ""
         },
         {
-          "id": "契约测试 202/Problem/ETag/幂等",
+          "id": "契约测试（口径依裁定 Q2/Q3 收窄）",
           "rc": null,
-          "evidence": ""
+          "evidence": "",
+          "authoritative": "HTTP 层：Problem 结构、Idempotency-Key 重放一次生效、createWorkspace 的 ETag 发布；DTO/单测层：Job 202 语义与 If-Match 412/428；HTTP 端到端 202 与 412 deferred_to 拥有对应 op 的后续任务"
         }
       ],
       "acs": [
@@ -190,13 +214,21 @@
         "src/campaignlab/infra/db/",
         "migrations/",
         "tests/api/session/",
-        "tests/integration/bootstrap/"
+        "tests/integration/bootstrap/",
+        "pyproject.toml",
+        "uv.lock",
+        "evidence/M0/M0-02/",
+        "evidence/M0/summaries/M0-02.md"
       ],
       "blockers": [],
       "depth": 2,
       "height": 13,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "design": "orchestrator/handoff/M0-02-design.md",
+      "design_lines": 117,
+      "s1_status": "DONE",
+      "rulings": "orchestrator/tasks/M0-02.md 文末裁定记录（Q1..Q8）"
     },
     "M0-03": {
       "status": "TODO",
@@ -1943,16 +1975,17 @@
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
-      "0 【已完成】owner_gate=GO：项目负责人明确下达『确认开工』并授权长程无人值守、裁定用默认值（见 resume.owner_decisions）",
+      "0 【已完成】owner_gate=GO（项目负责人明确下达「确认开工」并授权长程无人值守、裁定用默认值）",
       "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空",
-      "2 【已完成】POST-PATCH-REVIEW 第 6 节 4 件事全部按建议批准；手册 15.6（关键任务 L 循环上限 2 轮）已追认；pending_owner 5 项全部按默认值裁定",
-      "3 【已完成】fonts-noto-cjk 安装完成并复验（fc-list Noto=30、doctor rc=0），BLK-02 已关闭，证据 evidence/monthly/M0-P01/run-04/commands.md 第 7 节",
-      "4 【下一步-派单】派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001 至 D-006；证据写 evidence/M0/Q-VERIFY-M0-01/ 与 qa-reports/m0/",
-      "5 【下一步-派单】并行派 M0-02 / S1（qwen3.8-max，high）：契约抽取与设计，只写 orchestrator/handoff/M0-02-design.md（与 Q 的写路径无交集）",
-      "6 【延后到 Round 2】M0-03 / S1+S2（qwen3.8-max）：工程骨架 + 令牌体系设计；刻意延后以避免其改 web/ 时与 Q 的 G13（npm build）撞并发假红",
-      "7 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001..D-006 由 FIXED_PENDING_Q 置 CLOSED",
-      "8 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条）",
-      "9 【已完成】D-007 修复：doctor.sh:246 改 grep -ci，假 WARN 28/30 -> 0/30；补 tests/unit/test_doctor_determinism.py 4 条回归；手册升 v1.5 加 15.8；BLOCKERS 加 NOTE-07；run-04 第 8 节更正「WARN=0」侥幸绿（2026-11-12T23:30:05+08:00）"
+      "2 【已完成】POST-PATCH-REVIEW 第 6 节 4 件事按建议批准；追认手册 15.6；pending_owner 5 项按默认值裁定",
+      "3 【已完成】fonts-noto-cjk 装成并复验，BLK-02 关闭；期间发现并修复 D-007（doctor SIGPIPE 假 WARN，28/30 -> 0/30），手册升 v1.5 加 15.8",
+      "4 【已完成】wave1 Round1 派单：Q 取证（flash）+ M0-02/S1 设计（max high）双双 RETURNED，产出已入库",
+      "5 【已完成】S1 提出的 8 条未决问题全部裁定：Q1 spec 优先修正任务卡（立 D-008）、Q2/Q3 收窄 gate 并 deferred_to、Q4 不发明字段 + 立 CR-002、Q5/Q6 进 ADR-005、Q7/Q8 扩 scope_allow",
+      "6 【下一步】派 Q 判定档（max）：读 evidence/M0/Q-VERIFY-M0-01/collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md；额外受托全量核对 29 张任务卡的 AC 转述（D-008 回归防护的临时手段）；裁定 M0-01 PASS/PASS_WITH_TODO 与 D-001..D-008 是否 CLOSED",
+      "7 【下一步】并行派 M0-03/S1（max）前端壳与令牌体系设计，只写 orchestrator/handoff/M0-03-design.md（与 Q 判定档写路径不相交，且不动 web/，保证判定档复跑门禁时工作树稳定）",
+      "8 【Round 2b，待判定档返回后】并行派 M0-02/S2（max，首迁 + 删 package=false + uv lock）与 M0-03/S2（max，工程骨架）；二者写路径不相交（migrations/src/pyproject vs web/）",
+      "9 【Round 3】M0-02 的 S3/S4/S5 与 M0-03 的对应 flash 子任务，只能在 S1 白名单内工作",
+      "10 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），并确认 ADR-005 的 Problem code 注册表已冻结留痕"
     ],
     "in_flight_agents": [
       {
@@ -2034,7 +2067,10 @@
           "写任何实现代码",
           "自行裁定未决问题"
         ],
-        "next_step_after_return": "编排器审阅设计与白名单 -> 派 S2（max，首迁实现）；S3/S4/S5（flash）只能在 S1 白名单内工作"
+        "next_step_after_return": "编排器审阅设计与白名单 -> 派 S2（max，首迁实现）；S3/S4/S5（flash）只能在 S1 白名单内工作",
+        "status": "RETURNED",
+        "returned_at": "2026-11-12T23:44:54+08:00",
+        "return_verdict": "S1 完成：M0-02-design.md 117 行、7 节齐、5 条自检全 rc=0；提出 8 条未决问题且未自行决定；已全部裁定（见任务卡文末与 ADR-005/CR-002/D-008）"
       }
     ],
     "dispatch_requirements": [
@@ -2125,7 +2161,7 @@
       "29be319"
     ],
     "self_check_gates_rc0": {
-      "checked_at": "2026-11-12T22:48:36+08:00",
+      "checked_at": "2026-11-12T23:45:58+08:00",
       "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
       "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。",
       "gates": {
@@ -2257,7 +2293,7 @@
       "counts": {
         "pytest_passed": 32,
         "mypy_source_files": 7,
-        "ruff_formatted_files": 48,
+        "ruff_formatted_files": 51,
         "contract_registered_nodes": 12,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -2266,17 +2302,17 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 48,
+          "total": 51,
           "in_scope_py": 7,
-          "in_scope_md": 41,
+          "in_scope_md": 44,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-12T23:33:03+08:00：48 = 已跟踪 47（7 py + 40 md）+ 未跟踪未忽略 1（orchestrator/handoff/M0-02-design.md，M0-02/S1 在飞交付物，S1 回收后单独提交，届时未跟踪项归零、已跟踪升为 48）。.pytest_cache/README.md 被 gitignore，ruff 遵循 gitignore 故不计入。",
+          "measured_after": "S1 设计 + ADR-005 + CR-002 + D-008 四个 .md 入库后重测",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 7）**，Q 复核以它为准",
-          "identity": "tracked_in_scope(47) + untracked_not_ignored_in_scope(1) == ruff_total(48) -> True",
+          "identity": "tracked_in_scope(51) + untracked_not_ignored_in_scope(0) == ruff_total(51) -> True",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "orchestrator/handoff/M0-02-design.md"
@@ -2590,5 +2626,21 @@
       "ci_step": "基线三",
       "defect": "D-002"
     }
-  ]
+  ],
+  "docs": {},
+  "decisions": {
+    "ADR-005": {
+      "title": "Problem.type 的 URN 方案与 M0 运行参数默认值",
+      "status": "ACCEPTED",
+      "ref": "docs/decisions/ADR-005-problem-type-and-runtime-defaults.md",
+      "accepted_at": "2026-11-12T23:44:54+08:00",
+      "freeze": "M0-03b 之后 Problem.type 方案与 code 注册表冻结，变更走 CR",
+      "defaults": {
+        "problem_type_scheme": "urn:campaignlab:problem:<code.lower()>",
+        "session_ttl_seconds": 3600,
+        "MAX_JSON_BODY_BYTES": 1048576,
+        "WORKER_HEARTBEAT_TTL_SECONDS": 15
+      }
+    }
+  }
 }
