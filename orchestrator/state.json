@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T20:48:31+08:00",
+ "updated_at": "2026-11-12T21:19:36+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -16,7 +16,10 @@
    "M4": 140,
    "M5": 110
   },
-  "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额"
+  "quota_change_reason": "M0-P01 插入 6 个月报任务与 12 条 AC，按 DELIVERY-PATCH 的落点 wave 调整相对配额",
+  "subtask_log": [],
+  "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
+  "accounting_status": "NOT_STARTED（已派子任务数=0，故占比暂不可测；wave1 起必须有真值）"
  },
  "tasks": {
   "M0-01": {
@@ -1277,6 +1280,42 @@
      "id": "tamper negative test (check must fail)",
      "rc": 1,
      "evidence": "evidence/monthly/M0-P01/run-01/commands.md"
+    },
+    {
+     "id": "frontend baseline machine check (D-002)",
+     "cmd": "python3 scripts/check_frontend_baseline.py",
+     "rc": 0,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+    },
+    {
+     "id": "frontend baseline tamper negative (expect rc=1)",
+     "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css",
+     "rc": 1,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+    },
+    {
+     "id": "unit tests for baseline checker (14 passed)",
+     "cmd": "uv run --no-sync pytest -q",
+     "rc": 0,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+    },
+    {
+     "id": "evidence not ignored (D-003)",
+     "cmd": "git ls-files --others --exclude-standard evidence | wc -l",
+     "rc": 0,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+    },
+    {
+     "id": "npm ci + build",
+     "cmd": "npm --prefix web ci && npm --prefix web run build",
+     "rc": 0,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
+    },
+    {
+     "id": "doctor HEALTHY",
+     "cmd": "bash scripts/doctor.sh",
+     "rc": 0,
+     "evidence": "evidence/monthly/M0-P01/run-02/commands.md"
     }
    ],
    "acs": [],
@@ -1293,11 +1332,15 @@
     "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/"
    ],
    "blockers": [],
-   "note": "补丁接续登记与月报契约合入，Lane T 自执行；12 节点 ADD/UPDATE，0 CONFLICT；CR-001 + ADR-004。",
+   "note": "补丁接续登记与月报契约合入，Lane T 自执行；12 节点 ADD/UPDATE，0 CONFLICT；CR-001 + ADR-004。收尾含 D-002（前端基线机读校验 + 6 例单测）与 D-003（证据可入库），提交 29be319。",
    "depth": 1,
    "height": 1,
    "slack": 13,
-   "critical": false
+   "critical": false,
+   "followup_commits": [
+    "f842ec2",
+    "29be319"
+   ]
   },
   "M1-P01": {
    "status": "TODO",
@@ -1759,7 +1802,15 @@
    "severity": "MINOR",
    "status": "FIXED_PENDING_Q",
    "file": "orchestrator/defects/D-002.md",
-   "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI"
+   "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI，并补 tests/unit/test_frontend_baseline.py 6 例（手册 13.3 第 4 条）"
+  },
+  {
+   "id": "D-003",
+   "task": "M0-P01",
+   "severity": "MINOR",
+   "status": "FIXED_PENDING_Q",
+   "file": "orchestrator/defects/D-003.md",
+   "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库"
   }
  ],
  "change_requests": [
@@ -1801,15 +1852,17 @@
   }
  ],
  "resume": {
-  "recovered_at": "2026-11-12T12:28:41+08:00",
-  "incident": "host reboot by Windows Update; all subagent instances destroyed; zero data loss confirmed",
+  "recovered_at": "2026-11-12T21:19:36+08:00",
+  "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
   "wave": 0,
-  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED",
+  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + AWAIT_OWNER_GO",
   "next_actions": [
-   "1 派 Q（flash 采集 + max 判定）独立交叉验证 M0-01 九项门禁与 M0-P01 契约门禁",
-   "2 依判定置 M0-01 为 PASS/PASS_WITH_TODO；M0-P01 已 DONE，由 Q 复核 CR-001/ADR-004 与 CHANGES.json 一致性",
-   "3 并行派发 wave1：M0-02（max，服务入口+28 表首迁）与 M0-03（max，前端壳+令牌+UI-01，类型客户端按 openapi 1.0.1 生成）",
-   "4 wave2 出口后冻结公共件；wave4 起 M1-P01 并行插入，wave5 起 L3[M3-P01] 并行插入"
+   "0 【闸门】owner_gate=AWAIT_OWNER_GO：在项目负责人明确下达「开工」之前，不得 spawn 任何开发子智能体（手册 15.1）",
+   "1 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事（M0-04 加验收项 / M4-P01 与 M5-P01 设计前置 / 关键任务 L 循环 2 轮上限 / M0 阶段 Q 复核合并为一次）",
+   "2 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001、D-002、D-003；证据已备于 evidence/monthly/M0-P01/run-01|run-02 与 evidence/M0/M0-01/",
+   "3 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001/D-002/D-003 由 FIXED_PENDING_Q 置 CLOSED",
+   "4 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01，类型客户端按 openapi 1.0.1 生成）；两卡均须先出「子任务档位表」（手册 15.5），无拆解表不得 spawn",
+   "5 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），否则 wave5 的 L3 lane 会被推成关键路径"
   ],
   "in_flight_agents": [],
   "dispatch_requirements": [
@@ -1820,9 +1873,12 @@
   ],
   "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
   "persisted": {
-   "working_tree_clean": false,
-   "head": "baa7389",
-   "note": "M0-P01 主体提交已入库；本 state 更新为其后的治理提交"
+   "working_tree_clean": true,
+   "head": "29be319",
+   "head_full": "29be319316178f75a5323af395c1dbd405ae5ef8",
+   "remote_head": "29be319",
+   "remote_ref": "origin/m0-framework",
+   "note": "HEAD == origin/m0-framework == 29be319；git status --porcelain 为空。本次提交含 D-002/D-003 收口、6 个单测、6 个证据文件、手册 v1.2 第 15 节、BLOCKERS NOTE-04/05 与补丁后评审文档。"
   },
   "context": "驱动模型已于 2026-11-12T19:21:36+08:00 切换（新实例接管）；接管时已从磁盘重新核验全部门禁，未采信上一任会话自述。任何新实例接管必须重跑本节 self_check_gates_rc0 后才能派单。",
   "patch": {
@@ -1835,7 +1891,147 @@
   },
   "critical_path_len": 14,
   "slack_note": "slack=0 为关键任务（无浮动）；slack>0 表示可容忍的波次延误。月报任务中 M4-P01/M5-P01 为关键，M1-P01/M3-P01/M3-P02 有浮动，可用来吸收 max 档返工。",
-  "m0_p01_commit": "baa7389"
+  "m0_p01_commit": "baa7389",
+  "recovery_history": [
+   {
+    "recovered_at": "2026-11-12T12:28:41+08:00",
+    "incident": "host reboot by Windows Update; all subagent instances destroyed; zero data loss confirmed",
+    "head_at_recovery": "baa7389"
+   }
+  ],
+  "owner_gate": {
+   "status": "AWAIT_OWNER_GO",
+   "granted_at": null,
+   "granted_by": null,
+   "required_human_phrase": "开工",
+   "rule": "手册 15.1：非 GO 时只允许只读自检、门禁复跑、治理与证据修复、计划与评审文档编写；禁止 spawn 任何开发子智能体，禁止执行手册第 12 节第 4、5 步。编排器不得自行推断放行，也不得把「继续」「好的」当作放行。",
+   "conflict_rule": "闸门与 next_actions 冲突时以闸门为准。"
+  },
+  "d002_d003_commit": "29be319",
+  "m0_p01_commits": [
+   "baa7389",
+   "f842ec2",
+   "29be319"
+  ],
+  "self_check_gates_rc0": {
+   "checked_at": "2026-11-12T21:19:36+08:00",
+   "evidence": "evidence/monthly/M0-P01/run-02/commands.md",
+   "note": "rc 由脚本实跑回填，非人工誊写；G4 篡改负例的 expected 为 1，Q 复核时不得据此判红。",
+   "gates": {
+    "G1_baseline_v1.0": {
+     "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
+     "rc": 0,
+     "expected": 0
+    },
+    "G2_baseline_v1.0.1_patch": {
+     "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
+     "rc": 0,
+     "expected": 0
+    },
+    "G3_frontend_baseline": {
+     "cmd": "python3 scripts/check_frontend_baseline.py",
+     "rc": 0,
+     "expected": 0
+    },
+    "G4_frontend_tamper_negative": {
+     "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
+     "rc": 1,
+     "expected": 1
+    },
+    "G4b_frontend_after_restore": {
+     "cmd": "cp /tmp/tokens.bak <path> && python3 scripts/check_frontend_baseline.py",
+     "rc": 0,
+     "expected": 0
+    },
+    "G5_contract_gate": {
+     "cmd": "python3 scripts/check_contracts.py check",
+     "rc": 0,
+     "expected": 0
+    },
+    "G6_contract_meta_validate": {
+     "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
+     "rc": 0,
+     "expected": 0
+    },
+    "G7_ruff_check": {
+     "cmd": "uv run --no-sync ruff check .",
+     "rc": 0,
+     "expected": 0
+    },
+    "G8_ruff_format": {
+     "cmd": "uv run --no-sync ruff format --check .",
+     "rc": 0,
+     "expected": 0
+    },
+    "G9_mypy": {
+     "cmd": "uv run --no-sync mypy",
+     "rc": 0,
+     "expected": 0
+    },
+    "G10_pytest": {
+     "cmd": "uv run --no-sync pytest -q",
+     "rc": 0,
+     "expected": 0
+    },
+    "G11_prototype_verify": {
+     "cmd": "bash scripts/verify.sh",
+     "rc": 0,
+     "expected": 0
+    },
+    "G12_package_verify": {
+     "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
+     "rc": 0,
+     "expected": 0
+    },
+    "G13_npm_ci_and_build": {
+     "cmd": "npm --prefix web ci && npm --prefix web run build",
+     "rc": 0,
+     "expected": 0
+    },
+    "G14_doctor": {
+     "cmd": "bash scripts/doctor.sh",
+     "rc": 0,
+     "expected": 0
+    }
+   },
+   "spec_untouched": {
+    "cmd": "git status --porcelain spec/",
+    "result": "empty",
+    "rc": 0,
+    "expected": 0
+   },
+   "evidence_ignored_count": {
+    "cmd": "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'",
+    "result": 0,
+    "expected": 0
+   },
+   "counts": {
+    "pytest_passed": 14,
+    "mypy_source_files": 6,
+    "ruff_formatted_files": 33,
+    "contract_registered_nodes": 12,
+    "frontend_baseline_rows": 8,
+    "baseline_files": 45,
+    "doctor": "PASS=15 WARN=2 FAIL=0 HEALTHY"
+   }
+  },
+  "post_patch_review": {
+   "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
+   "status": "PENDING_OWNER_CONFIRMATION",
+   "decisions_needed": [
+    "M0-04 任务卡增加「指标注册表可外部注册」验收项（建议批准）",
+    "M4-P01 max 设计子任务前置到 wave7（触发条件：M3-P01 已 PASS）",
+    "M5-P01 flash 采集脚本与走查清单前置到 wave8",
+    "critical=true 任务的 L 循环上限 3 轮 → 2 轮 + 降级交付选项",
+    "M0 阶段 5 项复核合并为一次 Q（flash 采集 + max 判定）"
+   ],
+   "applied_now": [
+    "手册 v1.2 第 15 节（15.1-15.6）",
+    "state.json 成本账本字段 budget.subtask_log 与 accounting_rule",
+    ".gitignore 证据否定规则（D-003）",
+    "check_frontend_baseline.py 的 6 条单测（手册 13.3 第 4 条）"
+   ]
+  }
  },
  "acceptance": {
   "baseline_total": 35,
