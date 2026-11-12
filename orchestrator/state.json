@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-12T23:51:06+08:00",
+  "updated_at": "2026-11-13T00:42:29+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1889,6 +1889,67 @@
       "file": "orchestrator/defects/D-005.md",
       "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
       "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。"
+    },
+    {
+      "id": "D-006",
+      "title": "分母口径未定义：ruff format 计数含 Markdown，历史值 35 不可复现",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "lane": "T",
+      "found_at": "2026-11-12T22:48:36+08:00",
+      "found_by": "编排器（第 3 次接管全表重跑）",
+      "ref": "orchestrator/defects/D-006.md",
+      "fix_commit": "ce2d9fa",
+      "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
+      "regression_guard": "counts.ruff_formatted_files_composition（含 cmd/构成/复现命令）+ counts.ruff_lint_scope_files"
+    },
+    {
+      "id": "D-007",
+      "title": "doctor.sh 字体检查在 pipefail 下因 SIGPIPE 恒判假 WARN（非确定性门禁）",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "lane": "T",
+      "found_at": "2026-11-12T23:20:00+08:00",
+      "found_by": "Q lane 取证员（F-A4-1）+ 编排器独立复现（30 次：rc0=2 / rc141=28）",
+      "ref": "orchestrator/defects/D-007.md",
+      "fix_commit": "de550a5",
+      "evidence": "evidence/monthly/M0-P01/run-04/commands.md 第 8 节",
+      "regression_guard": "tests/unit/test_doctor_determinism.py（4 条：反模式静态扫描+分母断言、grep -ci 定点钉住、doctor 3 次摘要逐字一致、Noto 20 次采样唯一）",
+      "verified_after_fix": "连跑 30 次 doctor 假 WARN 0/30（修复前 28/30）",
+      "impact_on_prior_records": "提交 8ce2bdc / 33bf5c5 中「doctor 实为 WARN=0」是侥幸绿，已在 run-04 第 8 节更正"
+    },
+    {
+      "id": "D-008",
+      "title": "M0-02 任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyproject.toml/uv.lock/evidence",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "lane": "S",
+      "found_at": "2026-11-13T00:27:40+08:00",
+      "found_by": "M0-02/S1 设计员（qwen3.8-max high），以 Q1/Q7/Q8 提出且未自行决定",
+      "ref": "orchestrator/defects/D-008.md",
+      "fix_commit": "ee51f3f",
+      "derived": [
+        "docs/decisions/ADR-005-problem-type-and-runtime-defaults.md",
+        "orchestrator/change-requests/CR-002.md",
+        "orchestrator/tasks/M0-03.md 加注"
+      ],
+      "regression_guard_pending": "scripts/check_task_cards.py 未落地；本轮由 Q 判定档（Plato）全量核对 29 张卡的 AC 转述并断言 AC 分母=47 作为临时防护",
+      "hazard": "照错误任务卡执行会让 S3-S5 实现错的验收标准，且 gate 会判绿（错得自洽）"
+    },
+    {
+      "id": "D-009",
+      "title": "编排器用 isinstance(dict) 守卫写 state.json，而 defects/change_requests 实为 list，导致 D-006/D-007/D-008 与 CR-002 静默未入账",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "lane": "T",
+      "found_at": "2026-11-13T00:27:40+08:00",
+      "found_by": "编排器（执行 CR-002 入账时 TypeError 暴露）",
+      "ref": "orchestrator/defects/D-009.md",
+      "fix_commit": "本次提交",
+      "root_cause": "写入代码形如 if isinstance(st.get('defects'),dict): st['defects']['D-006']={...}；实际结构是 list[dict{id,...}]，守卫为假 -> 整段静默跳过，无异常、无日志、无失败",
+      "impact": "三个缺陷单与一个 CR 只存在于 .md 文件与提交信息里，state.json 账本查不到；任何按账本恢复的新实例都会漏掉它们（正是手册 15.3 禁止的悬空引用）",
+      "fix": "① 改用结构感知 upsert（按 id 匹配，存在则合并、不存在则追加）；② 写入后必须 re-read 并断言目标 id 确实在账本里；③ 立 D-009 留痕；④ 手册 15.3 增补『账本写入必须回读断言，禁止 isinstance 静默跳过』",
+      "regression_guard": "本脚本写入后回读断言 D-006/D-007/D-008/D-009/CR-002 全部在账本内；并新增 tests/unit/test_state_ledger.py 钉住『defects 与 change_requests 必须是 list[dict] 且每条含 id』"
     }
   ],
   "change_requests": [
@@ -1899,6 +1960,46 @@
       "adr": "ADR-004",
       "nodes": 12,
       "file": "orchestrator/change-requests/CR-001.md"
+    },
+    {
+      "id": "CR-002",
+      "task": "M0-02",
+      "status": "APPROVED_OPTION_B_PENDING_MERGE",
+      "adr": "ADR-006（待新建）",
+      "nodes": 1,
+      "file": "orchestrator/change-requests/CR-002.md",
+      "title": "listWorkspaces.status 在契约内无对应字段",
+      "severity": "MINOR",
+      "raised_at": "2026-11-12T23:55:00+08:00",
+      "owner_ruling": {
+        "decision": "选项 B：从 listWorkspaces 移除 status 查询参数",
+        "ruled_by": "项目负责人",
+        "ruled_at": "2026-11-13T00:27:40+08:00"
+      },
+      "new_facts_before_merge": {
+        "status_param_origin": "只读基线 v1.0.0 即含该参数（与活契约 schema 逐字相同），非 v1.0.1 月报增量引入",
+        "baseline": {
+          "info_version": "1.0.0",
+          "bytes": 430624,
+          "sha16": "3a5c6e3b8a0539cd"
+        },
+        "live_before": {
+          "info_version": "1.0.1",
+          "bytes": 443552,
+          "sha16": "01bd28f0772f506e"
+        },
+        "changes_json_entries_touching_listWorkspaces": 0,
+        "contract_gate_semantics": "基线↔活契约每处结构差异必须有登记项（含 cr 与 adr），且 CR/ADR 文件必须真实存在，并反查僵尸条目",
+        "traceability_impact": "contracts/traceability.json 不引用 listWorkspaces"
+      },
+      "interim_ruling": "WORKSPACE_STATUS_WHITELIST=frozenset()，非空 status -> 422 INVALID_SCOPE（契约合入后该过渡分支取消）",
+      "version_ruling": "info.version 保持 1.0.1（不 bump）；理由与日后 bump 的连带改动清单见 CR-002.md 6.2",
+      "execution_hold": {
+        "hold": true,
+        "until": "Round 2 的 Plato 与 Ohm 返回后原子执行",
+        "reason": "现在改契约会让 Ohm 的 PRE-3 切片 sha 自检假红、让 Plato 的分母核对（ruff=51）与 G 项判定失去基准",
+        "steps_ref": "orchestrator/change-requests/CR-002.md 第 6.3 节（8 步，一次提交）"
+      }
     }
   ],
   "pending_owner": [
@@ -1996,7 +2097,9 @@
       "7 【下一步】并行派 M0-03/S1（max）前端壳与令牌体系设计，只写 orchestrator/handoff/M0-03-design.md（与 Q 判定档写路径不相交，且不动 web/，保证判定档复跑门禁时工作树稳定）",
       "8 【Round 2b，待判定档返回后】并行派 M0-02/S2（max，首迁 + 删 package=false + uv lock）与 M0-03/S2（max，工程骨架）；二者写路径不相交（migrations/src/pyproject vs web/）",
       "9 【Round 3】M0-02 的 S3/S4/S5 与 M0-03 的对应 flash 子任务，只能在 S1 白名单内工作",
-      "10 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），并确认 ADR-005 的 Problem code 注册表已冻结留痕"
+      "10 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），并确认 ADR-005 的 Problem code 注册表已冻结留痕",
+      "11 【已裁定·待执行】CR-002 选项 B：HOLD 到 Plato/Ohm 返回后按 CR-002.md 6.3 节 8 步原子执行（新建 ADR-006、改 openapi.json、登记 CHANGES.json 使登记项 12->13、契约门禁 rc=0、重切两份切片、更新 counts 与 M0-02 设计 Q4 行、一次提交）",
+      "12 【新增·D-009 派生】补 tests/unit/test_state_ledger.py 与手册 15.3 增补条款（账本写入必须回读断言，禁止 isinstance 静默跳过）"
     ],
     "in_flight_agents": [
       {
@@ -2175,7 +2278,7 @@
     "self_check_gates_rc0": {
       "checked_at": "2026-11-12T23:45:58+08:00",
       "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
-      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。",
+      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。",
       "gates": {
         "G1_baseline_v1.0": {
           "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
@@ -2239,28 +2342,32 @@
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "measured_at": "2026-11-13T00:42:29+08:00",
+          "last_summary": "All checks passed!"
         },
         "G8_ruff_format": {
           "cmd": "uv run --no-sync ruff format --check .",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "measured_at": "2026-11-13T00:42:29+08:00",
+          "last_summary": "53 files already formatted"
         },
         "G9_mypy": {
           "cmd": "uv run --no-sync mypy",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "measured_at": "2026-11-13T00:42:29+08:00",
+          "last_summary": "Success: no issues found in 8 source files"
         },
         "G10_pytest": {
           "cmd": "uv run --no-sync pytest -q",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 1,
-          "measured_at": "2026-11-12T22:48:36+08:00"
+          "measured_at": "2026-11-13T00:42:29+08:00",
+          "last_summary": "38 passed in 3.74s"
         },
         "G11_prototype_verify": {
           "cmd": "bash scripts/verify.sh",
@@ -2303,9 +2410,9 @@
         "expected": 0
       },
       "counts": {
-        "pytest_passed": 32,
-        "mypy_source_files": 7,
-        "ruff_formatted_files": 51,
+        "pytest_passed": 38,
+        "mypy_source_files": 8,
+        "ruff_formatted_files": 53,
         "contract_registered_nodes": 12,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -2314,28 +2421,47 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 51,
-          "in_scope_py": 7,
-          "in_scope_md": 44,
+          "total": 53,
+          "in_scope_py": 8,
+          "in_scope_md": 45,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "S1 设计 + ADR-005 + CR-002 + D-008 四个 .md 入库后重测",
+          "measured_after": "2026-11-13T00:42:29+08:00：D-009 修复（+1 md +1 py）与 ruff format 应用后重测",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 7）**，Q 复核以它为准",
-          "identity": "tracked_in_scope(51) + untracked_not_ignored_in_scope(0) == ruff_total(51) -> True",
+          "identity": "tracked_in_scope(53) + untracked_not_ignored_in_scope(0) == ruff_total(53) -> True",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "orchestrator/handoff/M0-02-design.md"
           ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）"
         },
-        "ruff_lint_scope_files": 7,
+        "ruff_lint_scope_files": 8,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-12T23:30:05+08:00",
-        "counts_refresh_reason": "D-007 修复（+4 单测、+1 py 源文件）与 Q 取证证据入库（+6 md）后重测"
-      }
+        "counts_refreshed_at": "2026-11-13T00:42:29+08:00",
+        "counts_refresh_reason": "D-009 收口：新增 orchestrator/defects/D-009.md 与 tests/unit/test_state_ledger.py，并对二者应用 ruff format（旧脚本 grep '^[0-9]+' 误抓 diff 行号导致 ValueError，改为解析 'N files already formatted'/'N files would be reformatted' 摘要行）后重测"
+      },
+      "denominator_history": [
+        {
+          "at": "2026-11-13T00:42:29+08:00",
+          "ruff_total": 53,
+          "in_scope_py": 8,
+          "in_scope_md": 45,
+          "pytest_passed": 38,
+          "mypy_source_files": 8,
+          "cause": "D-009 修复（+1 md +1 py）",
+          "commit": "本次提交（见 git log -1）",
+          "prev": {
+            "ruff_total": 51,
+            "in_scope_py": 7,
+            "pytest_passed": 32,
+            "mypy_source_files": 7
+          },
+          "note": "Q 判定档（Plato）若在此刻核对分母，应以本条为准；此前基线 ruff=51 / pytest=32 / mypy=7 / py=7"
+        }
+      ]
     },
     "post_patch_review": {
       "file": "docs/delivery/POST-PATCH-REVIEW-v1.0.1.md",
@@ -2413,7 +2539,13 @@
         "SRC-1",
         "Q-VERIFY-M0-01"
       ],
-      "fonts_noto_cjk": "APPROVED_BY_OWNER 并已完成：fonts-noto-cjk 1:20230817+repack1-3；fc-list :lang=zh 中 Noto 计数=30；doctor rc=0；BLK-02 已关闭"
+      "fonts_noto_cjk": "APPROVED_BY_OWNER 并已完成：fonts-noto-cjk 1:20230817+repack1-3；fc-list :lang=zh 中 Noto 计数=30；doctor rc=0；BLK-02 已关闭",
+      "CR-002": {
+        "decision": "选项 B（从契约移除 listWorkspaces.status）",
+        "ruled_at": "2026-11-13T00:27:40+08:00",
+        "ruled_by": "项目负责人",
+        "state": "已入账；契约编辑 HOLD 到 Round 2 返回后原子执行"
+      }
     },
     "pending_owner_cleared_at": "2026-11-12T22:48:36+08:00",
     "environment": {
