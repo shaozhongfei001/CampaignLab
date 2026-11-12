@@ -1,0 +1,137 @@
+== 分母断言 ==
+BASE  spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md 行数(AC-\d+)      = 35
+DELTA spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/CampaignLab-Review-Acceptance-Checklist.append.md 行数(AC-MR-) = 12
+权威 AC 总数 = 47   期望 = 47   -> OK
+两表 id 交集 = 空
+BASE id 连续性: AC-001..AC-035 缺号 = []
+DELTA id: AC-MR-01..AC-MR-12 缺号 = []
+
+== 任务卡清单（分母核对：D-008 声称 29 张）==
+orchestrator/tasks/*.md 实际文件数 = 4  -> ['M0-01.md', 'M0-02.md', 'M0-03.md', 'M0-P01.md']
+state.json tasks 键数 = 29
+有卡无 state: []
+state 无卡: ['M0-03b', 'M0-04', 'M1-01', 'M1-02', 'M1-03', 'M1-04', 'M1-P01', 'M2-01', 'M2-02', 'M2-03', 'M2-04', 'M3-01', 'M3-02', 'M3-03', 'M3-04', 'M3-P01', 'M3-P02', 'M4-01', 'M4-02', 'M4-03', 'M4-P01', 'M5-01', 'M5-02', 'M5-03', 'M5-P01']
+
+== 逐卡 AC 引用比对 ==
+
+### M0-01.md: 无 AC 引用
+
+### M0-02.md: 9 处 AC 引用（去重 id 3 个）
+
+  [M0-02.md:7] AC-001
+    卡内: slice: orchestrator/handoff/M0-02.slice.json（5 个 operationId 的完整请求/响应/状态码 + AC-001/034/035 原文行）
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=21 权威token=42 交集=3 覆盖率(交集/卡内)=0.14
+    卡内独有token(18): 02 034 035 5 handoff json m0 operationid orchestrator slice 原文 响应 完整 态码 整请 文行 的完 请求
+
+  [M0-02.md:12] AC-001
+    卡内: - AC-001：会话令牌仅首次可用，重复换取拒绝；工作区切换保留各自数据；worker 状态在 health 中可见
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=31 权威token=42 交集=20 覆盖率(交集/卡内)=0.65
+    卡内独有token(11): health 中可 仅首 取拒 可用 复换 态在 次可 牌仅 话令 首次
+
+  [M0-02.md:13] AC-034
+    卡内: - AC-034（**已按 spec 原文修正，见文末裁定 Q1**）：过期会话、错误 Host/Origin、跨工作区 ID、上传失败 → 按 401/403/404/413 或 422 返回；隔离、路径、日志与 ETag 证据可查（HTTP 负例）
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=41 权威token=34 交集=30 覆盖率(交集/卡内)=0.73
+    卡内独有token(11): q1 spec 修正 原文 已按 志与 文修 文末 末裁 裁定 见文
+
+  [M0-02.md:14] AC-035
+    卡内: - AC-035（**已按 spec 原文修正，见文末裁定 Q1**）：按 M0 锁版本、迁移、核对包与 API → verify_package.py、DDL 等价、OpenAPI 请求响应及前端生成类型通过；锁与运行环境清楚
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:43): AC-035 | 按 M0 锁版本、迁移、核对包和 API | `verify_package.py`、DDL 等价、OpenAPI 请求响应及前端生成类型通过。锁和运行环境清楚 | 命令、锁和报告
+    关键词重合: 卡内token=44 权威token=37 交集=31 覆盖率(交集/卡内)=0.70
+    卡内独有token(13): q1 spec 与运 修正 包与 原文 已按 文修 文末 末裁 裁定 见文 锁与
+
+  [M0-02.md:32] AC-001
+    卡内: | S1 契约抽取与设计：会话 / 工作区 / Problem / ETag / 幂等的接口签名与错误映射（切片已含 5 个 operationId 全文与 AC-001/034/035 原文行） | `qwen3.8-max` high | 55k | `orchestrator/handoff/M0-02-design.md`（≤120 行：接口签名、数据结构、边界清单、验证清单、文件级 TODO） |
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=59 权威token=42 交集=6 覆盖率(交集/卡内)=0.10
+    卡内独有token(53): 02 034 035 120 5 55k 8 design etag handoff high m0 max md operationid orchestrator problem qwen3 s1 todo 与设 与错 件级 全文 切片 原文 取与 口签 名与 契约 已含 幂等 抽取 据结 接口 文与 文件 文行 映射 清单 片已 界清 的接 等的 签名 约抽 结构 设计 证清 误映 边界 错误 验证
+
+  [M0-02.md:36] AC-001
+    卡内: | S5 AC-001、034、035 证据采集与回执（命令 + rc + HTTP 样本） | `qwen3.8-flash` | 12k | `evidence/M0/M0-02/{commands.md,ac.md,migration-diff.md,http/**}` |
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=26 权威token=42 交集=3 覆盖率(交集/卡内)=0.12
+    卡内独有token(23): 02 034 035 12k 8 commands diff evidence flash m0 md migration qwen3 rc s5 与回 命令 回执 据采 样本 证据 采集 集与
+
+  [M0-02.md:76] AC-034
+    卡内: - D-008（MAJOR）：任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyproject.toml/uv.lock/evidence —— 见 `orchestrator/defects/D-008.md`
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=20 权威token=34 交集=3 覆盖率(交集/卡内)=0.15
+    卡内独有token(17): 008 035 d defects evidence lock major md orchestrator pyproject scope_allow toml uv 任务 务卡 转述 述错
+
+  [M0-02.md:76] AC-035
+    卡内: - D-008（MAJOR）：任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyproject.toml/uv.lock/evidence —— 见 `orchestrator/defects/D-008.md`
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:43): AC-035 | 按 M0 锁版本、迁移、核对包和 API | `verify_package.py`、DDL 等价、OpenAPI 请求响应及前端生成类型通过。锁和运行环境清楚 | 命令、锁和报告
+    关键词重合: 卡内token=20 权威token=37 交集=2 覆盖率(交集/卡内)=0.10
+    卡内独有token(18): 008 034 d defects evidence lock major md orchestrator pyproject scope_allow toml uv 任务 务卡 转述 述错 错误
+
+  [M0-02.md:79] AC-034
+    卡内: - M0-03 卡加注：「深链与刷新回到合法入口」属 UI-01 页面侧，归 M0-03，不是 M0-02 的 AC-034
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=22 权威token=34 交集=2 覆盖率(交集/卡内)=0.09
+    卡内独有token(20): 01 02 03 m0 ui 不是 与刷 入口 到合 刷新 加注 卡加 合法 回到 新回 法入 深链 链与 面侧 页面
+
+### M0-03.md: 6 处 AC 引用（去重 id 2 个）
+
+  [M0-03.md:11] AC-001
+    卡内: - AC-001 页面侧：入口换取会话、工作区列表与新建、两条首跑路线；无工作区时突出创建
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=27 权威token=42 交集=7 覆盖率(交集/卡内)=0.26
+    卡内独有token(20): 与新 两条 入口 出创 列表 创建 区列 区时 取会 口换 无工 时突 条首 突出 表与 跑路 路线 面侧 页面 首跑
+
+  [M0-03.md:12] AC-034
+    卡内: - AC-034：深链、刷新、返回、切工作区、404、过期会话均回到合法入口；切工作区清理临时查询、轮询与失效选择
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=31 权威token=34 交集=9 覆盖率(交集/卡内)=0.29
+    卡内独有token(22): 与失 临时 入口 切工 到合 刷新 区清 合法 回到 均回 失效 效选 时查 查询 法入 深链 清理 理临 话均 询与 轮询 选择
+
+  [M0-03.md:38] AC-001
+    卡内: | S8 vitest 单测脚手架与 AC-001 / AC-034 页面侧断言 | `qwen3.8-flash` | 7k | `web/tests/**` |
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:9): AC-001 | 启动本机模式，换取一次性会话，新建并进入工作区 | 正常会话进入。重复令牌拒绝。工作区切换保留各自数据。worker 状态可见 | HTTP 与 Playwright
+    关键词重合: 卡内token=20 权威token=42 交集=2 覆盖率(交集/卡内)=0.10
+    卡内独有token(18): 034 7k 8 flash qwen3 s8 tests vitest web 侧断 单测 手架 断言 架与 测脚 脚手 面侧 页面
+
+  [M0-03.md:38] AC-034
+    卡内: | S8 vitest 单测脚手架与 AC-001 / AC-034 页面侧断言 | `qwen3.8-flash` | 7k | `web/tests/**` |
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=20 权威token=34 交集=2 覆盖率(交集/卡内)=0.10
+    卡内独有token(18): 001 7k 8 flash qwen3 s8 tests vitest web 侧断 单测 手架 断言 架与 测脚 脚手 面侧 页面
+
+  [M0-03.md:71] AC-034
+    卡内: 此前被误挂进 M0-02 任务卡的 AC-034 gates（spec `qa/ACCEPTANCE.md` 第 42 行的 AC-034 实为
+    权威(spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:42): AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例
+    关键词重合: 卡内token=20 权威token=34 交集=2 覆盖率(交集/卡内)=0.10
+    卡内独有token(18): 02 42 acceptance gates m0 md qa spec 任务 前被 务卡 卡的 实为 挂进 此前 行的 被误 误挂
+
+### M0-P01.md: 无 AC 引用
+
+== 合计 AC 引用处数（去重按 行×id）= 14 ==
+
+== state.json 内 AC 引用扫描（覆盖无卡的 25 个任务）==
+  M0-02: ['AC-001', 'AC-034', 'AC-035']
+  M0-03: ['AC-001', 'AC-034']
+  M0-04: ['AC-029', 'AC-031']
+  M1-01: ['AC-005', 'AC-006']
+  M1-02: ['AC-007', 'AC-008', 'AC-020']
+  M1-03: ['AC-009', 'AC-010', 'AC-011']
+  M1-04: ['AC-005', 'AC-011', 'AC-020']
+  M2-01: ['AC-002', 'AC-003', 'AC-004']
+  M2-02: ['AC-012', 'AC-013', 'AC-014', 'AC-015']
+  M2-03: ['AC-016', 'AC-017']
+  M2-04: ['AC-002', 'AC-004', 'AC-012', 'AC-017']
+  M3-01: ['AC-018', 'AC-019', 'AC-020', 'AC-033']
+  M3-02: ['AC-021', 'AC-022', 'AC-024']
+  M3-03: ['AC-023']
+  M3-04: ['AC-018', 'AC-024', 'AC-033']
+  M4-01: ['AC-025', 'AC-026']
+  M4-02: ['AC-027', 'AC-028', 'AC-030']
+  M4-03: ['AC-025', 'AC-028', 'AC-030']
+  M5-01: ['AC-029', 'AC-031', 'AC-032', 'AC-035']
+  M5-02: ['AC-MR-01']
+  M1-P01: ['AC-005', 'AC-006', 'AC-007', 'AC-MR-01', 'AC-MR-02', 'AC-MR-10']
+  M3-P01: ['AC-008', 'AC-018', 'AC-019', 'AC-020', 'AC-021', 'AC-022', 'AC-MR-03', 'AC-MR-04', 'AC-MR-05', 'AC-MR-06', 'AC-MR-07', 'AC-MR-08']
+  M3-P02: ['AC-MR-03', 'AC-MR-04', 'AC-MR-05', 'AC-MR-06', 'AC-MR-07', 'AC-MR-08']
+  M4-P01: ['AC-025', 'AC-026', 'AC-027', 'AC-028', 'AC-029', 'AC-030', 'AC-MR-09', 'AC-MR-10', 'AC-MR-11']
+  M5-P01: ['AC-MR-01', 'AC-MR-02', 'AC-MR-03', 'AC-MR-04', 'AC-MR-05', 'AC-MR-06', 'AC-MR-07', 'AC-MR-08', 'AC-MR-09', 'AC-MR-10', 'AC-MR-11', 'AC-MR-12']
+  state.json 中无 AC 引用的任务数 = 4

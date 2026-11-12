@@ -1,0 +1,63 @@
+# F2 · M0-03 任务卡 AC-034 误标复测（HEAD=f12dcf8 ts=2026-11-13T01:40:38+08:00）
+
+=== [1] spec 权威：AC-034 原文 ===
+42:| AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例 |
+(patch 内无 AC-034 行)
+
+=== [2] spec 权威：哪一条才是「深链/刷新/返回/切工作区/404/过期会话回到合法入口」===
+(未命中 深链)
+--- 放宽：合法入口 ---
+spec/CampaignLab-SDD-v1.0/framework/FRONTEND.md:12:- 深链接带工作区和对象标识。直接打开、刷新、返回、切工作区、404 和过期会话都要能回到合法入口。
+
+=== [3] M0-03.md 全部 AC 引用（f12dcf8 时点）===
+11:  - AC-001 页面侧：入口换取会话、工作区列表与新建、两条首跑路线；无工作区时突出创建
+12:  - AC-034：深链、刷新、返回、切工作区、404、过期会话均回到合法入口；切工作区清理临时查询、轮询与失效选择
+38:| S8 vitest 单测脚手架与 AC-001 / AC-034 页面侧断言 | `qwen3.8-flash` | 7k | `web/tests/**` |
+77:此前被误挂进 M0-02 任务卡的 AC-034 gates（spec `qa/ACCEPTANCE.md` 第 42 行的 AC-034 实为
+
+=== [4] M0-03.md 第 70-90 行（卡内自述 spec 第 42 行口径）===
+  收到项目负责人裁定后，令牌回改属手册 6.3 的**强制 flash** 机械替换，返工成本低。
+
+---
+
+## 加注（编排器 · 2026-11-12T23:41:32+08:00 · 依 M0-02/S1 裁定 Q1）
+
+「深链与刷新可回到合法入口」属 **UI-01 页面侧**职责，归本任务（M0-03），
+此前被误挂进 M0-02 任务卡的 AC-034 gates（spec `qa/ACCEPTANCE.md` 第 42 行的 AC-034 实为
+「过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 → 401/403/404/413 或 422」）。
+本任务须覆盖：深链直达与浏览器刷新后回到合法入口、非法/越权 ID 的前端表现与服务端 404/403 一致（不可见即不可见）。
+详见 `orchestrator/defects/D-008.md` 与 `orchestrator/tasks/M0-02.md` 文末裁定记录。
+
+
+---
+
+## 裁定记录（编排器 · 2026-11-13T01:29:09+08:00 · 针对 M0-03/S1+S2 设计文档 §8 的 9 条未决问题）
+
+裁定原则：**活契约与 spec 基线优先；不发明未规定的语义；契约缺口走 CR；降范围不降质量；
+依赖新增必须由编排器声明并留理由。** 项目负责人已授权本次长程无人值守「裁定用默认值」，
+故以下裁定即刻生效、全部留痕，Q 判定档可复核推翻。
+
+
+=== [5] M0-02.md 对照（D-008 已修）===
+7:  slice: orchestrator/handoff/M0-02.slice.json（5 个 operationId 的完整请求/响应/状态码 + AC-001/034/035 原文行）
+12:  - AC-001：会话令牌仅首次可用，重复换取拒绝；工作区切换保留各自数据；worker 状态在 health 中可见
+13:  - AC-034（**已按 spec 原文修正，见文末裁定 Q1**）：过期会话、错误 Host/Origin、跨工作区 ID、上传失败 → 按 401/403/404/413 或 422 返回；隔离、路径、日志与 ETag 证据可查（HTTP 负例）
+14:  - AC-035（**已按 spec 原文修正，见文末裁定 Q1**）：按 M0 锁版本、迁移、核对包与 API → verify_package.py、DDL 等价、OpenAPI 请求响应及前端生成类型通过；锁与运行环境清楚
+32:| S1 契约抽取与设计：会话 / 工作区 / Problem / ETag / 幂等的接口签名与错误映射（切片已含 5 个 operationId 全文与 AC-001/034/035 原文行） | `qwen3.8-max` high | 55k | `orchestrator/handoff/M0-02-design.md`（≤120 行：接口签名、数据结构、边界清单、验证清单、文件级 TODO） |
+36:| S5 AC-001、034、035 证据采集与回执（命令 + rc + HTTP 样本） | `qwen3.8-flash` | 12k | `evidence/M0/M0-02/{commands.md,ac.md,migration-diff.md,http/**}` |
+76:- D-008（MAJOR）：任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyproject.toml/uv.lock/evidence —— 见 `orchestrator/defects/D-008.md`
+79:- M0-03 卡加注：「深链与刷新回到合法入口」属 UI-01 页面侧，归 M0-03，不是 M0-02 的 AC-034
+
+=== [6] M0-02-design.md / M0-03-design.md 中的 AC-034/035 引用 ===
+orchestrator/handoff/M0-02-design.md:26:- 会话令牌（**仅进程内存**；28 表里没有 sessions 表，落库即违背 AC-035）：`SessionTokenStore = RLock + dict[str, _Grant]`，`_Grant(identity: AppIdentity, issued_at: datetime, expires_at: datetime)`；`mint(identity: AppIdentity, now: datetime) -> str` 用 `secrets.token_urlsafe(32)`（43 字符，落在 16–180），`expires_at = now + timedelta(seconds=TOKEN_TTL_SECONDS)`，`TOKEN_TTL_SECONDS: Final = 60`（OPERATIONS.md）；`consume(token: str, now: datetime) -> AppIdentity | None` 在锁内 `pop`（保证一次使用），`now >= expires_at` 返回 `None`。
+orchestrator/handoff/M0-02-design.md:50:- **AC-034**（切片原文：过期会话、错误 Host/Origin、跨工作区 ID、上传失败 → 401/403/404/413 或 422；隔离、路径、日志和 ETag 证据可查）· 过期／缺失会话 → 401 `SESSION_EXPIRED`（两态同码同 detail）。
+orchestrator/handoff/M0-02-design.md:55:- **AC-035**（切片原文：锁版本、迁移、核对包与 API；任务卡另述会话过期、进程重启后会话失效）· 会话过期：`expires_at = created_at + session_ttl_seconds`（默认 3600，Q6），`SessionStore.get()` 内过期即删并返回 `None` → 401。
+orchestrator/handoff/M0-02-design.md:69:| V6 | AC-034 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api -k ac034` | 0 |
+orchestrator/handoff/M0-02-design.md:70:| V7 | AC-035 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api tests/integration/bootstrap -k ac035` | 0 |
+orchestrator/handoff/M0-02-design.md:100:| Q1 | **AC-034/AC-035 语义冲突**：任务卡 gates 把 AC-034 写成「深链与刷新回到合法入口」、AC-035 写成「会话过期、进程重启后会话失效」；但切片与 `spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md` 第 42/43 行原文里 AC-034＝「过期会话、错误 Host/Origin、跨工作区 ID 和上传失败」、AC-035＝「锁版本、迁移、核对包和 API」。「深链/刷新」属 UI-01 页面侧（M0-03），「会话过期/重启」在原文里归 AC-001＋AC-034。 | gates 判定口径、S5 `ac.md` 结论 | §4 同时覆盖两种读法（服务端侧：未匹配路由返回 Problem 形 404 ＋ 会话过期/重启 401），以切片原文为主、任务卡描述为附加约束 |
+orchestrator/handoff/M0-02-design.md:105:| Q6 | 三处运行参数契约未规定：会话 TTL、JSON 正文上限、worker 心跳窗口（OPERATIONS.md 只给了文件 64 MiB／8 MiB 与令牌 60s）。 | AC-035 可测性、413 触发点、`Health.worker` 灵敏度 | 取 `session_ttl_seconds=3600`、`MAX_JSON_BODY_BYTES=1_048_576`、`WORKER_HEARTBEAT_TTL_SECONDS=15`，全部经 `AppConfig` 可注入（测试用小值） |
+orchestrator/handoff/M0-03-design.md:5:**PRE-3 门禁自证（实算，不采信派单文本）**：`contracts/openapi.json` bytes=443552、sha256=`01bd28f0772f506e15fb70f07a37479ab9c33c4a3c9a39651445e6fa435cf583`、sha16=`01bd28f0772f506e`、`info.version=1.0.1`；`M0-03.slice.json` 的 `spec_version=1.0.1`、`source.openapi.sha16=01bd28f0772f506e`、`bytes=443552` → 三项逐字一致，**PASS**。切片 5 op = exchangeSession / getSession / getHealth / listWorkspaces / createWorkspace；pages = UI-01（route `/`，FR-01，AC-001 + AC-034）。
+orchestrator/handoff/M0-03-design.md:69:- **status → 前端行为（UI-01 范围）**：401（`SESSION_EXPIRED`/无会话）清本地会话与 store → 跳 `/`，原深链存 `?redirect=`（AC-034）；403 对象级 → 与 404 **同一呈现**（COMMON.md「越权对象按不可见处理」＝不可见即不可见），仅证据里区分 status；403 会话/Host/Origin 级（exchangeSession/getSession）→ 回 `/` 并提示「重开本机入口」；404 → 404 页 + 当前工作区返回入口；400 `INVALID_SCOPE` / 422 → AlertBanner + `issues[]` 定位字段且**保留输入**；409 `IDEMPOTENCY_CONFLICT` → ConfirmDialog「已受理，勿重复提交」，重试沿原 `Idempotency-Key`；412 `REVISION_CONFLICT` → 保留本地输入 + 显示新旧 `revision` + 「重新获取/复跑」入口；413 → JSON 正文上限 **1 MiB**（ADR-005 §2.3），`createWorkspace` 提交前用 `new TextEncoder().encode(JSON.stringify(body)).byteLength` 预检，超限即字段级提示且**不发请求**（文件上传的 8/64 MiB 是另一对象，不得混用）；428 `PRECONDITION_REQUIRED` → 缺 `If-Match`，属前端缺陷：dev 断言 + 通用失败态；429 → 指数退避（首次 1s，上限 3 次）后仍渲染服务端 `title`；500 → 通用失败 + `request_id`。
+orchestrator/handoff/M0-03-design.md:84:| S8 | `web/tests/unit/**` | `workspace-entry.spec.ts`（AC-001）、`deep-link.spec.ts`（AC-034）、`tokens.spec.ts`（S3 守卫） | 需 DOM 的用例依赖 Q1 裁定；未裁定前只写 node 环境可跑的纯函数断言 |
+orchestrator/handoff/M0-03-design.md:92:| Q1 | **DOM 测试环境缺失**：`web/package.json` 未声明 `jsdom`（registry 实测 latest 31.0.0）或 `happy-dom`（21.0.4），也未声明 `@vue/test-utils`（2.5.1）；vitest 只能 `environment:"node"`。而 token-mapping §4.4「对比度断言进 Vitest」与 S8「AC-001/AC-034 页面侧断言」都需要 DOM/computed style。 | S3 守卫、S8 全部页面侧断言 | 请求批准新增 devDependencies：`jsdom@^31.0.0`（或更轻的 `happy-dom@^21.0.4`）+ `@vue/test-utils@^2.5.1`。未裁定前 vitest 固定 `node` 环境，用例不得触碰 `document`/`window` |
+ts_end=2026-11-13T01:40:38+08:00

@@ -1,0 +1,156 @@
+# E1 CR-001 / ADR-004 / contracts/CHANGES.json 三方措辞级核对 ts=2026-11-13T00:14:29+08:00 HEAD=6d9f1b2
+
+=== [E-1] CR-001 全文 ===
+     1	# CR-001 合入 v1.0.1 全行月报增量契约
+     2	
+     3	- 提出者：Lane T（编排器），依据项目负责人 2026-11-12 提供的补丁包
+     4	- 状态：ACCEPTED（裁定人＝项目负责人，裁定载体＝补丁包本身）
+     5	- 关联：ADR-004、手册第 7 节
+     6	- 影响任务：M0-P01（本次执行）、M1-P01、M3-P01、M3-P02、M4-P01、M5-P01
+     7	
+     8	## 动机
+     9	项目负责人交付纯增量补丁 `CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta`，要求保留 v1.0 基线、
+    10	在现有工作树接续，并把「全行月报」的分析口径、页面、合成样例与契约节点合入。架构与验收原文仍从 v1.0 读取。
+    11	
+    12	## 来源与完整性（全部实测）
+    13	| 来源 | SHA256 | 结论 |
+    14	|---|---|---|
+    15	| 原 v1.0 ZIP `CampaignLab-SDD-Handoff-v1.0.zip` | `c8ac004c50f53ea08416807bd43a4b585784b31892513082e4aa635952850d81` | 与补丁工具内置 BASE_SHA 一致 |
+    16	| v1.0 解压根清单 `SHA256SUMS` | `3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91` | 与内置 BASE_MANIFEST_SHA 一致 |
+    17	| 补丁 ZIP | `13b1be8cfa11c8b457f3d66eb3d9431e8238c15b5b0985b15d79dc3a1856c371` | 与本机解压目录 22/22 文件哈希一致 |
+    18	| 补丁清单 `DELTA-SHA256SUMS` | 21 项 | `sha256sum -c` 全 OK；工具自验 `PASS 补丁摘要 21 项` |
+    19	
+    20	## 影响面（12 个节点）
+    21	| 文件 | 指针 | 类型 | 工具状态 |
+    22	|---|---|---|---|
+    23	| openapi.json | /info/version | changed | UPDATE 1.0.0 → 1.0.1 |
+    24	| openapi.json | /components/schemas/ReviewCreate/properties/profile | added | ADD（可选） |
+    25	| openapi.json | /components/schemas/Review/properties/monthly_review | added | ADD（可选） |
+    26	| openapi.json | /components/schemas/MonthlyCapacity | added | ADD |
+    27	| openapi.json | /components/schemas/MonthlyComparison | added | ADD |
+    28	| openapi.json | /components/schemas/MonthlyOriginOverlap | added | ADD |
+    29	| openapi.json | /components/schemas/MonthlyParticipation | added | ADD |
+    30	| openapi.json | /components/schemas/MonthlyProduction | added | ADD |
+    31	| openapi.json | /components/schemas/MonthlyReview | added | ADD |
+    32	| openapi.json | /components/schemas/MonthlyTrend | added | ADD |
+    33	| source-json.schema.json | /$defs/SourceMetadata/properties/monthly_review | added | ADD（可选） |
+    34	| source-metadata.schema.json | /properties/monthly_review | added | ADD（可选） |
+    35	
+    36	## 兼容性判定（有据）
+    37	- 三个新增属性**均未进入任何 `required` 数组**：实测 `ReviewCreate.required=['scope']`；
+    38	  `Review.required` 17 项不含 `monthly_review`；两份 SourceMetadata 的 `required` 9 项不含 `monthly_review`。
+    39	- 未修改任何既有端点的 path/method，未修改既有 schema 的既有字段。
+    40	- `info.version` 属条件更新：仅当当前值为 `1.0.0` 时改为 `1.0.1`，实测命中（若已改过则工具会输出 KEEP）。
+    41	- 结论：**向后兼容**。旧请求、旧快照与既有 A/B 两条业务流程不受影响。
+    42	
+    43	## 合并方式（可审计，非手改）
+    44	1. `tools/monthly_delta.py --base <原 ZIP>` 只读预检 → 11 ADD + 1 UPDATE，rc=0，无 CONFLICT。
+    45	2. `tools/monthly_delta.py --contracts-dir contracts` 只读预检（对活契约）→ 同上，rc=0。
+    46	3. `--stage orchestrator/handoff/monthly-candidate-20261112` 生成候选（工具唯一写盘动作，目录必须新建）。
+    47	4. `scripts/check_contracts.py diff` 指针级审计：候选 vs 合并前 = 12 处；候选 vs 不可变基线 = 12 处，**完全一致**。
+    48	5. 覆盖活契约 3 个文件；其余 8 个文件保持与基线逐字节相同（逐个 sha256 比对为 SAME）。
+    49	6. 12 处差异全部登记 `contracts/CHANGES.json`，由 `scripts/check_contracts.py check` 强制一一对应。
+    50	
+    51	## 回归用例（合并后必须重跑）
+    52	- 原有：AC-005/006/007（导入与发布）、AC-008 与 AC-018–022（分析）、AC-025–030（报告与行动）。
+    53	- 新增：AC-MR-01 至 AC-MR-12（见补丁 `qa/CampaignLab-Review-Acceptance-Checklist.append.md`）。
+    54	- 门禁：`scripts/check_contracts.py check --validate`、`bash scripts/verify.sh`、`qa/verify_package.py`、
+    55	  `ruff`/`mypy`/`pytest`、前端 `typecheck`（类型客户端需按 1.0.1 重新生成）。
+    56	
+    57	## 明确不做
+    58	- 不修改 `spec/**`：v1.0 与补丁包都按字节只读入库，SHA256 永久可验。
+    59	- 不引入真实银行数据；月报涉及行内真实分母、口径归属、客户键、容量定义的，仍走 BLK-04 / SRC-1 裁定流程。
+=== [E-2] CR-001 中「（可选）」出现处 ===
+24:| openapi.json | /components/schemas/ReviewCreate/properties/profile | added | ADD（可选） |
+25:| openapi.json | /components/schemas/Review/properties/monthly_review | added | ADD（可选） |
+33:| source-json.schema.json | /$defs/SourceMetadata/properties/monthly_review | added | ADD（可选） |
+34:| source-metadata.schema.json | /properties/monthly_review | added | ADD（可选） |
+count=4
+
+=== [E-3] CR-001 中「三个新增属性」原文 ===
+37:- 三个新增属性**均未进入任何 `required` 数组**：实测 `ReviewCreate.required=['scope']`；
+38:  `Review.required` 17 项不含 `monthly_review`；两份 SourceMetadata 的 `required` 9 项不含 `monthly_review`。
+
+=== [E-4] CHANGES.json 结构（定点提取，不整读 openapi）===
+顶层键: ['schema', 'note', 'baseline', 'live', 'entries']
+entries 数: 12
+entry 字段集合: ['adr', 'cr', 'delta_tool_state', 'file', 'kind', 'pointer', 'source']
+
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyCapacity", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyComparison", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyOriginOverlap", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyParticipation", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyProduction", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyReview", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/MonthlyTrend", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/Review/properties/monthly_review", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/components/schemas/ReviewCreate/properties/profile", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "openapi.json", "pointer": "/info/version", "kind": "changed", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "UPDATE"}
+  {"file": "source-json.schema.json", "pointer": "/$defs/SourceMetadata/properties/monthly_review", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  {"file": "source-metadata.schema.json", "pointer": "/properties/monthly_review", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+
+schema = "campaignlab.contract-changes/1"
+note = "活契约 contracts/ 相对不可变基线的全部结构差异登记。scripts/check_contracts.py check 强制一一对应。"
+baseline = {"path": "spec/CampaignLab-SDD-v1.0/contracts", "manifest": "spec/CampaignLab-SDD-v1.0/SHA256SUMS", "manifest_sha256": "3d3e32632c1d28368fc3fec4e591572dc73b0ed56eb89193e4c84d54e4ef3d91", "openapi_info_version_at_baseline": "1.0.0"}
+live = {"path": "contracts", "openapi_info_version": "1.0.1", "normalization": "json indent=2, ensure_ascii=False"}
+
+是否存在表达『可选/未进 required』语义的字段: []
+
+=== [E-5] 12 个 pointer 中属『新增属性』类的条目计数（文件×pointer 口径 vs 属性名口径）===
+含 /properties/ 的条目数 = 4
+   openapi.json /components/schemas/Review/properties/monthly_review added
+   openapi.json /components/schemas/ReviewCreate/properties/profile added
+   source-json.schema.json /$defs/SourceMetadata/properties/monthly_review added
+   source-metadata.schema.json /properties/monthly_review added
+按属性名去重 = ['monthly_review', 'profile'] 个数 = 2
+按 schema 级新增（整块 schema）条目数 = 7
+   openapi.json /components/schemas/MonthlyCapacity added
+   openapi.json /components/schemas/MonthlyComparison added
+   openapi.json /components/schemas/MonthlyOriginOverlap added
+   openapi.json /components/schemas/MonthlyParticipation added
+   openapi.json /components/schemas/MonthlyProduction added
+   openapi.json /components/schemas/MonthlyReview added
+   openapi.json /components/schemas/MonthlyTrend added
+
+=== [E-6] ADR-004 全文 ===
+     1	# ADR-004 采纳 CampaignLab SDD v1.0.1「全行月报」增量契约
+     2	
+     3	- 状态：ACCEPTED
+     4	- 日期：2026-11-12（Asia/Shanghai）
+     5	- 裁定人：项目负责人（以补丁包 `CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta` 为裁定载体）
+     6	- 关联：CR-001、ADR-001（批准范围）、ADR-002（实施细节）、ADR-003（前端设计基线）
+     7	
+     8	## 背景
+     9	v1.0 交付两条端到端流程（满额赠券规则验证、远程回拨策略复盘）。补丁新增第三条流程「全行月报」：
+    10	月度快照接入、三月交集与共同范围、参与度与重复触达、渠道容量与客群产能、总分行去重、
+    11	月报报告与签认、补采更正与下期观察，并附 12 条验收（AC-MR-01..12）、页面说明与合成样例。
+    12	
+    13	## 决策
+    14	1. 补丁包按字节入库为**第三份不可变基线** `spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/`
+    15	   （22 个文件；`DELTA-SHA256SUMS` 21 项校验 OK；源 ZIP SHA256 `13b1be8c…`）。
+    16	2. 补齐手册第 7 节要求而 wave0 遗漏的**活契约目录** `contracts/`，初始为 v1.0 基线的逐字节副本，
+    17	   并附 `contracts/PROVENANCE.md` 溯源。
+    18	3. 契约合入一律走补丁自带 `tools/monthly_delta.py`：先只读预检分类（ADD/ALREADY/UPDATE/KEEP/CONFLICT），
+    19	   再用 `--stage` 生成候选，最后由编排器覆盖活契约。**禁止手工编辑大 JSON**。
+    20	4. 全部差异登记 `contracts/CHANGES.json`，新增 CI 门禁 `scripts/check_contracts.py check`
+    21	   强制「实测结构差异 ⇄ 登记项」一一对应，且每项必须有真实存在的 CR 与 ADR 文件。
+    22	5. 验收基线由 **35 条扩为 47 条**（新增 AC-MR-01..12）；交付计划插入 6 个 P 任务
+    23	   （M0-P01、M1-P01、M3-P01、M3-P02、M4-P01、M5-P01），依赖见 `docs/delivery/MONTHLY-DELTA-PLAN.md`。
+    24	
+    25	## 备选方案与拒绝理由
+    26	| 备选 | 结论 |
+    27	|---|---|
+    28	| 直接手改 `contracts/openapi.json` 加节点 | 拒绝：430KB 文件手改不可审计，易漏 `required`/`$ref` 一致性 |
+    29	| 把月报内容写回 `spec/CampaignLab-SDD-v1.0/` | 拒绝：破坏基线 SHA256 可验性与「基线不可变」不变量 |
+    30	| 只留补丁包、不建活契约 | 拒绝：实现无唯一契约真值，前后端会各自解释，且 CI 无从守漂移 |
+    31	
+    32	## 影响
+    33	- 活契约 `info.version` = 1.0.1；前端类型客户端必须重新生成（M0-03 门禁：openapi-typescript 产物 diff 为空）。
+    34	- M1 需支持月报输入与 `DISTINCT_CUSTOMER`、扩展粒度、等价 CSV；M3 需实现三月交集、两种覆盖率、
+    35	  容量/客均、客群与总分行互斥集合；M4 需支持 PARTIAL_DRAFT、补采签认、更正与下期观察；M5 增加第三条走查。
+    36	- 新增合成样例（source-01..04、monthly-golden、map-monthly、csv-equivalent）进入 fixtures 使用范围，
+    37	  仍属合成数据，不触碰真实银行数据不变量。
+    38	
+    39	## 未决（不阻塞开发）
+    40	- 行内真实分母、口径归属、客户键、容量定义：沿用 BLK-04 与 SRC-1 的 `PENDING_OWNER` 机制，
+    41	  合成语义先行验证「待补分支」，实际取数依赖保留在待办中。

@@ -1,0 +1,76 @@
+# E2 兼容性声明独立复核（required 数组）+ CHANGES.json 条目字段与门禁容忍度 ts=2026-11-13T00:15:36+08:00
+=== [1] openapi: ReviewCreate.profile / Review.monthly_review ===
+  ReviewCreate.required (len=1) = ['scope']
+  ReviewCreate 有属性 'profile' ? True   该属性在 required 中 ? False
+  Review.required (len=17) = ['id', 'revision', 'created_at', 'scope', 'state', 'reasons', 'included_channels', 'metrics', 'participation_rows', 'detail_rows', 'detail_count', 'origin_rows', 'topic_rows', 'worst_layer_id', 'missing_requirements', 'evidence_ids', 'digest']
+  Review 有属性 'monthly_review' ? True   该属性在 required 中 ? False
+
+=== [2] source-json.schema.json: /$defs/SourceMetadata.monthly_review ===
+  required (len=9) = ['bank_id', 'bank_name', 'snapshot_code', 'branches', 'channels', 'strategies', 'coverage', 'sources', 'push_detail_seconds']
+  有 monthly_review ? True  在 required ? False
+
+=== [3] source-metadata.schema.json: /properties/monthly_review ===
+  required (len=9) = ['bank_id', 'bank_name', 'snapshot_code', 'branches', 'channels', 'strategies', 'coverage', 'sources', 'push_detail_seconds']
+  有 monthly_review ? True  在 required ? False
+
+=== [4] CHANGES.json 条目字段（第一条原文）===
+  顶层键: ['schema', 'note', 'baseline', 'live', 'entries']
+  条目字段集合: ['adr', 'cr', 'delta_tool_state', 'file', 'kind', 'pointer', 'source']
+  第一条: {"file": "openapi.json", "pointer": "/components/schemas/MonthlyCapacity", "kind": "added", "source": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta", "cr": "CR-001", "adr": "ADR-004", "delta_tool_state": "ADD"}
+  note: "活契约 contracts/ 相对不可变基线的全部结构差异登记。scripts/check_contracts.py check 强制一一对应。"
+
+=== [5] check_contracts.py 是否严格校验 entry 字段（决定能否加 optional 字段）===
+52:def diff_nodes(base: Any, live: Any, pointer: str = "") -> list[tuple[str, str]]:
+57:            child = pointer + "/" + key.replace("~", "~0").replace("/", "~1")
+64:                child = pointer + "/" + key.replace("~", "~0").replace("/", "~1")
+69:            rows.extend(diff_nodes(base[index], live[index], pointer + "/" + str(index)))
+71:            rows.append((pointer + "/" + str(index), "removed"))
+73:            rows.append((pointer + "/" + str(index), "added"))
+76:        rows.append((pointer or "/", "changed"))
+105:        for pointer, kind in rows:
+106:            print(f"{kind:8} {name} {pointer}")
+113:    entries = doc.get("entries")
+114:    if not isinstance(entries, list):
+115:        raise ValueError("CHANGES.json 缺少 entries 列表")
+117:    for entry in entries:
+120:        for field in ("file", "pointer", "kind", "cr", "adr"):
+145:        entries = load_registry()
+150:    for entry in entries:
+151:        key = (str(entry["file"]), str(entry["pointer"]))
+158:        for pointer, kind in diff_file(name, BASELINE, LIVE):
+159:            observed[(name, pointer)] = kind
+176:    for entry in entries:
+219:        f"CONTRACT CHECK PASS 登记项={len(entries)} 实测差异={len(observed)} "
+
+=== [6] spec/ 未被触碰 + evidence 无被忽略文件（state.json 两项声明的独立复核）===
+  rc_spec_untouched=0 (空输出=未触碰)
+0
+  rc=1
+
+=== [7] 当前工作树全量（并发 lane 观测）===
+ M web/eslint.config.js
+ M web/playwright.config.ts
+ M web/src/main.ts
+ M web/tsconfig.json
+ M web/vite.config.ts
+?? evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/b2-d003-checkignore-method.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c4-doctor-counting-semantics.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/e1-cr001-adr004-changes.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/e2-required-arrays-and-changes-schema.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+?? web/src/api/.gitkeep
+?? web/src/components/.gitkeep
+?? web/src/composables/.gitkeep
+?? web/src/features/.gitkeep
+?? web/src/pages/.gitkeep
+?? web/src/router/.gitkeep
+?? web/src/styles/.gitkeep
+?? web/tests/e2e/.gitkeep
+?? web/tests/unit/project-baseline.spec.ts
+?? web/vitest.config.ts

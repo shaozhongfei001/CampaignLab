@@ -1,0 +1,76 @@
+# G1 CR-002 事实独立核实（含只读基线）+ 17 个 status 参数的同类缺口分类 + D-009 验证
+ts=2026-11-13T01:06:02+08:00 HEAD=b1f38a9
+
+=== [1] 活契约与只读基线的 openapi 指纹 ===
+  contracts/openapi.json: sha16=01bd28f0772f506e bytes=443552 info.version=1.0.1
+  spec/CampaignLab-SDD-v1.0/contracts/openapi.json: sha16=3a5c6e3b8a0539cd bytes=430624 info.version=1.0.0
+
+=== [2] 基线 v1.0.0 的 listWorkspaces 参数（CR-002 §6.1 声称 status 非月报增量引入）===
+  spec/CampaignLab-SDD-v1.0/contracts/openapi.json
+      {"name": "cursor", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 300}}
+      {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 25}}
+      {"name": "q", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 100}}
+      {"name": "status", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 60}}
+  contracts/openapi.json
+      {"name": "cursor", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 300}}
+      {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 25}}
+      {"name": "q", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 100}}
+      {"name": "status", "in": "query", "required": false, "schema": {"type": "string", "minLength": 1, "maxLength": 60}}
+
+=== [3] 12 条登记项是否涉及 listWorkspaces / workspaces（CR-002 §6.1 声称完全不涉及）===
+  命中条目数 = 0 []
+  登记项总数 = 12
+
+=== [4] 17 个声明 status 参数的 list op 分类（同类缺口面）===
+  has_status = 1
+      ('listActivities', 'Activity')
+  has_state = 9
+      ('listRules', 'RuleVersion')
+      ('listImports', 'Import')
+      ('listCases', 'Case')
+      ('listRuns', 'RunSummary')
+      ('listCandidates', 'Candidate')
+      ('listPreflights', 'Preflight')
+      ('listReports', 'ReportSummary')
+      ('listActions', 'Action')
+      ('listJobs', 'Job')
+  has_other_stateish = 1
+      ('listAudit', 'AuditEvent', ['outcome'])
+  none = 6
+      ('listWorkspaces', 'Workspace')
+      ('listSnapshots', 'Snapshot')
+      ('listDefinitions', 'Definition')
+      ('listThresholds', 'ThresholdVersion')
+      ('listEvidence', 'Evidence')
+      ('listExports', 'Export')
+
+=== [5] D-009 验证：账本回读 + 双向守护单测 + 手册 15.3 增补 ===
+  defects ids = ['D-001', 'D-002', 'D-003', 'D-004', 'D-005', 'D-006', 'D-007', 'D-008', 'D-009']
+  cr ids = ['CR-001', 'CR-002']
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 6 items
+
+tests/unit/test_state_ledger.py ......                                   [100%]
+
+============================== 6 passed in 0.06s ===============================
+rc_pytest_state_ledger=0
+  -- 磁盘上的缺陷单文件 --
+D-001.md
+D-002.md
+D-003.md
+D-004.md
+D-005.md
+D-006.md
+D-007.md
+D-008.md
+D-009.md
+  -- 手册 15.3 是否含『回读断言』增补 --
+596:- **账本写入必须回读断言；禁止用 `isinstance` 之类守卫静默跳过**（依 D-009）：
+598:  曾出现 `if isinstance(st.get("defects"), dict): st["defects"]["D-006"] = {...}` 的写法——
+  -- spec/ 未污染 --
+  rc=0
+ts_end=2026-11-13T01:06:03+08:00

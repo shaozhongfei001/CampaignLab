@@ -1,0 +1,39 @@
+# C3 doctor 三次输出的非摘要差异定位（line 43）
+-- run1 line 40-46 --
+     1	== 5. 前端依赖（web/） ==
+     2	  [ OK ] web/package-lock.json 存在（122775 字节）
+     3	  npm ci --dry-run 退出码: 0
+     4	  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+     5	         up to date in 470ms
+     6	         web/node_modules 已安装（顶层 159 项）
+     7	
+-- run2 line 40-46 --
+     1	== 5. 前端依赖（web/） ==
+     2	  [ OK ] web/package-lock.json 存在（122775 字节）
+     3	  npm ci --dry-run 退出码: 0
+     4	  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+     5	         up to date in 412ms
+     6	         web/node_modules 已安装（顶层 159 项）
+     7	
+-- run3 line 40-46 --
+     1	== 5. 前端依赖（web/） ==
+     2	  [ OK ] web/package-lock.json 存在（122775 字节）
+     3	  npm ci --dry-run 退出码: 0
+     4	  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+     5	         up to date in 396ms
+     6	         web/node_modules 已安装（顶层 159 项）
+     7	
+=== diff run1 vs run2（去首行时间戳）===
+43c43
+<          up to date in 470ms
+---
+>          up to date in 412ms
+rc=1
+=== diff run1 vs run3 ===
+43c43
+<          up to date in 470ms
+---
+>          up to date in 396ms
+rc=1
+=== 差异行是否含耗时字样 ===
+44:         up to date in 470ms

@@ -1,0 +1,157 @@
+# A2 M0-01 证据材料齐备性 + cp314 wheel 版本独立复核 ts=2026-11-13T01:03:21+08:00 HEAD=b1f38a9
+
+=== [1] M0-01 证据文件是否在场（state.json gates[].evidence 指针逐条落地检查）===
+  OK   evidence/M0/M0-01/commands.md                               16792 bytes  tracked=yes
+  OK   evidence/M0/M0-01/npm.md                                      854 bytes  tracked=yes
+  OK   evidence/M0/M0-01/wheels.md                                  7073 bytes  tracked=yes
+  OK   evidence/M0/M0-01/orchestrator-verification.md               2455 bytes  tracked=yes
+  OK   evidence/M0/M0-01/recovery-2026-11-12.md                     4109 bytes  tracked=yes
+  OK   evidence/M0/env.md                                          10474 bytes  tracked=yes
+  OK   evidence/M0/summaries/M0-01.md                               1856 bytes  tracked=yes
+  OK   orchestrator/defects/D-001.md                                2018 bytes  tracked=yes
+
+=== [2] cp314 wheel 版本（BLK-06 关闭依据）独立实测 ===
+python 3.14.10
+duckdb 2.0.0
+pydantic_core 2.50.4
+fastapi 0.162.4
+sqlalchemy 2.0.57
+alembic 1.20.1
+uvicorn 0.54.0
+rc=0
+
+=== [3] wheels.md / npm.md 中声明的版本（对照用，不采信）===
+18:| duckdb | cp314 | 2.0.0 | `duckdb-2.0.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl` | `cp312-abi3-manylinux_2_27_x86_64` | **可用（abi3 稳定 ABI）** |
+19:| pydantic-core | cp314 | 2.50.4 | `pydantic_core-2.50.4-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl` | `cp314-cp314-manylinux2014_x86_64` | **可用（原生 cp314）** |
+20:| sqlalchemy | cp314 | 2.0.57 | `sqlalchemy-2.0.57-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl` | `cp314-cp314-manylinux_2_17_x86_64` | **可用（原生 cp314）** |
+21:| alembic | cp314 | 1.20.1 | `alembic-1.20.1-py3-none-any.whl` | `py3-none-any` | **可用（纯 Python）** |
+22:| fastapi | cp314 | 0.162.4 | `fastapi-0.162.4-py3-none-any.whl` | `py3-none-any` | **可用（纯 Python）** |
+23:| uvicorn | cp314 | 0.54.0 | `uvicorn-0.54.0-py3-none-any.whl` | `py3-none-any` | **可用（纯 Python）** |
+24:| python-multipart | cp314 | 0.0.33 | `python_multipart-0.0.33-py3-none-any.whl` | `py3-none-any` | **可用（纯 Python）** |
+34:### 关于 duckdb 的 abi3 说明（BLK-06 关注点）
+36:duckdb 2.0.0 未发布字面 `cp314` tag 的 wheel，而是发布 `cp312-abi3` —— 这是 CPython **稳定 ABI**
+42:| site-packages 内落地二进制 | `_duckdb.abi3.so` |
+43:| `import duckdb; duckdb.__version__` | `2.0.0` |
+44:| `duckdb.connect().execute("select 40+2").fetchone()[0]` | `42` |
+
+=== [4] M0-02-design.md 是否把未决问题当已决定（§1-§6 内的 Q 标记 与 断言式措辞）===
+-- 各 Q 标记在设计文档中的出现行 --
+9:- `exchangeSession` POST `/api/v1/session/exchange` — `async def exchange_session(payload: SessionExchange, request: Request, svc: SessionService = Depends(get_session_service)) -> Response`：200 `Session` ＋ `Set-Cookie: cl_session=<sid>; HttpOnly; SameSite=Strict; Path=/api/v1; Max-Age=<ttl>`｜400 `BAD_REQUEST` 正文非 JSON 或 Content-Type 错｜401 `SESSION_EXPIRED` 令牌未知／已消费／超 60s（**三者同码同 detail**，杜绝枚举 oracle）｜403 `ORIGIN_DENIED` Origin 或 Host 非实际绑定的回环源｜413 `INPUT_TOO_LARGE`｜422 `VALIDATION_ERROR` `token` 长度 <16 或 >180、出现未知字段｜500 `INTERNAL_ERROR`；契约另声明的 404/409/412/428/429 在 M0-02 不可达（Q2/Q3）。
+12:- `listWorkspaces` GET `/api/v1/workspaces` — `async def list_workspaces(cursor: str | None = Query(None, min_length=1, max_length=300), limit: int = Query(25, ge=1, le=100), q: str | None = Query(None, min_length=1, max_length=100), status: str | None = Query(None, min_length=1, max_length=60), actor: Session = Depends(require_session), svc: WorkspaceService = Depends(get_workspace_service)) -> Response`：200 `WorkspacePage{items(0–100), next_cursor}`；排序固定 `created_at DESC, id ASC`，键集翻页谓词 `created_at < :k0 OR (created_at = :k0 AND id > :k1)`，每页取 `limit+1` 行以判 `next_cursor`；`q` 对 `name` 做 NFKC＋casefold 子串匹配；无结果 → `items=[]`、`next_cursor=null`｜400 `BAD_CURSOR` 游标解不开／HMAC 不符／查询摘要不符｜401 `SESSION_EXPIRED`｜403 `ORIGIN_DENIED`（Host 非法）｜422 `VALIDATION_ERROR` `limit` 越界、`q`/`status` 超长｜422 `INVALID_SCOPE` `status` 不在白名单（白名单当前为空集，Q4）｜500 `INTERNAL_ERROR`；404/409/412/413/428/429 不可达。
+13:- `createWorkspace` POST `/api/v1/workspaces` — `async def create_workspace(payload: WorkspaceCreate, idempotency_key: str = Header(alias="Idempotency-Key", min_length=8, max_length=128), actor: Session = Depends(require_session), svc: WorkspaceService = Depends(get_workspace_service)) -> Response`：201 `Workspace` ＋ `ETag: "1"` ＋ `X-Request-Id`｜400 `BAD_REQUEST`｜401 `SESSION_EXPIRED`｜403 `ORIGIN_DENIED`／`ACCESS_DENIED`｜409 `IDEMPOTENCY_CONFLICT` 同键异摘要｜413 `INPUT_TOO_LARGE`｜422 `VALIDATION_ERROR` `name` 空或 >80、`source_class` 非枚举、`authorization_note` >500、未知字段、`Idempotency-Key` 长度不合规（`issues[0].location="/header/Idempotency-Key"`）｜500 `INTERNAL_ERROR`；404/412/428/429 不可达（Q2/Q3）。领域约束：`source_class="AUTHORIZED_DEIDENTIFIED"` 时 `authorization_note` 必须非空（DDL 表级 CHECK）→ 违反映射 422 `VALIDATION_ERROR`、`issues[0].location="/authorization_note"`；`id` 一律服务端生成 `new_resource_id("W")`，不接受客户端指定；`revision` 恒为 1；写 `workspaces` 与写 `audit`（`sequence=1`）必须同一事务（DOMAIN.md「数据变更和审计事件同事务」）。
+25:- `domain/errors.py::PROBLEM_CODES: dict[str, tuple[int, str, str]]`（`code → (status, type, title)`），`type = "urn:campaignlab:problem:" + code.lower()`（Q5）：`BAD_REQUEST`=400、`BAD_CURSOR`=400、`SESSION_EXPIRED`=401、`ORIGIN_DENIED`=403、`ACCESS_DENIED`=403、`RESOURCE_NOT_FOUND`=404、`IDEMPOTENCY_CONFLICT`=409、`STATE_CONFLICT`=409、`VERSION_MISMATCH`=409、`REVISION_CONFLICT`=412、`PRECONDITION_REQUIRED`=428、`INPUT_TOO_LARGE`=413、`VALIDATION_ERROR`=422、`INVALID_SCOPE`=422、`EVIDENCE_REQUIRED`=422、`JOB_CAPACITY`=429（必须附 `Retry-After` 1–3600）、`INTERNAL_ERROR`=500；`detail` 缺省取 `title`，500 的 `detail` 只含 `request_id`，禁止回显堆栈／SQL／用户源字段（OPERATIONS.md）。
+29:- ETag：`etag(revision: int) -> str` 返回 `f'"{revision}"'`（带双引号十进制整数，对齐 If-Match 正则 `^"[1-9][0-9]*"$`）；`check_if_match(header: str | None, current_revision: int) -> None`：`header is None` → raise `PreconditionRequired`（428 `PRECONDITION_REQUIRED`），`header != etag(current_revision)` → raise `RevisionConflict`（412 `REVISION_CONFLICT`）。切片 5 个 op 均未声明 If-Match，故 `create_workspace` **不得**调用它（Q3）；helper 仍须实现并被单测钉住，供 M1 的 16 个 If-Match op 复用。
+53:- 上传失败（M0-02 无文件端点，等价约束＝正文过大）：先按 `Content-Length` 预判、再在流式读取时累计二次判定，超过 `MAX_JSON_BODY_BYTES: Final = 1_048_576`（Q6）→ 413 `INPUT_TOO_LARGE`。失败模式：只信 `Content-Length`（可伪造），或先 `await request.body()` 全量读入再判长度（等于没有上限）。
+55:- **AC-035**（切片原文：锁版本、迁移、核对包与 API；任务卡另述会话过期、进程重启后会话失效）· 会话过期：`expires_at = created_at + session_ttl_seconds`（默认 3600，Q6），`SessionStore.get()` 内过期即删并返回 `None` → 401。
+61:全部在 WSL 仓库根执行，前置 `export PATH="$HOME/.local/bin:$HOME/.local/share/node/bin:$PATH"`；`PYTHONPATH=src` 是 Q7 裁定前的临时通道（`[tool.uv] package = false` 使 `campaignlab` 不可导入，已实测 `ModuleNotFoundError`）。
+72:| V9 | 契约：202 与 GET 作业语义（DTO 级，见 Q2） | `PYTHONPATH=src uv run --no-sync pytest -q tests/unit/test_job_dto.py tests/unit/test_problem_codes.py` | 0 |
+90:  参数化必须覆盖：切片 5 op × 各自声明的全部状态码（断言「凡服务端可能返回的码都是 Problem 形、`status` 与 `code` 一致、`content-type` 为 `application/problem+json`」）；409 `IDEMPOTENCY_CONFLICT`；412 `REVISION_CONFLICT` 与 428 `PRECONDITION_REQUIRED`（走 `check_if_match` 单元路径，Q3）；422（缺字段／超长／未知字段／`limit` 越界／非法 ID 各 ≥1 例）；202＋`Location`＋`Job`（走 `accepted_response` DTO 路径，Q2）；Idempotency-Key 重放**一次生效**（同键同体两次 → 两个 201 逐字节相同且 DB 只 1 行，同键异体 → 409）。S4 禁止修改 `src/**`、`contracts/**`、`migrations/**` 与既有 `tests/unit/test_contract_slice.py`、`tests/unit/test_frontend_baseline.py`。
+93:  S5 逐条采集 §5 的 V1–V13（命令、rc、时间戳、环境行）；`ac.md` 对 AC-001/034/035 各给「判定＋依据＋证据指针」；`migration-diff.md` 贴 `compare_schema()` 的空返回与 28 表指纹摘要；`evidence/**` 未列入 `scope_allow` 但为任务卡 `outputs:` 指定落点（Q8）。
+100:| Q1 | **AC-034/AC-035 语义冲突**：任务卡 gates 把 AC-034 写成「深链与刷新回到合法入口」、AC-035 写成「会话过期、进程重启后会话失效」；但切片与 `spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md` 第 42/43 行原文里 AC-034＝「过期会话、错误 Host/Origin、跨工作区 ID 和上传失败」、AC-035＝「锁版本、迁移、核对包和 API」。「深链/刷新」属 UI-01 页面侧（M0-03），「会话过期/重启」在原文里归 AC-001＋AC-034。 | gates 判定口径、S5 `ac.md` 结论 | §4 同时覆盖两种读法（服务端侧：未匹配路由返回 Problem 形 404 ＋ 会话过期/重启 401），以切片原文为主、任务卡描述为附加约束 |
+101:| Q2 | **「202 与 GET 作业语义」在切片内不可达**：全契约 11 个返回 202 的 op（validateImport、publishImport、correctSnapshot、runComparison、createRun、runReview、runDiagnosis、executeQuestion、createReport、retryJob、createExport）无一在 M0-02 的 5 个 operationId 里，`getJob`/`listJobs` 也不在切片里。 | gate「契约测试：202 与 GET 作业语义」无法在 HTTP 层取证 | 在 `api/common.py` 实现 `accepted_response(job, location)`（202＋`Location`＋`ETag`＋`Job` 体）与 `job_from_row()`／`JobRepository.get()`，用 `tests/unit/test_job_dto.py` 以活契约 `Job` schema 做 jsonschema 校验；HTTP 层 202 用例待裁定（缩 gate 或扩切片重派） |
+102:| Q3 | **412/428 在切片内不可达**：全契约 16 个带 `If-Match` 的 op 无一在 M0-02 内，`createWorkspace` 只声明 `Idempotency-Key`；gate 却要求「ETag 与 412」「409/412/422 各分支」。 | gate「契约测试：…412…」的取证层 | 实现并单测 `check_if_match()`（缺头 428、不匹配 412）＋ Problem 形断言；HTTP 端到端 412 需追加一个 If-Match op 进切片，或把该 gate 判为「DTO 级覆盖即通过」 |
+103:| Q4 | `listWorkspaces` 声明了 `status` 查询参数（1–60），但 `Workspace` schema 与 `workspaces` 表都没有 `status` 字段 → 状态白名单无法确定（API.md 只说「按对应对象状态白名单过滤」）。 | listWorkspaces 行为、S4 用例期望 | 常量 `WORKSPACE_STATUS_WHITELIST: Final[frozenset[str]] = frozenset()`，任何非空 `status` → 422 `INVALID_SCOPE`（`issues[0].location="/query/status"`），裁定后改一行即可 |
+104:| Q5 | `Problem.type` 的 URI 方案与 `title` 文案在契约中**完全未规定**（只约束长度 1–250／1–200），而任务卡 `public_frozen` 写明本任务与 M0-03 共同确立公共件、M0-03b 后冻结 → 一旦落地即成冻结面。 | 前端错误分支、全部后续 lane | 取 `type = "urn:campaignlab:problem:" + code.lower()`，`title` 用固定中文短句表；请在 M0-03b 冻结前裁定是否改为 `https://` 形式 |
+105:| Q6 | 三处运行参数契约未规定：会话 TTL、JSON 正文上限、worker 心跳窗口（OPERATIONS.md 只给了文件 64 MiB／8 MiB 与令牌 60s）。 | AC-035 可测性、413 触发点、`Health.worker` 灵敏度 | 取 `session_ttl_seconds=3600`、`MAX_JSON_BODY_BYTES=1_048_576`、`WORKER_HEARTBEAT_TTL_SECONDS=15`，全部经 `AppConfig` 可注入（测试用小值） |
+106:| Q7 | **`pyproject.toml` 与 `uv.lock` 不在 `scope_allow` 内**，但 gate「`uv run python -m campaignlab doctor` 可运行」与「pytest 全绿」都要求 `campaignlab` 可导入：已实测 `uv run --no-sync python -c "import campaignlab"` → `ModuleNotFoundError`（M0-01 设了 `[tool.uv] package = false`，其注释明确写「M0-02 交付 CLI 与 `__main__` 后删除」）；`PYTHONPATH=src` 可用但会改变 gate 命令原文。 | 全部 gate 命令口径、S2–S5 执行方式 | §5 统一用 `PYTHONPATH=src` 前缀；请裁定「把 `pyproject.toml`＋`uv.lock` 加入 M0-02 `scope_allow`（由 S2 删 `package = false` 并重跑 `uv lock`）」还是「交 Lane T 单独改」 |
+107:| Q8 | `scope_allow` 未包含 `evidence/**`，与任务卡 `outputs:` 指定的 `evidence/M0/M0-02/{commands.md,ac.md,migration-diff.md,http/**}` 冲突；另 S3 的产出列只写 `src/campaignlab/api/**`，而 `state.json` 的 `M0-02.scope` 还含 `src/campaignlab/application/`、`src/campaignlab/infra/db/`、`tests/api/session/`、`tests/integration/bootstrap/`。 | S3/S5 是否越界（手册 6.4 要求越界即回报） | 按 `scope_allow` ∪ `state.json.M0-02.scope` 划白名单（均在 `src/campaignlab/**` 内，未触碰 `scope_deny`），`evidence/**` 按 `outputs:` 执行；请裁定确认，或把 `evidence/M0/M0-02/**` 与 `evidence/M0/summaries/**` 显式加入 `scope_allow` |
+-- 断言式措辞扫描（已裁定/已决定/已批准/定稿）--
+rc_grep=1 (1=无命中)
+-- §7 标题原文 --
+## 7. 未决问题（不自行决定，交编排器／项目负责人裁定；手册 6.4）
+
+| # | 问题 | 影响面 | 本设计的临时处置 |
+|---|---|---|---|
+| Q1 | **AC-034/AC-035 语义冲突**：任务卡 gates 把 AC-034 写成「深链与刷新回到合法入口」、AC-035 写成「会话过期、进程重启后会话失效」；但切片与 `spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md` 第 42/43 行原文里 AC-034＝「过期会话、错误 Host/Origin、跨工作区 ID 和上传失败」、AC-035＝「锁版本、迁移、核对包和 API」。「深链/刷新」属 UI-01 页面侧（M0-03），「会话过期/重启」在原文里归 AC-001＋AC-034。 | gates 判定口径、S5 `ac.md` 结论 | §4 同时覆盖两种读法（服务端侧：未匹配路由返回 Problem 形 404 ＋ 会话过期/重启 401），以切片原文为主、任务卡描述为附加约束 |
+
+=== [5] 设计文档 S3/S4/S5 白名单路径是否落在 scope_allow ∪ state.scope 内（机械化判定）===
+卡内 scope_allow 项:
+    src/campaignlab/**
+    migrations/**
+    tests/api/**
+    tests/integration/bootstrap/**
+    tests/unit/**
+    pyproject.toml
+    uv.lock
+    evidence/M0/M0-02/**
+    evidence/M0/summaries/M0-02.md（后四项依裁定 Q7/Q8 于 2026-11-12T23:41:32+08:00 加入）
+state.scope 项:
+    src/campaignlab/api/session.py
+    src/campaignlab/api/workspaces.py
+    src/campaignlab/api/common.py
+    src/campaignlab/application/
+    src/campaignlab/infra/db/
+    migrations/
+    tests/api/session/
+    tests/integration/bootstrap/
+    pyproject.toml
+    uv.lock
+    evidence/M0/M0-02/
+    evidence/M0/summaries/M0-02.md
+归一化前缀集合: ['evidence/M0/M0-02', 'evidence/M0/M0-02/', 'evidence/M0/summaries/M0-02.md', 'evidence/M0/summaries/M0-02.md（后四项依裁定 Q7/Q8 于 2026-11-12T23:41:32+08:00 加入）', 'migrations', 'migrations/', 'pyproject.toml', 'src/campaignlab', 'src/campaignlab/api/common.py', 'src/campaignlab/api/session.py', 'src/campaignlab/api/workspaces.py', 'src/campaignlab/application/', 'src/campaignlab/infra/db/', 'tests/api', 'tests/api/session/', 'tests/integration/bootstrap', 'tests/integration/bootstrap/', 'tests/unit', 'uv.lock']
+
+设计 §6 白名单路径                                                    是否被 scope 覆盖 命中前缀
+V13.log                                                        NO         -
+__init__.py                                                    NO         -
+ac.md                                                          NO         -
+api/common.py                                                  NO         -
+api/deps.py                                                    NO         -
+api/health.py                                                  NO         -
+api/session.py                                                 NO         -
+api/workspaces.py                                              NO         -
+application/audit.py                                           NO         -
+application/health_service.py                                  NO         -
+application/idempotency.py                                     NO         -
+application/worker.py                                          NO         -
+application/workspace_service.py                               NO         -
+cli.py                                                         NO         -
+clock.py                                                       NO         -
+config.py                                                      NO         -
+contracts/**                                                   NO         -
+create_workspace/createWorkspace                               NO         -
+domain/ids.py                                                  NO         -
+domain/values.py                                               NO         -
+evidence/**                                                    NO         -
+evidence/M0/M0-02/ac.md                                        YES        evidence/M0/M0-02
+evidence/M0/M0-02/commands.md                                  YES        evidence/M0/M0-02
+evidence/M0/M0-02/gates/V1.log                                 YES        evidence/M0/M0-02
+evidence/M0/M0-02/migration-diff.md                            YES        evidence/M0/M0-02
+evidence/M0/summaries/M0-02.md                                 YES        evidence/M0/summaries/M0-02.md
+exchange_session/exchangeSession                               NO         -
+get_health/getHealth                                           NO         -
+get_session/getSession                                         NO         -
+infra/db/repositories.py                                       NO         -
+list_workspaces/listWorkspaces                                 NO         -
+migration-diff.md                                              NO         -
+migrations/**                                                  YES        migrations
+migrations/alembic.ini                                         YES        migrations
+migrations/env.py                                              YES        migrations
+migrations/script.py.mako                                      YES        migrations
+migrations/versions/0001_initial_schema.py                     YES        migrations
+orchestrator/**                                                NO         -
+problem-422}.json                                              NO         -
+pyproject.toml                                                 YES        pyproject.toml
+scripts/**                                                     NO         -
+spec/**                                                        NO         -
+src/**                                                         NO         -
+src/campaignlab/__main__.py                                    YES        src/campaignlab
+src/campaignlab/api/app.py                                     YES        src/campaignlab
+src/campaignlab/application/session_service.py                 YES        src/campaignlab
+src/campaignlab/domain/errors.py                               YES        src/campaignlab
+src/campaignlab/infra/db/ddl_compare.py                        YES        src/campaignlab
+src/campaignlab/infra/db/engine.py                             YES        src/campaignlab
+tests/**                                                       NO         -
+tests/api/conftest.py                                          YES        tests/api
+tests/api/test_contract_conformance.py                         YES        tests/api
+tests/api/test_health.py                                       YES        tests/api
+tests/api/test_session.py                                      YES        tests/api
+tests/api/test_workspaces.py                                   YES        tests/api
+tests/integration/bootstrap/conftest.py                        YES        tests/integration/bootstrap
+tests/integration/bootstrap/test_migration_equivalence.py      YES        tests/integration/bootstrap
+tests/unit/test_contract_slice.py                              YES        tests/unit
+tests/unit/test_frontend_baseline.py                           YES        tests/unit
+tests/unit/test_job_dto.py                                     YES        tests/unit
+tests/unit/test_problem_codes.py                               YES        tests/unit
+web/**                                                         NO         -
+
+未覆盖条目: ['V13.log', '__init__.py', 'ac.md', 'api/common.py', 'api/deps.py', 'api/health.py', 'api/session.py', 'api/workspaces.py', 'application/audit.py', 'application/health_service.py', 'application/idempotency.py', 'application/worker.py', 'application/workspace_service.py', 'cli.py', 'clock.py', 'config.py', 'contracts/**', 'create_workspace/createWorkspace', 'domain/ids.py', 'domain/values.py', 'evidence/**', 'exchange_session/exchangeSession', 'get_health/getHealth', 'get_session/getSession', 'infra/db/repositories.py', 'list_workspaces/listWorkspaces', 'migration-diff.md', 'orchestrator/**', 'problem-422}.json', 'scripts/**', 'spec/**', 'src/**', 'tests/**', 'web/**']

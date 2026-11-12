@@ -1,0 +1,62 @@
+# C2 doctor 三次输出逐字比对 + fc-list 20x 双变体 + 确定性单测
+ts_start=2026-11-12T23:56:12+08:00  HEAD=6d9f1b2
+
+=== [1] 三次 doctor 输出逐字比对（去掉首行时间戳）===
+90e130b2cbda9428c54d69553f419dcac29e2a70cbe4bda263fc5cacfb91602b  /tmp/dn1.txt
+1b2fd0140dd82f5cb7c66c227dccad17be4ae3bdb9372749a9178332ef1730c3  /tmp/dn2.txt
+dbe791d488c8209cd66c560064f328f83410364f868806a17c1fb815b2c2f720  /tmp/dn3.txt
+/tmp/dn1.txt /tmp/dn2.txt differ: byte 2028, line 43
+cmp_1_2_rc=1
+/tmp/dn1.txt /tmp/dn3.txt differ: byte 2027, line 43
+cmp_1_3_rc=1
+首行时间戳（唯一差异来源）:
+CampaignLab doctor @ 2026-11-12T23:55:08+08:00
+CampaignLab doctor @ 2026-11-12T23:55:09+08:00
+CampaignLab doctor @ 2026-11-12T23:55:10+08:00
+
+=== [2] 摘要行原文（3 次）===
+run1:   PASS=14  WARN=2  FAIL=0
+run2:   PASS=14  WARN=2  FAIL=0
+run3:   PASS=14  WARN=2  FAIL=0
+run1 RESULT:   RESULT: HEALTHY
+
+=== [3] WARN 行文本（3 次全部列出，验证语义属预期）===
+-- run1 --
+8:  [WARN] 工作树存在 1 项未提交改动
+57:  [WARN] DOCTOR_SKIP_VERIFY=1，已跳过原型基线复跑
+-- run2 --
+8:  [WARN] 工作树存在 1 项未提交改动
+57:  [WARN] DOCTOR_SKIP_VERIFY=1，已跳过原型基线复跑
+-- run3 --
+8:  [WARN] 工作树存在 1 项未提交改动
+57:  [WARN] DOCTOR_SKIP_VERIFY=1，已跳过原型基线复跑
+
+=== [4] 修复后写法 fc-list | grep -ci 连跑 20 次（bash -c 内 set -uo pipefail）===
+     20 rc=0
+-- 命中条数分布（20 次）--
+     20 10
+
+=== [5] 原缺陷写法 fc-list | grep -qi 连跑 20 次（bash -c 内 set -uo pipefail）===
+      5 rc=0
+     15 rc=141
+-- 对照：不带 pipefail 的同一写法 20 次 --
+     20 rc=0
+
+=== [6] fc-list 输出字节数（SIGPIPE 前提）===
+18876
+Noto Sans CJK 命中行数: 10
+dpkg: install ok installed
+
+=== [7] 确定性单测 ===
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 4 items
+
+tests/unit/test_doctor_determinism.py ....                               [100%]
+
+============================== 4 passed in 2.63s ===============================
+rc_pytest_determinism=0
+ts_end=2026-11-12T23:56:16+08:00

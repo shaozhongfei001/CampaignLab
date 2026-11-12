@@ -1,0 +1,58 @@
+# C4 doctor 计数语义核实（info 是否计入 PASS）与 PASS=16 期望值的可达性推算
+ts=2026-11-13T00:11:58+08:00 HEAD=6d9f1b2
+
+=== [1] doctor.sh 的 ok/warn/bad/info 定义与计数变量 ===
+37:PASS=0; WARN=0; FAIL=0
+38:ok()   { printf "  [ OK ] %s\n" "$1"; PASS=$((PASS+1)); }
+39:warn() { printf "  [WARN] %s\n" "$1"; WARN=$((WARN+1)); }
+40:bad()  { printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL+1)); }
+41:info() { printf "         %s\n" "$1"; }
+42:sec()  { printf "\n== %s ==\n" "$1"; }
+97:print("DOCTOR_JSON_OK=%s" % (row[0] == 1 and row[1] == 1 and rows == 3))
+101:  if grep -q "^DOCTOR_JSON_OK=True$" "$TMPD/py"; then ok "JSON 函数实测可用（json_extract/json_valid/json_type/json_each/json_group_array）"; else bad "JSON 函数实测不可用"; fi
+257:printf "  PASS=%d  WARN=%d  FAIL=%d\n" "$PASS" "$WARN" "$FAIL"
+
+=== [2] 我这次 SKIP_VERIFY 运行的标记计数 ===
+  [ OK ] 行数 = 14
+  [WARN] 行数 = 2
+  [FAIL] 行数 = 0
+  摘要行      =   PASS=14  WARN=2  FAIL=0
+
+=== [3] 字体检查段原文（确认命中走 info 还是 ok）===
+if have fc-list; then
+  ZH="$(fc-list :lang=zh 2>/dev/null | wc -l)"
+  if [ "$ZH" -gt 0 ]; then ok "存在中文字体（fc-list :lang=zh = ${ZH} 条）"; else warn "无中文字体，视觉走查结论不可用（BLK-02，需 root 安装 fonts-noto-cjk）"; fi
+  # D-007：此处曾用 `fc-list | grep -qi`。grep -q 命中即退出，fc-list（约 18.8KB 输出）继续写管道
+  # 会收 SIGPIPE(141)，在 set -uo pipefail 下被传播成「未安装」假 WARN（实测 30 次中 28 次误报）。
+  # grep -c 读完全部输入不提前退出，故无 SIGPIPE；同时把命中条数写进消息便于取证。
+  NOTO_CNT="$(fc-list 2>/dev/null | grep -ci "noto sans cjk")"
+  if [ "${NOTO_CNT:-0}" -gt 0 ]; then info "Noto Sans CJK 已安装（fc-list 命中 ${NOTO_CNT} 条）"; else warn "未安装 Noto Sans CJK（BLK-02 未解除，字体度量可能与行内设计基线不一致）"; fi
+else
+  warn "fc-list 不可用，无法判定字体"
+fi
+
+# ---------------- 摘要 ----------------
+sec "摘要"
+printf "  PASS=%d  WARN=%d  FAIL=%d\n" "$PASS" "$WARN" "$FAIL"
+if [ "$FAIL" -eq 0 ]; then
+
+=== [4] 脏树检查段原文 ===
+printf "  path   : %s\n" "$ROOT"
+if have git; then
+  printf "  branch : %s\n" "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  printf "  head   : %s\n" "$(git rev-parse --short HEAD 2>/dev/null)"
+  DIRTY="$(git status --porcelain)"
+  if [ -z "$DIRTY" ]; then
+    ok "工作树干净"
+  else
+    N="$(printf "%s\n" "$DIRTY" | grep -c .)"
+    warn "工作树存在 ${N} 项未提交改动"
+    printf "%s\n" "$DIRTY" | head -15 | sed "s/^/         /"
+  fi
+else
+
+=== [5] 推算：干净树 + 完整 verify 的期望摘要 ===
+  当前（脏树1项 + SKIP_VERIFY）: PASS=14 WARN=2
+  脏树项转 ok              : PASS=15 WARN=1
+  verify.sh 项转 ok（rc=0） : PASS=16 WARN=0   <- 与任务/state 期望一致
+  注：字体命中走 info（不计 PASS），故不存在 PASS=17；collect 01 文件 §3 的「应为 17」为算术误判

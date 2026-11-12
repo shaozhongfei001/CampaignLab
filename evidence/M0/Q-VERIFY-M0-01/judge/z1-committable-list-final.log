@@ -1,0 +1,55 @@
+# Z1 · 可入库确认（最终）HEAD=f12dcf8 ts=2026-11-13T01:42:00+08:00
+
+$ git ls-files --others --exclude-standard qa-reports/ evidence/M0/Q-VERIFY-M0-01/judge/
+evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/a2-m0-01-evidence-and-wheels.log
+evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/b2-d003-checkignore-method.log
+evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+evidence/M0/Q-VERIFY-M0-01/judge/c4-doctor-counting-semantics.log
+evidence/M0/Q-VERIFY-M0-01/judge/e1-cr001-adr004-changes.log
+evidence/M0/Q-VERIFY-M0-01/judge/e2-required-arrays-and-changes-schema.log
+evidence/M0/Q-VERIFY-M0-01/judge/f1-ac-transcription-audit.log
+evidence/M0/Q-VERIFY-M0-01/judge/f2-m0-03-ac034-recheck-at-f12dcf8.log
+evidence/M0/Q-VERIFY-M0-01/judge/g1-cr002-facts-and-d009.log
+evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+evidence/M0/Q-VERIFY-M0-01/judge/i3-appendix-b-recheck-at-b1f38a9.log
+evidence/M0/Q-VERIFY-M0-01/judge/i4-identity-fix-quotepath.log
+evidence/M0/Q-VERIFY-M0-01/judge/i5-state-counts-at-f12dcf8.log
+evidence/M0/Q-VERIFY-M0-01/judge/z1-committable-list-final.log
+qa-reports/m0/Q-VERIFY-M0-01.md
+rc=0
+count=20
+
+$ git check-ignore -v（应全部 rc=1，即未被忽略）
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/a2-m0-01-evidence-and-wheels.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/b2-d003-checkignore-method.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/c4-doctor-counting-semantics.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/e1-cr001-adr004-changes.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/e2-required-arrays-and-changes-schema.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/f1-ac-transcription-audit.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/f2-m0-03-ac034-recheck-at-f12dcf8.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/g1-cr002-facts-and-d009.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/i3-appendix-b-recheck-at-b1f38a9.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/i4-identity-fix-quotepath.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/i5-state-counts-at-f12dcf8.log
+  rc=1 evidence/M0/Q-VERIFY-M0-01/judge/z1-committable-list-final.log
+  rc=1 qa-reports/m0/Q-VERIFY-M0-01.md
+
+$ .gitignore 中 evidence / qa-reports 相关行
+17:# gates[].evidence 的指针会指向仓库中不存在的文件，Q lane 无法复核，宿主重置即永久丢失。
+18:!evidence/**/*.log
+
+$ 报告当前行数/字节
+  525 64052 qa-reports/m0/Q-VERIFY-M0-01.md
+ts_end=2026-11-13T01:42:00+08:00

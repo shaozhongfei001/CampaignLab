@@ -1,0 +1,51 @@
+# I5 state.json counts 定位与对照（HEAD=f12dcf8 ts=2026-11-13T01:39:43+08:00）
+top-level keys: ['schema', 'phase', 'wave', 'updated_at', 'budget', 'tasks', 'waves', 'critical_path', 'defects', 'change_requests', 'pending_owner', 'resume', 'acceptance', 'contract', 'critical_paths', 'critical_path_note', 'critical_tasks', 'baselines', 'docs', 'decisions']
+  resume.patch.nodes = 12
+  resume.patch.contract_version = 1.0.1
+  resume.self_check_gates_rc0.evidence_ignored_count.result = 0
+  resume.self_check_gates_rc0.evidence_ignored_count.expected = 0
+  resume.self_check_gates_rc0.counts.pytest_passed = 38
+  resume.self_check_gates_rc0.counts.mypy_source_files = 8
+  resume.self_check_gates_rc0.counts.ruff_formatted_files = 56
+  resume.self_check_gates_rc0.counts.contract_registered_nodes = 12
+  resume.self_check_gates_rc0.counts.acceptance_denominator = 47
+  resume.self_check_gates_rc0.counts.acceptance_resolvable = 47
+  resume.self_check_gates_rc0.counts.frontend_baseline_rows = 8
+  resume.self_check_gates_rc0.counts.live_openapi_sha16 = 01bd28f0772f506e
+  resume.self_check_gates_rc0.counts.live_openapi_info_version = 1.0.1
+  resume.self_check_gates_rc0.counts.ruff_formatted_files_composition.total = 56
+  resume.self_check_gates_rc0.counts.ruff_formatted_files_composition.in_scope_py = 8
+  resume.self_check_gates_rc0.counts.ruff_formatted_files_composition.in_scope_md = 48
+  resume.self_check_gates_rc0.counts.ruff_lint_scope_files = 8
+  resume.self_check_gates_rc0.counts.ruff_format_check_rc_after_governance_files = 0
+  resume.environment.fonts_noto_cjk.fc_lang_zh_noto_count = 30
+  acceptance.baseline_total = 35
+  acceptance.monthly_total = 12
+  acceptance.total = 47
+  contract.openapi_info_version = 1.0.1
+  contract.registered_nodes = 12
+
+defects entries: 10
+    D-001 | FIXED_PENDING_Q | MAJOR | 
+    D-002 | FIXED_PENDING_Q | MINOR | 
+    D-003 | FIXED_PENDING_Q | MINOR | 
+    D-004 | FIXED_PENDING_Q | MAJOR | 
+    D-005 | FIXED_PENDING_Q | MAJOR | 
+    D-006 | FIXED_PENDING_Q | MINOR | 分母口径未定义：ruff format 计数含 Markdown，历史值 35 不可复现
+    D-007 | FIXED_PENDING_Q | MAJOR | doctor.sh 字体检查在 pipefail 下因 SIGPIPE 恒判假 WARN（非确定
+    D-008 | FIXED_PENDING_Q | MAJOR | M0-02 任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyp
+    D-009 | FIXED_PENDING_Q | MAJOR | 编排器用 isinstance(dict) 守卫写 state.json，而 defects/c
+    D-010 | FIXED_PENDING_Q | MINOR | M0-03 任务卡与设计基线文档三处记载不一致（BLK-02 过期 / scope_allow 
+
+has 'D-010' in raw: True
+has 'D-011' in raw: False
+resume keys: ['recovered_at', 'incident', 'wave', 'gate', 'next_actions', 'in_flight_agents', 'dispatch_requirements', 'wave0_commit', 'persisted', 'context', 'patch', 'critical_path_len', 'slack_note', 'm0_p01_commit', 'recovery_history', 'owner_gate', 'd002_d003_commit', 'm0_p01_commits', 'self_check_gates_rc0', 'post_patch_review', 'dispatch_preconditions', 'd004_d005_commit', 'owner_decisions', 'pending_owner_cleared_at', 'environment', 'dispatch_log', 'q_verify', 'commit_message_corrections']
+resume.self_check_gates_rc0 = {'checked_at': '2026-11-12T23:45:58+08:00', 'evidence': 'evidence/monthly/M0-P01/run-04/commands.md', 'note': '第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。', 'gates': {'G1_baseline_v1.0': {'cmd': '( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G2_baseline_v1.0.1_patch': {'cmd': '( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )', 'rc': 0, 'expected': 0, 'elapsed_s': 1, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G3_frontend_baseline': {'cmd': 'python3 scripts/check_frontend_baseline.py', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G4_slice_unknown_op_negative': {'cmd': 'python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json', 'rc': 2, 'expected': 2, 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G4b_slice_unknown_ac_negative': {'cmd': 'python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json', 'rc': 2, 'expected': 2, 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G4c_frontend_tamper_negative': {'cmd': "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py", 'rc': 1, 'expected': 1, 'note': '本轮已真实执行篡改负例：cp 备份 -> printf 追加换行 -> 实测 rc=1 -> cp 还原 -> git status --porcelain spec/ == 0。不再沿用 run-02 的转录值。', 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G5_contract_gate': {'cmd': 'python3 scripts/check_contracts.py check', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G6_contract_meta_validate': {'cmd': 'uv run --no-sync python scripts/check_contracts.py check --validate', 'rc': 0, 'expected': 0, 'elapsed_s': 2, 'measured_at': '2026-11-12T22:48:36+08:00'}, 'G7_ruff_check': {'cmd': 'uv run --no-sync ruff check .', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': 'All checks passed!'}, 'G8_ruff_format': {'cmd': 'uv run --no-sync ruff format --check .', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': '56 files already formatted'}, 'G9_mypy': {'cmd': 'uv run --no-sync mypy', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': 'Success: no issues found in 8 source files'}, 'G10_pytest': {'cmd': 'uv run --no-sync pytest -q', 'rc': 0, 'expected': 0, 'elapsed_s': 1, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': '38 passed in 4.13s'}, 'G11_prototype_verify': {'cmd': 'bash scripts/verify.sh', 'rc': 0, 'expected': 0, 'elapsed_s': 1, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': 'PASS: 字节级复现'}, 'G12_package_verify': {'cmd': 'python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py', 'rc': 0, 'expected': 0, 'elapsed_s': 0, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': 'PACKAGE PASS 6/6'}, 'G13_npm_ci_and_build': {'cmd': 'npm --prefix web ci && npm --prefix web run build', 'rc': 0, 'expected': 0, 'elapsed_s': 9, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': '✓ built in 174ms'}, 'G14_doctor': {'cmd': 'bash scripts/doctor.sh', 'rc': 0, 'expected': 0, 'elapsed_s': 1, 'measured_at': '2026-11-13T01:37:27+08:00', 'last_summary': '  RESULT: HEALTHY'}}, 'spec_untouched': {'cmd': 'git status --porcelain spec/', 'result': 'empty', 'rc': 0, 'expected': 0}, 'evidence_ignored_count': {'cmd': "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'", 'result': 0, 'expected': 0}, 'counts': {'pytest_passed': 38, 'mypy_source_files': 8, 'ruff_formatted_files': 56, 'contract_registered_nodes': 12, 'acceptance_denominator': 47, 'acceptance_resolvable': 47, 'frontend_baseline_rows': 8, 'live_openapi_sha16': '01bd28f0772f506e', 'live_openapi_info_version': '1.0.1', 'ruff_formatted_files_composition': {'cmd': 'uv run --no-sync ruff format --check .', 'total': 56, 'in_scope_py': 8, 'in_scope_md': 48, 'reproduce_py': "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l", 'reproduce_md': 'git ls-files -z \'*.md\' | tr \'\\0\' \'\\n\' | grep -vE \'^"?(spec|prototype|web)/\' | wc -l', 'why_md_counted': 'ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。', 'exclusions_verified': "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。", 'historical_value': '全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）', 'measured_after': '2026-11-13T01:37:27+08:00：Ohm(M0-03/S1+S2) 产出入库（+1 md）与 D-010（+1 md）后重测', 'drift_rule': 'md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 7）**，Q 复核以它为准', 'identity': 'tracked_in_scope(55) + untracked_not_ignored_in_scope(1) == ruff_total(56) -> True', 'identity_cmd': 'git ls-files -z \'*.py\' \'*.md\' | tr \'\\0\' \'\\n\' | grep -vE \'^[\\"]?(spec|prototype|web)/\' | wc -l ；git ls-files --others --exclude-standard -z \'*.py\' \'*.md\' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N', 'untracked_component': ['qa-reports/m0/Q-VERIFY-M0-01.md'], 'assert_in_place': 'counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）', 'untracked_component_note': 'qa-reports/m0/Q-VERIFY-M0-01.md 属并行 Q lane（Plato）在飞产物，尚未返回，本次不提交；其入库时分母将再 +1'}, 'ruff_lint_scope_files': 8, 'ruff_format_check_rc_after_governance_files': 0, 'counts_refreshed_at': '2026-11-13T01:37:27+08:00', 'counts_refresh_reason': 'M0-03/S1+S2 入库：新增 handoff/M0-03-design.md 与 defects/D-010.md（各 +1 md 分母）'}, 'denominator_history': [{'at': '2026-11-13T00:42:29+08:00', 'ruff_total': 53, 'in_scope_py': 8, 'in_scope_md': 45, 'pytest_passed': 38, 'mypy_source_files': 8, 'cause': 'D-009 修复（+1 md +1 py）', 'commit': '本次提交（见 git log -1）', 'prev': {'ruff_total': 51, 'in_scope_py': 7, 'pytest_passed': 32, 'mypy_source_files': 7}, 'note': 'Q 判定档（Plato）若在此刻核对分母，应以本条为准；此前基线 ruff=51 / pytest=32 / mypy=7 / py=7'}, {'at': '2026-11-13T01:37:27+08:00', 'ruff_total': 56, 'in_scope_py': 8, 'in_scope_md': 48, 'pytest_passed': 38, 'mypy_source_files': 8, 'cause': 'M0-03/S1+S2 入库 + D-010（+2 md）', 'prev': {'ruff_total': 53, 'in_scope_py': 8, 'pytest_passed': 38, 'mypy_source_files': 8}, 'note': 'Plato 受托基线 ruff=51/pytest=32/mypy=7 已被并行推进连续取代（51→53→54→56）；其报告若据此判红属基准漂移，非真实回归'}]}
+
+=== pytest / mypy / ruff 实测（同一 HEAD 复述）===
+38 passed in 3.94s
+Success: no issues found in 8 source files
+56 files already formatted
+ruff_check_showfiles=9
+ruff_check_showfiles_py=8
+ts_end=2026-11-13T01:39:48+08:00

@@ -1,8 +1,12 @@
+> **编排器修改标注（2026-11-13T01:54:49+08:00，依 D-011）**：本文中 4 处把「页面侧深链」标为 AC-034 的表述已由编排器更正为
+> 引用 `spec/CampaignLab-SDD-v1.0/framework/FRONTEND.md:12`；AC-034 的 HTTP 负例本体归 M0-02。
+> 修改者为编排器，**非 S1/S2 原作者（Ohm）**；其余内容未改动。
+
 # M0-03 设计 · S1 工程骨架与严格基线 + S2 令牌体系
 
 lane F · tier `qwen3.8-max` · 子任务 S1（工程骨架与严格模式基线）+ S2（令牌体系设计）。依据（全部只读）：`orchestrator/tasks/M0-03.md`（含 PRE-3 门禁与文末加注）、`docs/design/token-mapping.md`（唯一令牌真值）、`docs/design/page-component-map.md` §1、`docs/decisions/ADR-003`、`docs/decisions/ADR-005`、`ui/COMMON.md`、`framework/FRONTEND.md`、`orchestrator/handoff/M0-03.slice.json`、`docs/design/frontend-pitfalls.md`。
 
-**PRE-3 门禁自证（实算，不采信派单文本）**：`contracts/openapi.json` bytes=443552、sha256=`01bd28f0772f506e15fb70f07a37479ab9c33c4a3c9a39651445e6fa435cf583`、sha16=`01bd28f0772f506e`、`info.version=1.0.1`；`M0-03.slice.json` 的 `spec_version=1.0.1`、`source.openapi.sha16=01bd28f0772f506e`、`bytes=443552` → 三项逐字一致，**PASS**。切片 5 op = exchangeSession / getSession / getHealth / listWorkspaces / createWorkspace；pages = UI-01（route `/`，FR-01，AC-001 + AC-034）。
+**PRE-3 门禁自证（实算，不采信派单文本）**：`contracts/openapi.json` bytes=443552、sha256=`01bd28f0772f506e15fb70f07a37479ab9c33c4a3c9a39651445e6fa435cf583`、sha16=`01bd28f0772f506e`、`info.version=1.0.1`；`M0-03.slice.json` 的 `spec_version=1.0.1`、`source.openapi.sha16=01bd28f0772f506e`、`bytes=443552` → 三项逐字一致，**PASS**。切片 5 op = exchangeSession / getSession / getHealth / listWorkspaces / createWorkspace；pages = UI-01（route `/`，FR-01，AC-001；页面侧深链依据 `framework/FRONTEND.md:12`，**非** AC-034，见 D-011）。
 
 ## 1. S1 已落地（实测结论，非计划）
 
@@ -66,7 +70,7 @@ lane F · tier `qwen3.8-max` · 子任务 S1（工程骨架与严格模式基线
 - **分支键只用 `code`**，不解析 `type` 里的 URL；但 `http.ts` 必须做一次一致性断言 `type === "urn:campaignlab:problem:" + code.toLowerCase()`（ADR-005 §2.1）：不一致时**以 `code` 为准**，dev 下抛断言、生产下走 AlertBanner 呈现（不得 `console.*`，eslint 已禁）。
 - **`title` 直接渲染服务端返回值，前端不得另编文案**（ADR-005 §2.2；§3 已否决「各 lane 自定义 title」）。`detail` 可展示；`request_id` 必须可见（COMMON.md「错误显示 request_id」）；`issues[]` 按 `location` 定位到表单字段，`severity` 的 ERROR/WARNING/INFO → AlertBanner 危险/警示/信息。
 - **前端不内置 code 白名单**：契约只约束 `code` 为 pattern 串，注册表 `src/campaignlab/domain/errors.py` 实测尚不存在（Q4）。未知 code 一律走 default 分支，渲染服务端 `title` + `detail` + `request_id`，禁止「全部通过」式总括文案。
-- **status → 前端行为（UI-01 范围）**：401（`SESSION_EXPIRED`/无会话）清本地会话与 store → 跳 `/`，原深链存 `?redirect=`（AC-034）；403 对象级 → 与 404 **同一呈现**（COMMON.md「越权对象按不可见处理」＝不可见即不可见），仅证据里区分 status；403 会话/Host/Origin 级（exchangeSession/getSession）→ 回 `/` 并提示「重开本机入口」；404 → 404 页 + 当前工作区返回入口；400 `INVALID_SCOPE` / 422 → AlertBanner + `issues[]` 定位字段且**保留输入**；409 `IDEMPOTENCY_CONFLICT` → ConfirmDialog「已受理，勿重复提交」，重试沿原 `Idempotency-Key`；412 `REVISION_CONFLICT` → 保留本地输入 + 显示新旧 `revision` + 「重新获取/复跑」入口；413 → JSON 正文上限 **1 MiB**（ADR-005 §2.3），`createWorkspace` 提交前用 `new TextEncoder().encode(JSON.stringify(body)).byteLength` 预检，超限即字段级提示且**不发请求**（文件上传的 8/64 MiB 是另一对象，不得混用）；428 `PRECONDITION_REQUIRED` → 缺 `If-Match`，属前端缺陷：dev 断言 + 通用失败态；429 → 指数退避（首次 1s，上限 3 次）后仍渲染服务端 `title`；500 → 通用失败 + `request_id`。
+- **status → 前端行为（UI-01 范围）**：401（`SESSION_EXPIRED`/无会话）清本地会话与 store → 跳 `/`，原深链存 `?redirect=`（页面侧深链要求，依据 `framework/FRONTEND.md:12`；AC-034 的 HTTP 负例本体归 M0-02，见 D-011）；403 对象级 → 与 404 **同一呈现**（COMMON.md「越权对象按不可见处理」＝不可见即不可见），仅证据里区分 status；403 会话/Host/Origin 级（exchangeSession/getSession）→ 回 `/` 并提示「重开本机入口」；404 → 404 页 + 当前工作区返回入口；400 `INVALID_SCOPE` / 422 → AlertBanner + `issues[]` 定位字段且**保留输入**；409 `IDEMPOTENCY_CONFLICT` → ConfirmDialog「已受理，勿重复提交」，重试沿原 `Idempotency-Key`；412 `REVISION_CONFLICT` → 保留本地输入 + 显示新旧 `revision` + 「重新获取/复跑」入口；413 → JSON 正文上限 **1 MiB**（ADR-005 §2.3），`createWorkspace` 提交前用 `new TextEncoder().encode(JSON.stringify(body)).byteLength` 预检，超限即字段级提示且**不发请求**（文件上传的 8/64 MiB 是另一对象，不得混用）；428 `PRECONDITION_REQUIRED` → 缺 `If-Match`，属前端缺陷：dev 断言 + 通用失败态；429 → 指数退避（首次 1s，上限 3 次）后仍渲染服务端 `title`；500 → 通用失败 + `request_id`。
 - **运行参数**：会话 TTL 1h、worker 心跳 15s（ADR-005 §2.3）。UI-01 顶栏「作业受限」由 `Health.worker === "OFFLINE"` 或 `status === "DEGRADED"` 驱动；**前端一律以服务端响应为准，不得用系统当前时间自行推算过期**（领域不变量）。
 
 ## 6. 状态章节（S5 填写，本节仅留边界，S1/S2 不替 S5 决定）
@@ -81,7 +85,7 @@ S5 需在本节补：`web/src/api/http.ts`（cookie credentials、ETag/If-Match�
 |---|---|---|---|
 | S6 | `web/src/pages/**`、`web/src/components/**`、`web/src/features/**`、`web/src/router/index.ts`、`web/src/main.ts`（仅接线）、`web/src/styles/**`（仅接线，不改令牌值） | page-component-map §1 首交 M0-03：`AppShell` `SideRail` `AppBar` `PageBar` `EvidenceDrawer` `StatusTag` `PageGrid` `CardPanel` `AlertBanner` `EmptyState` `DataTable`（+ `ConfirmDialog`，见 Q3）；页面 `web/src/pages/workspace/WorkspacePage.vue` | 改 `tokens.css` 色值；import 模板；写死色值；自建 store（属 S5）；`console.*` |
 | S7 | `web/tests/e2e/**` | `keyboard-baseline.spec.ts`：焦点可见 2px、Tab 序、抽屉 Esc 关闭并返回触发焦点、表头排序可键盘触发 | 改 `web/src/**`；绑 3000 段端口 |
-| S8 | `web/tests/unit/**` | `workspace-entry.spec.ts`（AC-001）、`deep-link.spec.ts`（AC-034）、`tokens.spec.ts`（S3 守卫） | 需 DOM 的用例依赖 Q1 裁定；未裁定前只写 node 环境可跑的纯函数断言 |
+| S8 | `web/tests/unit/**` | `workspace-entry.spec.ts`（AC-001）、`deep-link.spec.ts`（页面侧深链，依据 `framework/FRONTEND.md:12`，**非** AC-034，见 D-011）、`tokens.spec.ts`（S3 守卫） | 需 DOM 的用例依赖 Q1 裁定；未裁定前只写 node 环境可跑的纯函数断言 |
 | S9 | `evidence/M0/M0-03/**`、`evidence/M0/ui/**`、`web/tests/e2e/**`（截图 spec） | `ui-01-desktop-1440x900.png`、`ui-01-laptop-1024x768.png`（文件名 ASCII） | 写 `web/src/**`；未附字体声明（doctor 第 8 节原文）即下视觉结论；浏览器不可用却谎称 E2E 通过（须记 PASS_WITH_TODO 关联 BLK-01） |
 | S10 | `orchestrator/handoff/M0-03-public-components.md` | 公共组件清单与冻结边界 | 见 Q8（该目录未列入 `scope_allow`） |
 
@@ -89,7 +93,7 @@ S5 需在本节补：`web/src/api/http.ts`（cookie credentials、ETag/If-Match�
 
 | # | 问题 | 影响面 | 本设计的临时处置 |
 |---|---|---|---|
-| Q1 | **DOM 测试环境缺失**：`web/package.json` 未声明 `jsdom`（registry 实测 latest 31.0.0）或 `happy-dom`（21.0.4），也未声明 `@vue/test-utils`（2.5.1）；vitest 只能 `environment:"node"`。而 token-mapping §4.4「对比度断言进 Vitest」与 S8「AC-001/AC-034 页面侧断言」都需要 DOM/computed style。 | S3 守卫、S8 全部页面侧断言 | 请求批准新增 devDependencies：`jsdom@^31.0.0`（或更轻的 `happy-dom@^21.0.4`）+ `@vue/test-utils@^2.5.1`。未裁定前 vitest 固定 `node` 环境，用例不得触碰 `document`/`window` |
+| Q1 | **DOM 测试环境缺失**：`web/package.json` 未声明 `jsdom`（registry 实测 latest 31.0.0）或 `happy-dom`（21.0.4），也未声明 `@vue/test-utils`（2.5.1）；vitest 只能 `environment:"node"`。而 token-mapping §4.4「对比度断言进 Vitest」与 S8「AC-001 断言 + 页面侧深链断言（`framework/FRONTEND.md:12`，非 AC-034，见 D-011）」都需要 DOM/computed style。 | S3 守卫、S8 全部页面侧断言 | 请求批准新增 devDependencies：`jsdom@^31.0.0`（或更轻的 `happy-dom@^21.0.4`）+ `@vue/test-utils@^2.5.1`。未裁定前 vitest 固定 `node` 环境，用例不得触碰 `document`/`window` |
 | Q2 | **`@types/node` 未声明**（registry latest 26.6.6）：`web/*.config.ts` 不能用 `node:path`/`node:url`（本子任务改用 `new URL(...).pathname` 规避），而 S9 的 Playwright 截图归档几乎必然要 `node:fs`/`node:path`；`tests/**` 已纳入 tsconfig，届时 `typecheck` 会红。 | S9 证据采集、typecheck 门禁 | 请求批准新增 devDependency `@types/node@^26`；若否决，须把 `tests/e2e/**` 移出 `tsconfig.json` 的 `include`（牺牲 e2e 类型检查），二选一请裁定 |
 | Q3 | **`ConfirmDialog` 交付期冲突**：`page-component-map.md` §1 记「首次交付 M2-04」，但同文件 §2 的 UI-01 行写「创建走 `ConfirmDialog`」，且 M0-03 gates 要求 UI-01 能新建工作区。 | S6 组件清单、S10 冻结边界 | 建议 M0-03 交付 `ConfirmDialog` 最小实现（520px，摘要+影响+取消+主按钮），并把 §1 的「首次交付」改为 M0-03；或改用 `ElDialog` 顶替（会与「公共组件各只有一个实现」冲突） |
 | Q4 | **`code` 注册表不可得**：契约只把 `code` 约束为 pattern 串、未枚举取值；ADR-005 §2.1 指定的单一来源 `src/campaignlab/domain/errors.py` 实测尚不存在（`find src -name errors.py` 为空）。 | §5 错误分支、S8 参数化断言 | 前端不内置 code 白名单，未知 code 走 default 分支渲染服务端 `title`/`detail`/`request_id`。请求 M0-02 S3 落地后把注册表以**只读快照**交 S8 做参数化，而不是让前端镜像一份（镜像即污染冻结面） |

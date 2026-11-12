@@ -1,0 +1,89 @@
+# B2 D-003 验证方法学复核：check-ignore -v 的 rc 语义与 --no-index 对照
+ts=2026-11-13T00:10:24+08:00 HEAD=6d9f1b2  git=git version 2.43.0
+
+=== [1] .gitignore 全文（带行号，cat -A 显示不可见字符）===
+     1	# 运行时/构建产物
+     2	node_modules/
+     3	.venv/
+     4	__pycache__/
+     5	*.py[cod]
+     6	dist/
+     7	build/
+     8	coverage/
+     9	.playwright-mcp/
+    10	test-results/
+    11	# 环境与本地
+    12	.env
+    13	.env.*
+    14	!.env.example
+    15	*.log
+    16	# 例外（D-003）：手册 9.2 的证据布局要求 <gate>.log 入库，否则 state.json 里
+    17	# gates[].evidence 的指针会指向仓库中不存在的文件，Q lane 无法复核，宿主重置即永久丢失。
+    18	!evidence/**/*.log
+    19	.DS_Store
+    20	Thumbs.db
+    21	# 本地 IDE/工具目录
+    22	.vscode/
+    23	.idea/
+    24	
+    25	# 契约候选目录：由 monthly_delta.py --stage 生成，可随时重生成（含 430KB openapi 副本，不入库）
+    26	orchestrator/handoff/monthly-candidate-*/--- cat -A（第 14-20 行）---
+!.env.example$
+*.log$
+# M-dM->M-^KM-eM-$M-^VM-oM-<M-^HD-003M-oM-<M-^IM-oM-<M-^ZM-fM-^IM-^KM-eM-^FM-^L 9.2 M-gM-^ZM-^DM-hM-/M-^AM-fM-^MM-.M-eM-8M-^CM-eM-1M-^@M-hM-&M-^AM-fM-1M-^B <gate>.log M-eM-^EM-%M-eM-:M-^SM-oM-<M-^LM-eM-^PM-&M-eM-^HM-^Y state.json M-iM-^GM-^L$
+# gates[].evidence M-gM-^ZM-^DM-fM-^LM-^GM-iM-^RM-^HM-dM-<M-^ZM-fM-^LM-^GM-eM-^PM-^QM-dM-;M-^SM-eM-:M-^SM-dM-8M--M-dM-8M-^MM-eM--M-^XM-eM-^\M-(M-gM-^ZM-^DM-fM-^VM-^GM-dM-;M-6M-oM-<M-^LQ lane M-fM-^WM- M-fM-3M-^UM-eM-$M-^MM-fM- M-8M-oM-<M-^LM-eM-.M-?M-dM-8M-;M-iM-^GM-^MM-gM-=M-.M-eM-^MM-3M-fM-0M-8M-dM-9M-^EM-dM-8M-"M-eM-$M-1M-cM-^@M-^B$
+!evidence/**/*.log$
+.DS_Store$
+Thumbs.db$
+
+=== [2] 未跟踪的新 judge 日志：check-ignore -v 完整输出（看命中哪条规则）===
+-- evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log --
+.gitignore:18:!evidence/**/*.log	evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+  rc_with_-v=0
+  rc_without_-v=1 (0=被忽略并打印路径, 1=未被忽略)
+.gitignore:18:!evidence/**/*.log	evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+  rc_no_index_-v=0
+
+=== [3] 已跟踪的历史证据日志：同一三种口径 ===
+-- evidence/monthly/M0-P01/run-01/precheck-base.log (tracked) --
+  rc_with_-v=1
+.gitignore:18:!evidence/**/*.log	evidence/monthly/M0-P01/run-01/precheck-base.log
+  rc_no_index_-v=0
+
+=== [4] 权威判据：git ls-files --others --exclude-standard（能否入库）===
+evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/b2-d003-checkignore-method.log
+evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+rc=0
+计数=8
+
+=== [5] 反向对照：把一个 .log 放在 evidence/ 之外，确认仍被忽略（证明否定规则是局部的）===
+.gitignore:15:*.log	./tmp_probe.log
+  rc_root_log=0
+  ls_others_root_log_rc=0
+--- 清理确认（不得留痕在仓库）---
+ M web/eslint.config.js
+ M web/playwright.config.ts
+ M web/src/main.ts
+ M web/tsconfig.json
+ M web/vite.config.ts
+?? web/src/api/
+?? web/src/components/
+?? web/src/composables/
+?? web/src/features/
+?? web/src/pages/
+?? web/src/router/
+?? web/src/styles/
+?? web/tests/
+?? web/vitest.config.ts
+  rc=0
+
+=== [6] 结论性事实 ===
+check-ignore -v 对未跟踪路径：命中任一规则（含 ! 否定规则）即 rc=0；
+check-ignore（无 -v）只对『真被忽略』的路径 rc=0；
+对已跟踪路径，默认查索引 -> 一律 rc=1（与规则无关），故 D-003 原验证方法对已入库日志是恒真断言。

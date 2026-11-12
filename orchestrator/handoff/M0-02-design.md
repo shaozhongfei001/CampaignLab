@@ -1,3 +1,7 @@
+> **编排器修改标注（2026-11-13T01:54:49+08:00，依 D-014）**：① V11 的写死计数改为「rc=0 为判据 + 引用 state.json 权威键」；
+> ② §5 的 V1–V13 共 10 处 `PYTHONPATH=src` 前缀已去除（Q7 裁定后由 S2 删 `[tool.uv] package = false`）；
+> ③ §6 关于 `evidence/**` 不在 `scope_allow` 的说法已按 Q8 裁定更正。修改者为编排器，**非 S1 原作者**。
+
 # M0-02 设计 · S1 契约抽取与设计
 
 依据 `orchestrator/handoff/M0-02.slice.json`（spec_version=1.0.1；`source.openapi.sha16=01bd28f0772f506e`、`bytes=443552`，本次实算一致 → 切片新鲜可派单）。活契约 `contracts/sqlite-v1.sql` 与基线 `spec/CampaignLab-SDD-v1.0/contracts/sqlite-v1.sql` **字节相同**（sha256 `ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e`，`diff -u` 无输出）→ 不存在「以哪份为准」的分歧；按手册第 7 节，实现唯一依据是活契约 `contracts/`，spec 仅参考。基址 `/api/v1`（`servers[0].url`）；全局 `security=[{LocalSession:[]}]` ＝ Cookie `cl_session`，`exchangeSession`/`getHealth` 显式 `security:[]`（免会话），其余 3 个 op 继承全局；每个响应必带 `X-Request-Id`（正则 `^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$`，取 `uuid4().hex`）；`create_app()` 必须置 `openapi_url=None, docs_url=None, redoc_url=None`，契约真值只在 `contracts/openapi.json`，不得暴露第二个 OpenAPI 面。
@@ -58,22 +62,22 @@ DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝�
 
 ## 5. 验证清单（命令 → 期望 rc；供 S5 直接采集，无「人工确认」项）
 
-全部在 WSL 仓库根执行，前置 `export PATH="$HOME/.local/bin:$HOME/.local/share/node/bin:$PATH"`；`PYTHONPATH=src` 是 Q7 裁定前的临时通道（`[tool.uv] package = false` 使 `campaignlab` 不可导入，已实测 `ModuleNotFoundError`）。
+全部在 WSL 仓库根执行，前置 `export PATH="$HOME/.local/bin:$HOME/.local/share/node/bin:$PATH"`。**Q7 已裁定**：`pyproject.toml`＋`uv.lock` 已加入 `scope_allow`，**S2 须删除 `[tool.uv] package = false` 并重跑 `uv lock`**，此后 `campaignlab` 可直接导入，故 §5 全部 V 命令的 `PYTHONPATH=src` 前缀**已作废并去除**（见 D-014）。
 | # | 目标（gate / AC） | 命令 | 期望 rc |
 |---|---|---|---|
 | V1 | 切片新鲜度（派单前置） | `uv run --no-sync python -c "import hashlib,pathlib;d=pathlib.Path('contracts/openapi.json').read_bytes();print(hashlib.sha256(d).hexdigest()[:16],len(d))"`，输出须为 `01bd28f0772f506e 443552` | 0 |
 | V2 | 活契约门禁未回归 | `uv run --no-sync python scripts/check_contracts.py check --validate` | 0 |
-| V3 | 首迁可执行 | `D=$(mktemp -d); PYTHONPATH=src CAMPAIGNLAB_DATA_DIR=$D uv run --no-sync alembic -c migrations/alembic.ini upgrade head` | 0 |
-| V4 | DDL 等价＋28 表＋PRAGMA＋跨工作区外键负例 | `PYTHONPATH=src uv run --no-sync pytest -q tests/integration/bootstrap/test_migration_equivalence.py` | 0 |
-| V5 | AC-001 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api -k ac001` | 0 |
-| V6 | AC-034 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api -k ac034` | 0 |
-| V7 | AC-035 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api tests/integration/bootstrap -k ac035` | 0 |
-| V8 | 契约：Problem 结构／ETag／409／412／428／422／幂等重放一次生效 | `PYTHONPATH=src uv run --no-sync pytest -q tests/api/test_contract_conformance.py` | 0 |
-| V9 | 契约：202 与 GET 作业语义（DTO 级，见 Q2） | `PYTHONPATH=src uv run --no-sync pytest -q tests/unit/test_job_dto.py tests/unit/test_problem_codes.py` | 0 |
-| V10 | `doctor` 可运行 | `PYTHONPATH=src uv run --no-sync python -m campaignlab doctor` | 0 |
-| V11 | ruff lint ＋ format | `uv run --no-sync ruff check . && uv run --no-sync ruff format --check .`，后者计数须为 `40 files already formatted`（基线 39，+1 即本文件被接受） | 0 |
-| V12 | mypy strict ＋ 全量 pytest | `uv run --no-sync mypy && PYTHONPATH=src uv run --no-sync pytest -q` | 0 |
-| V13 | HTTP 样本落盘 ＋ 证据齐备 | `PYTHONPATH=src CAMPAIGNLAB_HTTP_EVIDENCE_DIR=evidence/M0/M0-02/http uv run --no-sync pytest -q tests/api -k record_http && test -s evidence/M0/M0-02/commands.md && test -s evidence/M0/M0-02/ac.md && test -s evidence/M0/M0-02/migration-diff.md && test -s evidence/M0/summaries/M0-02.md && ls evidence/M0/M0-02/http/*.json` | 0 |
+| V3 | 首迁可执行 | `D=$(mktemp -d); CAMPAIGNLAB_DATA_DIR=$D uv run --no-sync alembic -c migrations/alembic.ini upgrade head` | 0 |
+| V4 | DDL 等价＋28 表＋PRAGMA＋跨工作区外键负例 | `uv run --no-sync pytest -q tests/integration/bootstrap/test_migration_equivalence.py` | 0 |
+| V5 | AC-001 | `uv run --no-sync pytest -q tests/api -k ac001` | 0 |
+| V6 | AC-034 | `uv run --no-sync pytest -q tests/api -k ac034` | 0 |
+| V7 | AC-035 | `uv run --no-sync pytest -q tests/api tests/integration/bootstrap -k ac035` | 0 |
+| V8 | 契约：Problem 结构／ETag／409／412／428／422／幂等重放一次生效 | `uv run --no-sync pytest -q tests/api/test_contract_conformance.py` | 0 |
+| V9 | 契约：202 与 GET 作业语义（DTO 级，见 Q2） | `uv run --no-sync pytest -q tests/unit/test_job_dto.py tests/unit/test_problem_codes.py` | 0 |
+| V10 | `doctor` 可运行 | `uv run --no-sync python -m campaignlab doctor` | 0 |
+| V11 | ruff lint ＋ format | `uv run --no-sync ruff check . && uv run --no-sync ruff format --check .`，后者以 **rc=0** 为判据，**计数不得写死**（写死值随并行 lane 漂移：本档撰写时 40，`f12dcf8` 时点 56）；权威现值见 `state.json → resume.self_check_gates_rc0.counts.ruff_formatted_files`（见 D-014） | 0 |
+| V12 | mypy strict ＋ 全量 pytest | `uv run --no-sync mypy && uv run --no-sync pytest -q` | 0 |
+| V13 | HTTP 样本落盘 ＋ 证据齐备 | `CAMPAIGNLAB_HTTP_EVIDENCE_DIR=evidence/M0/M0-02/http uv run --no-sync pytest -q tests/api -k record_http && test -s evidence/M0/M0-02/commands.md && test -s evidence/M0/M0-02/ac.md && test -s evidence/M0/M0-02/migration-diff.md && test -s evidence/M0/summaries/M0-02.md && ls evidence/M0/M0-02/http/*.json` | 0 |
 
 ## 6. 文件级 TODO 与白名单（S3–S5 不得越出；越界即回报编排器，手册 6.4）
 
@@ -90,7 +94,7 @@ DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝�
   参数化必须覆盖：切片 5 op × 各自声明的全部状态码（断言「凡服务端可能返回的码都是 Problem 形、`status` 与 `code` 一致、`content-type` 为 `application/problem+json`」）；409 `IDEMPOTENCY_CONFLICT`；412 `REVISION_CONFLICT` 与 428 `PRECONDITION_REQUIRED`（走 `check_if_match` 单元路径，Q3）；422（缺字段／超长／未知字段／`limit` 越界／非法 ID 各 ≥1 例）；202＋`Location`＋`Job`（走 `accepted_response` DTO 路径，Q2）；Idempotency-Key 重放**一次生效**（同键同体两次 → 两个 201 逐字节相同且 DB 只 1 行，同键异体 → 409）。S4 禁止修改 `src/**`、`contracts/**`、`migrations/**` 与既有 `tests/unit/test_contract_slice.py`、`tests/unit/test_frontend_baseline.py`。
 - **S5**（`qwen3.8-flash`，AC 证据采集；**只新建**，不得改代码或测试）
   `evidence/M0/M0-02/commands.md` · `evidence/M0/M0-02/ac.md` · `evidence/M0/M0-02/migration-diff.md` · `evidence/M0/M0-02/gates/V1.log … V13.log` · `evidence/M0/M0-02/http/{exchangeSession,getSession,getHealth,listWorkspaces,createWorkspace,problem-401,problem-403,problem-404,problem-409,problem-413,problem-422}.json` · `evidence/M0/summaries/M0-02.md`
-  S5 逐条采集 §5 的 V1–V13（命令、rc、时间戳、环境行）；`ac.md` 对 AC-001/034/035 各给「判定＋依据＋证据指针」；`migration-diff.md` 贴 `compare_schema()` 的空返回与 28 表指纹摘要；`evidence/**` 未列入 `scope_allow` 但为任务卡 `outputs:` 指定落点（Q8）。
+  S5 逐条采集 §5 的 V1–V13（命令、rc、时间戳、环境行）；`ac.md` 对 AC-001/034/035 各给「判定＋依据＋证据指针」；`migration-diff.md` 贴 `compare_schema()` 的空返回与 28 表指纹摘要；**Q8 已裁定**：`evidence/M0/M0-02/**` 与 `evidence/M0/summaries/M0-02.md` 已显式加入 `scope_allow`，S5 按 `outputs:` 落点采集即属合规（见 D-014）。
 - **S2**（`qwen3.8-max`，已由编排器单独派单；白名单列出以免 S3/S4 误入）：`migrations/alembic.ini`、`migrations/env.py`、`migrations/script.py.mako`、`migrations/versions/0001_initial_schema.py:upgrade,downgrade`、`src/campaignlab/infra/db/ddl_compare.py:compare_schema,normalize_sql,table_fingerprint`、`tests/integration/bootstrap/conftest.py:migrated_db,reference_db`、`tests/integration/bootstrap/test_migration_equivalence.py:test_28_tables,test_column_fingerprint_equal,test_foreign_key_list_equal,test_index_list_equal,test_all_tables_strict,test_sql_text_normalized_equal,test_pragma_integrity_and_fk_check,test_cross_workspace_fk_negative,test_check_constraints_negative`。
 
 ## 7. 未决问题（不自行决定，交编排器／项目负责人裁定；手册 6.4）

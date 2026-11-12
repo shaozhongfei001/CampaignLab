@@ -9,6 +9,13 @@
 | BLK-05 | 需求追溯 | `CampaignLab-Bank-Strategy-Review-Source-Extract.md` 原件缺失 | 项目负责人 | 提供原件，或批准由 docx/pptx 重建 extract |
 | BLK-06 | 已关闭 | duckdb 或 pydantic-core 若无 cp314 wheel | — | M0-01 实测 CPython 3.14.10 全部安装成功，无需回退 |
 | BLK-07 | 编排机制（新增） | 宿主机重启会销毁全部子智能体实例；恢复时不得假设实例还在，需按 state.json 重新 spawn，并用 send_input 语义在新实例上续做 | 编排器自检 | 恢复协议第 2 步已加「实例丢失」判定；开工前先读 state.json 的 resume 块 |
+| BLK-08 | wave2–wave11 全部（**最高优先**） | **任务卡缺口 25 张**：`state.json` 有 29 个任务与 11 波计划，`orchestrator/tasks/` 只有 4 张卡；其中 14 张缺卡在关键路径上。手册 15.5「无拆解表不得 spawn」→ 补卡前不可派单 | 编排器（Lane T，可分批委派） | 见 **D-016**；守护测试 `tests/unit/test_task_cards.py` 已上线，`KNOWN_MISSING` 必须单调收敛 |
+| BLK-Q1 | M0-03 的 S6/S8/S9 | AC-034 误标（真出处 `framework/FRONTEND.md:12`） | — | 见 **D-011**，已于本次提交修净（卡 2 处 + 设计文档 4 处 + 文首修改者标注）→ **已关闭** |
+| BLK-Q2 | M0-02 的 S3/S4/S5 | 设计文档三处过期文本 | — | 见 **D-014**，已修净（V11 写死计数改引用权威键、10 处 `PYTHONPATH=src` 前缀去除、§6 evidence 说法按 Q8 更正）→ **已关闭** |
+| BLK-Q3 | CR-002 落地 | 选项 B 执行后必须重切两份切片并同步**全部** sha16 基准文本（含两张卡的 PRE-3 硬编码） | 编排器 | 见 **D-013**；重切参数已干跑验证可**字节复现**（M0-02 `--ac AC-001,AC-034,AC-035`；M0-03 `--ui UI-01`）；随 CR-002 原子提交关闭 |
+| BLK-Q4 | M0 收口 | 门禁清单四份口径互不相同 + `tasks.M0-01.gates` 两条 `cmd` 是描述文字 | 编排器 | 见 **D-012**；裁定以 `resume.self_check_gates_rc0.gates`（16 项 G 编号）为**唯一权威** |
+| NOTE-08 | 全体（新增，度量口径） | `git ls-files '*.md'` 在默认 `core.quotepath=true` 下对非 ASCII 路径加引号并八进制转义，使排除用的 grep 漏匹配，实测得 49 而真值 **47**（假 FAIL） | 编排器与全部子智能体 | 统计分母一律用 `git ls-files -z` 配合 NUL→换行，或 `git -c core.quotepath=false ls-files`；两者一致才可写入 `counts`。详见手册 **15.10** |
+| NOTE-09 | 全体（新增，原子性） | 缺陷单 `.md` 落盘与 `state.json` 台账写入若跨提交，`test_state_ledger.py` 在窗口内必然判红（本轮编排器与 Plato 各撞一次假 RED） | 编排器 | 硬性顺序：台账 upsert → 写 state.json → 跑 ledger 测试确认绿 → `git add` → 算分母 → 全门禁 → **一次提交**。详见手册 **15.9** |
 | NOTE-01 | M0-03、M5-01（非阻塞） | 宿主占用 TCP 3000/3001/3002（WSL 镜像网络可见）；vite 默认 5173 空闲 | 编排器 | 前端 dev server 固定用 5173 或在 playwright.config 显式指定端口，勿绑 3000 段 |
 | NOTE-02 | 全体（新增，操作纪律） | 经 PowerShell→bash 通道写多行文件有两类自伤：heredoc 字面写入使反斜杠翻倍；`sed` 模式串含 `/` 会提前终止定界符 | 编排器与全部子智能体 | 一律用「PowerShell 字面 here-string → base64 → WSL 解码」整文件写入；改配置优先整写或 `python3 -c` 定点替换，禁止含 `/` 的 sed 模式串。详见 LONG-HORIZON-ORCHESTRATION.md 第 13.2 节 |
 | NOTE-03 | 编排器自身（新增） | 提交 2fcfb8e 的标题含未转义的 `\uXXXX` 字面量：`git commit -m` 里嵌转义序列时 bash 不解释。因禁止 force-push，不改写历史，仅留痕 | 编排器 | 后续一律 `git commit -F 文件`，文件用 here-string→base64 通道写入（见手册 13.2） |

@@ -1,0 +1,64 @@
+# I2 ruff_lint_scope_files 差异定位（state.json=7 vs 实测 --show-files=8）
+ts=2026-11-13T00:06:53+08:00 HEAD=6d9f1b2
+=== ruff check . --show-files 原文 ===
+/home/szf/dev/CampaignLab/pyproject.toml
+/home/szf/dev/CampaignLab/scripts/check_contracts.py
+/home/szf/dev/CampaignLab/scripts/check_frontend_baseline.py
+/home/szf/dev/CampaignLab/scripts/contract_slice.py
+/home/szf/dev/CampaignLab/src/campaignlab/__init__.py
+/home/szf/dev/CampaignLab/tests/unit/test_contract_slice.py
+/home/szf/dev/CampaignLab/tests/unit/test_doctor_determinism.py
+/home/szf/dev/CampaignLab/tests/unit/test_frontend_baseline.py
+rc=0
+=== 计数 ===
+8
+=== git ls-files '*.py'（作用域内）原文 ===
+scripts/check_contracts.py
+scripts/check_frontend_baseline.py
+scripts/contract_slice.py
+src/campaignlab/__init__.py
+tests/unit/test_contract_slice.py
+tests/unit/test_doctor_determinism.py
+tests/unit/test_frontend_baseline.py
+=== 差集：--show-files 有而 git ls-files 无 ===
+/home/szf/dev/CampaignLab/pyproject.toml
+/home/szf/dev/CampaignLab/scripts/check_contracts.py
+/home/szf/dev/CampaignLab/scripts/check_frontend_baseline.py
+/home/szf/dev/CampaignLab/scripts/contract_slice.py
+/home/szf/dev/CampaignLab/src/campaignlab/__init__.py
+/home/szf/dev/CampaignLab/tests/unit/test_contract_slice.py
+/home/szf/dev/CampaignLab/tests/unit/test_doctor_determinism.py
+/home/szf/dev/CampaignLab/tests/unit/test_frontend_baseline.py
+rc_comm=0
+=== 该文件的 git 状态 ===
+?? evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+?? evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+=== 是否被 .gitignore 忽略 ===
+-- /home/szf/dev/CampaignLab/pyproject.toml --
+-rw-r--r-- 1 szf szf 2570 Nov 12 20:21 /home/szf/dev/CampaignLab/pyproject.toml
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/scripts/check_contracts.py --
+-rw-r--r-- 1 szf szf 9857 Nov 12 20:27 /home/szf/dev/CampaignLab/scripts/check_contracts.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/scripts/check_frontend_baseline.py --
+-rw-r--r-- 1 szf szf 2957 Nov 12 20:47 /home/szf/dev/CampaignLab/scripts/check_frontend_baseline.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/scripts/contract_slice.py --
+-rwxr-xr-x 1 szf szf 11504 Nov 12 22:01 /home/szf/dev/CampaignLab/scripts/contract_slice.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/src/campaignlab/__init__.py --
+-rw-r--r-- 1 szf szf 344 Nov 12 12:24 /home/szf/dev/CampaignLab/src/campaignlab/__init__.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/tests/unit/test_contract_slice.py --
+-rw-r--r-- 1 szf szf 10234 Nov 12 22:03 /home/szf/dev/CampaignLab/tests/unit/test_contract_slice.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/tests/unit/test_doctor_determinism.py --
+-rw-r--r-- 1 szf szf 4226 Nov 12 23:26 /home/szf/dev/CampaignLab/tests/unit/test_doctor_determinism.py
+check_ignore_rc=1
+-- /home/szf/dev/CampaignLab/tests/unit/test_frontend_baseline.py --
+-rw-r--r-- 1 szf szf 4781 Nov 12 21:03 /home/szf/dev/CampaignLab/tests/unit/test_frontend_baseline.py
+check_ignore_rc=1

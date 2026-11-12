@@ -1,0 +1,64 @@
+# A1 Python 侧门禁 Q 判定档复跑（ts=2026-11-12T23:56:45+08:00 HEAD=6d9f1b2）
+=== G1 uv lock --check ===
+CMD: uv lock --check
+ts=2026-11-12T23:56:45+08:00 rc=0
+Resolved 52 packages in 0.87ms
+
+=== G2 uv sync --locked ===
+CMD: uv sync --locked
+ts=2026-11-12T23:56:45+08:00 rc=0
+Resolved 52 packages in 1ms
+Checked 50 packages in 0.25ms
+
+=== G3 ruff check ===
+CMD: uv run --no-sync ruff check .
+ts=2026-11-12T23:56:45+08:00 rc=0
+All checks passed!
+
+=== G4 ruff format --check ===
+CMD: uv run --no-sync ruff format --check .
+ts=2026-11-12T23:56:45+08:00 rc=0
+51 files already formatted
+
+=== G5 mypy ===
+CMD: uv run --no-sync mypy
+ts=2026-11-12T23:56:45+08:00 rc=0
+Success: no issues found in 7 source files
+
+=== G6 pytest -q ===
+CMD: uv run --no-sync pytest -q
+ts=2026-11-12T23:56:45+08:00 rc=0
+................................                                         [100%]
+32 passed in 3.31s
+
+=== C1 check_contracts check ===
+CMD: python3 scripts/check_contracts.py check
+ts=2026-11-12T23:56:49+08:00 rc=0
+CONTRACT CHECK PASS 登记项=12 实测差异=12 元校验=skipped
+
+=== C2 check_contracts check --validate ===
+CMD: uv run --no-sync python scripts/check_contracts.py check --validate
+ts=2026-11-12T23:56:49+08:00 rc=0
+CONTRACT CHECK PASS 登记项=12 实测差异=12 元校验=6
+
+=== F1 check_frontend_baseline ===
+CMD: python3 scripts/check_frontend_baseline.py
+ts=2026-11-12T23:56:50+08:00 rc=0
+OK   css/tokens.css sha16=a4e27cc208ccc428 expect=a4e27cc208ccc428 bytes=3199 expect=3199
+OK   css/youxia-ui.css sha16=7ab1eadff01dc5f8 expect=7ab1eadff01dc5f8 bytes=104677 expect=104677
+OK   js/youxia-charts.js sha16=6d831e1415154721 expect=6d831e1415154721 bytes=10260 expect=10260
+OK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+
+=== F2 verify_package ===
+CMD: python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+ts=2026-11-12T23:56:50+08:00 rc=0
+PASS 接口和本地 Schema 引用共 80 个操作
+PASS 26 个页面、35 个验收用例、55 个材料点位、47 个手册操作点及文档链接
+PASS SQLite DDL 可执行，共 28 表，含完整性与外键负例
+PASS 甲乙各 510 切片、元分与六行 CSV/JSON、分母、量率、估算、补数及 60 个问法条目
+PASS 四版规则、15 个案例双版本、五种预发状态
+PACKAGE PASS 6/6
+
+ts_end=2026-11-12T23:56:51+08:00

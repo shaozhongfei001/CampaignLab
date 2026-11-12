@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T01:37:27+08:00",
+  "updated_at": "2026-11-13T02:07:05+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.25,
+    "flash_share_tasks": 0.2,
     "flash_share_tokens": null,
     "phase_quotas": {
       "M0": 100,
@@ -100,26 +100,50 @@
         "orchestrator_reverify": "15/15 与自报吻合（npm 四条 rc=0、rg/grep 守卫 rc=1、ruff/mypy/pytest 全绿、doctor HEALTHY、fc-list=37、探针残留 0、PRE-3 逐字一致）",
         "open_questions_raised": 9,
         "value_added": "主动发现 D-010 三处记载不一致且拒绝自行决定；证明 BLK-02 已解除；G7 端口守卫自伤型假红一次修正并留痕"
+      },
+      {
+        "task": "Q-VERIFY-M0-01",
+        "subtask": "judge（判定档）",
+        "subtask_count": 1,
+        "lane": "Q",
+        "agent_id": "01a1d072-960c-7ef3-a89c-7b9dde7289e3",
+        "nickname": "Plato",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": 155000,
+        "tokens_note": "子智能体自报 ≈155k（区间 145k–165k）：A–I 全量取证 ~40 次 exec_command + 大文件读取 + 7 段报告写入 + 收尾 ~15 次命令",
+        "returned_at": "2026-11-13T02:05:13+08:00",
+        "outputs": [
+          "qa-reports/m0/Q-VERIFY-M0-01.md（637 行 / 73913 B）",
+          "evidence/M0/Q-VERIFY-M0-01/judge/ 19 个 .log"
+        ],
+        "scope_violation": "NONE（自证 git status --porcelain orchestrator/ spec/ contracts/ scripts/ tests/ = 空；编排器复核 dirty=0）",
+        "value_added": "发现 D-011(MAJOR) 与 D-016(MAJOR)、D-012/D-013/D-014/D-015；纠正取证档算术 PASS=17→16；发现 git quotepath 分母陷阱（49≠47 假 FAIL）→ 手册 15.10；独立撞到并证实 D-015 的假 RED 窗口",
+        "verdicts": "A=PASS_WITH_TODO；B: D-001..D-009 全 CLOSED；C: D-007 成立；D: A1=MINOR；E: ①MINOR不改 ②MINOR必改CR-001.md:37 ③NIT不改；F=FAIL(MAJOR)；G 无冲突；H=PASS_WITH_TODO；I=PASS@f12dcf8"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 1,
+    "dispatched_not_yet_returned": 0,
     "flash_share_dev_lanes": 0.0,
     "flash_share_口径": {
-      "all_lanes": "1/4=0.25",
+      "all_lanes": "1/5=0.2",
       "dev_lanes_only_excl_Q": "0/3=0.0",
-      "tokens_coverage": "仅 1/3 条回传用量，故 flash_share_tokens 记 null，禁估算",
-      "why_below_target": "设计先行：wave1 已完成的 4 个子任务里 3 个是 max 档设计/判定（M0-02/S1、M0-03/S1、M0-03/S2），flash 档实现子任务尚未开始",
-      "projection_at_wave1_exit": "M0-02(2 max + 3 flash) + M0-03(4 max + 6 flash) = 9/15 = 0.600 恰达护栏（手册 6.6 的 60% 是每任务卡全生命周期口径，非中间时点口径）",
-      "guardrail_checkpoint": "wave2 出口；若 dev_lanes 口径仍 <0.60，把可降档子任务改派 flash 并记理由（首选 M0-03/S10 降 flash + max 复审）",
-      "recomputed_at": "2026-11-13T01:37:27+08:00",
+      "tokens_coverage": "2/4 条回传用量（Ohm 95k、Plato 155k 均为 max 档），flash 档暂无回传，故 flash_share_tokens 记 null，禁估算",
+      "why_below_target": "wave1 已完成的 5 个子任务全是 max 档（设计/判定），flash 档实现子任务尚未开始；属「设计先行」的必然形态，非降档失控",
+      "projection_at_wave1_exit": "M0-02(2 max + 3 flash) + M0-03(4 max + 6 flash) = 9/15 = 0.600 恰达护栏",
+      "guardrail_checkpoint": "wave2 出口；不足则降档并记理由（首选 M0-03/S10 降 flash + max 复审）",
+      "recomputed_at": "2026-11-13T02:05:13+08:00",
       "recomputed_by": "程序化重算（禁手填）"
     }
   },
   "tasks": {
     "M0-01": {
-      "status": "VERIFYING",
+      "status": "PASS_WITH_TODO",
       "lane": "T",
       "tier_planned": "max",
       "tier_used": "max",
@@ -207,7 +231,56 @@
       "depth": 1,
       "height": 14,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "q_verdict": {
+        "verdict": "PASS_WITH_TODO",
+        "judged_by": "Q-VERIFY-M0-01 judge (Plato)",
+        "judged_at": "2026-11-13T02:05:13+08:00",
+        "report": "qa-reports/m0/Q-VERIFY-M0-01.md（637 行 / 73913 B）",
+        "evidence_logs": 19,
+        "gates_rerun": "6 项本档复跑 rc=0；G13 等 3 项引用取证档（并发 lane 正在改 web/，注明引用而非复跑）",
+        "todos": [
+          {
+            "id": "T-A1",
+            "sev": "MINOR",
+            "item": "门禁清单口径四份互不相同 → D-012"
+          },
+          {
+            "id": "T-A2",
+            "sev": "MINOR",
+            "item": "evidence/M0/summaries/M0-01.md 含多处未标时点的历史值，会被误读为现值"
+          },
+          {
+            "id": "T-A3",
+            "sev": "MINOR",
+            "item": "orchestrator-verification.md:14 记 PASS=15 WARN=2，未注明 2 条 WARN 属预期（真实 PASS=16，Plato 已纠正取证档算术）"
+          },
+          {
+            "id": "T-A4",
+            "sev": "MINOR",
+            "item": "gates[*].measured_at 曾 16 项全为同一时间戳；现随每次重测更新，须保持"
+          },
+          {
+            "id": "T-A5",
+            "sev": "流程",
+            "item": "M0 收口前由 Q 在静态树（无并发 lane）上复跑全 16 项 G"
+          }
+        ],
+        "defects_closed": [
+          "D-001",
+          "D-002",
+          "D-003",
+          "D-004",
+          "D-005",
+          "D-006",
+          "D-007",
+          "D-008",
+          "D-009"
+        ],
+        "ac_denominator_check": "47 ✓（基线 35 + 月度 12，程序化实测，与 state.json.acceptance.total 一致）",
+        "adr005_cr002_verdict": "无冲突，事实全部成立（urn 最长 120 ≤ 契约 250；1 MiB JSON 正文上限与 8/64 MiB 文件口径未混用）",
+        "m0_02_design_verdict": "PASS_WITH_TODO（117 行 ≤120、7 节齐、5 个 operationId 与切片逐字一致）；三处过期文本 → D-014 已修"
+      }
     },
     "M0-02": {
       "status": "TODO",
@@ -1916,51 +1989,66 @@
       "id": "D-001",
       "task": "M0-01",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
-      "file": "orchestrator/defects/D-001.md"
+      "status": "CLOSED",
+      "file": "orchestrator/defects/D-001.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-002",
       "task": "M0-P01",
       "severity": "MINOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "file": "orchestrator/defects/D-002.md",
-      "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI，并补 tests/unit/test_frontend_baseline.py 6 例（手册 13.3 第 4 条）"
+      "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI，并补 tests/unit/test_frontend_baseline.py 6 例（手册 13.3 第 4 条）",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-003",
       "task": "M0-P01",
       "severity": "MINOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "file": "orchestrator/defects/D-003.md",
-      "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库"
+      "summary": ".gitignore 的 *.log 使 state.json 中 4 条 gates[].evidence 指针在仓库内悬空；已加否定规则 !evidence/**/*.log 并将 6 个证据文件入库",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-004",
       "task": "M0-P01",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "file": "orchestrator/defects/D-004.md",
       "summary": "scripts/contract_slice.py 的 openapi/pages/DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码为 1.0.0；活契约已是 1.0.1。wave1 内容经实测字节等价不受影响，但 5 个月报任务（M1-P01/M3-P01/M3-P02/M4-P01/M5-P01）会被静默提供过期契约。",
       "blocks": "已解除：wave1 派单前置 PRE-1 完成",
       "commit": "1f5912e",
-      "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
+      "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-005",
       "task": "M0-P01",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "commit": "1f5912e",
       "file": "orchestrator/defects/D-005.md",
       "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
-      "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。"
+      "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-006",
       "title": "分母口径未定义：ruff format 计数含 Markdown，历史值 35 不可复现",
       "severity": "MINOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "lane": "T",
       "found_at": "2026-11-12T22:48:36+08:00",
       "found_by": "编排器（第 3 次接管全表重跑）",
@@ -1968,13 +2056,16 @@
       "fix_commit": "ce2d9fa",
       "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
       "regression_guard": "counts.ruff_formatted_files_composition（含 cmd/构成/复现命令）+ counts.ruff_lint_scope_files",
-      "file": "orchestrator/defects/D-006.md"
+      "file": "orchestrator/defects/D-006.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-007",
       "title": "doctor.sh 字体检查在 pipefail 下因 SIGPIPE 恒判假 WARN（非确定性门禁）",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "lane": "T",
       "found_at": "2026-11-12T23:20:00+08:00",
       "found_by": "Q lane 取证员（F-A4-1）+ 编排器独立复现（30 次：rc0=2 / rc141=28）",
@@ -1984,13 +2075,16 @@
       "regression_guard": "tests/unit/test_doctor_determinism.py（4 条：反模式静态扫描+分母断言、grep -ci 定点钉住、doctor 3 次摘要逐字一致、Noto 20 次采样唯一）",
       "verified_after_fix": "连跑 30 次 doctor 假 WARN 0/30（修复前 28/30）",
       "impact_on_prior_records": "提交 8ce2bdc / 33bf5c5 中「doctor 实为 WARN=0」是侥幸绿，已在 run-04 第 8 节更正",
-      "file": "orchestrator/defects/D-007.md"
+      "file": "orchestrator/defects/D-007.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-008",
       "title": "M0-02 任务卡 AC-034/AC-035 转述错误 + scope_allow 缺 pyproject.toml/uv.lock/evidence",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "lane": "S",
       "found_at": "2026-11-13T00:27:40+08:00",
       "found_by": "M0-02/S1 设计员（qwen3.8-max high），以 Q1/Q7/Q8 提出且未自行决定",
@@ -2003,13 +2097,16 @@
       ],
       "regression_guard_pending": "scripts/check_task_cards.py 未落地；本轮由 Q 判定档（Plato）全量核对 29 张卡的 AC 转述并断言 AC 分母=47 作为临时防护",
       "hazard": "照错误任务卡执行会让 S3-S5 实现错的验收标准，且 gate 会判绿（错得自洽）",
-      "file": "orchestrator/defects/D-008.md"
+      "file": "orchestrator/defects/D-008.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-009",
       "title": "编排器用 isinstance(dict) 守卫写 state.json，而 defects/change_requests 实为 list，导致 D-006/D-007/D-008 与 CR-002 静默未入账",
       "severity": "MAJOR",
-      "status": "FIXED_PENDING_Q",
+      "status": "CLOSED",
       "lane": "T",
       "found_at": "2026-11-13T00:27:40+08:00",
       "found_by": "编排器（执行 CR-002 入账时 TypeError 暴露）",
@@ -2019,7 +2116,10 @@
       "impact": "三个缺陷单与一个 CR 只存在于 .md 文件与提交信息里，state.json 账本查不到；任何按账本恢复的新实例都会漏掉它们（正是手册 15.3 禁止的悬空引用）",
       "fix": "① 改用结构感知 upsert（按 id 匹配，存在则合并、不存在则追加）；② 写入后必须 re-read 并断言目标 id 确实在账本里；③ 立 D-009 留痕；④ 手册 15.3 增补『账本写入必须回读断言，禁止 isinstance 静默跳过』",
       "regression_guard": "本脚本写入后回读断言 D-006/D-007/D-008/D-009/CR-002 全部在账本内；并新增 tests/unit/test_state_ledger.py 钉住『defects 与 change_requests 必须是 list[dict] 且每条含 id』",
-      "file": "orchestrator/defects/D-009.md"
+      "file": "orchestrator/defects/D-009.md",
+      "closed_at": "2026-11-13T02:05:13+08:00",
+      "closed_by": "Q-VERIFY-M0-01 judge（Plato，qwen3.8-max high）B 项：每单以命令+rc 或文件+行号独立复核，未采信单内自述",
+      "closed_evidence": "qa-reports/m0/Q-VERIFY-M0-01.md#B"
     },
     {
       "id": "D-010",
@@ -2041,6 +2141,121 @@
       "evidence": [
         "orchestrator/handoff/M0-03-design.md#8-未决问题",
         "orchestrator/defects/D-010.md"
+      ]
+    },
+    {
+      "id": "D-011",
+      "task": "M0-03",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "M0-03 卡与设计文档把页面侧深链误标为 AC-034（真出处 framework/FRONTEND.md:12），已扩散到已入库产物",
+      "found_by": "Plato F 项 / BLK-Q1 / Q-N2；编排器复核成立",
+      "file": "orchestrator/defects/D-011.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "orchestrator/tasks/M0-03.md",
+        "orchestrator/handoff/M0-03-design.md"
+      ],
+      "regression_guard": "缺陷修复必须附全仓 grep 命中清单（含 0 命中反证）；AC 编号只能引 ACCEPTANCE.md，禁从 framework/ui 反推",
+      "evidence": [
+        "orchestrator/defects/D-011.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
+      ]
+    },
+    {
+      "id": "D-012",
+      "task": "M0-01",
+      "severity": "MINOR",
+      "status": "OPEN",
+      "title": "门禁清单四份口径互不相同，且 tasks.M0-01.gates 两条 cmd 是描述文字而非可复跑命令",
+      "found_by": "Plato A/D 项 / T-A1 / BLK-Q4 / Q-N1",
+      "file": "orchestrator/defects/D-012.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "evidence/M0/summaries/M0-01.md",
+        "evidence/M0/M0-01/orchestrator-verification.md"
+      ],
+      "regression_guard": "以 resume.self_check_gates_rc0.gates（16 项 G）为唯一权威；叙述性文档只引 G 编号，不得另立集合",
+      "evidence": [
+        "orchestrator/defects/D-012.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
+      ]
+    },
+    {
+      "id": "D-013",
+      "task": "M0-02",
+      "severity": "MINOR",
+      "status": "OPEN",
+      "title": "CR-002 影响面记载不完整（另 6 资源同缺状态字段、9 处用 state 命名），且选项 B 执行后必须重切切片并同步全部 sha16 基准文本",
+      "found_by": "Plato G 项 / BLK-Q3 / Q-N3；步骤 6b 由编排器独立发现",
+      "file": "orchestrator/defects/D-013.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "contracts/openapi.json",
+        "contracts/CHANGES.json",
+        "orchestrator/tasks/M0-02.md",
+        "orchestrator/tasks/M0-03.md"
+      ],
+      "regression_guard": "重切参数已干跑验证可字节复现；漏做即升级 MAJOR",
+      "evidence": [
+        "orchestrator/defects/D-013.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
+      ]
+    },
+    {
+      "id": "D-014",
+      "task": "M0-02",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "M0-02 设计文档三处过期文本（V11 写死 40 files、10 处 PYTHONPATH=src、§6 evidence 说法）会让 S3/S4/S5 按作废口径执行",
+      "found_by": "Plato H 项 / BLK-Q2 / Q-N4",
+      "file": "orchestrator/defects/D-014.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "orchestrator/handoff/M0-02-design.md"
+      ],
+      "regression_guard": "设计文档内所有计数一律引用 state.json 权威键，禁写死；临时通道必须标注失效条件",
+      "evidence": [
+        "orchestrator/defects/D-014.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
+      ]
+    },
+    {
+      "id": "D-015",
+      "task": "编排机制",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "缺陷单落盘与 state.json 台账写入非原子，产生可复现的假 RED（编排器与 Plato 各撞一次）",
+      "found_by": "Plato BLK-Q5→Q-N5 与编排器各自独立撞到同一次假 RED",
+      "file": "orchestrator/defects/D-015.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "tests/unit/test_state_ledger.py",
+        "docs/delivery/LONG-HORIZON-ORCHESTRATION.md"
+      ],
+      "regression_guard": "手册 15.9 固化硬性顺序；台账 upsert 时补齐缺失的 file 键",
+      "evidence": [
+        "orchestrator/defects/D-015.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
+      ]
+    },
+    {
+      "id": "D-016",
+      "task": "规划（wave2–wave11）",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "title": "任务卡缺口 25 张：state.json 有 29 任务与 11 波，磁盘只有 4 张卡，其中 14 张缺卡在关键路径",
+      "found_by": "Plato F 项「分母异常」+ 编排器独立复核",
+      "file": "orchestrator/defects/D-016.md",
+      "found_at": "2026-11-13T02:05:13+08:00",
+      "fix_scope": [
+        "orchestrator/tasks/",
+        "tests/unit/test_task_cards.py"
+      ],
+      "regression_guard": "守护测试已上线，KNOWN_MISSING 必须单调收敛；补卡按 wave 顺序，每卡必含档位表与 AC 原文引用",
+      "evidence": [
+        "orchestrator/defects/D-016.md",
+        "qa-reports/m0/Q-VERIFY-M0-01.md"
       ]
     }
   ],
@@ -2179,57 +2394,17 @@
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
-      "0 【已完成】owner_gate=GO（项目负责人明确下达「确认开工」并授权长程无人值守、裁定用默认值）",
-      "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空",
-      "2 【已完成】POST-PATCH-REVIEW 第 6 节 4 件事按建议批准；追认手册 15.6；pending_owner 5 项按默认值裁定",
-      "3 【已完成】fonts-noto-cjk 装成并复验，BLK-02 关闭；期间发现并修复 D-007（doctor SIGPIPE 假 WARN，28/30 -> 0/30），手册升 v1.5 加 15.8",
-      "4 【已完成】wave1 Round1 派单：Q 取证（flash）+ M0-02/S1 设计（max high）双双 RETURNED，产出已入库",
-      "5 【已完成】S1 提出的 8 条未决问题全部裁定：Q1 spec 优先修正任务卡（立 D-008）、Q2/Q3 收窄 gate 并 deferred_to、Q4 不发明字段 + 立 CR-002、Q5/Q6 进 ADR-005、Q7/Q8 扩 scope_allow",
-      "6 【下一步】派 Q 判定档（max）：读 evidence/M0/Q-VERIFY-M0-01/collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md；额外受托全量核对 29 张任务卡的 AC 转述（D-008 回归防护的临时手段）；裁定 M0-01 PASS/PASS_WITH_TODO 与 D-001..D-008 是否 CLOSED",
-      "7 【下一步】并行派 M0-03/S1（max）前端壳与令牌体系设计，只写 orchestrator/handoff/M0-03-design.md（与 Q 判定档写路径不相交，且不动 web/，保证判定档复跑门禁时工作树稳定）",
-      "8 【Round 2b，待判定档返回后】并行派 M0-02/S2（max，首迁 + 删 package=false + uv lock）与 M0-03/S2（max，工程骨架）；二者写路径不相交（migrations/src/pyproject vs web/）",
-      "9 【Round 3】M0-02 的 S3/S4/S5 与 M0-03 的对应 flash 子任务，只能在 S1 白名单内工作",
-      "10 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），并确认 ADR-005 的 Problem code 注册表已冻结留痕",
-      "11 【已裁定·待执行】CR-002 选项 B：HOLD 到 Plato/Ohm 返回后按 CR-002.md 6.3 节 8 步原子执行（新建 ADR-006、改 openapi.json、登记 CHANGES.json 使登记项 12->13、契约门禁 rc=0、重切两份切片、更新 counts 与 M0-02 设计 Q4 行、一次提交）",
-      "12 【新增·D-009 派生】补 tests/unit/test_state_ledger.py 与手册 15.3 增补条款（账本写入必须回读断言，禁止 isinstance 静默跳过）"
+      "0..7 【已完成】见 git log（owner_gate=GO、PRE-1/2/3、POST-PATCH-REVIEW、fonts-noto-cjk、wave1 Round1、8 条裁定、Round2 派单）",
+      "8 【已完成】Ohm(M0-03/S1+S2) 返回并入库 f12dcf8；9 条未决问题全部裁定",
+      "9 【已完成】Plato(Q-VERIFY-M0-01 judge) 返回并入库；M0-01 判 PASS_WITH_TODO；D-001..D-009 全 CLOSED；新立 D-011..D-016",
+      "10 【已完成】BLK-Q1(MAJOR)/BLK-Q2 修净；CR-001.md:37 措辞精确化；手册升 v1.6 加 15.9/15.10；BLOCKERS 加 BLK-08/NOTE-08/NOTE-09",
+      "11 【下一步·最高优先】原子执行 CR-002 选项 B（CR-002.md 6.3 的 8 步 + 步骤 6b 任务卡 PRE-3 硬编码 sha16/bytes 同步，依 D-013/BLK-Q3）",
+      "12 【Round 3 派单，CR-002 落地后】M0-02/S2（max high，首迁 28 表 + 删 [tool.uv] package=false + uv lock，禁再带 PYTHONPATH=src）∥ M0-03/S3+S4（flash，tokens.css 机械落地 + openapi-typescript 生成 types.ts）",
+      "13 【并行·补卡】D-016：分批撰写 25 张任务卡（先 wave2 的 M0-04/M0-03b，再 wave3 的 M1-01..03/M2-01..03）；每批提交后 KNOWN_MISSING 单调收敛",
+      "14 wave2 出口冻结公共件前：指标注册表预留月报扩展点、ADR-005 的 Problem code 注册表冻结留痕、flash_share dev 口径 ≥0.60",
+      "15 【需项目负责人】ADR-005 追认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
     ],
-    "in_flight_agents": [
-      {
-        "agent_id": "01a1d072-960c-7ef3-a89c-7b9dde7289e3",
-        "nickname": "Plato",
-        "lane": "Q",
-        "task": "Q-VERIFY-M0-01",
-        "subtask": "judge（判定档）",
-        "tier_planned": "qwen3.8-max",
-        "reasoning_effort": "high",
-        "model_explicitly_set": true,
-        "fork_context": false,
-        "dispatched_at": "2026-11-12T23:51:06+08:00",
-        "scope_write": [
-          "qa-reports/m0/**",
-          "evidence/M0/Q-VERIFY-M0-01/judge/**"
-        ],
-        "remits": [
-          "A M0-01 总判定",
-          "B D-001..D-008 逐个 CLOSED 与否",
-          "C 独立复核 D-007（doctor 3 次摘要一致性 + 原写法 20 次 rc 分布 + 定向 pytest）",
-          "D A1 文档不一致严重度",
-          "E A3 三条措辞级不一致严重度",
-          "F 全量核对 29 张任务卡的 AC 转述（D-008 回归防护的临时手段）+ 断言 AC 分母=47",
-          "G 裁定 ADR-005 与 CR-002 是否与 spec/活契约冲突",
-          "H 裁定 M0-02/S1 设计的可执行性与白名单合规",
-          "I 分母核对（ruff 51 / pytest 32 / mypy 7）"
-        ],
-        "forbidden": [
-          "git 写操作",
-          "sudo",
-          "再 spawn",
-          "任何 npm/node/vite/playwright/openapi-typescript 命令（并发 lane 正在改 web/，G13 只能引用 collect 的 rc）",
-          "整读 openapi.json"
-        ],
-        "token_self_report": "REQUIRED（新增硬性要求）"
-      }
-    ],
+    "in_flight_agents": [],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -2320,7 +2495,7 @@
     "self_check_gates_rc0": {
       "checked_at": "2026-11-12T23:45:58+08:00",
       "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
-      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。",
+      "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。",
       "gates": {
         "G1_baseline_v1.0": {
           "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
@@ -2384,7 +2559,7 @@
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-13T01:37:27+08:00",
+          "measured_at": "2026-11-13T02:07:05+08:00",
           "last_summary": "All checks passed!"
         },
         "G8_ruff_format": {
@@ -2392,31 +2567,31 @@
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-13T01:37:27+08:00",
-          "last_summary": "56 files already formatted"
+          "measured_at": "2026-11-13T02:07:05+08:00",
+          "last_summary": "63 files already formatted"
         },
         "G9_mypy": {
           "cmd": "uv run --no-sync mypy",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-13T01:37:27+08:00",
-          "last_summary": "Success: no issues found in 8 source files"
+          "measured_at": "2026-11-13T02:07:05+08:00",
+          "last_summary": "Success: no issues found in 9 source files"
         },
         "G10_pytest": {
           "cmd": "uv run --no-sync pytest -q",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 1,
-          "measured_at": "2026-11-13T01:37:27+08:00",
-          "last_summary": "38 passed in 4.13s"
+          "measured_at": "2026-11-13T02:07:05+08:00",
+          "last_summary": "43 passed in 2.69s"
         },
         "G11_prototype_verify": {
           "cmd": "bash scripts/verify.sh",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 1,
-          "measured_at": "2026-11-13T01:37:27+08:00",
+          "measured_at": "2026-11-13T02:07:05+08:00",
           "last_summary": "PASS: 字节级复现"
         },
         "G12_package_verify": {
@@ -2424,7 +2599,7 @@
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0,
-          "measured_at": "2026-11-13T01:37:27+08:00",
+          "measured_at": "2026-11-13T02:07:05+08:00",
           "last_summary": "PACKAGE PASS 6/6"
         },
         "G13_npm_ci_and_build": {
@@ -2432,15 +2607,15 @@
           "rc": 0,
           "expected": 0,
           "elapsed_s": 9,
-          "measured_at": "2026-11-13T01:37:27+08:00",
-          "last_summary": "✓ built in 174ms"
+          "measured_at": "2026-11-13T02:07:05+08:00",
+          "last_summary": "✓ built in 137ms"
         },
         "G14_doctor": {
           "cmd": "bash scripts/doctor.sh",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 1,
-          "measured_at": "2026-11-13T01:37:27+08:00",
+          "measured_at": "2026-11-13T02:07:05+08:00",
           "last_summary": "  RESULT: HEALTHY"
         }
       },
@@ -2456,9 +2631,9 @@
         "expected": 0
       },
       "counts": {
-        "pytest_passed": 38,
-        "mypy_source_files": 8,
-        "ruff_formatted_files": 56,
+        "pytest_passed": 43,
+        "mypy_source_files": 9,
+        "ruff_formatted_files": 63,
         "contract_registered_nodes": 12,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -2467,28 +2642,27 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 56,
-          "in_scope_py": 8,
-          "in_scope_md": 48,
+          "total": 63,
+          "in_scope_py": 9,
+          "in_scope_md": 54,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T01:37:27+08:00：Ohm(M0-03/S1+S2) 产出入库（+1 md）与 D-010（+1 md）后重测",
-          "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 7）**，Q 复核以它为准",
-          "identity": "tracked_in_scope(55) + untracked_not_ignored_in_scope(1) == ruff_total(56) -> True",
+          "measured_after": "2026-11-13T02:07:05+08:00：Q 判定档报告（+1 md）、D-011..D-016（+6 md）、test_task_cards.py（+1 py）入库后重测",
+          "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）",
+          "identity": "tracked_in_scope(63) + untracked_not_ignored_in_scope(0) == ruff_total(63) -> True",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
-          "untracked_component": [
-            "qa-reports/m0/Q-VERIFY-M0-01.md"
-          ],
+          "untracked_component": [],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "qa-reports/m0/Q-VERIFY-M0-01.md 属并行 Q lane（Plato）在飞产物，尚未返回，本次不提交；其入库时分母将再 +1"
+          "untracked_component_note": "qa-reports/m0/Q-VERIFY-M0-01.md 属并行 Q lane（Plato）在飞产物，尚未返回，本次不提交；其入库时分母将再 +1",
+          "counting_method": "手册 15.10：-z NUL 分隔与 -c core.quotepath=false 双口径互验一致（63==63）才可写入 counts"
         },
-        "ruff_lint_scope_files": 8,
+        "ruff_lint_scope_files": 9,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T01:37:27+08:00",
-        "counts_refresh_reason": "M0-03/S1+S2 入库：新增 handoff/M0-03-design.md 与 defects/D-010.md（各 +1 md 分母）"
+        "counts_refreshed_at": "2026-11-13T02:07:05+08:00",
+        "counts_refresh_reason": "Q-VERIFY-M0-01 judge 入库（+1 md 报告，19 个 .log 不计入 ruff 分母）、D-011..D-016（+6 md）、tests/unit/test_task_cards.py（+1 py）"
       },
       "denominator_history": [
         {
@@ -2523,6 +2697,22 @@
             "mypy_source_files": 8
           },
           "note": "Plato 受托基线 ruff=51/pytest=32/mypy=7 已被并行推进连续取代（51→53→54→56）；其报告若据此判红属基准漂移，非真实回归"
+        },
+        {
+          "at": "2026-11-13T02:07:05+08:00",
+          "ruff_total": 63,
+          "in_scope_py": 9,
+          "in_scope_md": 54,
+          "pytest_passed": 43,
+          "mypy_source_files": 9,
+          "cause": "Q 判定档入库 + D-011..D-016 + 守护测试（+7 md +1 py）",
+          "prev": {
+            "ruff_total": 56,
+            "in_scope_py": 8,
+            "pytest_passed": 38,
+            "mypy_source_files": 8
+          },
+          "note": "演进链 51→53(D-009)→54→56(M0-03 S1+S2)→63(本次)；pytest 32→38→43；mypy 7→8→9"
         }
       ]
     },
@@ -2723,19 +2913,20 @@
     ],
     "q_verify": {
       "task": "Q-VERIFY-M0-01",
-      "stage": "COLLECT_DONE_AWAIT_JUDGE",
-      "collect_evidence": "evidence/M0/Q-VERIFY-M0-01/collect/",
-      "collected_at": "2026-11-12T23:25:00+08:00",
-      "collector_tier": "qwen3.8-flash",
-      "key_findings": [
-        "A1 九项门禁：准确清单出处是 evidence/M0/summaries/M0-01.md（9 条）；orchestrator-verification.md 只有 8 行且集合不同（文档不一致，待判定档裁定）；逐项重跑 11 项全 rc=0",
-        "A2 契约门禁：check=0、check --validate=0，登记项==实测==12 成立",
-        "A3 三方一致性：CR-001 与 CHANGES.json 12 节点交集 12/12、差集空；ADR-004 不枚举节点但交叉数字一致；措辞级不一致 3 条",
-        "A4 D-001..D-006 验证命令全部复跑通过；D-006 复现命令实跑 py=6/md=33/ruff=39 与 state 当前值一致",
-        "A4 新发现 F-A4-1 -> 已立 D-007：doctor.sh:246 在 pipefail 下 grep -qi 提前退管触发 SIGPIPE(141)，字体已装却恒判 WARN（编排器复现 30 次：rc0=2 / rc141=28）",
-        "A5 切片一致性：独立复算 sha16=01bd28f0772f506e/bytes=443552/info.version=1.0.1 与两切片一致；重切逐字节一致；抽查 getHealth/listWorkspaces 12 个响应码两侧一致"
+      "stage": "judge_DONE",
+      "returned_at": "2026-11-13T02:05:13+08:00",
+      "agent": "Plato (qwen3.8-max high)",
+      "report": "qa-reports/m0/Q-VERIFY-M0-01.md",
+      "verdict_summary": "A=PASS_WITH_TODO / B: D-001..D-009 全 CLOSED / F=FAIL(MAJOR) / I=PASS@f12dcf8",
+      "new_defects": [
+        "D-011",
+        "D-012",
+        "D-013",
+        "D-014",
+        "D-015",
+        "D-016"
       ],
-      "next": "派 max 档判定员读 collect/ 出 qa-reports/m0/Q-VERIFY-M0-01.md，裁定 A1 文档不一致与 A3 三条措辞级不一致的严重度，并给出 M0-01 PASS/PASS_WITH_TODO 与 D-001..D-007 CLOSED 与否"
+      "orchestrator_reverify": "12/12 论断独立复核成立（含 4 张卡 vs 29 任务、AC-034 误标、quotepath 陷阱 49≠47、AC 分母 47、越界自证 dirty=0）"
     },
     "commit_message_corrections": [
       {
@@ -2747,7 +2938,61 @@
         "handling": "禁止 force-push，不改写历史；在此留痕（同 NOTE-03 口径）。改进：提交信息里的数字一律由脚本回填实测值后再写文件",
         "rule_added": "后续所有提交信息中的计数必须由同一次运行的实测变量插入，禁止手写数字"
       }
-    ]
+    ],
+    "card_gap": {
+      "recorded_at": "2026-11-13T02:05:13+08:00",
+      "source": "D-016 / Q-VERIFY-M0-01 F 项",
+      "tasks_in_state": 29,
+      "cards_on_disk": 4,
+      "missing": 25,
+      "missing_ids": [
+        "M0-03b",
+        "M0-04",
+        "M1-01",
+        "M1-02",
+        "M1-03",
+        "M1-04",
+        "M1-P01",
+        "M2-01",
+        "M2-02",
+        "M2-03",
+        "M2-04",
+        "M3-01",
+        "M3-02",
+        "M3-03",
+        "M3-04",
+        "M3-P01",
+        "M3-P02",
+        "M4-01",
+        "M4-02",
+        "M4-03",
+        "M4-P01",
+        "M5-01",
+        "M5-02",
+        "M5-03",
+        "M5-P01"
+      ],
+      "missing_critical": 14,
+      "missing_critical_ids": [
+        "M0-04",
+        "M1-01",
+        "M1-02",
+        "M3-01",
+        "M3-02",
+        "M3-03",
+        "M4-01",
+        "M4-02",
+        "M4-03",
+        "M5-01",
+        "M5-02",
+        "M5-03",
+        "M4-P01",
+        "M5-P01"
+      ],
+      "blocking": "手册 15.5 无拆解表不得 spawn → wave2 起整条 DAG 实质停摆",
+      "guard": "tests/unit/test_task_cards.py（KNOWN_MISSING 必须单调收敛；任务总数分母钉死 29）",
+      "plan": "按 wave 顺序补卡：wave2(M0-04,M0-03b) → wave3(M1-01..03,M2-01..03) → 其余；max 起草 + flash 机械铺开；每批提交后 KNOWN_MISSING 单调收敛并重算 card_gap"
+    }
   },
   "acceptance": {
     "baseline_total": 35,

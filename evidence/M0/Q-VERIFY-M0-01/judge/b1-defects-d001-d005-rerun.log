@@ -1,0 +1,115 @@
+# B1 D-001..D-005 缺陷验证命令 Q 判定档复跑 ts=2026-11-13T00:08:57+08:00 HEAD=6d9f1b2
+
+=========== D-001 切片 --tables 静默 NOT_FOUND ===========
+--- [D001-1] 原始复现：--tables workspaces（修复后必须给出真 DDL 而非 NOT_FOUND）---
+spec_version=1.0.1 slice_bytes=949 slice_lines=16 sections=['spec_version', 'source', 'ddl'] missing=[]
+rc=0
+ddl keys: ['workspaces']
+NOT_FOUND 出现: False
+首行: CREATE TABLE workspaces (
+尾行: ) STRICT;
+--- [D001-2] --all-tables：表数分母与 NOT_FOUND ---
+spec_version=1.0.1 slice_bytes=18769 slice_lines=61 sections=['spec_version', 'source', 'ddl'] missing=[]
+rc=0
+ddl 键总数= 34  表键= 28  索引组键= 6
+NOT_FOUND 值个数= 0
+不以 CREATE TABLE 开头或不以 STRICT; 收尾的表 = []
+spec_version= 1.0.1
+--- [D001-3] 参考 DDL 表数分母 28 ---
+28
+--- [D001-4] 未知表 rc 必须为 2 ---
+spec_version=1.0.1 slice_bytes=594 slice_lines=16 sections=['spec_version', 'source', 'ddl'] missing=['ddl:no_such_table']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['ddl:no_such_table']
+rc=2
+ls: cannot access '/tmp/qb_bad.json': No such file or directory
+ls_rc=2
+--- [D001-5] 切片单测用例数 ---
+......................                                                   [100%]
+22 passed in 0.39s
+22
+
+=========== D-002 前端基线机读校验 ===========
+--- [D002-1] check_frontend_baseline.py（已在 A1 复跑 rc=0 8/8）此处取用例数 ---
+6
+--- [D002-2] verify_package.py 路径核实（缺陷单写 qa/verify_package.py）---
+ls: cannot access 'qa/verify_package.py': No such file or directory
+ls_rc_root_path=2
+spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+ls_rc_spec_path=0
+--- [D002-3] 篡改负例：不复跑（禁止改 spec/），引用 run-04 §1.1 ---
+3:- 生成时间：2026-11-12T22:50:51+08:00（Asia/Shanghai）
+26:| G4c_frontend_tamper_negative | `printf '\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py` | 1 | 1 | 0s | PASS |
+33:### 1.1 G4c 篡改负例本轮真实执行（不再转录 run-02）
+36:cp spec/frontend-template-spdb-v1.1/css/tokens.css /tmp/tokens.css.bak
+37:printf '\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css
+
+=========== D-003 证据日志 .gitignore ===========
+--- [D003-1] .gitignore 否定规则 ---
+15:*.log
+16:# 例外（D-003）：手册 9.2 的证据布局要求 <gate>.log 入库，否则 state.json 里
+18:!evidence/**/*.log
+--- [D003-2] 5 个历史证据日志 check-ignore（期望 rc=1 即不被忽略）---
+  evidence/monthly/M0-P01/run-01/precheck-base.log check_ignore_rc=1 (期望 1)  tracked=yes
+  evidence/monthly/M0-P01/run-01/post-merge-precheck.log check_ignore_rc=1 (期望 1)  tracked=yes
+  evidence/monthly/M0-P01/run-01/merged-diff.log check_ignore_rc=1 (期望 1)  tracked=yes
+  evidence/monthly/M0-P01/run-01/check-validate.log check_ignore_rc=1 (期望 1)  tracked=yes
+  evidence/monthly/M0-P01/run-02/frontend-baseline.log check_ignore_rc=1 (期望 1)  tracked=yes
+--- [D003-3] 本轮 Q judge 日志同样不被忽略（新证据）---
+  evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log check_ignore_rc=0
+  evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log check_ignore_rc=0
+--- [D003-4] git ls-files evidence 计数 ---
+27
+
+=========== D-004 切片源钉死活契约 + 版本动态 ===========
+--- [D004-1] 两切片 spec_version / source ---
+orchestrator/handoff/M0-02.slice.json -> spec_version= 1.0.1  sha16= 01bd28f0772f506e  bytes= 443552  live= contracts
+orchestrator/handoff/M0-03.slice.json -> spec_version= 1.0.1  sha16= 01bd28f0772f506e  bytes= 443552  live= contracts
+--- [D004-2] 未知 op rc=2 且不写产物 ---
+spec_version=1.0.1 slice_bytes=596 slice_lines=16 sections=['spec_version', 'source', 'operations'] missing=['operations:noSuchOp']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']
+rc=2
+ls: cannot access '/tmp/qb_noop.json': No such file or directory
+ls_rc=2
+--- [D004-3] 字节级重切（金样本再生）---
+spec_version=1.0.1 slice_bytes=14675 slice_lines=693 sections=['spec_version', 'source', 'operations', 'acceptance_rows'] missing=[]
+rc_slice02=0
+diff_rc_M0-02=0
+spec_version=1.0.1 slice_bytes=16347 slice_lines=697 sections=['spec_version', 'source', 'operations', 'pages'] missing=[]
+rc_slice03=0
+diff_rc_M0-03=0
+--- [D004-4] test_live_contract_is_the_source 用例在场 ---
+.                                                                        [100%]
+1 passed, 31 deselected in 0.02s
+--- [D004-5] 工具内是否仍有硬编码版本号 ---
+14:  DELTA = spec/CampaignLab-SDD-Patch-v1.0.1-.../    月报增量，供 AC-MR-01..12 原文行（D-005）
+21:D-004 修复记录：此前 openapi / pages / DDL 全部只读 BASE，且 spec_version 硬编码 "1.0.0"。
+22:活契约升到 1.0.1 后，切片会**静默提供过期契约**（rc=0，无任何提示）。现改读 LIVE 并动态取版本。
+46:DELTA = Path("spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta")
+
+=========== D-005 AC-MR 可解析 ===========
+--- [D005-1] 35 + 12 = 47 ---
+base=35
+delta=12
+--- [D005-2] 未知 AC rc=2 ---
+spec_version=1.0.1 slice_bytes=2800 slice_lines=124 sections=['spec_version', 'source', 'operations', 'acceptance_rows'] missing=['acceptance_rows:AC-MR-99']
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']
+rc=2
+ls: cannot access '/tmp/qb_ac99.json': No such file or directory
+ls_rc=2
+--- [D005-3] 正常路径 rc=0 且含 2 条 acceptance_rows ---
+spec_version=1.0.1 slice_bytes=3542 slice_lines=137 sections=['spec_version', 'source', 'operations', 'acceptance_rows'] missing=[]
+rc=0
+acceptance_rows keys= ['AC-001', 'AC-MR-01']
+spec_version= 1.0.1
+--- [D005-4] 47 条 id 全可解析（单测）---
+.                                                                        [100%]
+1 passed, 31 deselected in 0.01s
+--- [D005-5] AC-MR-05 83.33% / AC-MR-08 79.31% 原文在场 ---
+1
+1
+ts_end=2026-11-13T00:08:59+08:00

@@ -1,0 +1,93 @@
+# I3 附录 B：报告落盘后的分母复测与台账守卫复测
+ts=2026-11-13T01:36:17+08:00 HEAD=b1f38a9 branch=m0-framework
+
+=== [1] git ls-files --others --exclude-standard qa-reports/ evidence/M0/Q-VERIFY-M0-01/judge/ ===
+evidence/M0/Q-VERIFY-M0-01/judge/a1-python-gates-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/a2-m0-01-evidence-and-wheels.log
+evidence/M0/Q-VERIFY-M0-01/judge/b1-defects-d001-d005-rerun.log
+evidence/M0/Q-VERIFY-M0-01/judge/b2-d003-checkignore-method.log
+evidence/M0/Q-VERIFY-M0-01/judge/c1-doctor-determinism.log
+evidence/M0/Q-VERIFY-M0-01/judge/c2-doctor-byteidentity-fclist-pytest.log
+evidence/M0/Q-VERIFY-M0-01/judge/c3-doctor-line43-nondeterminism.log
+evidence/M0/Q-VERIFY-M0-01/judge/c4-doctor-counting-semantics.log
+evidence/M0/Q-VERIFY-M0-01/judge/e1-cr001-adr004-changes.log
+evidence/M0/Q-VERIFY-M0-01/judge/e2-required-arrays-and-changes-schema.log
+evidence/M0/Q-VERIFY-M0-01/judge/f1-ac-transcription-audit.log
+evidence/M0/Q-VERIFY-M0-01/judge/g1-cr002-facts-and-d009.log
+evidence/M0/Q-VERIFY-M0-01/judge/i1-denominators.log
+evidence/M0/Q-VERIFY-M0-01/judge/i2-ruff-lint-scope-8-vs-7.log
+evidence/M0/Q-VERIFY-M0-01/judge/i3-appendix-b-recheck-at-b1f38a9.log
+qa-reports/m0/Q-VERIFY-M0-01.md
+rc=0
+count=16
+
+=== [2] ruff format --check . ===
+56 files already formatted
+rc=0
+
+=== [3] tracked .py+.md 作用域内（排除 spec/prototype/web）===
+tracked_in_scope=55
+py=8 md=45
+
+=== [4] untracked non-ignored .py+.md 作用域内 ===
+untracked_not_ignored_in_scope=3
+orchestrator/defects/D-010.md
+orchestrator/handoff/M0-03-design.md
+qa-reports/m0/Q-VERIFY-M0-01.md
+
+=== [5] 恒等式 tracked + untracked ===
+tracked=55 untracked=3 sum=58
+
+=== [6] 台账守卫 pytest tests/unit/test_state_ledger.py ===
+...F..                                                                   [100%]
+=================================== FAILURES ===================================
+____________________ test_every_md_on_disk_has_ledger_entry ____________________
+
+state = {'schema': '1.0', 'phase': 'M0', 'wave': 1, 'updated_at': '2026-11-13T00:42:29+08:00', ...}
+
+    def test_every_md_on_disk_has_ledger_entry(state: dict[str, Any]) -> None:
+        entries = _assert_list_of_dicts_with_id(state.get("defects"), "defects")
+        ledger = {e["id"] for e in entries}
+        on_disk = sorted(p.stem for p in DEFECT_DIR.glob("D-*.md"))
+        if not on_disk:
+            pytest.fail(f"denominator=0：{DEFECT_DIR} 下没有任何 D-*.md", pytrace=False)
+        orphan = [d for d in on_disk if d not in ledger]
+>       assert orphan == [], (
+            f"磁盘上有缺陷单但账本查不到（D-009 的形态：新实例按账本恢复会漏掉它们）：{orphan}"
+        )
+E       AssertionError: 磁盘上有缺陷单但账本查不到（D-009 的形态：新实例按账本恢复会漏掉它们）：['D-010']
+E       assert ['D-010'] == []
+E         
+E         Left contains one more item: 'D-010'
+E         Use -v to get more diff
+
+tests/unit/test_state_ledger.py:86: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_state_ledger.py::test_every_md_on_disk_has_ledger_entry
+1 failed, 5 passed in 0.04s
+rc=1
+
+=== [7] D-010 台账状态 ===
+-rw-r--r-- 1 szf szf 3321 Nov 13 01:29 orchestrator/defects/D-010.md
+?? orchestrator/defects/D-010.md
+state.json hits: D-009=9 D-010=0
+
+=== [8] 全量 pytest / mypy / ruff lint scope 复测 ===
+=========================== short test summary info ============================
+FAILED tests/unit/test_state_ledger.py::test_every_md_on_disk_has_ledger_entry
+1 failed, 37 passed in 4.27s
+rc_pytest=1
+Success: no issues found in 8 source files
+rc_mypy=0
+ruff_lint_scope_showfiles=9
+
+=== [9] M0-03.md AC 引用（F 项 MAJOR 复测）===
+11:  - AC-001 页面侧：入口换取会话、工作区列表与新建、两条首跑路线；无工作区时突出创建
+12:  - AC-034：深链、刷新、返回、切工作区、404、过期会话均回到合法入口；切工作区清理临时查询、轮询与失效选择
+38:| S8 vitest 单测脚手架与 AC-001 / AC-034 页面侧断言 | `qwen3.8-flash` | 7k | `web/tests/**` |
+77:此前被误挂进 M0-02 任务卡的 AC-034 gates（spec `qa/ACCEPTANCE.md` 第 42 行的 AC-034 实为
+--- spec 权威行 AC-033..AC-036 ---
+41:| AC-033 | 逐项验证环比、同比、同组、全行、总行、目标、年度已选月份和自选 | 参照标签、同组剔除自身、分行等权、年度缺月与目标仅有指标正确 | 计算和问答 |
+42:| AC-034 | 测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败 | 按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查 | HTTP 负例 |
+43:| AC-035 | 按 M0 锁版本、迁移、核对包和 API | `verify_package.py`、DDL 等价、OpenAPI 请求响应及前端生成类型通过。锁和运行环境清楚 | 命令、锁和报告 |
+ts_end=2026-11-13T01:36:22+08:00

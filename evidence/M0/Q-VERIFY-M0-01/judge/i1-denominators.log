@@ -1,0 +1,58 @@
+# I1 分母核对（Q 判定档实测）ts=2026-11-13T00:06:14+08:00 HEAD=6d9f1b2
+
+=== [I-1] ruff format --check . 报的 N ===
+51 files already formatted
+rc=0
+
+=== [I-2] git ls-files 口径：已跟踪 .py + .md（排除 spec/prototype/web）===
+tracked_in_scope=51
+--- 分目录构成 ---
+      1 (root)
+      1 contracts
+      9 docs
+     17 evidence
+     16 orchestrator
+      3 scripts
+      1 src
+      3 tests
+--- py / md 拆分 ---
+py=7
+md=44
+
+=== [I-3] 未跟踪且未忽略的 .py/.md（同口径）===
+untracked_not_ignored_in_scope=0
+
+=== [I-4] 恒等式 tracked + untracked == ruff_total ===
+ruff_total=51 tracked=51 untracked=0 sum=51
+IDENTITY=TRUE
+
+=== [I-5] 磁盘 find 口径（旁证，含被忽略文件）===
+52
+
+=== [I-6] state.json counts 对照 ===
+  pytest_passed = 32
+  mypy_source_files = 7
+  ruff_formatted_files = 51
+  ruff_lint_scope_files = 7
+  acceptance_denominator = 47
+  acceptance_resolvable = 47
+  frontend_baseline_rows = 8
+  contract_registered_nodes = 12
+  live_openapi_sha16 = 01bd28f0772f506e
+  live_openapi_info_version = 1.0.1
+  composition.total = 51  in_scope_py = 7  in_scope_md = 44
+  composition.identity = tracked_in_scope(51) + untracked_not_ignored_in_scope(0) == ruff_total(51) -> True
+  composition.untracked_component = ['orchestrator/handoff/M0-02-design.md']
+
+=== [I-7] pytest / mypy 实测计数 ===
+................................                                         [100%]
+32 passed in 3.49s
+rc_pytest=0
+Success: no issues found in 7 source files
+rc_mypy=0
+ruff_lint_scope: 8
+
+=== [I-8] 活契约三指标独立实算（V1 期望值核对）===
+01bd28f0772f506e 443552
+info.version = 1.0.1
+ts_end=2026-11-13T00:06:18+08:00
