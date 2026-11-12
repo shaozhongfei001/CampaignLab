@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T02:46:54+08:00",
+  "updated_at": "2026-11-13T03:01:56+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -2427,8 +2427,8 @@
         "M0-02",
         "M0-03"
       ],
-      "status": "ROUND2_RETURNED_CR002_MERGED_AWAIT_ROUND3",
-      "round": 2,
+      "status": "IN_FLIGHT_ROUND3",
+      "round": 3,
       "round1_dispatched": [
         "Q-VERIFY-M0-01/collect（flash）",
         "M0-02/S1（max high）"
@@ -2453,7 +2453,16 @@
       "round2_started_at": "2026-11-12T23:51:06+08:00",
       "round2_result": "双双 RETURNED 并已 close_agent：Plato(Q judge, max, 自报 155k tokens) 判定档入库 b317fac；Ohm(M0-03/S1+S2, max, 自报 95k tokens) 入库 f12dcf8。in_flight_agents=[]。随后编排器原子执行 CR-002 选项 B（本次提交）。",
       "round3_preconditions_cleared_at": "2026-11-13T02:46:54+08:00",
-      "round3_preconditions": "CR-002 已 MERGED；两切片已重切为 592571099d638251/443309B，S2/S3/S4 派单必须引用重切后的切片；M0-02 设计 Q4 与 M0-03 设计 Q7 的临时处置已取消，派单提示词必须显式告知子智能体不得实现 status 相关分支"
+      "round3_preconditions": "CR-002 已 MERGED；两切片已重切为 592571099d638251/443309B，S2/S3/S4 派单必须引用重切后的切片；M0-02 设计 Q4 与 M0-03 设计 Q7 的临时处置已取消，派单提示词必须显式告知子智能体不得实现 status 相关分支",
+      "round2_returned_at": "2026-11-13T01:36:47+08:00（Ohm）/ 2026-11-13T02:05:13+08:00（Plato）；两者均已 close_agent",
+      "round3_dispatched": [
+        "M0-02/S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock（qwen3.8-max high）· Galileo",
+        "M0-03/S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts（qwen3.8-flash）· Goodall",
+        "D-016/补卡批次1（8 张：M0-04/M0-03b/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17（qwen3.8-flash）· Dirac"
+      ],
+      "round3_started_at": "2026-11-13T03:01:56+08:00",
+      "round3_parallel_safety": "S lane(Galileo) 只写 migrations/**、pyproject.toml、uv.lock、src/campaignlab/infra/db/**、tests/unit/**（仅新建）、tests/integration/bootstrap/**、evidence/M0/M0-02/**；F lane(Goodall) 只写 web/src/**、web/tests/**、evidence/M0/M0-03/**，并明令禁改 web/package.json（裁定 M0-03-Q8 仅编排器可改）；T lane(Dirac) 只写 orchestrator/tasks/{M0-04,M0-03b,M1-01,M1-02,M1-03,M2-01,M2-02,M2-03}.md 与 tests/unit/test_task_cards.py 的 KNOWN_MISSING。三者路径集合两两交集为空；orchestrator/state.json 与 git 写权限由编排器独占。",
+      "round3_toolchain_isolation": "已明令：Galileo 禁跑任何 npm/node/vite/playwright；Goodall 禁跑任何 uv/pytest/mypy/ruff；Dirac 禁跑 pytest/uv/npm，自检一律用纯 python3。故 uv(.venv/uv.lock) 由 Galileo 独占、npm(web/node_modules) 由 Goodall 独占，无并发假红。"
     },
     "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
     "next_actions": [
@@ -2467,7 +2476,41 @@
       "14 wave2 出口冻结公共件前：指标注册表预留月报扩展点、ADR-005 的 Problem code 注册表冻结留痕、flash_share dev 口径 ≥0.60",
       "15 【需项目负责人】ADR-005 追认；BLK-03（gh auth login）；BLK-05（Source-Extract 原件）；BLK-04（ADR-003 三项）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d11e-9bae-7cd3-acd2-664f6826b738",
+        "nickname": "Galileo",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "est_tokens_planned": 90000,
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      },
+      {
+        "agent_id": "01a1d11f-b9c0-7653-8eab-f938a68a6a07",
+        "nickname": "Goodall",
+        "lane": "F",
+        "task": "M0-03",
+        "subtask": "S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts",
+        "tier": "qwen3.8-flash",
+        "subtask_count": 2,
+        "est_tokens_planned": 15000,
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      },
+      {
+        "agent_id": "01a1d121-8cf0-7530-a457-8e6f9f8556fa",
+        "nickname": "Dirac",
+        "lane": "T",
+        "task": "D-016",
+        "subtask": "补卡批次1（8 张：M0-04/M0-03b/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17",
+        "tier": "qwen3.8-flash",
+        "est_tokens_planned": null,
+        "est_tokens_note": "卡片撰写属文档生成，token 量与卡数强相关；派单未给预估，待子智能体自报后回填，缺失记 null 禁估算",
+        "dispatched_at": "2026-11-13T03:01:56+08:00"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -2477,19 +2520,20 @@
     "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
     "persisted": {
       "working_tree_clean": true,
-      "head": "1f5912e",
-      "head_full": "1f5912e60e11512ef40c4e74333af8fce56dd8db",
-      "remote_head": "待本次 state 提交推送后与 HEAD 一致",
+      "head": "42079fa",
+      "head_full": "42079fa1162755c4d940da6fe959049918b4cd62",
+      "remote_head": "42079fa1162755c4d940da6fe959049918b4cd62",
       "remote_ref": "origin/m0-framework",
-      "head_semantics": "head/head_full 指最近一次**交付提交**（1f5912e：D-004/D-005 修复、wave1 任务卡档位表、切片按活契约 1.0.1 重切、手册第 3.1/3.2/7/15.4 节同步）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
+      "head_semantics": "head/head_full 指最近一次**交付提交**（42079fa：CR-002 选项 B 落地——移除 listWorkspaces.status、ADR-006、登记 12->13、两切片重切、基准文本二分同步，并修复提交前复核检出的 3 类问题）。state.json 自身的提交号无法自包含，故不记录。",
       "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。",
-      "note": "head/head_full 仍指最近一次交付提交 1f5912e（语义见 head_semantics）；governance_head_at_takeover 是本次接管时的工作提交 07ab3ca。本次治理提交推送后需再次复核 dirty=0 且 ahead/behind=0/0。",
+      "note": "42079fa 已推送并验证 HEAD==origin/m0-framework、behind/ahead=0/0、worktree CLEAN。本次为 Round 3 派单的治理提交（仅 orchestrator/state.json），推送后需再次复核 dirty 仅含三 lane 的在飞产物。",
       "governance_head_at_takeover": "07ab3ca",
       "remote_sync_verified": {
         "cmd": "git rev-list --left-right --count '@{u}...HEAD'",
         "result": "0\t0",
         "at": "2026-11-12T22:48:36+08:00"
-      }
+      },
+      "governance_head_at_round3": "42079fa"
     },
     "context": "驱动模型已于 2026-11-12 三次接管（宿主重启一次、模型切换两次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；本轮已于 run-04 全表重跑通过，且 resume.owner_gate.status == GO（项目负责人明确下达『确认开工』），故允许按 next_actions 派单。sudo 免密策略见手册 15.7 与 resume.owner_gate.sudo_policy；任何实例不得再等待密码输入，也不得把密码写入任何文件。",
     "patch": {
@@ -3080,6 +3124,70 @@
         ],
         "write_scope_disjoint": true,
         "new_requirement": "自本轮起，派单提示词强制要求子智能体自报 token 估算，用于回填 budget.subtask_log（前两档缺失，已记 null）"
+      },
+      {
+        "at": "2026-11-13T03:01:56+08:00",
+        "wave": 1,
+        "round": 3,
+        "mode": "parallel-3-lanes",
+        "dispatched": [
+          {
+            "agent_id": "01a1d11e-9bae-7cd3-acd2-664f6826b738",
+            "nickname": "Galileo",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S2 首迁 28 表与 DDL 等价 + 删 [tool.uv] package=false + uv lock",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high"
+          },
+          {
+            "agent_id": "01a1d11f-b9c0-7653-8eab-f938a68a6a07",
+            "nickname": "Goodall",
+            "lane": "F",
+            "task": "M0-03",
+            "subtask": "S3 令牌机械落地与守卫 + S4 openapi-typescript 生成 types.ts",
+            "tier": "qwen3.8-flash"
+          },
+          {
+            "agent_id": "01a1d121-8cf0-7530-a457-8e6f9f8556fa",
+            "nickname": "Dirac",
+            "lane": "T",
+            "task": "D-016",
+            "subtask": "补卡批次1（8 张：M0-04/M0-03b/M1-01..03/M2-01..03）+ KNOWN_MISSING 25->17",
+            "tier": "qwen3.8-flash"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "disjoint_proof": "S lane(Galileo) 只写 migrations/**、pyproject.toml、uv.lock、src/campaignlab/infra/db/**、tests/unit/**（仅新建）、tests/integration/bootstrap/**、evidence/M0/M0-02/**；F lane(Goodall) 只写 web/src/**、web/tests/**、evidence/M0/M0-03/**，并明令禁改 web/package.json（裁定 M0-03-Q8 仅编排器可改）；T lane(Dirac) 只写 orchestrator/tasks/{M0-04,M0-03b,M1-01,M1-02,M1-03,M2-01,M2-02,M2-03}.md 与 tests/unit/test_task_cards.py 的 KNOWN_MISSING。三者路径集合两两交集为空；orchestrator/state.json 与 git 写权限由编排器独占。",
+        "toolchain_isolation": "已明令：Galileo 禁跑任何 npm/node/vite/playwright；Goodall 禁跑任何 uv/pytest/mypy/ruff；Dirac 禁跑 pytest/uv/npm，自检一律用纯 python3。故 uv(.venv/uv.lock) 由 Galileo 独占、npm(web/node_modules) 由 Goodall 独占，无并发假红。",
+        "known_transient_red": "已告知 Galileo：tests/unit/test_task_cards.py 可能因 Dirac 并发改 KNOWN_MISSING 而瞬时红，属并行 lane 归属、不计入 M0-02/S2 判定，且明令不得去修它。全量套件由编排器在三 lane 全部返回后统一复跑。",
+        "predispatch_slice_check": {
+          "contracts/openapi.json": {
+            "bytes": 443309,
+            "sha16": "592571099d638251",
+            "info.version": "1.0.1"
+          },
+          "M0-02.slice.json": {
+            "spec_version": "1.0.1",
+            "source.openapi.sha16": "592571099d638251",
+            "bytes": 443309,
+            "match": true,
+            "own_file_sha16": "a06b4941fd35b39d",
+            "own_file_bytes": 14493
+          },
+          "M0-03.slice.json": {
+            "spec_version": "1.0.1",
+            "source.openapi.sha16": "592571099d638251",
+            "bytes": 443309,
+            "match": true,
+            "own_file_sha16": "b2aaba68adef8747",
+            "own_file_bytes": 16165
+          },
+          "verdict": "PASS（手册 15.4 第 5 条：两切片 source.openapi.sha16/bytes 与活契约实算值逐字一致，可直接派单，无需重切。本次为 CR-002/ADR-006 重切后的首次派单校验）"
+        },
+        "cr002_notice_given": "三份派单提示词均显式告知：listWorkspaces.status 已由 CR-002 选项 B 从活契约移除（ADR-006），M0-02 设计 Q4 的 WORKSPACE_STATUS_WHITELIST 与 422 INVALID_SCOPE 过渡分支已取消、不得实现、不得写测试；M0-03 设计 Q7 的「UI-01 不提供状态筛选控件」已转终态；getHealth.Health.properties.status 是合法响应字段不得误删。",
+        "token_selfreport_required": "三份派单均硬性要求自报 token（唯一内容口径），用于回填 budget.subtask_log；缺失记 null 禁估算",
+        "flash_share_projection": "本轮 3 个 lane 中 2 个为 flash（Goodall/Dirac），按 lane 计 flash_share=2/3=0.667；其中开发 lane（排除 Q/治理）只有 Galileo(max) 与 Goodall(flash) → dev flash_share=1/2=0.500，低于 0.60 护栏。wave1 累计 dev lane 为 M0-02/S1(max)、M0-03/S1+S2(max)、M0-02/S2(max)、M0-03/S3+S4(flash) → 1/4=0.250。**复核点＝wave2 出口**：若仍不足 0.60，按手册 15.5 降档并记理由，首选把 M0-03/S10 降 flash + max 复审。"
       }
     ],
     "q_verify": {
@@ -3162,7 +3270,25 @@
       ],
       "blocking": "手册 15.5 无拆解表不得 spawn → wave2 起整条 DAG 实质停摆",
       "guard": "tests/unit/test_task_cards.py（KNOWN_MISSING 必须单调收敛；任务总数分母钉死 29）",
-      "plan": "按 wave 顺序补卡：wave2(M0-04,M0-03b) → wave3(M1-01..03,M2-01..03) → 其余；max 起草 + flash 机械铺开；每批提交后 KNOWN_MISSING 单调收敛并重算 card_gap"
+      "plan": "按 wave 顺序补卡：wave2(M0-04,M0-03b) → wave3(M1-01..03,M2-01..03) → 其余；max 起草 + flash 机械铺开；每批提交后 KNOWN_MISSING 单调收敛并重算 card_gap",
+      "batch1": {
+        "dispatched_at": "2026-11-13T03:01:56+08:00",
+        "agent": "Dirac（qwen3.8-flash）",
+        "ids": [
+          "M0-04",
+          "M0-03b",
+          "M1-01",
+          "M1-02",
+          "M1-03",
+          "M2-01",
+          "M2-02",
+          "M2-03"
+        ],
+        "expected_known_missing_after": "25 -> 17",
+        "status": "IN_FLIGHT",
+        "note": "编排器在 Dirac 返回后统一复跑 tests/unit/test_task_cards.py 与全量门禁，并据实重算 card_gap；不采信自报"
+      },
+      "plan_updated_at": "2026-11-13T03:01:56+08:00"
     },
     "cr002_merge": {
       "cr": "CR-002",
@@ -3208,7 +3334,11 @@
         "设计文档 Q4/Q7 追注改为合法 blockquote",
         "CHANGES.json indent 规范化显式登记"
       ],
-      "out_of_scope_warning": "ADR-006 §4.7：另有 6 个资源同缺状态字段、9 处用 state 命名，属独立议题，不得据本 ADR 推断其余已处理"
+      "out_of_scope_warning": "ADR-006 §4.7：另有 6 个资源同缺状态字段、9 处用 state 命名，属独立议题，不得据本 ADR 推断其余已处理",
+      "commit": "42079fa",
+      "commit_full": "42079fa1162755c4d940da6fe959049918b4cd62",
+      "pushed": true,
+      "push_verified": "HEAD == origin/m0-framework == 42079fa1162755c4d940da6fe959049918b4cd62；behind/ahead=0/0；worktree CLEAN"
     }
   },
   "acceptance": {
