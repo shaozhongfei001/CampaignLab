@@ -1,0 +1,193 @@
+{
+  "profile": "BANK_MONTHLY_V1",
+  "focus_period": "2026-09",
+  "source_01": {
+    "periods": [
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "observed": [
+      7,
+      4,
+      6
+    ],
+    "common_channels": [
+      "remote",
+      "manager",
+      "ai",
+      "sms",
+      "push"
+    ],
+    "common_trend": [
+      6,
+      4,
+      5
+    ],
+    "wechat_observed": [
+      2,
+      null,
+      2
+    ],
+    "comparison_previous": {
+      "state": "PARTIAL",
+      "observed_delta": 2,
+      "comparable_current": 5,
+      "comparable_baseline": 4,
+      "comparable_delta": 1,
+      "coverage_gap_delta": 1,
+      "relative_delta": "0.25"
+    },
+    "comparison_two_months": {
+      "state": "FULL",
+      "comparable_delta": -1
+    },
+    "current_participation": {
+      "eligible": 7,
+      "sent_in_pool": 7,
+      "success_in_pool": 6,
+      "sent_outside_pool": 1,
+      "success_outside_pool": 1,
+      "sent_coverage": "1",
+      "success_coverage": "0.857142857142857143",
+      "group_equal_weight_success_coverage": "0.833333333333333333",
+      "branch_only_eligible_sends": [
+        4,
+        2
+      ]
+    },
+    "current_remote": {
+      "capacity": 10,
+      "used": 10,
+      "effective_customers": 4,
+      "utilization": "1",
+      "effective_per_unit": "0.4",
+      "aum_fen": 1270000,
+      "aum_fen_per_effective": "317500"
+    },
+    "current_origin": {
+      "HQ_ONLY": [
+        1,
+        300000,
+        50000
+      ],
+      "BRANCH_ONLY": [
+        3,
+        50000,
+        45000
+      ],
+      "BOTH": [
+        2,
+        1100000,
+        300000
+      ],
+      "UNION": [
+        6,
+        1450000,
+        395000
+      ],
+      "BRANCH_WITH_OVERLAP": [
+        5,
+        1150000,
+        345000
+      ]
+    },
+    "current_branch_aum_share": "0.793103448275862069",
+    "current_production_cohort": {
+      "STRATEGY": [
+        6,
+        1450000
+      ],
+      "SELF_MANAGED": [
+        1,
+        150000
+      ],
+      "ORGANIC": [
+        1,
+        50000
+      ],
+      "OTHER": [
+        0,
+        0
+      ]
+    },
+    "current_production_lifecycle": {
+      "NEW_YTD": [
+        2,
+        500000
+      ],
+      "EXISTING": [
+        4,
+        950000
+      ],
+      "UNKNOWN": [
+        0,
+        0
+      ]
+    },
+    "current_production_segment": {
+      "MASS": [
+        2,
+        270000
+      ],
+      "AFFLUENT": [
+        2,
+        900000
+      ],
+      "VIP": [
+        1,
+        400000
+      ],
+      "PRIVATE": [
+        1,
+        -120000
+      ],
+      "UNKNOWN": [
+        0,
+        0
+      ]
+    },
+    "monthly_state": "PARTIAL",
+    "report_state": "PARTIAL_DRAFT"
+  },
+  "source_02": {
+    "observed": [
+      7,
+      5,
+      6
+    ],
+    "common_trend": [
+      7,
+      5,
+      6
+    ],
+    "previous_delta": 1,
+    "coverage_gap_delta": 0,
+    "monthly_state": "FULL",
+    "report_state": "DRAFT_READY",
+    "current_union_aum_fen": 1450000
+  },
+  "source_03": {
+    "current_union_aum_fen": 1550000,
+    "current_both_aum_fen": 1200000,
+    "original_signed_union_aum_fen": 1450000
+  },
+  "source_04": {
+    "focus_period": "2026-10",
+    "effective_customers": 7,
+    "remote_effective_customers": 5,
+    "remote_effective_per_unit": "0.5",
+    "remote_effective_per_unit_delta": "0.1"
+  },
+  "base_regression": {
+    "A-001": {
+      "sent": 12000,
+      "success": 11520,
+      "eligible": 15750,
+      "effective": 1728,
+      "contacted": 3456,
+      "prior_effective": 1920
+    },
+    "A-001-R1_aum_fen": -394900000
+  }
+}

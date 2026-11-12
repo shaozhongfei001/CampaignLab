@@ -1,0 +1,51 @@
+{
+  "id": "MR-MAP-1",
+  "bank_id": "MR-SYN",
+  "layout": "wide",
+  "entity_table": "monthly_touch_slices",
+  "counts_table": "monthly_touch_slices",
+  "dimensions": {
+    "id": "id",
+    "period": "period",
+    "cutoff": "cutoff",
+    "branch": "branch",
+    "subbranch": "subbranch",
+    "channel": "channel",
+    "strategy": "strategy",
+    "origin": "origin",
+    "segment": "segment",
+    "tag": "tag",
+    "definition": "definition",
+    "batch": "batch",
+    "customer_key": "customer_key"
+  },
+  "count_fields": {
+    "eligible": "eligible",
+    "sent": "sent",
+    "success": "success",
+    "executed": "executed",
+    "contacted": "contacted",
+    "effective": "effective",
+    "capacity": "capacity",
+    "intentCount": "intentCount",
+    "activityCount": "activityCount"
+  },
+  "money_fields": {
+    "aum": "aum",
+    "deposit": "deposit",
+    "wealth": "wealth",
+    "fund": "fund",
+    "loan": "loan",
+    "wealthSale": "wealthSale",
+    "nonCashWealthSale": "nonCashWealthSale",
+    "fundSale": "fundSale",
+    "nonMoneyFundSale": "nonMoneyFundSale",
+    "insuranceSale": "insuranceSale",
+    "depositDemand": "depositDemand",
+    "depositTerm": "depositTerm"
+  },
+  "source_money_unit": "CNY_FEN",
+  "long_columns": null,
+  "codes": {},
+  "dedup_mode": "DISTINCT_CUSTOMER"
+}

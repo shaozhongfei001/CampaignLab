@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SourceMapping",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+    },
+    "bank_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+    },
+    "layout": {
+      "type": "string",
+      "enum": [
+        "wide",
+        "long"
+      ]
+    },
+    "entity_table": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "counts_table": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    },
+    "count_fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    },
+    "money_fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    },
+    "source_money_unit": {
+      "type": "string",
+      "enum": [
+        "CNY_YUAN",
+        "CNY_FEN"
+      ]
+    },
+    "long_columns": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "metric": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "id",
+            "metric",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "codes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      }
+    },
+    "dedup_mode": {
+      "type": "string",
+      "enum": [
+        "SYNTHETIC_INTERVAL",
+        "DISTINCT_CUSTOMER",
+        "AGGREGATE_ONLY"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "bank_id",
+    "layout",
+    "entity_table",
+    "counts_table",
+    "dimensions",
+    "count_fields",
+    "money_fields",
+    "source_money_unit",
+    "long_columns",
+    "codes",
+    "dedup_mode"
+  ],
+  "additionalProperties": false,
+  "$defs": {}
+}

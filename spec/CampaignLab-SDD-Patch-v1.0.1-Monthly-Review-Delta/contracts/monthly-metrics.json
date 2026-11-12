@@ -1,0 +1,51 @@
+{
+  "profile": "BANK_MONTHLY_V1",
+  "amount_unit": "CNY_FEN",
+  "balances": [
+    "aum",
+    "deposit",
+    "wealth",
+    "fund",
+    "loan",
+    "nonMoneyFundBalance",
+    "insuranceBalance",
+    "privateStandardBalance",
+    "familyTrustBalance"
+  ],
+  "sales": [
+    "wealthSale",
+    "nonCashWealthSale",
+    "fundSale",
+    "nonMoneyFundSale",
+    "insuranceSale"
+  ],
+  "required_for_ready": [
+    "aum",
+    "wealthSale",
+    "nonCashWealthSale",
+    "fundSale",
+    "nonMoneyFundSale",
+    "insuranceSale"
+  ],
+  "monthly_metrics": [
+    "effective_customers",
+    "eligible",
+    "sent",
+    "success",
+    "sent_coverage",
+    "success_coverage",
+    "sent_outside_pool",
+    "success_outside_pool",
+    "participating_branches",
+    "strategy_count",
+    "mean_strategy_per_participating_branch",
+    "capacity",
+    "used",
+    "utilization",
+    "effective_per_unit",
+    "aum_fen_per_effective",
+    "customers",
+    "strategy_segment_reach",
+    "share.<metric_id>"
+  ]
+}

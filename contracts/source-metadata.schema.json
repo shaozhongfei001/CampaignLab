@@ -1,0 +1,804 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SourceMetadata",
+  "type": "object",
+  "properties": {
+    "bank_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+    },
+    "bank_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "snapshot_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Branch"
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "channels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Strategy"
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SourceActivity"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Coverage"
+      },
+      "minItems": 1,
+      "maxItems": 4000
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 180
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "push_detail_seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400
+    },
+    "targets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 42,
+        "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      }
+    },
+    "link_policy": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+            },
+            "route_windows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": -36600,
+                  "maximum": 36600
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "dispatch_days": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": -36600,
+                  "maximum": 36600
+                },
+                "minItems": 1,
+                "maxItems": 20
+              }
+            }
+          },
+          "required": [
+            "version",
+            "route_windows",
+            "dispatch_days"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "touches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "customer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "strategy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "node": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "batch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "dispatchDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "at": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "id",
+          "customer",
+          "strategy",
+          "node",
+          "batch",
+          "channel",
+          "dispatchDate",
+          "at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "customer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "amount_fen": {
+            "type": "integer",
+            "minimum": -9000000000000,
+            "maximum": 9000000000000
+          }
+        },
+        "required": [
+          "id",
+          "customer",
+          "date",
+          "amount_fen"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "monthly_review": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "bank-monthly.v1"
+        },
+        "months": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "scope_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "eligibility_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "outcome_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "cohort_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "population_status": {
+                "type": "string",
+                "enum": [
+                  "COMPLETE",
+                  "MISSING"
+                ]
+              },
+              "activity_status": {
+                "type": "string",
+                "enum": [
+                  "COMPLETE",
+                  "MISSING"
+                ]
+              },
+              "outcome_metric_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "aum",
+                    "deposit",
+                    "wealth",
+                    "fund",
+                    "loan",
+                    "nonMoneyFundBalance",
+                    "insuranceBalance",
+                    "privateStandardBalance",
+                    "familyTrustBalance",
+                    "wealthSale",
+                    "nonCashWealthSale",
+                    "fundSale",
+                    "nonMoneyFundSale",
+                    "insuranceSale"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 14,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "period",
+              "scope_key",
+              "eligibility_key",
+              "outcome_key",
+              "cohort_key",
+              "population_status",
+              "activity_status",
+              "outcome_metric_ids"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 36
+        },
+        "customers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "customer_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "home_branch_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "segment": {
+                "type": "string",
+                "enum": [
+                  "MASS",
+                  "AFFLUENT",
+                  "VIP",
+                  "PRIVATE",
+                  "UNKNOWN"
+                ]
+              },
+              "lifecycle": {
+                "type": "string",
+                "enum": [
+                  "NEW_YTD",
+                  "EXISTING",
+                  "UNKNOWN"
+                ]
+              },
+              "eligible": {
+                "type": "boolean"
+              },
+              "outside_strategy": {
+                "type": "string",
+                "enum": [
+                  "SELF_MANAGED",
+                  "ORGANIC",
+                  "NONE",
+                  "UNKNOWN"
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "customer_key",
+              "home_branch_id",
+              "segment",
+              "lifecycle",
+              "eligible",
+              "outside_strategy"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 1000000
+        },
+        "outcomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "customer_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "metric_id": {
+                "type": "string",
+                "enum": [
+                  "aum",
+                  "deposit",
+                  "wealth",
+                  "fund",
+                  "loan",
+                  "nonMoneyFundBalance",
+                  "insuranceBalance",
+                  "privateStandardBalance",
+                  "familyTrustBalance",
+                  "wealthSale",
+                  "nonCashWealthSale",
+                  "fundSale",
+                  "nonMoneyFundSale",
+                  "insuranceSale"
+                ]
+              },
+              "value_fen": {
+                "type": "integer",
+                "minimum": -9000000000000,
+                "maximum": 9000000000000
+              }
+            },
+            "required": [
+              "period",
+              "customer_key",
+              "metric_id",
+              "value_fen"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "metric_id": {
+                      "enum": [
+                        "wealthSale",
+                        "nonCashWealthSale",
+                        "fundSale",
+                        "nonMoneyFundSale",
+                        "insuranceSale"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value_fen": {
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 1000000
+        },
+        "capacity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "channel_id": {
+                "type": "string",
+                "enum": [
+                  "remote",
+                  "manager",
+                  "ai",
+                  "wechat",
+                  "sms",
+                  "push"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "CALL_ATTEMPT",
+                  "MESSAGE_SENT",
+                  "TASK_SLOT"
+                ]
+              },
+              "semantic_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "capacity": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9000000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "used": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9000000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "channel_id",
+              "unit",
+              "semantic_key",
+              "capacity",
+              "used"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 216
+        },
+        "revision": {
+          "type": "object",
+          "properties": {
+            "supersedes_snapshot_code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "supersedes_snapshot_code",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "months",
+        "customers",
+        "outcomes",
+        "capacity"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "bank_id",
+    "bank_name",
+    "snapshot_code",
+    "branches",
+    "channels",
+    "strategies",
+    "coverage",
+    "sources",
+    "push_detail_seconds"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Branch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "group": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "group"
+      ],
+      "additionalProperties": false
+    },
+    "Strategy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "branch",
+            "hq"
+          ]
+        },
+        "source_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "origin",
+        "source_version"
+      ],
+      "additionalProperties": false
+    },
+    "SourceActivity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "strategy_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "valid_from": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metric_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "strategy_ids",
+        "valid_from",
+        "valid_until",
+        "metric_label",
+        "evidence_label"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "remote",
+            "manager",
+            "ai",
+            "wechat",
+            "sms",
+            "push"
+          ]
+        },
+        "cutoff": {
+          "type": "string",
+          "format": "date"
+        },
+        "close_mode": {
+          "type": "string",
+          "enum": [
+            "MONTH_END",
+            "DAY"
+          ]
+        },
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "AVAILABLE",
+            "NOT_COLLECTED",
+            "RESTORED"
+          ]
+        },
+        "definition_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "semantic_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+      },
+      "required": [
+        "period",
+        "channel",
+        "cutoff",
+        "close_mode",
+        "coverage",
+        "definition_id",
+        "semantic_key"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,7 +1,7 @@
 name: verify
 on:
   push:
-    branches: [main]
+    branches: [main, m0-framework]
   pull_request:
 jobs:
   prototype-baseline:
@@ -15,3 +15,23 @@ jobs:
         with:
           node-version: "22"
       - run: bash scripts/verify.sh
+  contract-gate:
+    # 活契约与不可变基线的差异必须逐条登记（CR + ADR），否则失败。
+    # 只依赖标准库，因此与 prototype-baseline 共用 3.12；
+    # 元校验（--validate）需要 dev 依赖，放在本地与 M5 回归执行。
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 基线完整性（清单内路径相对各自目录，必须 cd 后校验）
+        run: |
+          cd spec/CampaignLab-SDD-v1.0
+          sha256sum -c SHA256SUMS --quiet
+          cd ../CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta
+          sha256sum -c DELTA-SHA256SUMS --quiet
+      - name: 活契约差异门禁
+        run: python3 scripts/check_contracts.py check
+      - name: 指针级差异清单（留档到 CI 日志）
+        run: python3 scripts/check_contracts.py diff --base spec/CampaignLab-SDD-v1.0/contracts --live contracts

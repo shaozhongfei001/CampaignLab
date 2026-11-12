@@ -1,0 +1,35 @@
+{
+  "runReview": {
+    "profile": "BANK_MONTHLY_V1",
+    "scope": {
+      "snapshot_id": "LOOKUP-MR-SYN-001",
+      "period": "2026-09",
+      "baseline": {
+        "kind": "previous"
+      }
+    }
+  },
+  "createReport": {
+    "review_id": "LOOKUP-MONTHLY-REVIEW",
+    "kind": "TOPIC",
+    "title": "2026-09 全行月度经营复盘"
+  },
+  "createAction": {
+    "title": "核对远程满负荷下的单位有效触达",
+    "owner": "合成渠道负责人",
+    "due_on": "2026-10-31",
+    "checkpoint_days": 30,
+    "hypothesis": "排队时段或名单结构影响单位有效触达，待下期核对",
+    "verification": "同范围复算远程有效客户/实际拨打次数。核对容量、覆盖与证据",
+    "review_id": "LOOKUP-MONTHLY-REVIEW",
+    "evidence_ids": [
+      "LOOKUP-REMOTE-EVIDENCE"
+    ]
+  },
+  "reviewAction": {
+    "next_review_id": "LOOKUP-OCTOBER-REVIEW",
+    "case_ids": [],
+    "verification_outcome": "OBSERVED",
+    "note": "按同范围比较远程每次拨打有效触达，从 0.4 到 0.5 户/次，记录观察"
+  }
+}

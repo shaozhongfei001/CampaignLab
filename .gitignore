@@ -18,3 +18,6 @@ Thumbs.db
 # 本地 IDE/工具目录
 .vscode/
 .idea/
+
+# 契约候选目录：由 monthly_delta.py --stage 生成，可随时重生成（含 430KB openapi 副本，不入库）
+orchestrator/handoff/monthly-candidate-*/

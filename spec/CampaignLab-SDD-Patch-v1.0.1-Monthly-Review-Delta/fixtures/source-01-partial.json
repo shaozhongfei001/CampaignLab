@@ -1,0 +1,3305 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "bank_id": "MR-SYN",
+    "bank_name": "月报样例银行（合成）",
+    "snapshot_code": "MR-SYN-001",
+    "branches": [
+      {
+        "id": "B-M1",
+        "name": "样例一分行",
+        "group": "MR-G1"
+      },
+      {
+        "id": "B-M2",
+        "name": "样例二分行",
+        "group": "MR-G1"
+      }
+    ],
+    "channels": {
+      "remote": "远程",
+      "manager": "客户经理",
+      "ai": "AI 外呼",
+      "wechat": "企业微信",
+      "sms": "短信",
+      "push": "手机银行推送"
+    },
+    "strategies": [
+      {
+        "id": "MR-HQ-STRATEGY",
+        "name": "合成总行策略",
+        "origin": "hq",
+        "source_version": "V1"
+      },
+      {
+        "id": "MR-BR-STRATEGY",
+        "name": "合成分行策略",
+        "origin": "branch",
+        "source_version": "V1"
+      }
+    ],
+    "coverage": [
+      {
+        "period": "2026-07",
+        "channel": "remote",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-remote-DEF1",
+        "semantic_key": "MR-remote-SEM1"
+      },
+      {
+        "period": "2026-07",
+        "channel": "manager",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-manager-DEF1",
+        "semantic_key": "MR-manager-SEM1"
+      },
+      {
+        "period": "2026-07",
+        "channel": "ai",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-ai-DEF1",
+        "semantic_key": "MR-ai-SEM1"
+      },
+      {
+        "period": "2026-07",
+        "channel": "wechat",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-wechat-DEF1",
+        "semantic_key": "MR-wechat-SEM1"
+      },
+      {
+        "period": "2026-07",
+        "channel": "sms",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-sms-DEF1",
+        "semantic_key": "MR-sms-SEM1"
+      },
+      {
+        "period": "2026-07",
+        "channel": "push",
+        "cutoff": "2026-07-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-push-DEF1",
+        "semantic_key": "MR-push-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "remote",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-remote-DEF1",
+        "semantic_key": "MR-remote-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "manager",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-manager-DEF1",
+        "semantic_key": "MR-manager-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "ai",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-ai-DEF1",
+        "semantic_key": "MR-ai-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "wechat",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "NOT_COLLECTED",
+        "definition_id": "MR-wechat-DEF1",
+        "semantic_key": "MR-wechat-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "sms",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-sms-DEF1",
+        "semantic_key": "MR-sms-SEM1"
+      },
+      {
+        "period": "2026-08",
+        "channel": "push",
+        "cutoff": "2026-08-31",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-push-DEF1",
+        "semantic_key": "MR-push-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "remote",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-remote-DEF1",
+        "semantic_key": "MR-remote-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "manager",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-manager-DEF1",
+        "semantic_key": "MR-manager-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "ai",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-ai-DEF1",
+        "semantic_key": "MR-ai-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "wechat",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "RESTORED",
+        "definition_id": "MR-wechat-DEF1",
+        "semantic_key": "MR-wechat-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "sms",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-sms-DEF1",
+        "semantic_key": "MR-sms-SEM1"
+      },
+      {
+        "period": "2026-09",
+        "channel": "push",
+        "cutoff": "2026-09-30",
+        "close_mode": "MONTH_END",
+        "coverage": "AVAILABLE",
+        "definition_id": "MR-push-DEF1",
+        "semantic_key": "MR-push-SEM1"
+      }
+    ],
+    "sources": [
+      "CampaignLab 自造合成月报样例"
+    ],
+    "push_detail_seconds": 0,
+    "monthly_review": {
+      "schema_version": "bank-monthly.v1",
+      "months": [
+        {
+          "period": "2026-07",
+          "scope_key": "MR-SCOPE1",
+          "eligibility_key": "MR-ELIG1",
+          "outcome_key": "MR-OUTCOME1",
+          "cohort_key": "MR-COHORT1",
+          "population_status": "COMPLETE",
+          "activity_status": "COMPLETE",
+          "outcome_metric_ids": [
+            "aum",
+            "deposit",
+            "wealth",
+            "fund",
+            "nonMoneyFundBalance",
+            "insuranceBalance",
+            "wealthSale",
+            "nonCashWealthSale",
+            "fundSale",
+            "nonMoneyFundSale",
+            "insuranceSale"
+          ]
+        },
+        {
+          "period": "2026-08",
+          "scope_key": "MR-SCOPE1",
+          "eligibility_key": "MR-ELIG1",
+          "outcome_key": "MR-OUTCOME1",
+          "cohort_key": "MR-COHORT1",
+          "population_status": "COMPLETE",
+          "activity_status": "COMPLETE",
+          "outcome_metric_ids": [
+            "aum",
+            "deposit",
+            "wealth",
+            "fund",
+            "nonMoneyFundBalance",
+            "insuranceBalance",
+            "wealthSale",
+            "nonCashWealthSale",
+            "fundSale",
+            "nonMoneyFundSale",
+            "insuranceSale"
+          ]
+        },
+        {
+          "period": "2026-09",
+          "scope_key": "MR-SCOPE1",
+          "eligibility_key": "MR-ELIG1",
+          "outcome_key": "MR-OUTCOME1",
+          "cohort_key": "MR-COHORT1",
+          "population_status": "COMPLETE",
+          "activity_status": "COMPLETE",
+          "outcome_metric_ids": [
+            "aum",
+            "deposit",
+            "wealth",
+            "fund",
+            "nonMoneyFundBalance",
+            "insuranceBalance",
+            "wealthSale",
+            "nonCashWealthSale",
+            "fundSale",
+            "nonMoneyFundSale",
+            "insuranceSale"
+          ]
+        }
+      ],
+      "customers": [
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "home_branch_id": "B-M1",
+          "segment": "AFFLUENT",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "home_branch_id": "B-M1",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "home_branch_id": "B-M1",
+          "segment": "PRIVATE",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "home_branch_id": "B-M1",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "home_branch_id": "B-M2",
+          "segment": "AFFLUENT",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "home_branch_id": "B-M2",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "ORGANIC"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "EXISTING",
+          "eligible": false,
+          "outside_strategy": "ORGANIC"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "home_branch_id": "B-M1",
+          "segment": "AFFLUENT",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "home_branch_id": "B-M1",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "home_branch_id": "B-M1",
+          "segment": "PRIVATE",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "home_branch_id": "B-M1",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "home_branch_id": "B-M2",
+          "segment": "AFFLUENT",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "home_branch_id": "B-M2",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "ORGANIC"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "EXISTING",
+          "eligible": false,
+          "outside_strategy": "ORGANIC"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "home_branch_id": "B-M1",
+          "segment": "AFFLUENT",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "home_branch_id": "B-M1",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "home_branch_id": "B-M1",
+          "segment": "PRIVATE",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "home_branch_id": "B-M1",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "home_branch_id": "B-M2",
+          "segment": "AFFLUENT",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "NONE"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "home_branch_id": "B-M2",
+          "segment": "VIP",
+          "lifecycle": "EXISTING",
+          "eligible": true,
+          "outside_strategy": "ORGANIC"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "NEW_YTD",
+          "eligible": true,
+          "outside_strategy": "SELF_MANAGED"
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "home_branch_id": "B-M2",
+          "segment": "MASS",
+          "lifecycle": "EXISTING",
+          "eligible": false,
+          "outside_strategy": "ORGANIC"
+        }
+      ],
+      "outcomes": [
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "aum",
+          "value_fen": 700000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "deposit",
+          "value_fen": 350000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "wealth",
+          "value_fen": 140000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "fund",
+          "value_fen": 70000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 35000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "insuranceBalance",
+          "value_fen": 28000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "wealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "fundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C01",
+          "metric_id": "insuranceSale",
+          "value_fen": 14285
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "aum",
+          "value_fen": 400000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "deposit",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "wealth",
+          "value_fen": 80000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "fund",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "insuranceBalance",
+          "value_fen": 16000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "wealthSale",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "fundSale",
+          "value_fen": 66666
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C02",
+          "metric_id": "insuranceSale",
+          "value_fen": 28571
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "aum",
+          "value_fen": -120000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "deposit",
+          "value_fen": -60000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "wealth",
+          "value_fen": -24000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "fund",
+          "value_fen": -12000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "insuranceBalance",
+          "value_fen": -4800
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C03",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "aum",
+          "value_fen": 300000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "deposit",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "wealth",
+          "value_fen": 60000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "fund",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "insuranceBalance",
+          "value_fen": 12000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "wealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "fundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 8333
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C04",
+          "metric_id": "insuranceSale",
+          "value_fen": 7142
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "aum",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "deposit",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "wealth",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "fund",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "insuranceBalance",
+          "value_fen": 8000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "wealthSale",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "fundSale",
+          "value_fen": 13333
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 6666
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C05",
+          "metric_id": "insuranceSale",
+          "value_fen": 5714
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "aum",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "deposit",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "wealth",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "fund",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "insuranceBalance",
+          "value_fen": 2000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C06",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "aum",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "deposit",
+          "value_fen": 75000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "wealth",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "fund",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 7500
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "insuranceBalance",
+          "value_fen": 6000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "wealthSale",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "fundSale",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C07",
+          "metric_id": "insuranceSale",
+          "value_fen": 4285
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "aum",
+          "value_fen": -30000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "deposit",
+          "value_fen": -15000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "wealth",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "fund",
+          "value_fen": -3000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -1500
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "insuranceBalance",
+          "value_fen": -1200
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "wealthSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "fundSale",
+          "value_fen": 1666
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 833
+        },
+        {
+          "period": "2026-07",
+          "customer_key": "C08",
+          "metric_id": "insuranceSale",
+          "value_fen": 714
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "aum",
+          "value_fen": 700000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "deposit",
+          "value_fen": 350000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "wealth",
+          "value_fen": 140000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "fund",
+          "value_fen": 70000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 35000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "insuranceBalance",
+          "value_fen": 28000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "wealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "fundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C01",
+          "metric_id": "insuranceSale",
+          "value_fen": 14285
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "aum",
+          "value_fen": 400000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "deposit",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "wealth",
+          "value_fen": 80000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "fund",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "insuranceBalance",
+          "value_fen": 16000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "wealthSale",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "fundSale",
+          "value_fen": 66666
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C02",
+          "metric_id": "insuranceSale",
+          "value_fen": 28571
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "aum",
+          "value_fen": -120000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "deposit",
+          "value_fen": -60000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "wealth",
+          "value_fen": -24000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "fund",
+          "value_fen": -12000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "insuranceBalance",
+          "value_fen": -4800
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C03",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "aum",
+          "value_fen": 300000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "deposit",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "wealth",
+          "value_fen": 60000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "fund",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "insuranceBalance",
+          "value_fen": 12000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "wealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "fundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 8333
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C04",
+          "metric_id": "insuranceSale",
+          "value_fen": 7142
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "aum",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "deposit",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "wealth",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "fund",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "insuranceBalance",
+          "value_fen": 8000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "wealthSale",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "fundSale",
+          "value_fen": 13333
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 6666
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C05",
+          "metric_id": "insuranceSale",
+          "value_fen": 5714
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "aum",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "deposit",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "wealth",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "fund",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "insuranceBalance",
+          "value_fen": 2000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C06",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "aum",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "deposit",
+          "value_fen": 75000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "wealth",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "fund",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 7500
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "insuranceBalance",
+          "value_fen": 6000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "wealthSale",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "fundSale",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C07",
+          "metric_id": "insuranceSale",
+          "value_fen": 4285
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "aum",
+          "value_fen": -30000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "deposit",
+          "value_fen": -15000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "wealth",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "fund",
+          "value_fen": -3000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -1500
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "insuranceBalance",
+          "value_fen": -1200
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "wealthSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "fundSale",
+          "value_fen": 1666
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 833
+        },
+        {
+          "period": "2026-08",
+          "customer_key": "C08",
+          "metric_id": "insuranceSale",
+          "value_fen": 714
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "aum",
+          "value_fen": 700000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "deposit",
+          "value_fen": 350000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "wealth",
+          "value_fen": 140000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "fund",
+          "value_fen": 70000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 35000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "insuranceBalance",
+          "value_fen": 28000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "wealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "fundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C01",
+          "metric_id": "insuranceSale",
+          "value_fen": 14285
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "aum",
+          "value_fen": 400000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "deposit",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "wealth",
+          "value_fen": 80000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "fund",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "insuranceBalance",
+          "value_fen": 16000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "wealthSale",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "fundSale",
+          "value_fen": 66666
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 33333
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C02",
+          "metric_id": "insuranceSale",
+          "value_fen": 28571
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "aum",
+          "value_fen": -120000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "deposit",
+          "value_fen": -60000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "wealth",
+          "value_fen": -24000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "fund",
+          "value_fen": -12000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "insuranceBalance",
+          "value_fen": -4800
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C03",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "aum",
+          "value_fen": 300000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "deposit",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "wealth",
+          "value_fen": 60000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "fund",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "insuranceBalance",
+          "value_fen": 12000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "wealthSale",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "fundSale",
+          "value_fen": 16666
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 8333
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C04",
+          "metric_id": "insuranceSale",
+          "value_fen": 7142
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "aum",
+          "value_fen": 200000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "deposit",
+          "value_fen": 100000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "wealth",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "fund",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "insuranceBalance",
+          "value_fen": 8000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "wealthSale",
+          "value_fen": 40000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 20000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "fundSale",
+          "value_fen": 13333
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 6666
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C05",
+          "metric_id": "insuranceSale",
+          "value_fen": 5714
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "aum",
+          "value_fen": 50000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "deposit",
+          "value_fen": 25000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "wealth",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "fund",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "insuranceBalance",
+          "value_fen": 2000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "wealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "fundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C06",
+          "metric_id": "insuranceSale",
+          "value_fen": 0
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "aum",
+          "value_fen": 150000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "deposit",
+          "value_fen": 75000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "wealth",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "fund",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": 7500
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "insuranceBalance",
+          "value_fen": 6000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "wealthSale",
+          "value_fen": 30000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 15000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "fundSale",
+          "value_fen": 10000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C07",
+          "metric_id": "insuranceSale",
+          "value_fen": 4285
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "aum",
+          "value_fen": -30000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "deposit",
+          "value_fen": -15000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "wealth",
+          "value_fen": -6000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "fund",
+          "value_fen": -3000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundBalance",
+          "value_fen": -1500
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "insuranceBalance",
+          "value_fen": -1200
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "wealthSale",
+          "value_fen": 5000
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "nonCashWealthSale",
+          "value_fen": 2500
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "fundSale",
+          "value_fen": 1666
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "nonMoneyFundSale",
+          "value_fen": 833
+        },
+        {
+          "period": "2026-09",
+          "customer_key": "C08",
+          "metric_id": "insuranceSale",
+          "value_fen": 714
+        }
+      ],
+      "capacity": [
+        {
+          "period": "2026-07",
+          "channel_id": "remote",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-remote-CAP1",
+          "capacity": 10,
+          "used": 9
+        },
+        {
+          "period": "2026-07",
+          "channel_id": "ai",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-ai-CAP1",
+          "capacity": 8,
+          "used": 8
+        },
+        {
+          "period": "2026-07",
+          "channel_id": "sms",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-sms-CAP1",
+          "capacity": 20,
+          "used": 10
+        },
+        {
+          "period": "2026-07",
+          "channel_id": "push",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-push-CAP1",
+          "capacity": 12,
+          "used": 9
+        },
+        {
+          "period": "2026-08",
+          "channel_id": "remote",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-remote-CAP1",
+          "capacity": 10,
+          "used": 10
+        },
+        {
+          "period": "2026-08",
+          "channel_id": "ai",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-ai-CAP1",
+          "capacity": 8,
+          "used": 8
+        },
+        {
+          "period": "2026-08",
+          "channel_id": "sms",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-sms-CAP1",
+          "capacity": 20,
+          "used": 12
+        },
+        {
+          "period": "2026-08",
+          "channel_id": "push",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-push-CAP1",
+          "capacity": 12,
+          "used": 9
+        },
+        {
+          "period": "2026-09",
+          "channel_id": "remote",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-remote-CAP1",
+          "capacity": 10,
+          "used": 10
+        },
+        {
+          "period": "2026-09",
+          "channel_id": "ai",
+          "unit": "CALL_ATTEMPT",
+          "semantic_key": "MR-ai-CAP1",
+          "capacity": 8,
+          "used": 8
+        },
+        {
+          "period": "2026-09",
+          "channel_id": "sms",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-sms-CAP1",
+          "capacity": 20,
+          "used": 12
+        },
+        {
+          "period": "2026-09",
+          "channel_id": "push",
+          "unit": "MESSAGE_SENT",
+          "semantic_key": "MR-push-CAP1",
+          "capacity": 12,
+          "used": 9
+        }
+      ]
+    }
+  },
+  "tables": {
+    "monthly_touch_slices": {
+      "columns": [
+        "id",
+        "period",
+        "cutoff",
+        "branch",
+        "subbranch",
+        "channel",
+        "strategy",
+        "origin",
+        "segment",
+        "tag",
+        "definition",
+        "batch",
+        "customer_key",
+        "eligible",
+        "sent",
+        "success",
+        "executed",
+        "contacted",
+        "effective",
+        "capacity",
+        "intentCount",
+        "activityCount",
+        "aum",
+        "deposit",
+        "wealth",
+        "fund",
+        "loan",
+        "wealthSale",
+        "nonCashWealthSale",
+        "fundSale",
+        "nonMoneyFundSale",
+        "insuranceSale",
+        "depositDemand",
+        "depositTerm"
+      ],
+      "rows": [
+        [
+          "2026-07:R001",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "remote",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-07",
+          "C01",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R002",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "VIP",
+          "VIP",
+          "MR-remote-DEF1",
+          "MR-2026-07",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R003",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "remote",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "PRIVATE",
+          "PRIVATE",
+          "MR-remote-DEF1",
+          "MR-2026-07",
+          "C03",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R004",
+          "2026-07",
+          "2026-07-31",
+          "B-M2",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-07",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R005",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "ai",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "VIP",
+          "VIP",
+          "MR-ai-DEF1",
+          "MR-2026-07",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R006",
+          "2026-07",
+          "2026-07-31",
+          "B-M2",
+          null,
+          "ai",
+          "MR-BR-STRATEGY",
+          "branch",
+          "MASS",
+          "MASS",
+          "MR-ai-DEF1",
+          "MR-2026-07",
+          "C08",
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R007",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "wechat",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "MASS",
+          "MASS",
+          "MR-wechat-DEF1",
+          "MR-2026-07",
+          "C04",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R008",
+          "2026-07",
+          "2026-07-31",
+          "B-M1",
+          null,
+          "wechat",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-wechat-DEF1",
+          "MR-2026-07",
+          "C01",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R009",
+          "2026-07",
+          "2026-07-31",
+          "B-M2",
+          null,
+          "sms",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-sms-DEF1",
+          "MR-2026-07",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-07:R010",
+          "2026-07",
+          "2026-07-31",
+          "B-M2",
+          null,
+          "push",
+          "MR-BR-STRATEGY",
+          "branch",
+          "VIP",
+          "VIP",
+          "MR-push-DEF1",
+          "MR-2026-07",
+          "C06",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R001",
+          "2026-08",
+          "2026-08-31",
+          "B-M1",
+          null,
+          "remote",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-08",
+          "C01",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R002",
+          "2026-08",
+          "2026-08-31",
+          "B-M1",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "VIP",
+          "VIP",
+          "MR-remote-DEF1",
+          "MR-2026-08",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R003",
+          "2026-08",
+          "2026-08-31",
+          "B-M2",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-08",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R004",
+          "2026-08",
+          "2026-08-31",
+          "B-M1",
+          null,
+          "ai",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "VIP",
+          "VIP",
+          "MR-ai-DEF1",
+          "MR-2026-08",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R005",
+          "2026-08",
+          "2026-08-31",
+          "B-M2",
+          null,
+          "sms",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-sms-DEF1",
+          "MR-2026-08",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-08:R006",
+          "2026-08",
+          "2026-08-31",
+          "B-M2",
+          null,
+          "push",
+          "MR-BR-STRATEGY",
+          "branch",
+          "MASS",
+          "MASS",
+          "MR-push-DEF1",
+          "MR-2026-08",
+          "C08",
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R001",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "remote",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C01",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R002",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "VIP",
+          "VIP",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R003",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "remote",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "PRIVATE",
+          "PRIVATE",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C03",
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R004",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "MASS",
+          "MASS",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C04",
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R005",
+          "2026-09",
+          "2026-09-30",
+          "B-M2",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R006",
+          "2026-09",
+          "2026-09-30",
+          "B-M2",
+          null,
+          "remote",
+          "MR-BR-STRATEGY",
+          "branch",
+          "MASS",
+          "MASS",
+          "MR-remote-DEF1",
+          "MR-2026-09",
+          "C08",
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R007",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "ai",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "VIP",
+          "VIP",
+          "MR-ai-DEF1",
+          "MR-2026-09",
+          "C02",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R008",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "ai",
+          "MR-BR-STRATEGY",
+          "branch",
+          "PRIVATE",
+          "PRIVATE",
+          "MR-ai-DEF1",
+          "MR-2026-09",
+          "C03",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R009",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "wechat",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "MASS",
+          "MASS",
+          "MR-wechat-DEF1",
+          "MR-2026-09",
+          "C04",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R010",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "wechat",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-wechat-DEF1",
+          "MR-2026-09",
+          "C01",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R011",
+          "2026-09",
+          "2026-09-30",
+          "B-M2",
+          null,
+          "sms",
+          "MR-BR-STRATEGY",
+          "branch",
+          "AFFLUENT",
+          "AFFLUENT",
+          "MR-sms-DEF1",
+          "MR-2026-09",
+          "C05",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R012",
+          "2026-09",
+          "2026-09-30",
+          "B-M2",
+          null,
+          "sms",
+          "MR-BR-STRATEGY",
+          "branch",
+          "VIP",
+          "VIP",
+          "MR-sms-DEF1",
+          "MR-2026-09",
+          "C06",
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R013",
+          "2026-09",
+          "2026-09-30",
+          "B-M1",
+          null,
+          "push",
+          "MR-BR-STRATEGY",
+          "branch",
+          "PRIVATE",
+          "PRIVATE",
+          "MR-push-DEF1",
+          "MR-2026-09",
+          "C03",
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "2026-09:R014",
+          "2026-09",
+          "2026-09-30",
+          "B-M2",
+          null,
+          "push",
+          "MR-HQ-STRATEGY",
+          "hq",
+          "MASS",
+          "MASS",
+          "MR-push-DEF1",
+          "MR-2026-09",
+          "C07",
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    }
+  }
+}

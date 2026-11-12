@@ -1,0 +1,932 @@
+{
+  "format": "campaignlab-additions-v1",
+  "profile": "BANK_MONTHLY_V1",
+  "additions": [
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/ReviewCreate/properties/profile",
+      "value_key": "ReviewCreate.profile",
+      "optional_property": true
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/Review/properties/monthly_review",
+      "value_key": "Review.monthly_review",
+      "optional_property": true
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyCapacity",
+      "value_key": "MonthlyCapacity"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyComparison",
+      "value_key": "MonthlyComparison"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyOriginOverlap",
+      "value_key": "MonthlyOriginOverlap"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyParticipation",
+      "value_key": "MonthlyParticipation"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyProduction",
+      "value_key": "MonthlyProduction"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyReview",
+      "value_key": "MonthlyReview"
+    },
+    {
+      "file": "openapi.json",
+      "path": "/components/schemas/MonthlyTrend",
+      "value_key": "MonthlyTrend"
+    },
+    {
+      "file": "source-json.schema.json",
+      "path": "/$defs/SourceMetadata/properties/monthly_review",
+      "value_key": "MonthlySource",
+      "optional_property": true
+    },
+    {
+      "file": "source-metadata.schema.json",
+      "path": "/properties/monthly_review",
+      "value_key": "MonthlySource",
+      "optional_property": true
+    }
+  ],
+  "version_update": {
+    "file": "openapi.json",
+    "path": "/info/version",
+    "from": "1.0.0",
+    "to": "1.0.1"
+  },
+  "values": {
+    "ReviewCreate.profile": {
+      "type": "string",
+      "enum": [
+        "BANK_MONTHLY_V1"
+      ]
+    },
+    "Review.monthly_review": {
+      "$ref": "#/components/schemas/MonthlyReview"
+    },
+    "MonthlyCapacity": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "channel_id": {
+          "type": "string",
+          "enum": [
+            "remote",
+            "manager",
+            "ai",
+            "wechat",
+            "sms",
+            "push"
+          ]
+        },
+        "capacity_unit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "CALL_ATTEMPT",
+                "MESSAGE_SENT",
+                "TASK_SLOT"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comparable_to_previous": {
+          "type": "boolean"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "period",
+        "channel_id",
+        "capacity_unit",
+        "comparable_to_previous",
+        "metrics"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyComparison": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "baseline_period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "channel_id": {
+          "type": "string",
+          "enum": [
+            "all",
+            "remote",
+            "manager",
+            "ai",
+            "wechat",
+            "sms",
+            "push"
+          ]
+        },
+        "state": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "MISSING"
+          ]
+        },
+        "common_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "observed_current": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "observed_baseline": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "observed_delta": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "comparable_current": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "comparable_baseline": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "comparable_delta": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "relative_delta": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "coverage_gap_delta": {
+          "$ref": "#/components/schemas/Measure"
+        }
+      },
+      "required": [
+        "period",
+        "baseline_period",
+        "channel_id",
+        "state",
+        "common_channels",
+        "observed_current",
+        "observed_baseline",
+        "observed_delta",
+        "comparable_current",
+        "comparable_baseline",
+        "comparable_delta",
+        "relative_delta",
+        "coverage_gap_delta"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyOriginOverlap": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "bucket": {
+          "type": "string",
+          "enum": [
+            "HQ_ONLY",
+            "BRANCH_ONLY",
+            "BOTH",
+            "UNION",
+            "BRANCH_WITH_OVERLAP"
+          ]
+        },
+        "state": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "MISSING"
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "period",
+        "bucket",
+        "state",
+        "metrics"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyParticipation": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "BANK",
+            "GROUP",
+            "BRANCH"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "ALL",
+            "branch"
+          ]
+        },
+        "covered_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "period",
+        "level",
+        "key",
+        "label",
+        "origin",
+        "covered_channels",
+        "metrics"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyProduction": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "dimension": {
+          "type": "string",
+          "enum": [
+            "COHORT",
+            "SEGMENT",
+            "LIFECYCLE"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "enum": [
+            "STRATEGY",
+            "SELF_MANAGED",
+            "ORGANIC",
+            "OTHER",
+            "MASS",
+            "AFFLUENT",
+            "VIP",
+            "PRIVATE",
+            "NEW_YTD",
+            "EXISTING",
+            "UNKNOWN"
+          ]
+        },
+        "state": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "MISSING"
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "period",
+        "dimension",
+        "key",
+        "state",
+        "metrics"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyReview": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "const": "BANK_MONTHLY_V1"
+        },
+        "calculation_version": {
+          "const": "1.0.1"
+        },
+        "focus_period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "periods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "state": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "MISSING"
+          ]
+        },
+        "common_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Issue"
+          },
+          "minItems": 0,
+          "maxItems": 1000
+        },
+        "trend": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyTrend"
+          },
+          "minItems": 0,
+          "maxItems": 21
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyComparison"
+          },
+          "minItems": 0,
+          "maxItems": 14
+        },
+        "participation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyParticipation"
+          },
+          "minItems": 0,
+          "maxItems": 12006
+        },
+        "capacity": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyCapacity"
+          },
+          "minItems": 0,
+          "maxItems": 18
+        },
+        "production": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyProduction"
+          },
+          "minItems": 0,
+          "maxItems": 36
+        },
+        "origin_overlap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MonthlyOriginOverlap"
+          },
+          "minItems": 0,
+          "maxItems": 15
+        }
+      },
+      "required": [
+        "profile",
+        "calculation_version",
+        "focus_period",
+        "periods",
+        "state",
+        "common_channels",
+        "issues",
+        "trend",
+        "comparisons",
+        "participation",
+        "capacity",
+        "production",
+        "origin_overlap"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlyTrend": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        "channel_id": {
+          "type": "string",
+          "enum": [
+            "all",
+            "remote",
+            "manager",
+            "ai",
+            "wechat",
+            "sms",
+            "push"
+          ]
+        },
+        "coverage_state": {
+          "type": "string",
+          "enum": [
+            "AVAILABLE",
+            "RESTORED",
+            "NOT_COLLECTED",
+            "MISSING",
+            "PARTIAL"
+          ]
+        },
+        "observed_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "comparable_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "manager",
+              "ai",
+              "wechat",
+              "sms",
+              "push"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6,
+          "uniqueItems": true
+        },
+        "observed": {
+          "$ref": "#/components/schemas/Measure"
+        },
+        "comparable": {
+          "$ref": "#/components/schemas/Measure"
+        }
+      },
+      "required": [
+        "period",
+        "channel_id",
+        "coverage_state",
+        "observed_channels",
+        "comparable_channels",
+        "observed",
+        "comparable"
+      ],
+      "additionalProperties": false
+    },
+    "MonthlySource": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "bank-monthly.v1"
+        },
+        "months": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "scope_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "eligibility_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "outcome_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "cohort_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "population_status": {
+                "type": "string",
+                "enum": [
+                  "COMPLETE",
+                  "MISSING"
+                ]
+              },
+              "activity_status": {
+                "type": "string",
+                "enum": [
+                  "COMPLETE",
+                  "MISSING"
+                ]
+              },
+              "outcome_metric_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "aum",
+                    "deposit",
+                    "wealth",
+                    "fund",
+                    "loan",
+                    "nonMoneyFundBalance",
+                    "insuranceBalance",
+                    "privateStandardBalance",
+                    "familyTrustBalance",
+                    "wealthSale",
+                    "nonCashWealthSale",
+                    "fundSale",
+                    "nonMoneyFundSale",
+                    "insuranceSale"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 14,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "period",
+              "scope_key",
+              "eligibility_key",
+              "outcome_key",
+              "cohort_key",
+              "population_status",
+              "activity_status",
+              "outcome_metric_ids"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 36
+        },
+        "customers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "customer_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "home_branch_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "segment": {
+                "type": "string",
+                "enum": [
+                  "MASS",
+                  "AFFLUENT",
+                  "VIP",
+                  "PRIVATE",
+                  "UNKNOWN"
+                ]
+              },
+              "lifecycle": {
+                "type": "string",
+                "enum": [
+                  "NEW_YTD",
+                  "EXISTING",
+                  "UNKNOWN"
+                ]
+              },
+              "eligible": {
+                "type": "boolean"
+              },
+              "outside_strategy": {
+                "type": "string",
+                "enum": [
+                  "SELF_MANAGED",
+                  "ORGANIC",
+                  "NONE",
+                  "UNKNOWN"
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "customer_key",
+              "home_branch_id",
+              "segment",
+              "lifecycle",
+              "eligible",
+              "outside_strategy"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 1000000
+        },
+        "outcomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "customer_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "metric_id": {
+                "type": "string",
+                "enum": [
+                  "aum",
+                  "deposit",
+                  "wealth",
+                  "fund",
+                  "loan",
+                  "nonMoneyFundBalance",
+                  "insuranceBalance",
+                  "privateStandardBalance",
+                  "familyTrustBalance",
+                  "wealthSale",
+                  "nonCashWealthSale",
+                  "fundSale",
+                  "nonMoneyFundSale",
+                  "insuranceSale"
+                ]
+              },
+              "value_fen": {
+                "type": "integer",
+                "minimum": -9000000000000,
+                "maximum": 9000000000000
+              }
+            },
+            "required": [
+              "period",
+              "customer_key",
+              "metric_id",
+              "value_fen"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "metric_id": {
+                      "enum": [
+                        "wealthSale",
+                        "nonCashWealthSale",
+                        "fundSale",
+                        "nonMoneyFundSale",
+                        "insuranceSale"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value_fen": {
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 1000000
+        },
+        "capacity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {
+                "type": "string",
+                "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+              },
+              "channel_id": {
+                "type": "string",
+                "enum": [
+                  "remote",
+                  "manager",
+                  "ai",
+                  "wechat",
+                  "sms",
+                  "push"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "CALL_ATTEMPT",
+                  "MESSAGE_SENT",
+                  "TASK_SLOT"
+                ]
+              },
+              "semantic_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+              },
+              "capacity": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9000000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "used": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9000000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "channel_id",
+              "unit",
+              "semantic_key",
+              "capacity",
+              "used"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 216
+        },
+        "revision": {
+          "type": "object",
+          "properties": {
+            "supersedes_snapshot_code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "supersedes_snapshot_code",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "months",
+        "customers",
+        "outcomes",
+        "capacity"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

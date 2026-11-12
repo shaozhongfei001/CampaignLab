@@ -70,3 +70,8 @@ exclude = "^(spec|prototype|web|[.]venv)/"
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
 norecursedirs = ["spec", "prototype", "web", ".venv", "node_modules"]
+[[tool.mypy.overrides]]
+# 契约门禁中的 OpenAPI / JSON Schema 元校验是可选路径（CI 无 dev 依赖时自动跳过）。
+# 这两个包未提供内联类型，按 mypy 惯例忽略缺失存根；项目其余代码仍保持 strict。
+module = ["openapi_spec_validator.*", "jsonschema.*"]
+ignore_missing_imports = true
