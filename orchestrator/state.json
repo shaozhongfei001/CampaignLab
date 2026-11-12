@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T12:30:01+08:00",
+ "updated_at": "2026-11-12T19:21:36+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1260,6 +1260,12 @@
    "id": "SRC-1",
    "item": "CampaignLab-Bank-Strategy-Review-Source-Extract.md 未随包提供",
    "default": "用 docx/pptx 重建 extract"
+  },
+  {
+   "id": "Q-VERIFY-M0-01",
+   "item": "M0-01 已由编排器独立自验（九项门禁 rc 全 0），是否仍需单独派 Q 子智能体交叉验证",
+   "default": "按手册 4.2 派 Q（不采信自述）；flash 采集 + max 判定。若项目负责人要省成本，可改为接受自验并置 PASS_WITH_TODO",
+   "blocks": "不阻塞 wave1：M0-02/M0-03 只依赖 wave0 环境就绪，已就绪"
   }
  ],
  "resume": {
@@ -1283,8 +1289,23 @@
   "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
   "persisted": {
    "working_tree_clean": true,
-   "head": "d7cb757",
-   "pushed": true
-  }
+   "head": "58dded4",
+   "pushed": true,
+   "remote_equals_local": true,
+   "self_checked_at": "2026-11-12T19:21:36+08:00",
+   "self_check_gates_rc0": [
+    "uv lock --check",
+    "uv sync --locked",
+    "ruff check .",
+    "ruff format --check .",
+    "mypy",
+    "pytest -q",
+    "scripts/verify.sh",
+    "qa/verify_package.py",
+    "scripts/doctor.sh",
+    "npm --prefix web run build"
+   ]
+  },
+  "context": "驱动模型已于 2026-11-12T19:21:36+08:00 切换（新实例接管）；接管时已从磁盘重新核验全部门禁，未采信上一任会话自述。任何新实例接管必须重跑本节 self_check_gates_rc0 后才能派单。"
  }
 }
