@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T21:50:08+08:00",
+ "updated_at": "2026-11-12T22:16:36+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1816,10 +1816,22 @@
    "id": "D-004",
    "task": "M0-P01",
    "severity": "MAJOR",
-   "status": "OPEN",
+   "status": "FIXED_PENDING_Q",
    "file": "orchestrator/defects/D-004.md",
    "summary": "scripts/contract_slice.py 的 openapi/pages/DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码为 1.0.0；活契约已是 1.0.1。wave1 内容经实测字节等价不受影响，但 5 个月报任务（M1-P01/M3-P01/M3-P02/M4-P01/M5-P01）会被静默提供过期契约。",
-   "blocks": "wave1 派单前置条件之一（见 resume.dispatch_preconditions）"
+   "blocks": "已解除：wave1 派单前置 PRE-1 完成",
+   "commit": "1f5912e",
+   "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
+  },
+  {
+   "id": "D-005",
+   "task": "M0-P01",
+   "severity": "MAJOR",
+   "status": "FIXED_PENDING_Q",
+   "commit": "1f5912e",
+   "file": "orchestrator/defects/D-005.md",
+   "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
+   "summary": "slice_ac 的 AC_ROW 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错；5 个 P 任务共 30 处 AC-MR 引用会静默得到空的验收上下文。已扩展正则、增 ACCEPTANCE_SOURCES、新增 missing_targets 四类分母断言，未命中 rc=2 且不写文件。"
   }
  ],
  "change_requests": [
@@ -1864,15 +1876,15 @@
   "recovered_at": "2026-11-12T21:19:36+08:00",
   "incident": "驱动模型切换（第二次接管）。接管时工作树含未提交的 D-002 修复；本轮已完成 D-002/D-003 收口并提交推送，未采信上一任会话自述，全部门禁从磁盘重跑。",
   "wave": 0,
-  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_OPEN + AWAIT_OWNER_GO",
+  "gate": "WAVE0_EXIT_PENDING_Q + PATCH_v1.0.1_MERGED + D002_D003_FIXED + D004_D005_FIXED + PRE1_2_3_CLEARED + AWAIT_OWNER_GO",
   "next_actions": [
    "0 【闸门】owner_gate=AWAIT_OWNER_GO：在项目负责人明确下达「开工」之前，不得 spawn 任何开发子智能体（手册 15.1）",
-   "1 【派单前置】清空 resume.dispatch_preconditions：PRE-1 修 D-004（切片工具改读活契约）、PRE-2 两张 wave1 任务卡补子任务档位表、PRE-3 M0-03 补 info.version=1.0.1 门禁。三项均属闸门允许的治理修复",
-   "2 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事（M0-04 加验收项 / M4-P01 与 M5-P01 设计前置 / 关键任务 L 循环 2 轮上限 / M0 阶段 Q 复核合并为一次）",
-   "3 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001、D-002、D-003；证据已备于 evidence/monthly/M0-P01/run-01|run-02 与 evidence/M0/M0-01/",
-   "4 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001/D-002/D-003 由 FIXED_PENDING_Q 置 CLOSED",
-   "5 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01，类型客户端按 openapi 1.0.1 生成）；两卡均须先出「子任务档位表」（手册 15.5），无拆解表不得 spawn",
-   "6 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条），否则 wave5 的 L3 lane 会被推成关键路径"
+   "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空：D-004/D-005 修复并重切 wave1 切片（spec_version=1.0.1）、M0-02/M0-03 卡补子任务档位表、M0-03 补活契约版本门禁",
+   "2 请项目负责人裁定 docs/delivery/POST-PATCH-REVIEW-v1.0.1.md 第 6 节的 4 件事，并追认手册 15.6（关键任务 L 循环上限 2 轮）——该条已随 v1.2 写入手册，属事实生效，需追认或改回",
+   "3 放行后派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001 至 D-005；证据在 evidence/monthly/M0-P01/run-01|02|03 与 evidence/M0/M0-01/",
+   "4 依 Q 判定置 M0-01 为 PASS/PASS_WITH_TODO，并把 D-001..D-005 由 FIXED_PENDING_Q 置 CLOSED",
+   "5 并行派发 wave1：M0-02（max，服务入口 + 28 表首迁）与 M0-03（max，前端壳 + 令牌 + UI-01）；两卡子任务档位表已就位（M0-02 flash 3/5、M0-03 flash 6/10），spawn 必须显式填 model",
+   "6 wave2 出口冻结公共件前，确认指标注册表已为月报指标预留外部注册扩展点（手册 15.6 末条）"
   ],
   "in_flight_agents": [],
   "dispatch_requirements": [
@@ -1883,14 +1895,14 @@
   ],
   "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
   "persisted": {
-   "working_tree_clean": true,
-   "head": "29be319",
-   "head_full": "29be319316178f75a5323af395c1dbd405ae5ef8",
-   "remote_head": "29be319",
+   "working_tree_clean": false,
+   "head": "1f5912e",
+   "head_full": "1f5912e60e11512ef40c4e74333af8fce56dd8db",
+   "remote_head": "待本次 state 提交推送后与 HEAD 一致",
    "remote_ref": "origin/m0-framework",
-   "note": "HEAD == origin/m0-framework == f496551；git status --porcelain 为空。29be319 含 D-002/D-003 收口、6 例单测、6 个证据文件、手册 v1.2 第 15 节、BLOCKERS NOTE-04/05 与补丁后评审文档；f496551 为本次 state 恢复指针同步。",
-   "head_semantics": "head/head_full 指最近一次**交付提交**（29be319，含 D-002/D-003 收口与手册 v1.2）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
-   "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。"
+   "head_semantics": "head/head_full 指最近一次**交付提交**（1f5912e：D-004/D-005 修复、wave1 任务卡档位表、切片按活契约 1.0.1 重切、手册第 3.1/3.2/7/15.4 节同步）。state.json 自身的提交号无法自包含，故不记录，也不要求 head 等于当前 HEAD。",
+   "resume_safety_check": "判定可否续跑以两条为准：(a) git status --porcelain 为空；(b) git rev-parse HEAD == git rev-parse '@{u}'。不得以 head != 当前 HEAD 判定为指针陈旧。",
+   "note": "本 state 提交推送后，(a)(b) 两条即成立；届时 dirty=0、ahead/behind=0/0。"
   },
   "context": "驱动模型已于 2026-11-12 两次切换（宿主重启一次、模型切换一次），均由新实例接管。接管纪律：不采信上一任会话自述，必须从磁盘重跑 self_check_gates_rc0 全表；重跑通过后**先确认 resume.owner_gate.status == GO** 才允许派单（手册 15.1），否则只可做只读自检、门禁复跑、治理与证据修复、计划与评审文档编写。",
   "patch": {
@@ -1926,9 +1938,9 @@
    "29be319"
   ],
   "self_check_gates_rc0": {
-   "checked_at": "2026-11-12T21:19:36+08:00",
-   "evidence": "evidence/monthly/M0-P01/run-02/commands.md",
-   "note": "rc 由脚本实跑回填，非人工誊写；G4 篡改负例的 expected 为 1，Q 复核时不得据此判红。",
+   "checked_at": "2026-11-12T22:16:36+08:00",
+   "evidence": "evidence/monthly/M0-P01/run-03/commands.md",
+   "note": "rc 由本文件生成时实跑取得，非人工誊写。G4/G4b/G4c 的 expected 为 1 或 2（篡改与未命中负例），Q 复核时不得据此判红。G4c 沿用 run-02 实测，本轮不重复篡改基线以免污染 spec/。",
    "gates": {
     "G1_baseline_v1.0": {
      "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
@@ -1945,15 +1957,21 @@
      "rc": 0,
      "expected": 0
     },
-    "G4_frontend_tamper_negative": {
+    "G4_slice_unknown_op_negative": {
+     "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json",
+     "rc": 2,
+     "expected": 2
+    },
+    "G4b_slice_unknown_ac_negative": {
+     "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json",
+     "rc": 2,
+     "expected": 2
+    },
+    "G4c_frontend_tamper_negative": {
      "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
      "rc": 1,
-     "expected": 1
-    },
-    "G4b_frontend_after_restore": {
-     "cmd": "cp /tmp/tokens.bak <path> && python3 scripts/check_frontend_baseline.py",
-     "rc": 0,
-     "expected": 0
+     "expected": 1,
+     "note": "run-02 实测；本轮未重复篡改基线，避免污染 spec/"
     },
     "G5_contract_gate": {
      "cmd": "python3 scripts/check_contracts.py check",
@@ -2018,13 +2036,15 @@
     "expected": 0
    },
    "counts": {
-    "pytest_passed": 14,
+    "pytest_passed": 28,
     "mypy_source_files": 6,
-    "ruff_formatted_files": 33,
+    "ruff_formatted_files": 35,
     "contract_registered_nodes": 12,
+    "acceptance_denominator": 47,
+    "acceptance_resolvable": 47,
     "frontend_baseline_rows": 8,
-    "baseline_files": 45,
-    "doctor": "PASS=15 WARN=2 FAIL=0 HEALTHY"
+    "live_openapi_sha16": "01bd28f0772f506e",
+    "live_openapi_info_version": "1.0.1"
    }
   },
   "post_patch_review": {
@@ -2045,36 +2065,45 @@
    ]
   },
   "dispatch_preconditions": {
-   "note": "手册 15.1 的 owner_gate 放行后，仍必须逐项清空本表才允许 spawn wave1 子智能体。每项完成后置 status=DONE 并记 commit。",
+   "note": "PRE-1/2/3 已于提交 1f5912e 全部清空。owner_gate 放行后可直接派 wave1；派单前仍须校验切片 source.openapi.sha16 与当时活契约实算值一致（手册 15.4 第 5 条）。",
    "items": [
     {
      "id": "PRE-1",
-     "status": "OPEN",
+     "status": "DONE",
      "severity": "MAJOR",
      "item": "修 D-004：contract_slice.py 改读活契约 contracts/，spec_version 从 info.version 取，补差分回归 + 篡改负例 + 单测，并重切 M0-02/M0-03 切片入库（spec_version 应为 1.0.1）",
      "ref": "orchestrator/defects/D-004.md",
      "allowed_under_owner_gate": true,
-     "reason_allowed": "属治理与工具修复，非业务开发；且它是派单前置，绕不过去"
+     "reason_allowed": "属治理与工具修复，非业务开发；且它是派单前置，绕不过去",
+     "commit": "1f5912e",
+     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
     },
     {
      "id": "PRE-2",
-     "status": "OPEN",
+     "status": "DONE",
      "severity": "MINOR",
      "item": "M0-02.md / M0-03.md 任务卡补「子任务档位表」（手册 15.5：无拆解表不得 spawn）；两卡写于 02:51，早于 15.5 生效",
      "ref": "orchestrator/tasks/M0-02.md, orchestrator/tasks/M0-03.md",
-     "allowed_under_owner_gate": true
+     "allowed_under_owner_gate": true,
+     "commit": "1f5912e",
+     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
     },
     {
      "id": "PRE-3",
-     "status": "OPEN",
+     "status": "DONE",
      "severity": "MINOR",
      "item": "M0-03.md 增一条显式门禁：活契约 info.version 必须为 1.0.1，使「openapi-typescript 产物 diff 为空」有明确版本基准",
      "ref": "orchestrator/tasks/M0-03.md, docs/delivery/MONTHLY-DELTA-PLAN.md 第 1 节",
-     "allowed_under_owner_gate": true
+     "allowed_under_owner_gate": true,
+     "commit": "1f5912e",
+     "evidence": "evidence/monthly/M0-P01/run-03/commands.md"
     }
    ],
-   "wave1_slice_content_verdict": "M0-02/M0-03 现有切片内容经差分回归实测与活契约重切结果字节等价（v1.0.1 的 12 个节点与这 5 个 operationId 无交集），故内容不需重做，只需重切以修正 spec_version 与来源标记。"
-  }
+   "wave1_slice_content_verdict": "M0-02/M0-03 现有切片内容经差分回归实测与活契约重切结果字节等价（v1.0.1 的 12 个节点与这 5 个 operationId 无交集），故内容不需重做，只需重切以修正 spec_version 与来源标记。",
+   "cleared_at": "2026-11-12T22:16:36+08:00",
+   "all_cleared": true
+  },
+  "d004_d005_commit": "1f5912e"
  },
  "acceptance": {
   "baseline_total": 35,
