@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 0,
-  "updated_at": "2026-11-12T22:52:29+08:00",
+  "updated_at": "2026-11-12T22:55:34+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1901,7 +1901,7 @@
       "0 【已完成】owner_gate=GO：项目负责人明确下达『确认开工』并授权长程无人值守、裁定用默认值（见 resume.owner_decisions）",
       "1 【已完成】PRE-1/2/3 于提交 1f5912e 清空",
       "2 【已完成】POST-PATCH-REVIEW 第 6 节 4 件事全部按建议批准；手册 15.6（关键任务 L 循环上限 2 轮）已追认；pending_owner 5 项全部按默认值裁定",
-      "3 【进行中-环境】fonts-noto-cjk 安装完成后：fc-list :lang=zh | grep -ci noto > 0，复跑 bash scripts/doctor.sh，把 orchestrator/BLOCKERS.md 的 BLK-02 置为已关闭并附实测",
+      "3 【已完成】fonts-noto-cjk 安装完成并复验（fc-list Noto=30、doctor rc=0），BLK-02 已关闭，证据 evidence/monthly/M0-P01/run-04/commands.md 第 7 节",
       "4 【下一步-派单】派 Q（flash 采集 + max 判定）一次性交叉验证：M0-01 九项门禁、M0-P01 契约门禁与 CR-001/ADR-004/CHANGES.json 一致性、D-001 至 D-006；证据写 evidence/M0/Q-VERIFY-M0-01/ 与 qa-reports/m0/",
       "5 【下一步-派单】并行派 M0-02 / S1（qwen3.8-max，high）：契约抽取与设计，只写 orchestrator/handoff/M0-02-design.md（与 Q 的写路径无交集）",
       "6 【延后到 Round 2】M0-03 / S1+S2（qwen3.8-max）：工程骨架 + 令牌体系设计；刻意延后以避免其改 web/ 时与 Q 的 G13（npm build）撞并发假红",
@@ -2228,9 +2228,18 @@
         "SRC-1",
         "Q-VERIFY-M0-01"
       ],
-      "fonts_noto_cjk": "APPROVED_BY_OWNER：开工前安装；本次接管时 apt 仍在下载 61.2MB，BLK-02 待安装完成 + fc-list 验证 + doctor 复跑后关闭"
+      "fonts_noto_cjk": "APPROVED_BY_OWNER 并已完成：fonts-noto-cjk 1:20230817+repack1-3；fc-list :lang=zh 中 Noto 计数=30；doctor rc=0；BLK-02 已关闭"
     },
-    "pending_owner_cleared_at": "2026-11-12T22:48:36+08:00"
+    "pending_owner_cleared_at": "2026-11-12T22:48:36+08:00",
+    "environment": {
+      "fonts_noto_cjk": {
+        "installed": "fonts-noto-cjk 1:20230817+repack1-3",
+        "fc_lang_zh_noto_count": 30,
+        "doctor_rc": 0,
+        "verified_at": "2026-11-12T22:55:34+08:00",
+        "blocker": "BLK-02 CLOSED"
+      }
+    }
   },
   "acceptance": {
     "baseline_total": 35,

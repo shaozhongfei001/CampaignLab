@@ -101,3 +101,109 @@ git status --porcelain spec/frontend-template-spdb-v1.1/css/tokens.css | wc -l  
 ## 6. 本轮可入库性自检（NOTE-05）
 
 - 见同目录提交后的 `git ls-files evidence/monthly/M0-P01/run-04/` 输出（记录在提交说明与本文件末尾追加段）。
+
+
+## 7. 追加：`fonts-noto-cjk` 安装完成，BLK-02 关闭（2026-11-12T22:55:34+08:00）
+
+第 4 节记录的下载已完成，本节为关闭 BLK-02 的实测依据。
+
+| 命令 | rc | 实测输出 |
+|---|---|---|
+| `dpkg -l fonts-noto-cjk \| awk '/^ii/{print $2" "$3}'` | 0 | `fonts-noto-cjk 1:20230817+repack1-3` |
+| `fc-list :lang=zh \| grep -ci noto` | 0 | `30`（> 0 即达标） |
+| `fc-list :lang=zh \| wc -l` | 0 | `37` |
+| `bash scripts/doctor.sh` | 0 | 见下方原文 |
+
+`fc-list :lang=zh | grep -i noto` 抽样：
+
+```
+/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc: Noto Serif CJK SC:style=Bold
+/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc: Noto Serif CJK TC:style=Bold
+/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc: Noto Serif CJK JP:style=Bold
+/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc: Noto Serif CJK HK:style=Bold
+/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc: Noto Serif CJK KR:style=Bold
+/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc: Noto Sans CJK JP:style=Regular
+```
+
+`bash scripts/doctor.sh` 输出尾部原文（rc=0）：
+
+```
+ramework
+  head   : ce2d9fa
+  [ OK ] 工作树干净
+
+== 2. CPython 与 SQLite JSON 能力 ==
+  python : 3.14.10
+  path   : /home/szf/dev/CampaignLab/.venv/bin/python -> /home/szf/.local/share/uv/python/cpython-3.14.10-linux-x86_64-gnu/bin/python3.14
+  [ OK ] CPython 3.14.10 满足 >=3.14,<3.15
+  sqlite : 3.53.1 [3, 53, 1]
+  json1  : json_extract=1 json_valid=1 json_type=object
+           json_each_rows=3 json_group_array=[1,[10,20,30],{"d":"x"}]
+  note   : SQLite>=3.38 起 JSON 内建，SQLITE_ENABLE_JSON1 已非独立编译选项
+  [ OK ] sqlite_version >= 3.38
+  [ OK ] JSON 函数实测可用（json_extract/json_valid/json_type/json_each/json_group_array）
+
+== 3. Node / npm（含 ELF 取证） ==
+  node   : v24.22.3
+  path   : /home/szf/.local/bin/node -> /home/szf/.local/share/node-v24/bin/node
+  [ OK ] node 位于 Linux 文件系统（非 /mnt/*）：/home/szf/.local/share/node-v24/bin/node
+  elf    : ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), 
+  [ OK ] node 为 Linux ELF 可执行文件
+  [ OK ] Node v24.22.3 满足 >=24,<25
+  [ OK ] npm 11.19.1 @ /home/szf/.local/share/node-v24/lib/node_modules/npm/bin/npm-cli.js
+
+== 4. uv 与 Python 依赖锁 ==
+  [ OK ] uv uv 0.13.7 (x86_64-unknown-linux-gnu) @ /home/szf/.local/bin/uv
+         .python-version = 3.14.10
+         requires-python = ">=3.14,<3.15"
+  uv lock --check 退出码: 0
+  [ OK ] uv lock --check 通过（uv.lock 与 pyproject.toml 一致）
+         uv.lock 包条目数：52
+  [ OK ] uv sync --locked --dry-run 通过（虚拟环境与锁一致）
+
+== 5. 前端依赖（web/） ==
+  [ OK ] web/package-lock.json 存在（122775 字节）
+  npm ci --dry-run 退出码: 0
+  [ OK ] npm ci --dry-run 通过（锁与 package.json 一致且可复现；未改动 node_modules）
+         up to date in 483ms
+         web/node_modules 已安装（顶层 159 项）
+
+== 6. 构建与工具版本 ==
+  git        : git version 2.43.0
+  docker     : Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2
+  make       : GNU Make 4.3
+  rg         : ripgrep 14.1.0
+  curl       : curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3
+  sha256sum  : sha256sum (GNU coreutils) 9.4
+  fc-list    : fontconfig version 2.15.0
+
+== 7. 原型基线 scripts/verify.sh（四步结论） ==
+  env: node=v24.22.3 python=Python 3.12.3
+  ==> 1/4 交付件完整性
+  SHA256SUMS OK
+  ==> 2/4 计算与问法断言
+  79/79 PASS
+  ==> 3/4 确定性数据生成
+  ==> 4/4 字节级复现
+  PASS: 字节级复现
+  [ OK ] verify.sh 退出码 0（原型基线通过）
+
+== 8. 浏览器与字体（信息项，不判 FAIL） ==
+         cached: chromium-1234
+         cached: chromium-1254
+         cached: chromium_headless_shell-1234
+         cached: chromium_headless_shell-1254
+  [ OK ] Playwright 浏览器缓存存在：/home/szf/.cache/ms-playwright
+         web/node_modules/@playwright/test 已安装
+  [ OK ] 存在中文字体（fc-list :lang=zh = 37 条）
+         Noto Sans CJK 已安装
+
+== 摘要 ==
+  PASS=16  WARN=0  FAIL=0
+  RESULT: HEALTHY
+```
+
+- 判定：Noto Sans CJK 已注册到中文字体族，字形度量与行内设计基线一致的障碍消除；
+  `orchestrator/BLOCKERS.md` 的 BLK-02 由「安装进行中」置为**已关闭**。
+- 剩余 WARN 仅 BLK-01（Playwright 浏览器真跑待 M0-03 验证），非阻塞。
+- 本节不改动 `spec/`，不并发改写 `sources.list`；密码零落盘（安装由已落地的限定范围免密 sudo 完成）。

@@ -3,7 +3,7 @@
 | 编号 | 阻塞任务 | 事项 | 需要谁 | 建议命令或动作 |
 |---|---|---|---|---|
 | BLK-01 | 降级：待 M0-03 验证 | Playwright 浏览器缓存已存在（chromium-1254 与 headless shell），可能无需 sudo | 待验证 | M0-03 用真实 spec 启动一次；失败再走 npx playwright install --with-deps chromium |
-| BLK-02 | M0-03、M5-01（措辞已更新） | **降级：安装进行中**。免密 sudo 已落地（`/etc/sudoers.d/90-campaignlab-ops`，限定包管理/服务类命令），`apt-get install -y fonts-noto-cjk` 已在跑（需下载 61.2 MB，实测约 45 KB/s）。现有 7 条中文字体足以出图，但字形度量与行内设计基线不一致，视觉走查结论仍须附此声明 | 无需人工（已授权） | 装完复验 `dpkg -l fonts-noto-cjk` 出现 `ii`、`fc-list :lang=zh \| grep -ci noto > 0`，复跑 `bash scripts/doctor.sh`（WARN 应由 2 降为 1），再置本行为「已关闭」并附实测 |
+| BLK-02 | 已关闭（2026-11-12T22:55:34+08:00） | `fonts-noto-cjk 1:20230817+repack1-3` 安装完成；`fc-list :lang=zh \| grep -ci noto` = 30，`bash scripts/doctor.sh` rc=0；M0-03、M5-01 的视觉走查不再需要「字体度量不一致」声明 | — | 证据：`evidence/monthly/M0-P01/run-04/commands.md` 第 7 节 |
 | BLK-03 | 各阶段 PR | gh 未认证，编排器无法建 PR 与触发 workflow | 项目负责人 | `gh auth login`，或用 compare 链接手工建 PR |
 | BLK-04 | M3-01、M3-03 的行内语义 | ADR-003 三项未决（主色与导航、语义色分层、图表补偿） | 项目负责人 | 现按推荐值推进并留痕，收到裁定后回归核对 |
 | BLK-05 | 需求追溯 | `CampaignLab-Bank-Strategy-Review-Source-Extract.md` 原件缺失 | 项目负责人 | 提供原件，或批准由 docx/pptx 重建 extract |
