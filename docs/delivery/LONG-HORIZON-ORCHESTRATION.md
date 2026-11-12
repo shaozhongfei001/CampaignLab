@@ -152,7 +152,7 @@
 | 路径 | 写方 | 读方 | 内容约束 |
 |---|---|---|---|
 | `orchestrator/state.json` | T | 全体 | 唯一状态真值：phase/task/status/attempt/tier/tokens/commit/evidence/blockers |
-| `orchestrator/tasks/<task_id>.md` | T | 承接角色 | 任务卡，见 3.2 模板，≤ 60 行 |
+| `orchestrator/tasks/<task_id>.md` | T | 承接角色 | 任务卡，见 3.2 模板；**叙述正文 ≤ 60 行**，15.5 要求的「子任务档位表」为结构化必需项，不计入该上限（实测 M0-02 55 行 / M0-03 63 行） |
 | `orchestrator/handoff/<task_id>-design.md` | max 档实现者 | flash 档实现者 | 设计与骨架：接口签名、数据结构、边界、验证清单，≤ 120 行 |
 | `orchestrator/change-requests/CR-<n>.md` | 任意 lane | T 串行合并 | 契约变更请求：动机、影响面、回归用例、ADR 需求 |
 | `orchestrator/defects/D-<n>.md` | Q | 对应 lane | 缺陷单：BLOCKER/MAJOR/MINOR/NOTE + 受影响对象 + 复现 + 实际/预期 + 负责人 + 复测 |
@@ -178,6 +178,15 @@ inputs:
 gates:
   - <命令 + 期望退出码>
   - <AC 编号 + 判定依据>
+subtasks:                       # 15.5 必填；**无此表不得 spawn**
+  | 子任务 | 档位 | 预估 token | 产出 |
+  | <S1 …> | qwen3.8-max high | <n>k | <handoff/设计或实现文件> |
+  | <S2 …> | qwen3.8-flash | <n>k | <样板/参数化用例/证据采集> |
+  # 表后须给出：max/flash 的 token 合计与占比、flash 子任务占比，
+  # 并自证满足 6.6（flash ≥60% 子任务、token ≤35%）与单任务上限（max ≤200k、flash ≤60k）
+dispatch:
+  model: <spawn 时必须显式填 qwen3.8-max 或 qwen3.8-flash；省略即继承父模型＝静默降档>
+  loop_cap: <critical=true → 2 轮；slack 1-3 → 3 轮；slack ≥4 → 3 轮 + 1 轮 max 复审（15.6）>
 outputs:
   - <文件清单>
   - evidence/M<n>/<task_id>/…
@@ -371,7 +380,7 @@ T2/T3 任务标准拆法：max 产出 `handoff/<task>-design.md`（接口签名�
 1. 任何 lane 发现契约缺项或矛盾，先按第 0 节优先级核对权威来源。
 2. 能自行修正的写 `orchestrator/change-requests/CR-<n>.md`：动机、影响面（operationId / 表 / 页面 / 测试）、回归用例、是否需要 ADR。
 3. 触及**分母、状态、接口兼容、取数依据、资金模拟语义**的，必须同时写 ADR 草案并标 `PENDING_OWNER`，在裁定前继续其他可独立任务。
-4. 只有 Lane T 能修改 `contracts/`，且必须同一变更集内同步：OpenAPI + `pages.json` / `operations.json` + 受影响 `ui` 页说明 + 测试 + 受影响 fixture 期望。
+4. 只有 Lane T 能修改 `contracts/`，且必须同一变更集内同步：OpenAPI + `pages.json` / `operations.json` + 受影响 `ui` 页说明 + 测试 + 受影响 fixture 期望 + **所有以基线为数据源的工具**（D-004 的直接结论：`scripts/contract_slice.py` 曾把 openapi/pages/DDL 全部钉在 `spec/CampaignLab-SDD-v1.0/`，且 `spec_version` 硬编码，活契约升到 1.0.1 后仍静默按 1.0.0 派单。契约升级时必须同时检查每个工具的读取路径与版本戳来源，并跑差分回归）。
 5. CI 门禁 `scripts/check_contracts.py`（M0-01 交付）：比对活契约与基线，输出差异清单；每处差异必须能对应一个 CR 或 ADR 编号，否则失败。同时对活契约重跑 `qa/verify_schemas.py` 等价校验。
 
 ## 8. 成本与上下文经济（除第 5、6 节外的补充规则）
@@ -595,6 +604,8 @@ evidence/M<n>/<task_id>/
   `gates[].evidence` 指针在仓库内悬空）。注意 `git check-ignore -v` 对**否定规则**也会打印并返回 0，
   不能作为「是否被忽略」的判据。
 - 证据中的负例必须标注「期望 rc」，避免 Q lane 把期望的 1 判成失败。
+5. **工具必须显式声明数据源**（D-004 / D-005 的直接结论）：任何读取契约或规格的工具，其来源路径必须写成具名常量（如 `LIVE` / `BASE` / `DELTA`）并在输出中回显——切片输出的 `source` 段含来源路径与 `openapi` 的 bytes 及 sha256 前 16；版本号一律动态读取 `info.version`，**禁止硬编码**。派单前下游必须校验该指纹与当时活契约实算值一致，不一致即重切。工具的单测必须含一条**反证用例**：把数据源换回基线，断言新增内容随之消失，以此证明「确实读的是活契约」而非碰巧等价。
+6. **抽取类工具必须覆盖全部四类目标的分母断言**：`--ops` / `--ac` / `--ui` / `--tables` 任一未命中即 rc=2，且校验通过后才写出文件（未命中不得留下垃圾切片）。验收编号正则必须同时覆盖 `AC-<n>` 与 `AC-<前缀>-<n>`（如 `AC-MR-<n>`），并允许首单元格带标题；47 条 AC 的分母必须由单测钉死。
 
 ### 15.5 成本账本必填（否则第 6.6 节的配额与占比条款全部失效）
 

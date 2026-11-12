@@ -1,5 +1,16 @@
 {
- "spec_version": "1.0.0",
+ "spec_version": "1.0.1",
+ "source": {
+  "live_contracts": "contracts",
+  "openapi": {
+   "path": "contracts/openapi.json",
+   "bytes": 443552,
+   "sha16": "01bd28f0772f506e"
+  },
+  "readonly_originals": "spec/CampaignLab-SDD-v1.0",
+  "monthly_delta": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+  "rule": "活契约 contracts/ 是实现唯一依据（手册第 7 节）；BASE 仅供活契约中不存在的只读原件（qa/ACCEPTANCE.md、ui/*.md）；spec_version 从活契约 info.version 动态读取，禁止硬编码。"
+ },
  "operations": {
   "exchangeSession": {
    "method": "POST",

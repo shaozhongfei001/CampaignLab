@@ -4,10 +4,31 @@
 用法:
   python3 scripts/contract_slice.py --ops exchangeSession,getSession --ac AC-001,AC-034 \
       --ui UI-01 --tables workspaces,audit --out orchestrator/handoff/slice.json
-只依赖标准库。openapi.json 420KB 由本脚本定点抽取，绝不整份进上下文。
+只依赖标准库。活契约 openapi.json 443KB 由本脚本定点抽取，绝不整份进上下文。
+必须从仓库根目录运行（路径为 cwd 相对，与既有单测约定一致）。
+
+数据源（D-004 修复后）:
+  LIVE  = contracts/                                活契约，**实现唯一依据**（手册第 7 节）
+  BASE  = spec/CampaignLab-SDD-v1.0/                不可变基线，仅供活契约中不存在的只读原件
+                                                    （qa/ACCEPTANCE.md、ui/*.md）
+  DELTA = spec/CampaignLab-SDD-Patch-v1.0.1-.../    月报增量，供 AC-MR-01..12 原文行（D-005）
+  spec_version 从 LIVE/openapi.json 的 info.version **动态读取**，禁止硬编码；
+  输出附 source 段（来源路径 + openapi 字节数与 sha256 前 16），使上下文包可追溯来源字节。
 
 D-001 修复记录：参考 DDL 的 28 张表全部以 ") STRICT;" 结尾，旧正则找 "\n);"
 永不匹配，导致 --tables 静默返回 NOT_FOUND。现兼容任意 ) <选项>; 结尾。
+
+D-004 修复记录：此前 openapi / pages / DDL 全部只读 BASE，且 spec_version 硬编码 "1.0.0"。
+活契约升到 1.0.1 后，切片会**静默提供过期契约**（rc=0，无任何提示）。现改读 LIVE 并动态取版本。
+
+D-005 修复记录：AC_ROW 原为 ^\\|\\s*(AC-\\d+)\\s*\\|，既不匹配 AC-MR-<n>（月报行首单元格还带标题），
+也不读月报追加清单；而 slice_ac 只返回命中的行、未命中不报错 —— 5 个 P 任务共 30 处 AC-MR
+引用会**静默得到空的验收上下文**。现扩展正则为 AC-(?:MR-)?\\d+ 且允许单元格内带标题，
+并读取 DELTA 的追加清单；任何请求目标未命中一律 rc=2。
+
+静默失效防护（手册 13.3 / 15.4）：--ops / --ac / --ui / --tables 中任一目标未命中，
+一律 rc=2，禁止返回 NOT_FOUND 或空字典后 rc=0；且**校验通过后才写出文件**，
+未命中时不产生任何切片产物，避免坏上下文被派发。
 """
 
 from __future__ import annotations
@@ -16,20 +37,65 @@ import argparse
 import json
 import re
 import sys
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, cast
 
-SPEC = Path("spec/CampaignLab-SDD-v1.0")
+LIVE = Path("contracts")
+BASE = Path("spec/CampaignLab-SDD-v1.0")
+DELTA = Path("spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta")
+ACCEPTANCE_SOURCES: tuple[Path, ...] = (
+    BASE / "qa/ACCEPTANCE.md",
+    DELTA / "qa/CampaignLab-Review-Acceptance-Checklist.append.md",
+)
 Json = dict[str, Any]
 
 # ) 后可跟 STRICT / WITHOUT ROWID 等表选项，再到分号
 TABLE_TAIL = r"[\s\S]*?\n\)[^;]*;"
 INDEX_HINT = r"CREATE (UNIQUE )?INDEX.*ON "
-AC_ROW = r"^\|\s*(AC-\d+)\s*\|"
+# AC-001 与 AC-MR-01 都要匹配；月报清单首单元格形如 "AC-MR-01 标准接入"，故允许尾部标题
+AC_ROW = r"^\|\s*(AC-(?:MR-)?\d+)\b[^|]*\|"
 
 
 def load(path: Path) -> Json:
     return cast(Json, json.loads(path.read_text(encoding="utf-8")))
+
+
+def sha16(path: Path) -> str:
+    return sha256(path.read_bytes()).hexdigest()[:16]
+
+
+def live_spec_version() -> str:
+    """从活契约读取 info.version；缺失即 rc=2，禁止回退到硬编码值。"""
+    openapi = LIVE / "openapi.json"
+    if not openapi.exists():
+        print(f"FAIL 活契约缺失: {openapi}", file=sys.stderr)
+        raise SystemExit(2)
+    info = load(openapi).get("info") or {}
+    version = info.get("version")
+    if not isinstance(version, str) or not version:
+        print(f"FAIL 活契约 info.version 缺失或非法: {openapi}", file=sys.stderr)
+        raise SystemExit(2)
+    return version
+
+
+def source_block() -> Json:
+    """把数据来源写进切片，使上下文包可追溯到具体字节。"""
+    openapi = LIVE / "openapi.json"
+    return {
+        "live_contracts": str(LIVE),
+        "openapi": {
+            "path": str(openapi),
+            "bytes": openapi.stat().st_size,
+            "sha16": sha16(openapi),
+        },
+        "readonly_originals": str(BASE),
+        "monthly_delta": str(DELTA),
+        "rule": (
+            "活契约 contracts/ 是实现唯一依据（手册第 7 节）；BASE 仅供活契约中不存在的只读原件"
+            "（qa/ACCEPTANCE.md、ui/*.md）；spec_version 从活契约 info.version 动态读取，禁止硬编码。"
+        ),
+    }
 
 
 def table_head(name: str) -> str:
@@ -60,8 +126,8 @@ def refs_of(node: Any, bag: Json, schemas: Json, depth: int, cap: int) -> None:
 
 
 def slice_ops(op_ids: list[str], cap: int) -> Json:
-    """按 operationId 抽取 path/方法/操作体，并就地展开引用组件。"""
-    api = load(SPEC / "contracts/openapi.json")
+    """按 operationId 从**活契约**抽取 path/方法/操作体，并就地展开引用组件。"""
+    api = load(LIVE / "openapi.json")
     components = cast(Json, api.get("components") or {})
     schemas = cast(Json, components.get("schemas") or {})
     paths = cast(Json, api.get("paths") or {})
@@ -92,29 +158,33 @@ def slice_ops(op_ids: list[str], cap: int) -> Json:
 
 
 def slice_ac(ac_ids: set[str]) -> Json:
-    """抽取验收行原文，禁止转述（任务卡必须引用原句）。"""
-    text = (SPEC / "qa/ACCEPTANCE.md").read_text(encoding="utf-8")
+    """抽取验收行原文，禁止转述。同时覆盖基线 AC-001..035 与月报 AC-MR-01..12。"""
     rows: Json = {}
-    for line in text.splitlines():
-        m = re.match(AC_ROW, line)
-        if m is not None and m.group(1) in ac_ids:
-            rows[m.group(1)] = [cell.strip() for cell in line.strip().strip("|").split("|")]
+    for src in ACCEPTANCE_SOURCES:
+        if not src.exists():
+            continue
+        text = src.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            m = re.match(AC_ROW, line)
+            if m is not None and m.group(1) in ac_ids and m.group(1) not in rows:
+                rows[m.group(1)] = [cell.strip() for cell in line.strip().strip("|").split("|")]
     return rows
 
 
 def slice_pages(page_ids: set[str]) -> Json:
-    pages = cast(list[Json], load(SPEC / "contracts/pages.json"))
+    """页号索引取活契约 pages.json；页面 markdown 原件仍只在 BASE/ui/ 下。"""
+    pages = cast(list[Json], load(LIVE / "pages.json"))
     out: Json = {}
     for pg in pages:
         pid = str(pg["id"])
         if pid in page_ids:
-            md = (SPEC / str(pg["path"])).read_text(encoding="utf-8")
+            md = (BASE / str(pg["path"])).read_text(encoding="utf-8")
             out[pid] = {"meta": pg, "markdown_lines": md.count(chr(10)) + 1, "markdown": md}
     return out
 
 
 def slice_tables(tables: list[str]) -> Json:
-    sql = (SPEC / "contracts/sqlite-v1.sql").read_text(encoding="utf-8")
+    sql = (LIVE / "sqlite-v1.sql").read_text(encoding="utf-8")
     out: Json = {}
     for name in tables:
         m = re.search(table_head(name) + TABLE_TAIL, sql, re.I)
@@ -130,10 +200,29 @@ def slice_tables(tables: list[str]) -> Json:
 
 
 def all_table_names() -> list[str]:
-    sql = (SPEC / "contracts/sqlite-v1.sql").read_text(encoding="utf-8")
+    sql = (LIVE / "sqlite-v1.sql").read_text(encoding="utf-8")
     return re.findall(
         r"CREATE TABLE(?: IF NOT EXISTS)?[\s" + chr(34) + r"]+([a-z_][a-z0-9_]*)", sql, re.I
     )
+
+
+def missing_targets(requested: Json, bundle: Json) -> Json:
+    """比对请求目标与切片结果，返回各 section 的未命中清单。
+
+    这是「分母断言」的实现：任何请求了却没切到的目标都必须被检出，由 main 转成 rc=2。
+    NOT_FOUND 哨兵与「键根本不存在」两种形态都算未命中。
+    """
+    out: Json = {}
+    for section, ids in requested.items():
+        got = bundle.get(section)
+        if not ids or not isinstance(got, dict):
+            if ids:
+                out[str(section)] = [str(i) for i in ids]
+            continue
+        miss = [str(i) for i in ids if got.get(str(i)) in (None, "NOT_FOUND")]
+        if miss:
+            out[str(section)] = miss
+    return out
 
 
 def main() -> None:
@@ -146,32 +235,45 @@ def main() -> None:
     ap.add_argument("--depth", type=int, default=2)
     ap.add_argument("--out", default="")
     a = ap.parse_args()
-    bundle: Json = {"spec_version": "1.0.0"}
+
+    bundle: Json = {"spec_version": live_spec_version(), "source": source_block()}
+    requested: Json = {}
+
     if a.ops:
-        bundle["operations"] = slice_ops(list(str(a.ops).split(",")), int(a.depth))
+        ids = [x.strip() for x in str(a.ops).split(",") if x.strip()]
+        bundle["operations"] = slice_ops(ids, int(a.depth))
+        requested["operations"] = ids
     if a.ac:
-        bundle["acceptance_rows"] = slice_ac(set(str(a.ac).split(",")))
+        ids = sorted({x.strip() for x in str(a.ac).split(",") if x.strip()})
+        bundle["acceptance_rows"] = slice_ac(set(ids))
+        requested["acceptance_rows"] = ids
     if a.ui:
-        bundle["pages"] = slice_pages(set(str(a.ui).split(",")))
-    names = list(str(a.tables).split(",")) if a.tables else []
+        ids = [x.strip() for x in str(a.ui).split(",") if x.strip()]
+        bundle["pages"] = slice_pages(set(ids))
+        requested["pages"] = ids
+    names = [x.strip() for x in str(a.tables).split(",") if x.strip()] if a.tables else []
     if a.all_tables:
         names = all_table_names()
     if names:
         bundle["ddl"] = slice_tables(names)
+        requested["ddl"] = names
+
     txt = json.dumps(bundle, ensure_ascii=False, indent=1)
+    missing = missing_targets(requested, bundle)
+    flat = [f"{sec}:{i}" for sec, items in missing.items() for i in cast(list[str], items)]
+    stats = (
+        f"spec_version={bundle['spec_version']} slice_bytes={len(txt.encode())} "
+        f"slice_lines={txt.count(chr(10))} sections={list(bundle)} missing={flat}"
+    )
+    print(stats, file=sys.stderr)
+    if flat:
+        print(f"FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: {flat}", file=sys.stderr)
+        raise SystemExit(2)
     if a.out:
         out_path = Path(str(a.out))
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(txt, encoding="utf-8")
-    not_found = [k for k, v in bundle.get("ddl", {}).items() if v == "NOT_FOUND"]
-    stats = (
-        f"slice_bytes={len(txt.encode())} slice_lines={txt.count(chr(10))} "
-        f"sections={list(bundle)} ddl_not_found={not_found}"
-    )
-    print(stats, file=sys.stderr)
-    if not_found:
-        raise SystemExit(2)
-    if not a.out:
+    else:
         print(txt)
 
 

@@ -1,28 +1,42 @@
-"""契约切片工具的回归护栏（D-001 修复后新增）。
+"""契约切片工具的回归护栏（D-001 修复后新增；D-004 / D-005 修复后扩充）。
 
-背景：slice_tables 的旧正则在找 "\n);"，而参考 DDL 的 28 张表一律以 ") STRICT;"
-结尾，导致 --tables 静默返回 NOT_FOUND 且退出码为 0。本测试把三件事钉死：
-表数分母、解析完整性、索引覆盖完整性。任一退化即红。
+D-001：slice_tables 的旧正则在找 "\n);"，而参考 DDL 的 28 张表一律以 ") STRICT;"
+结尾，导致 --tables 静默返回 NOT_FOUND 且退出码为 0。
+D-004：openapi / pages / DDL 全部只读 v1.0.0 不可变基线，且 spec_version 硬编码，
+活契约升到 1.0.1 后切片会静默提供过期契约。
+D-005：AC 正则不匹配 AC-MR-<n> 且不读月报追加清单，未命中还不报错，
+月报任务的验收上下文会静默为空。
 
-约定：必须从仓库根目录运行 pytest（contract_slice 以仓库根为相对路径基准）。
+本文件把这些钉死：表数分母、解析完整性、索引覆盖、数据源必须是活契约、
+spec_version 必须动态读取、47 条 AC 分母必须全可解析、未命中必须 rc=2 且不产出文件。
+
+约定：必须从仓库根目录运行 pytest（contract_slice 以 cwd 相对路径为基准）。
 """
 
 from __future__ import annotations
 
 import importlib.util
+import json
 import re
+import subprocess
+import sys
+from hashlib import sha256
 from pathlib import Path
 from types import ModuleType
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPT = ROOT / "scripts" / "contract_slice.py"
+LIVE_OPENAPI = ROOT / "contracts" / "openapi.json"
+BASE_OPENAPI = ROOT / "spec" / "CampaignLab-SDD-v1.0" / "contracts" / "openapi.json"
+BASE_IDS = {f"AC-{i:03d}" for i in range(1, 36)}
+MONTHLY_IDS = {f"AC-MR-{i:02d}" for i in range(1, 13)}
 
 
 @pytest.fixture(scope="module")
 def mod() -> ModuleType:
-    path = ROOT / "scripts" / "contract_slice.py"
-    spec = importlib.util.spec_from_file_location("contract_slice", path)
+    spec = importlib.util.spec_from_file_location("contract_slice", SCRIPT)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -33,6 +47,16 @@ def mod() -> ModuleType:
 @pytest.fixture(scope="module")
 def ddl_text() -> str:
     return (ROOT / "spec/CampaignLab-SDD-v1.0/contracts/sqlite-v1.sql").read_text(encoding="utf-8")
+
+
+def run_cli(*args: str, out: Path | None = None) -> subprocess.CompletedProcess[str]:
+    cmd = [sys.executable, str(SCRIPT), *args]
+    if out is not None:
+        cmd += ["--out", str(out)]
+    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+
+
+# ---------------------------------------------------------------- D-001 既有护栏
 
 
 def test_working_dir_is_repo_root() -> None:
@@ -87,3 +111,143 @@ def test_acceptance_rows_are_verbatim(mod: ModuleType) -> None:
     assert set(rows) == {"AC-001", "AC-034", "AC-035"}
     for cells in rows.values():
         assert len(cells) >= 4, "验收行必须是原表行切片，不得转述"
+
+
+# ---------------------------------------------------------------- D-004 数据源
+
+
+def test_live_contract_is_the_source(mod: ModuleType) -> None:
+    live_dir, base_dir = str(mod.LIVE), str(mod.BASE)
+    assert live_dir == "contracts"
+    assert base_dir == "spec/CampaignLab-SDD-v1.0"
+    for name in ("openapi.json", "pages.json", "sqlite-v1.sql"):
+        assert (mod.LIVE / name).exists(), name
+
+
+def test_spec_version_is_read_from_live_not_hardcoded(mod: ModuleType) -> None:
+    live = json.loads(LIVE_OPENAPI.read_text(encoding="utf-8"))
+    base = json.loads(BASE_OPENAPI.read_text(encoding="utf-8"))
+    assert live["info"]["version"] != base["info"]["version"], (
+        "两版本相同则本测试无法证明数据源已切换，请改用其他判别点"
+    )
+    assert mod.live_spec_version() == live["info"]["version"]
+
+
+def test_get_review_slice_exposes_monthly_review_from_live(mod: ModuleType) -> None:
+    blob = json.dumps(mod.slice_ops(["getReview"], 2)["getReview"], ensure_ascii=False)
+    assert "monthly_review" in blob, "活契约 Review.monthly_review 未进入切片"
+    assert "MonthlyReview" in blob, "月报 schema 未被展开"
+
+
+def test_baseline_source_would_miss_monthly_review(
+    mod: ModuleType, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """反证：把数据源换回基线（即修复前的行为），月报字段就消失。"""
+    monkeypatch.setattr(mod, "LIVE", mod.BASE / "contracts")
+    assert mod.live_spec_version() == "1.0.0"
+    blob = json.dumps(mod.slice_ops(["getReview"], 2)["getReview"], ensure_ascii=False)
+    assert "monthly_review" not in blob
+    assert "MonthlyReview" not in blob
+
+
+def test_source_block_points_at_live_openapi(mod: ModuleType) -> None:
+    src = mod.source_block()
+    data = LIVE_OPENAPI.read_bytes()
+    assert str(src["live_contracts"]) == str(Path("contracts"))
+    assert src["openapi"]["sha16"] == sha256(data).hexdigest()[:16]
+    assert src["openapi"]["bytes"] == len(data)
+    assert str(src["readonly_originals"]) == str(mod.BASE)
+
+
+# ---------------------------------------------------------------- D-005 验收分母
+
+
+def test_all_47_acceptance_ids_resolve(mod: ModuleType) -> None:
+    rows = mod.slice_ac(BASE_IDS | MONTHLY_IDS)
+    assert set(rows) == BASE_IDS | MONTHLY_IDS
+    assert len(rows) == 47, "验收分母必须是 35 + 12 = 47"
+
+
+def test_monthly_rows_are_verbatim_with_golden_numbers(mod: ModuleType) -> None:
+    rows = mod.slice_ac({"AC-MR-05", "AC-MR-08"})
+    assert set(rows) == {"AC-MR-05", "AC-MR-08"}
+    for cells in rows.values():
+        assert len(cells) >= 4, "月报验收行必须是原表行切片，不得转述"
+    assert "83.33%" in "|".join(rows["AC-MR-05"]), "AC-MR-05 原文应含分组等权成功覆盖率 83.33%"
+    assert "79.31%" in "|".join(rows["AC-MR-08"]), "AC-MR-08 原文应含分行含重率 79.31%"
+
+
+def test_monthly_ids_are_unreachable_without_delta_source(
+    mod: ModuleType, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """反证：不读月报追加清单（即修复前），AC-MR 一条也切不到。"""
+    monkeypatch.setattr(mod, "ACCEPTANCE_SOURCES", (mod.BASE / "qa/ACCEPTANCE.md",))
+    assert mod.slice_ac(MONTHLY_IDS) == {}
+    assert len(mod.slice_ac(BASE_IDS)) == 35
+
+
+# ------------------------------------------------------- 分母断言与静默失效防护
+
+
+def test_missing_targets_flags_every_section(mod: ModuleType) -> None:
+    bundle = {
+        "operations": mod.slice_ops(["getHealth", "noSuchOp"], 2),
+        "acceptance_rows": mod.slice_ac({"AC-001"}),
+        "pages": mod.slice_pages({"UI-99"}),
+        "ddl": mod.slice_tables(["workspaces", "no_such_table"]),
+    }
+    miss = mod.missing_targets(
+        {
+            "operations": ["getHealth", "noSuchOp"],
+            "acceptance_rows": ["AC-001", "AC-MR-99"],
+            "pages": ["UI-99"],
+            "ddl": ["workspaces", "no_such_table"],
+        },
+        bundle,
+    )
+    assert miss == {
+        "operations": ["noSuchOp"],
+        "acceptance_rows": ["AC-MR-99"],
+        "pages": ["UI-99"],
+        "ddl": ["no_such_table"],
+    }
+
+
+def test_missing_targets_empty_when_all_hit(mod: ModuleType) -> None:
+    bundle = {"operations": mod.slice_ops(["getHealth"], 2)}
+    assert mod.missing_targets({"operations": ["getHealth"]}, bundle) == {}
+
+
+def test_cli_unknown_op_exits_2_and_writes_nothing(tmp_path: Path) -> None:
+    out = tmp_path / "slice.json"
+    proc = run_cli("--ops", "noSuchOp", out=out)
+    assert proc.returncode == 2, proc.stderr
+    assert not out.exists(), "未命中时不得写出切片文件，避免坏上下文被派发"
+    assert "noSuchOp" in proc.stderr
+
+
+def test_cli_unknown_ac_exits_2(tmp_path: Path) -> None:
+    proc = run_cli("--ac", "AC-MR-99", out=tmp_path / "s.json")
+    assert proc.returncode == 2, proc.stderr
+    assert "AC-MR-99" in proc.stderr
+
+
+def test_cli_happy_path_stamps_live_version_and_monthly_ac(tmp_path: Path) -> None:
+    out = tmp_path / "slice.json"
+    proc = run_cli("--ops", "getHealth", "--ac", "AC-001,AC-MR-01", out=out)
+    assert proc.returncode == 0, proc.stderr
+    d = json.loads(out.read_text(encoding="utf-8"))
+    live_version = json.loads(LIVE_OPENAPI.read_text(encoding="utf-8"))["info"]["version"]
+    assert d["spec_version"] == live_version
+    assert set(d["acceptance_rows"]) == {"AC-001", "AC-MR-01"}
+    assert d["source"]["openapi"]["sha16"] == sha256(LIVE_OPENAPI.read_bytes()).hexdigest()[:16]
+
+
+def test_cli_all_tables_still_finds_28(tmp_path: Path) -> None:
+    out = tmp_path / "ddl.json"
+    proc = run_cli("--all-tables", out=out)
+    assert proc.returncode == 0, proc.stderr
+    ddl = json.loads(out.read_text(encoding="utf-8"))["ddl"]
+    tables = [k for k in ddl if not k.endswith("__indexes")]
+    assert len(tables) == 28
+    assert not [k for k, v in ddl.items() if v == "NOT_FOUND"]

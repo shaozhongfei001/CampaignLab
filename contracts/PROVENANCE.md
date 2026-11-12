@@ -46,3 +46,19 @@ python3 scripts/check_contracts.py check --validate
 - 同一变更集必须同步：OpenAPI + `operations.json`/`pages.json` + 受影响 `ui` 页说明 + 测试 + fixture 期望。
   本次 v1.0.1 补丁未改 `operations.json`/`pages.json`（月报页面说明在补丁 `ui/MONTHLY-PAGES.md`，
   待 M3-P02/M4-P01 落地时再评估是否需要新增页号登记，届时另开 CR）。
+## 工具数据源（D-004 修复后登记，2026-11-12）
+
+`scripts/contract_slice.py` 是全体子智能体上下文包的唯一生成器，其数据源已明确为：
+
+| 用途 | 来源 | 说明 |
+|---|---|---|
+| `openapi.json`（operationId 切片、schema 展开） | `contracts/openapi.json`（**活契约**） | `spec_version` 从其 `info.version` 动态读取，禁止硬编码 |
+| `pages.json`（页号索引） | `contracts/pages.json`（活契约） | 与基线逐字节相同；月报页号若需登记，另开 CR |
+| `sqlite-v1.sql`（DDL 切片） | `contracts/sqlite-v1.sql`（活契约） | 与基线逐字节相同，受门禁强制不漂移 |
+| `qa/ACCEPTANCE.md`（AC-001..035 原文） | `spec/CampaignLab-SDD-v1.0/`（基线） | 活契约目录无 `qa/`，只能取基线原件 |
+| AC-MR-01..12 原文 | `spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/…append.md` | 见 D-005 |
+| `ui/*.md`（页面 markdown 原件） | `spec/CampaignLab-SDD-v1.0/`（基线） | `pages.json` 的 `path` 字段相对基线根解析 |
+
+切片输出含 `source` 段（来源路径 + `openapi` 的 bytes 与 sha256 前 16），
+下游必须校验该 sha16 与派单当时活契约的实算值一致，不一致即重切（手册 15.4 第 5 条）。
+当前活契约指纹：`openapi.json` = `01bd28f0772f506e`（443552 B，`info.version` 1.0.1）。
