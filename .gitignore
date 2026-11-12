@@ -13,6 +13,9 @@ test-results/
 .env.*
 !.env.example
 *.log
+# 例外（D-003）：手册 9.2 的证据布局要求 <gate>.log 入库，否则 state.json 里
+# gates[].evidence 的指针会指向仓库中不存在的文件，Q lane 无法复核，宿主重置即永久丢失。
+!evidence/**/*.log
 .DS_Store
 Thumbs.db
 # 本地 IDE/工具目录

@@ -1,0 +1,30 @@
+# run-02 · 第三份基线（前端设计模板）纳入机器校验
+
+时间 2026-11-12T20:48:30+08:00 · 触发 D-002 · 分支 m0-framework
+
+```
+$ python3 scripts/check_frontend_baseline.py
+OK   checklist_交付前自检.md sha16=b1c2ca4a8257a46a expect=b1c2ca4a8257a46a bytes=4024 expect=4024
+OK   gallery_组件图鉴.html sha16=4320e095e40121ba expect=4320e095e40121ba bytes=24323 expect=24323
+OK   template_blank.html sha16=aca591120b952542 expect=aca591120b952542 bytes=14103 expect=14103
+OK   template_blank_singlefile.html sha16=4b966e044d3305a1 expect=4b966e044d3305a1 bytes=139725 expect=139725
+OK   css/tokens.css sha16=a4e27cc208ccc428 expect=a4e27cc208ccc428 bytes=3199 expect=3199
+OK   css/youxia-ui.css sha16=7ab1eadff01dc5f8 expect=7ab1eadff01dc5f8 bytes=104677 expect=104677
+OK   js/youxia-charts.js sha16=6d831e1415154721 expect=6d831e1415154721 bytes=10260 expect=10260
+OK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+rc=0
+
+$ printf "\n" >> spec/frontend-template-spdb-v1.1/css/tokens.css   # 篡改负例
+OK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+rc=1   # 期望 1
+
+$ 还原后复跑
+baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+rc=0   # 期望 0
+$ git status --porcelain spec/
+(空 = 基线未被污染)
+```

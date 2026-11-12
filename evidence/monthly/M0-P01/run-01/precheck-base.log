@@ -1,0 +1,14 @@
+PASS 补丁摘要 21 项
+ADD      openapi.json /components/schemas/ReviewCreate/properties/profile
+ADD      openapi.json /components/schemas/Review/properties/monthly_review
+ADD      openapi.json /components/schemas/MonthlyCapacity
+ADD      openapi.json /components/schemas/MonthlyComparison
+ADD      openapi.json /components/schemas/MonthlyOriginOverlap
+ADD      openapi.json /components/schemas/MonthlyParticipation
+ADD      openapi.json /components/schemas/MonthlyProduction
+ADD      openapi.json /components/schemas/MonthlyReview
+ADD      openapi.json /components/schemas/MonthlyTrend
+ADD      source-json.schema.json /$defs/SourceMetadata/properties/monthly_review
+ADD      source-metadata.schema.json /properties/monthly_review
+UPDATE   openapi.json /info/version · 1.0.0 → 1.0.1
+只读检查通过。

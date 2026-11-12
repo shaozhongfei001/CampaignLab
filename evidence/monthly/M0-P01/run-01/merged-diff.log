@@ -1,0 +1,13 @@
+changed  openapi.json /info/version
+added    openapi.json /components/schemas/ReviewCreate/properties/profile
+added    openapi.json /components/schemas/Review/properties/monthly_review
+added    openapi.json /components/schemas/MonthlyCapacity
+added    openapi.json /components/schemas/MonthlyComparison
+added    openapi.json /components/schemas/MonthlyOriginOverlap
+added    openapi.json /components/schemas/MonthlyParticipation
+added    openapi.json /components/schemas/MonthlyProduction
+added    openapi.json /components/schemas/MonthlyReview
+added    openapi.json /components/schemas/MonthlyTrend
+added    source-json.schema.json /$defs/SourceMetadata/properties/monthly_review
+added    source-metadata.schema.json /properties/monthly_review
+total_differences=12 compared=10 skipped=[]

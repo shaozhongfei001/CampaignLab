@@ -16,21 +16,25 @@ jobs:
           node-version: "22"
       - run: bash scripts/verify.sh
   contract-gate:
-    # 活契约与不可变基线的差异必须逐条登记（CR + ADR），否则失败。
+    # 三份不可变基线的字节可验性 + 活契约差异登记门禁。
     # 只依赖标准库，因此与 prototype-baseline 共用 3.12；
-    # 元校验（--validate）需要 dev 依赖，放在本地与 M5 回归执行。
+    # 元校验（check --validate）需要 dev 依赖，放在本地与 M5 回归执行。
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: 基线完整性（清单内路径相对各自目录，必须 cd 后校验）
+      - name: 基线一 · v1.0 SDD（清单路径相对该目录，必须 cd 后校验）
         run: |
           cd spec/CampaignLab-SDD-v1.0
           sha256sum -c SHA256SUMS --quiet
-          cd ../CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta
+      - name: 基线二 · v1.0.1 月报增量补丁
+        run: |
+          cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta
           sha256sum -c DELTA-SHA256SUMS --quiet
+      - name: 基线三 · 前端设计模板（README 第九节哈希，D-002 修复）
+        run: python3 scripts/check_frontend_baseline.py
       - name: 活契约差异门禁
         run: python3 scripts/check_contracts.py check
       - name: 指针级差异清单（留档到 CI 日志）

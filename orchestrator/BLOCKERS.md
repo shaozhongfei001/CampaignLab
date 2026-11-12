@@ -12,3 +12,5 @@
 | NOTE-01 | M0-03、M5-01（非阻塞） | 宿主占用 TCP 3000/3001/3002（WSL 镜像网络可见）；vite 默认 5173 空闲 | 编排器 | 前端 dev server 固定用 5173 或在 playwright.config 显式指定端口，勿绑 3000 段 |
 | NOTE-02 | 全体（新增，操作纪律） | 经 PowerShell→bash 通道写多行文件有两类自伤：heredoc 字面写入使反斜杠翻倍；`sed` 模式串含 `/` 会提前终止定界符 | 编排器与全部子智能体 | 一律用「PowerShell 字面 here-string → base64 → WSL 解码」整文件写入；改配置优先整写或 `python3 -c` 定点替换，禁止含 `/` 的 sed 模式串。详见 LONG-HORIZON-ORCHESTRATION.md 第 13.2 节 |
 | NOTE-03 | 编排器自身（新增） | 提交 2fcfb8e 的标题含未转义的 `\uXXXX` 字面量：`git commit -m` 里嵌转义序列时 bash 不解释。因禁止 force-push，不改写历史，仅留痕 | 编排器 | 后续一律 `git commit -F 文件`，文件用 here-string→base64 通道写入（见手册 13.2） |
+| NOTE-04 | 编排器自身（新增，最高危） | 手册与 state.json 此前没有「开工闸门」：`resume.next_actions` 直接写「并行派发 wave1」，任何新实例按第 10/13.1 节恢复协议续跑，都会在项目负责人未下指令时擅自派单开发 | 编排器 + 项目负责人 | 已加手册 15.1 与 `state.json.resume.owner_gate=AWAIT_OWNER_GO`；owner_gate 非 GO 时只允许只读自检与治理修复，禁止 spawn 任何开发子智能体 |
+| NOTE-05 | 全体（新增，证据纪律） | `.gitignore` 的 `*.log` 曾使 state.json 的 4 条 `gates[].evidence` 指针在仓库内悬空（D-003）：证据写盘 ≠ 证据入库，宿主重置即永久丢失 | 编排器与全部子智能体 | 证据落盘后立即用 `git ls-files --others --exclude-standard <path>` 确认可入库；不可入库的证据视为未留证，必须补 `commands.md` |

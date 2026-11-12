@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T20:44:31+08:00",
+ "updated_at": "2026-11-12T20:48:31+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1752,6 +1752,14 @@
    "severity": "MAJOR",
    "status": "FIXED_PENDING_Q",
    "file": "orchestrator/defects/D-001.md"
+  },
+  {
+   "id": "D-002",
+   "task": "M0-P01",
+   "severity": "MINOR",
+   "status": "FIXED_PENDING_Q",
+   "file": "orchestrator/defects/D-002.md",
+   "summary": "前端设计基线此前无机读校验；已加 scripts/check_frontend_baseline.py 并接入 CI"
   }
  ],
  "change_requests": [
@@ -1942,5 +1950,27 @@
   "M5-02",
   "M5-03",
   "M5-P01"
+ ],
+ "baselines": [
+  {
+   "path": "spec/CampaignLab-SDD-v1.0",
+   "manifest": "SHA256SUMS",
+   "verify": "cd 后 sha256sum -c",
+   "ci_step": "基线一"
+  },
+  {
+   "path": "spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta",
+   "manifest": "DELTA-SHA256SUMS",
+   "items": 21,
+   "verify": "cd 后 sha256sum -c",
+   "ci_step": "基线二"
+  },
+  {
+   "path": "spec/frontend-template-spdb-v1.1",
+   "manifest": "README_设计与使用说明.md 第九节（8 项）",
+   "verify": "python3 scripts/check_frontend_baseline.py",
+   "ci_step": "基线三",
+   "defect": "D-002"
+  }
  ]
 }

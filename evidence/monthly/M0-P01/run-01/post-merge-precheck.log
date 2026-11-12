@@ -1,0 +1,14 @@
+PASS 补丁摘要 21 项
+ALREADY  openapi.json /components/schemas/ReviewCreate/properties/profile
+ALREADY  openapi.json /components/schemas/Review/properties/monthly_review
+ALREADY  openapi.json /components/schemas/MonthlyCapacity
+ALREADY  openapi.json /components/schemas/MonthlyComparison
+ALREADY  openapi.json /components/schemas/MonthlyOriginOverlap
+ALREADY  openapi.json /components/schemas/MonthlyParticipation
+ALREADY  openapi.json /components/schemas/MonthlyProduction
+ALREADY  openapi.json /components/schemas/MonthlyReview
+ALREADY  openapi.json /components/schemas/MonthlyTrend
+ALREADY  source-json.schema.json /$defs/SourceMetadata/properties/monthly_review
+ALREADY  source-metadata.schema.json /properties/monthly_review
+ALREADY  openapi.json /info/version
+只读检查通过。
