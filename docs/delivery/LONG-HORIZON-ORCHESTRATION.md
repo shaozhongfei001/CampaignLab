@@ -523,3 +523,28 @@ evidence/M<n>/<task_id>/
 - 含中文或多行的提交信息**一律** `git commit -F <file>`，file 由 here-string→base64 通道写入；
   禁止在 `git commit -m "..."` 里嵌 `\uXXXX` 转义序列（bash 不解释，会原样入库且不可 force-push 修正）。
 - 已发生的字面量化提交：2fcfb8e，保留并在 `orchestrator/BLOCKERS.md` NOTE-03 留痕。
+### 13.2.2 多行 bash 同样必须走 base64（v1.1 补记，M0-P01 实测踩坑）
+- 经 PowerShell 传递的**多行 bash 脚本**一律用 here-string→base64→`bash /tmp/x.sh`，不要拼在
+  PowerShell 单引号串里：bash 里的单引号（如 `FENCE='```'`、`sed 's#...#...#'`）会提前终止 PS 字符串，
+  报错信息还会被 PowerShell 包装成 NativeCommandError，掩盖真实原因。
+- 证据脚本必须在开头 `export PATH="$HOME/.local/bin:$HOME/.local/share/node/bin:$PATH"`，
+  否则 `uv`/`node` 取不到，写进证据的环境行会是假的（本次已重生成修正）。
+
+## 14. v1.0.1 月报增量生效后的计划调整（M0-P01 产出，细节见 docs/delivery/MONTHLY-DELTA-PLAN.md）
+
+1. **验收分母**：35 → **47** 条（新增 AC-MR-01..12）。第 11 节的阶段→AC 表按下述追加，原表不变：
+   | 阶段 | 追加覆盖 AC | 主要验证方式 |
+   |---|---|---|
+   | M1（含 M1-P01） | AC-MR-01、02、10 | 月报快照导入、等价 CSV、负例注入、原子发布与修订竞争 |
+   | M3（含 M3-P01/P02） | AC-MR-03 至 08 | 三月交集、两种覆盖率、容量与客均、客群与总分行去重、工作台走查 |
+   | M4（含 M4-P01） | AC-MR-09、10、11 | PARTIAL_DRAFT、补采签认、更正、旧制品、下期观察 |
+   | M5（含 M5-P01） | AC-MR-12 及全部 47 条 | 三条端到端走查（赠券、回拨、全行月报）＋导出与恢复 |
+2. **波次**：9 波 → **11 波**；关键路径 14 → **16** 个任务（插入 M1-P01、M3-P01、M4-P01）。
+3. **契约治理成为常设门禁**：`contracts/` 为活契约，`spec/**` 三份基线只读；任何差异必须在
+   `contracts/CHANGES.json` 登记且对应真实存在的 CR 与 ADR，由 `scripts/check_contracts.py check`
+   与 CI job `contract-gate` 强制。子智能体对 `contracts/` 一律只读。
+4. **模型路由影响**：P 系列 6 个任务中 4 个命中强制 max（契约、客户键归一、分母口径、签认状态机），
+   2 个走 mixed。为守住「flash ≥60% 子任务、token ≤35%」目标，P 系列一律先由 max 出
+   `handoff/<task>-design.md`，再把负例枚举、页面样板、CSV 等价校验、截图采集、文档回执下放 flash。
+5. **阶段配额调整**：M1 130 → **150**、M3 150 → **175**、M4 120 → **140**、M5 90 → **110**（新增走查与复跑）；
+   M0 与 M2 不变。配额变更由 M0-P01 复盘提出，M1 结束时按实际命中率再校准。
