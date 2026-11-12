@@ -1,0 +1,72 @@
+[project]
+name = "campaignlab"
+version = "0.0.0"
+description = "CampaignLab 策略复盘实验室：单机、零外部服务依赖的活动策略复盘与报告工具"
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+license = { text = "Proprietary" }
+dependencies = [
+  "fastapi>=0.118,<1",
+  "pydantic>=2.12,<3",
+  "uvicorn>=0.38,<1",
+  "sqlalchemy>=2.0,<2.1",
+  "alembic>=1.16,<2",
+  "duckdb>=1.4,<3",
+  "python-multipart>=0.0.20,<1",
+]
+
+[dependency-groups]
+dev = [
+  "ruff",
+  "mypy",
+  "pytest",
+  "httpx",
+  "jsonschema",
+  "openapi-spec-validator",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/campaignlab"]
+
+[tool.uv]
+# wave0 只落地 src/campaignlab 骨架（__init__.py 与 py.typed），目的是让 mypy/pytest
+# 从 wave0 起就有真实目标目录，而不是空跑或报「目录不存在」。
+# M0-02 交付 CLI 与 __main__ 后删除 package = false，即恢复为可安装项目
+# （届时 uv 需要把构建后端 hatchling 纳入锁文件）。
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+src = ["src", "tests"]
+# vendored 基线与前端工程不在 Python 质量门范围内：
+#   spec/       两份按字节入库的不可变基线（改动会破坏 SHA256 可验性）
+#   prototype/  v0.1 原型交付源码，由 scripts/verify.sh 单独守（79 断言 + 字节级复现）
+#   web/        由 npm 侧 eslint/vue-tsc/vitest 守
+extend-exclude = ["spec", "prototype", "web", "node_modules"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"scripts/*" = ["E501"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# 本项目源码、注释与文档字符串大量使用中文，RUF001/RUF002/RUF003 会把中文标点
+# 判为易混淆字符（confusable），属噪声，整体关闭；其余规则保持严格。
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+mypy_path = "src"
+warn_unreachable = true
+files = ["src", "tests", "scripts"]
+exclude = "^(spec|prototype|web|[.]venv)/"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+norecursedirs = ["spec", "prototype", "web", ".venv", "node_modules"]

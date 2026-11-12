@@ -1,0 +1,37 @@
+{
+  "name": "campaignlab-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CampaignLab 前端（Vue 3 + Vite）。M0-01 仅锁定依赖并提供最小可真实构建的骨架；业务界面属 M0-03。",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "echarts": ">=6 <7",
+    "element-plus": ">=2 <3",
+    "vue": ">=3.5 <4",
+    "vue-router": ">=4 <5"
+  },
+  "devDependencies": {
+    "@playwright/test": ">=1 <2",
+    "@typescript-eslint/parser": "^8",
+    "@vitejs/plugin-vue": "^6",
+    "eslint": "^10",
+    "eslint-plugin-vue": "^10",
+    "openapi-typescript": "^7",
+    "typescript": ">=5.9 <6",
+    "vite": ">=7 <9",
+    "vitest": ">=5 <6",
+    "vue-eslint-parser": "^10.3.0",
+    "vue-tsc": "^3"
+  }
+}
