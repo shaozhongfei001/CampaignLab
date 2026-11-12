@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T08:02:00+08:00",
+  "updated_at": "2026-11-13T08:12:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -3241,7 +3241,38 @@
       "6. wave2 出口复算 flash_share 两项护栏；若仍 <0.60 / >0.35，按手册 6.6 升级给项目负责人",
       "7. 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**不得在 29 任务全部交付前停止**（用户死命令）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d222-9a42-7801-8b1e-30e388f25081",
+        "nickname": "Hilbert",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S3c 基础设施与公共冻结件（config/clock/domain{errors,ids,values}/__main__/cli(含 doctor)/api",
+        "tier": "qwen3.8-max",
+        "dispatched_at": "2026-11-13T08:12:00+08:00",
+        "round": 5
+      },
+      {
+        "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
+        "nickname": "Pasteur",
+        "lane": "F",
+        "task": "M0-03",
+        "subtask": "S6 UI-01 页面样板 + S7 键盘基线参数化 + S8 vitest 脚手架与 AC-001/深链断言 + S9 Playwright 截图与证据（四片",
+        "tier": "qwen3.8-flash",
+        "dispatched_at": "2026-11-13T08:12:00+08:00",
+        "round": 5
+      },
+      {
+        "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+        "nickname": "Locke",
+        "lane": "T",
+        "task": "D-016-batch3",
+        "subtask": "补 4 张任务卡 M4-02/M4-03/M3-P01/M1-P01 + KNOWN_MISSING 13->9",
+        "tier": "qwen3.8-flash",
+        "dispatched_at": "2026-11-13T08:12:00+08:00",
+        "round": 5
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -4161,6 +4192,93 @@
         },
         "flash_share_projection": "本轮 4 lane 中仅 1 个 flash（Archimedes/T lane 治理）：按 lane 计 1/4=0.250；**开发 lane（排除 T 治理）为 Gauss(max)/Aquinas(max)/Heisenberg(max) -> dev flash_share=0/3=0.000**。wave1 累计 dev lane：M0-02/S1(max)、M0-03/S1+S2(max)、M0-02/S2(max)、M0-03/S3+S4(flash)、M0-02/S3a(max)、M0-03/S5(max)、M0-04/S1(max) -> 1/7=0.143，**远低于 0.60 护栏，如实入账不粉饰**。定性：wave1 是 M0 框架与公共件奠基期，手册 §6.3 把 OpenAPI/DDL/状态机/公共冻结件变更/跨模块一致性不变量全部强制 max，属「设计先行」的必然形态，非降档失控；且 R4-1 拆分使 M0-02 子任务分母 5->6 而 flash 数不变。回补路径（Round 5 起）：M0-02/S3b+S4+S5(flash 44k)、M0-03/S6-S9(4 个 flash 30k)、M0-04/S4-S8(5 个 flash 53k)、D-016 批次3(flash)。**检查点仍为 wave2 出口**；若仍不达标，按手册 6.6 升级给项目负责人，禁为凑配比降档。",
         "round5_plan_preview": "S3b+S4+S5(flash, 约 44k) ∥ M0-03/S6-S9(flash 批, 约 30k) ∥ M0-04/S2(max high, 50k) ∥ D-016 批次3(flash, 4-5 张 + 预抽摘要)；前置条件：M0-02/S3a 与 M0-04/S1 设计均已交付并复验。"
+      },
+      {
+        "at": "2026-11-13T08:12:00+08:00",
+        "wave": 1,
+        "round": 5,
+        "mode": "parallel-3-lanes",
+        "predispatch_commit": "b190830",
+        "predispatch_commit_note": "派单前置治理提交 b190830 已推送（8 路径：state.json + tasks/M0-02.md 的 R5-2 追注 + defects/D-022.md + handoff/D-016-batch3-context.md + 4 份批次3 切片）。提交前 16 项 G 全表实跑 rc==expected（G4c 篡改负例沿用 02:41:57 实测 rc=1）：G8 ruff format 101->103 files、G9 mypy 22、G10 pytest 110 passed、G5/G6 契约登记项 13、G13 npm ci+build rc=0、G14 doctor.sh HEALTHY；gate7 CLI doctor 仍 rc=1（随 S3c 移交）；前端 vitest 4 files/56 tests；spec/ dirty=0；双口径 tracked_in_scope 193(py40+md153)+untracked_in_scope 2==195；push 后 behind/ahead=0/0。",
+        "concurrency_slots_released_before_dispatch": [
+          {
+            "agent_id": "01a1d198-24b3-7c20-98af-0b98e9207130",
+            "nickname": "Heisenberg",
+            "closed_at": "2026-11-13T08:12:00+08:00"
+          },
+          {
+            "agent_id": "01a1d199-1bed-7183-a022-b211895d7865",
+            "nickname": "Archimedes",
+            "closed_at": "2026-11-13T08:12:00+08:00"
+          }
+        ],
+        "dispatched": [
+          {
+            "agent_id": "01a1d222-9a42-7801-8b1e-30e388f25081",
+            "nickname": "Hilbert",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S3c 基础设施与公共冻结件（config/clock/domain{errors,ids,values}/__main__/cli(含 doctor)/api{app,deps,health} + api/common.py 改 import 并 re-export + evidence/M0/M0-02/problem-code-registry.json）",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high",
+            "budget": "40k",
+            "loop_cap": 2,
+            "exit_condition": "python -m campaignlab doctor 由 rc=1 转 rc=0；既有 110 用例全绿；搬移不是复制（公开符号集差集为空）"
+          },
+          {
+            "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
+            "nickname": "Pasteur",
+            "lane": "F",
+            "task": "M0-03",
+            "subtask": "S6 UI-01 页面样板 + S7 键盘基线参数化 + S8 vitest 脚手架与 AC-001/深链断言 + S9 Playwright 截图与证据（四片合并派单）",
+            "tier": "qwen3.8-flash",
+            "budget": "30k",
+            "loop_cap": 3,
+            "exit_condition": "npm run typecheck/lint/test/build 全 rc=0 且 test >=56 passed/4 files；rg 六位色值 rc=1；304 计数=0；ApiError.kind 覆盖 20 码；BLK-01 据实回报"
+          },
+          {
+            "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+            "nickname": "Locke",
+            "lane": "T",
+            "task": "D-016-batch3",
+            "subtask": "补 4 张任务卡 M4-02/M4-03/M3-P01/M1-P01 + KNOWN_MISSING 13->9",
+            "tier": "qwen3.8-flash",
+            "budget": "45k",
+            "loop_cap": 2,
+            "exit_condition": "head<=60/tail<=40/total<=200/表头逐字四列；双向对账 20+9==29；档位表占比由脚本算；工具链调用 0 次"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "disjoint_proof": "S lane 写 src/campaignlab/{config,clock,__main__,cli}.py、src/campaignlab/domain/**、src/campaignlab/api/{app,deps,health,common}.py、tests/unit/<新增文件>、evidence/M0/M0-02/**；F lane 写 web/src/**、web/tests/**（除 package*.json）、evidence/M0/{M0-03,ui}/**、orchestrator/handoff/M0-03-design.md（仅末尾追加）；T lane 写 orchestrator/tasks/{M4-02,M4-03,M3-P01,M1-P01}.md 与 tests/unit/test_task_cards.py（仅删 KNOWN_MISSING 4 行）。三者路径前缀两两无交集；唯一潜在交叠 tests/unit/** 已用「T 只准改 test_task_cards.py 一个既有文件、S 只准新增自己的测试文件不得改既有测试」显式切分。工具链亦不争用：S 用 .venv(pytest/mypy/ruff)、F 用 web/node_modules(npm)、T 纯 python3 标准库（NOTE-10 假红已规避）。",
+        "adjudications_carried": [
+          "A5",
+          "A6",
+          "A7",
+          "A8",
+          "A9",
+          "A10",
+          "A11",
+          "A12",
+          "A13",
+          "R5-1",
+          "R5-2",
+          "CR-002/ADR-006",
+          "D-011",
+          "D-012",
+          "D-014",
+          "D-018",
+          "D-020",
+          "D-021",
+          "D-022(新立,暂按选项A)"
+        ],
+        "not_dispatched_this_round": {
+          "M0-02/S3d": "依赖 S3c 的 domain/errors.py、clock.py、config.py（编译期 import），R5-2 更正后改串行 → Round 6",
+          "M0-02/S3b": "依赖 S3c 的 domain/errors.py 与 api/deps.py → Round 6，可与 S3d 并行（写集不相交且对 S3c 均只读）",
+          "M0-02/S4,S5": "依赖 S3b+S3c+S3d 全部入库 → Round 7",
+          "M0-04/S2": "前置已由「S3a 已交付」升级为「S3c 与 S3d 均已交付并入库」（N6）→ 最早 Round 6 末",
+          "wave2 (M0-04, M0-03b)": "最早 Round 7 开启"
+        },
+        "new_requirement": "沿用 Round 4 起的要求：派单提示词强制子智能体自报 token 估算，缺失记 null、禁估算填数。本轮另新增：因批次3 切片为批次2 的 3-6 倍，派单文写入「定点抽取配方」硬规则（禁 cat 整份切片、禁 json.load 后整体 print）。"
       }
     ],
     "q_verify": {
@@ -5196,7 +5314,9 @@
         "01a1d198-24b3-7c20-98af-0b98e9207130 (Heisenberg)",
         "01a1d199-1bed-7183-a022-b211895d7865 (Archimedes)"
       ],
-      "slots_note": "手册 §15.11：派单前必须释放全部并发槽。Gauss(01a1d193) 与 Aquinas(01a1d194) 已于 Round 4 回收后关闭，本轮关闭余下两个"
+      "slots_note": "手册 §15.11：派单前必须释放全部并发槽。Gauss(01a1d193) 与 Aquinas(01a1d194) 已于 Round 4 回收后关闭，本轮关闭余下两个",
+      "predispatch_commit": "b190830",
+      "dispatch_commit": "PENDING(本条)"
     }
   },
   "acceptance": {
