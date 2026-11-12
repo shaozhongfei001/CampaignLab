@@ -29,6 +29,19 @@
 - `listWorkspaces` GET `/api/v1/workspaces` — `async def list_workspaces(cursor: str | None = Query(None, min_length=1, max_length=300), limit: int = Query(25, ge=1, le=100), q: str | None = Query(None, min_length=1, max_length=100), status: str | None = Query(None, min_length=1, max_length=60), actor: Session = Depends(require_session), svc: WorkspaceService = Depends(get_workspace_service)) -> Response`：200 `WorkspacePage{items(0–100), next_cursor}`；排序固定 `created_at DESC, id ASC`，键集翻页谓词 `created_at < :k0 OR (created_at = :k0 AND id > :k1)`，每页取 `limit+1` 行以判 `next_cursor`；`q` 对 `name` 做 NFKC＋casefold 子串匹配；无结果 → `items=[]`、`next_cursor=null`｜400 `BAD_CURSOR` 游标解不开／HMAC 不符／查询摘要不符｜401 `SESSION_EXPIRED`｜403 `ORIGIN_DENIED`（Host 非法）｜422 `VALIDATION_ERROR` `limit` 越界、`q`/`status` 超长｜422 `INVALID_SCOPE` `status` 不在白名单（白名单当前为空集，Q4）｜500 `INTERNAL_ERROR`；404/409/412/413/428/429 不可达。
 - `createWorkspace` POST `/api/v1/workspaces` — `async def create_workspace(payload: WorkspaceCreate, idempotency_key: str = Header(alias="Idempotency-Key", min_length=8, max_length=128), actor: Session = Depends(require_session), svc: WorkspaceService = Depends(get_workspace_service)) -> Response`：201 `Workspace` ＋ `ETag: "1"` ＋ `X-Request-Id`｜400 `BAD_REQUEST`｜401 `SESSION_EXPIRED`｜403 `ORIGIN_DENIED`／`ACCESS_DENIED`｜409 `IDEMPOTENCY_CONFLICT` 同键异摘要｜413 `INPUT_TOO_LARGE`｜422 `VALIDATION_ERROR` `name` 空或 >80、`source_class` 非枚举、`authorization_note` >500、未知字段、`Idempotency-Key` 长度不合规（`issues[0].location="/header/Idempotency-Key"`）｜500 `INTERNAL_ERROR`；404/412/428/429 不可达（Q2/Q3）。领域约束：`source_class="AUTHORIZED_DEIDENTIFIED"` 时 `authorization_note` 必须非空（DDL 表级 CHECK）→ 违反映射 422 `VALIDATION_ERROR`、`issues[0].location="/authorization_note"`；`id` 一律服务端生成 `new_resource_id("W")`，不接受客户端指定；`revision` 恒为 1；写 `workspaces` 与写 `audit`（`sequence=1`）必须同一事务（DOMAIN.md「数据变更和审计事件同事务」）。
 
+> **【编排器追注 · 2026-11-13T06:55:00+08:00 · CR-002/ADR-006 指向性提示 · 只加注不改写原文】**
+> 上方第 29 行 `listWorkspaces` 签名中的 `status: str | None = Query(None, min_length=1, max_length=60)` 形参，
+> 以及同行的两处错误分支 —— `422 VALIDATION_ERROR`「`q`/`status` 超长」中的 `status` 部分、
+> `422 INVALID_SCOPE`「`status` 不在白名单（白名单当前为空集，Q4）」—— **均已作废**，详见本文档下方
+> 「CR-002 已 MERGED（选项 B）」追注块。之所以在此重复提示：S3b/S4 为 `qwen3.8-flash` 档、被要求
+> 「严格按 S1 设计逐字落地」，若只读本节即照抄，会实现一个活契约里已不存在的查询参数（Gauss Q7 上报的陷阱）。
+>
+> 编排器实测活契约 `listWorkspaces.parameters` 为 **3** 项：`cursor`(string, minLength 1, maxLength 300)、
+> `limit`(integer, 1–100, default 25)、`q`(string, minLength 1, maxLength 100)，**无 `status`**。
+> 实现与测试一律以活契约为准（手册第 7 节 / D-011）：不得保留 `status` 形参、不得实现 `WORKSPACE_STATUS_WHITELIST`、
+> 不得写 `issues[0].location="/query/status"` 的任何用例期望。**注意区分**：`listJobs.status` 仍存在于活契约中
+> （合法，支持逗号分隔多值），`getHealth` 的 `Health.status`（`Literal["READY","DEGRADED"]`）亦为合法响应字段，二者均不得误删。
+
 ## 2. 数据结构（字段级）
 
 DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝未知字段、布尔冒充整数、非有限数值、不带偏移的时刻（PYTHON.md）。

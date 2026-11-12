@@ -158,7 +158,257 @@
      ],
      "additionalProperties": false
     },
-    "Job": "TRUNCATED"
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "getJob": {
@@ -374,8 +624,138 @@
      ],
      "additionalProperties": false
     },
-    "ObjectRef": "TRUNCATED",
-    "Problem": "TRUNCATED"
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "cancelJob": {
@@ -612,8 +992,138 @@
      ],
      "additionalProperties": false
     },
-    "ObjectRef": "TRUNCATED",
-    "Problem": "TRUNCATED"
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "retryJob": {
@@ -858,8 +1368,138 @@
      ],
      "additionalProperties": false
     },
-    "ObjectRef": "TRUNCATED",
-    "Problem": "TRUNCATED"
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "getHealth": {
@@ -993,5 +1633,6 @@
   "artifacts": "CREATE TABLE artifacts (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    sha256 TEXT NOT NULL CHECK(length(sha256)=64), relative_path TEXT NOT NULL UNIQUE,\n    byte_size INTEGER NOT NULL CHECK(byte_size>=0), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,kind,sha256)\n) STRICT;",
   "idempotency": "CREATE TABLE idempotency (\n    scope_key TEXT NOT NULL, actor_id TEXT NOT NULL, operation TEXT NOT NULL, idem_key TEXT NOT NULL,\n    request_digest TEXT NOT NULL CHECK(length(request_digest)=64), response_status INTEGER NOT NULL,\n    response_json TEXT NOT NULL CHECK(json_valid(response_json)), created_at TEXT NOT NULL,\n    PRIMARY KEY(scope_key,actor_id,operation,idem_key)\n) STRICT;",
   "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
- }
+ },
+ "truncated_schemas": []
 }

@@ -29,6 +29,15 @@ D-005 修复记录：AC_ROW 原为 ^\\|\\s*(AC-\\d+)\\s*\\|，既不匹配 AC-MR
 静默失效防护（手册 13.3 / 15.4）：--ops / --ac / --ui / --tables 中任一目标未命中，
 一律 rc=2，禁止返回 NOT_FOUND 或空字典后 rc=0；且**校验通过后才写出文件**，
 未命中时不产生任何切片产物，避免坏上下文被派发。
+
+D-020 修复记录：--depth 默认 2 时，depth==cap 的组件被写成 "TRUNCATED"，7 份**已派发**切片
+共 45 处被截断（M0-02:1 / M0-03:1 / M0-04:7 / M3-01:8 / M3-02:8 / M3-03:11 / M4-01:9），
+且被截断的正是 Problem / ObjectRef / Issue / Job 这类核心 schema —— lane 只能回读 443KB
+活契约，M0-04/S1 因此超支 11k token。现三处修死：
+  ① 默认 --depth 由 2 提到 5（实测 depth=6 与 depth=5 产出字节数相同，故 5 即足够；
+     5 层展开后 45 处 TRUNCATED 全部归零，切片仍仅为活契约的 8–11%）；
+  ② 输出顶层恒有 truncated_schemas 清单（无截断时为 []），使消费方可断言；
+  ③ 清单非空一律 rc=2 且不写出文件，令截断不可能再次静默发生。
 """
 
 from __future__ import annotations
@@ -55,6 +64,12 @@ TABLE_TAIL = r"[\s\S]*?\n\)[^;]*;"
 INDEX_HINT = r"CREATE (UNIQUE )?INDEX.*ON "
 # AC-001 与 AC-MR-01 都要匹配；月报清单首单元格形如 "AC-MR-01 标准接入"，故允许尾部标题
 AC_ROW = r"^\|\s*(AC-(?:MR-)?\d+)\b[^|]*\|"
+
+# D-020：组件展开达到 cap 层仍未展开时写入该哨兵。哨兵**不得被静默吞掉**——
+# main 会把 truncated_schemas 非空转成 rc=2，理由见模块 docstring 的 D-020 修复记录。
+TRUNCATED_SENTINEL = "TRUNCATED"
+# 实测 depth=6 与 depth=5 产出字节数完全相同，故 5 层已覆盖活契约的最深 $ref 链。
+DEFAULT_DEPTH = 5
 
 
 def load(path: Path) -> Json:
@@ -102,8 +117,20 @@ def table_head(name: str) -> str:
     return r"CREATE TABLE(?: IF NOT EXISTS)?" + r"[\s" + chr(34) + r"]+" + re.escape(name)
 
 
-def refs_of(node: Any, bag: Json, schemas: Json, depth: int, cap: int) -> None:
-    """把 $ref 指向的组件就地展开，最多 cap 层，防止整份 components 被拉进来。"""
+def refs_of(
+    node: Any,
+    bag: Json,
+    schemas: Json,
+    depth: int,
+    cap: int,
+    truncated: set[str] | None = None,
+) -> None:
+    """把 $ref 指向的组件就地展开，最多 cap 层，防止整份 components 被拉进来。
+
+    达到 cap 层仍未展开的组件写入 ``TRUNCATED_SENTINEL`` 并登记进 ``truncated``。
+    登记项由 ``main`` 转成 rc=2（D-020）：一条不响的守卫等于没有守卫。
+    ``truncated`` 为 ``None`` 时退化为旧行为，供只想探测不想收集的调用方使用。
+    """
     if depth > cap:
         return
     if isinstance(node, dict):
@@ -111,22 +138,28 @@ def refs_of(node: Any, bag: Json, schemas: Json, depth: int, cap: int) -> None:
         if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
             name = ref.rsplit("/", 1)[-1]
             if name not in bag:
-                bag[name] = "TRUNCATED" if depth == cap else {}
-                if depth < cap:
+                if depth == cap:
+                    bag[name] = TRUNCATED_SENTINEL
+                    if truncated is not None:
+                        truncated.add(name)
+                else:
                     sub = json.loads(json.dumps(schemas.get(name, {})))
                     bag[name] = sub
-                    refs_of(sub, bag, schemas, depth + 1, cap)
+                    refs_of(sub, bag, schemas, depth + 1, cap, truncated)
             node.clear()
             node["$schema"] = name
         for child in list(node.values()):
-            refs_of(child, bag, schemas, depth, cap)
+            refs_of(child, bag, schemas, depth, cap, truncated)
     elif isinstance(node, list):
         for child in node:
-            refs_of(child, bag, schemas, depth, cap)
+            refs_of(child, bag, schemas, depth, cap, truncated)
 
 
-def slice_ops(op_ids: list[str], cap: int) -> Json:
-    """按 operationId 从**活契约**抽取 path/方法/操作体，并就地展开引用组件。"""
+def slice_ops(op_ids: list[str], cap: int, truncated: set[str] | None = None) -> Json:
+    """按 operationId 从**活契约**抽取 path/方法/操作体，并就地展开引用组件。
+
+    ``truncated`` 用于回收 ``refs_of`` 登记的被截断组件名（D-020）。
+    """
     api = load(LIVE / "openapi.json")
     components = cast(Json, api.get("components") or {})
     schemas = cast(Json, components.get("schemas") or {})
@@ -149,7 +182,7 @@ def slice_ops(op_ids: list[str], cap: int) -> Json:
         path, meth, op = found
         op = json.loads(json.dumps(op))
         bag: Json = {}
-        refs_of(op, bag, schemas, 1, cap)
+        refs_of(op, bag, schemas, 1, cap, truncated)
         entry: Json = {"method": meth.upper(), "path": path, "operation": op}
         if bag:
             entry["schemas"] = bag
@@ -232,16 +265,17 @@ def main() -> None:
     ap.add_argument("--ui", default="")
     ap.add_argument("--tables", default="")
     ap.add_argument("--all-tables", action="store_true", help="抽取参考 DDL 的全部表，用于自检表数")
-    ap.add_argument("--depth", type=int, default=2)
+    ap.add_argument("--depth", type=int, default=DEFAULT_DEPTH)
     ap.add_argument("--out", default="")
     a = ap.parse_args()
 
     bundle: Json = {"spec_version": live_spec_version(), "source": source_block()}
     requested: Json = {}
+    truncated: set[str] = set()
 
     if a.ops:
         ids = [x.strip() for x in str(a.ops).split(",") if x.strip()]
-        bundle["operations"] = slice_ops(ids, int(a.depth))
+        bundle["operations"] = slice_ops(ids, int(a.depth), truncated)
         requested["operations"] = ids
     if a.ac:
         ids = sorted({x.strip() for x in str(a.ac).split(",") if x.strip()})
@@ -258,16 +292,28 @@ def main() -> None:
         bundle["ddl"] = slice_tables(names)
         requested["ddl"] = names
 
+    bundle["truncated_schemas"] = sorted(truncated)
+
     txt = json.dumps(bundle, ensure_ascii=False, indent=1)
     missing = missing_targets(requested, bundle)
     flat = [f"{sec}:{i}" for sec, items in missing.items() for i in cast(list[str], items)]
     stats = (
         f"spec_version={bundle['spec_version']} slice_bytes={len(txt.encode())} "
-        f"slice_lines={txt.count(chr(10))} sections={list(bundle)} missing={flat}"
+        f"slice_lines={txt.count(chr(10))} sections={list(bundle)} missing={flat} "
+        f"depth={int(a.depth)} truncated_schemas={bundle['truncated_schemas']}"
     )
     print(stats, file=sys.stderr)
     if flat:
         print(f"FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: {flat}", file=sys.stderr)
+        raise SystemExit(2)
+    if truncated:
+        print(
+            f"FAIL 组件展开在 depth={int(a.depth)} 处被截断（禁止静默，见 D-020）: "
+            f"{sorted(truncated)}。请提高 --depth（默认 {DEFAULT_DEPTH}；实测 depth=6 与 5 "
+            f"产出字节数相同，5 即足够）。被截断的正是 Problem/Job/ObjectRef 这类核心 "
+            f"schema，派发出去会迫使 lane 回读 443KB 活契约，成本与偏差同时失控。",
+            file=sys.stderr,
+        )
         raise SystemExit(2)
     if a.out:
         out_path = Path(str(a.out))

@@ -242,8 +242,138 @@
      ],
      "additionalProperties": false
     },
-    "ObjectRef": "TRUNCATED",
-    "Problem": "TRUNCATED",
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    },
     "DiagnosisCreate": {
      "type": "object",
      "properties": {
@@ -572,11 +702,399 @@
      ],
      "additionalProperties": false
     },
-    "DiagnosisCreate": "TRUNCATED",
-    "Alert": "TRUNCATED",
-    "Contribution": "TRUNCATED",
-    "Measure": "TRUNCATED",
-    "Issue": "TRUNCATED"
+    "DiagnosisCreate": {
+     "type": "object",
+     "properties": {
+      "review_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "threshold_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "dimension": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "group",
+          "channel",
+          "subbranch",
+          "segment",
+          "origin",
+          "strategy",
+          "deposit_type"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "both",
+        "up",
+        "down"
+       ]
+      },
+      "rule": {
+       "type": "string",
+       "enum": [
+        "all",
+        "mom",
+        "peer",
+        "own",
+        "layer",
+        "mix"
+       ]
+      }
+     },
+     "required": [
+      "review_id",
+      "threshold_id",
+      "metric_id"
+     ],
+     "additionalProperties": false
+    },
+    "Alert": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "mom",
+        "peer",
+        "own",
+        "layer",
+        "mix"
+       ]
+      },
+      "object_label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "current": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "baseline": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "change": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "change_unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "threshold": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "threshold_unit": {
+       "type": "string",
+       "enum": [
+        "PCT",
+        "PP",
+        "SIGMA"
+       ]
+      },
+      "threshold_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "baseline_label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "kind",
+      "object_label",
+      "metric_id",
+      "current",
+      "baseline",
+      "change",
+      "change_unit",
+      "threshold",
+      "threshold_unit",
+      "threshold_id",
+      "baseline_label",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Contribution": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "before": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "after": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "effect": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      }
+     },
+     "required": [
+      "key",
+      "label",
+      "before",
+      "after",
+      "effect",
+      "unit"
+     ],
+     "additionalProperties": false
+    },
+    "Measure": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "value": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "AVAILABLE",
+        "MISSING",
+        "NOT_COMPARABLE",
+        "ZERO_DENOMINATOR"
+       ]
+      },
+      "numerator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "denominator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "definition_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "metric_id",
+      "unit",
+      "value",
+      "state",
+      "numerator",
+      "denominator",
+      "definition_ids",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "computeEstimate": {
@@ -906,7 +1424,80 @@
      ],
      "additionalProperties": false
     },
-    "ThresholdVersion": "TRUNCATED"
+    "ThresholdVersion": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "mom_pct": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "peer_pct": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "own_sigma": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "layer_pct": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "mix_pp": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "label",
+      "mom_pct",
+      "peer_pct",
+      "own_sigma",
+      "layer_pct",
+      "mix_pp",
+      "digest"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "createThreshold": {
@@ -1166,5 +1757,6 @@
   "thresholds": "CREATE TABLE thresholds (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, label TEXT NOT NULL,\n    values_json TEXT NOT NULL CHECK(json_valid(values_json)), digest TEXT NOT NULL CHECK(length(digest)=64), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id)\n) STRICT;",
   "artifacts": "CREATE TABLE artifacts (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    sha256 TEXT NOT NULL CHECK(length(sha256)=64), relative_path TEXT NOT NULL UNIQUE,\n    byte_size INTEGER NOT NULL CHECK(byte_size>=0), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,kind,sha256)\n) STRICT;",
   "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
- }
+ },
+ "truncated_schemas": []
 }

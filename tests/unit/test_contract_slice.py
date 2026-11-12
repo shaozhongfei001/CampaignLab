@@ -251,3 +251,94 @@ def test_cli_all_tables_still_finds_28(tmp_path: Path) -> None:
     tables = [k for k in ddl if not k.endswith("__indexes")]
     assert len(tables) == 28
     assert not [k for k, v in ddl.items() if v == "NOT_FOUND"]
+
+
+# ---------------------------------------------------------------- D-020 截断守卫
+#
+# D-020：--depth 默认 2 时 depth==cap 的组件被写成 "TRUNCATED"，7 份已派发切片共 45 处
+# 被截断（M0-02:1 / M0-03:1 / M0-04:7 / M3-01:8 / M3-02:8 / M3-03:11 / M4-01:9），
+# 且被截断的正是 Problem / ObjectRef / Issue / Job 等核心 schema，迫使 lane 回读 443KB
+# 活契约（M0-04/S1 因此超支 11k token）。以下用例把三件事钉死：默认深度足够、截断必被
+# 登记、登记必致 rc=2 且不产出文件。其中「浅深度确实检出截断」一例是守卫的自证——
+# 一条永不触发的守卫等于没有守卫，绿灯毫无意义。
+
+# 已派发切片的 operationId 集合（取自各切片文件自身的 operations 段，非杜撰）
+D020_OP_SETS: tuple[tuple[str, ...], ...] = (
+    ("exchangeSession", "getSession", "getHealth", "listWorkspaces", "createWorkspace"),
+    ("listJobs", "getJob", "cancelJob", "retryJob", "getHealth"),
+    ("runReview", "getReview"),
+    ("runDiagnosis", "getDiagnosis", "computeEstimate", "listThresholds", "createThreshold"),
+    ("executeQuestion", "interpretQuestion", "getQuestion"),
+    ("listReports", "createReport", "getReport", "signReport"),
+)
+D020_CORE_SCHEMAS = ("Problem", "Issue", "ObjectRef", "Job")
+
+
+def _sentinels(node: object, hits: list[str], where: str = "") -> list[str]:
+    """递归收集任何等于 TRUNCATED 哨兵的值，返回其 JSON 路径。"""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if v == "TRUNCATED":
+                hits.append(f"{where}/{k}")
+            else:
+                _sentinels(v, hits, f"{where}/{k}")
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            _sentinels(v, hits, f"{where}[{i}]")
+    return hits
+
+
+def test_d020_default_depth_is_five(mod: ModuleType) -> None:
+    assert mod.DEFAULT_DEPTH == 5, "默认深度必须是 5：实测 depth=6 与 5 产出字节数相同"
+    assert mod.TRUNCATED_SENTINEL == "TRUNCATED"
+
+
+@pytest.mark.parametrize("ops", D020_OP_SETS)
+def test_d020_all_dispatched_op_sets_expand_without_truncation(
+    mod: ModuleType, ops: tuple[str, ...]
+) -> None:
+    truncated: set[str] = set()
+    out = mod.slice_ops(list(ops), mod.DEFAULT_DEPTH, truncated)
+    assert truncated == set(), sorted(truncated)
+    assert _sentinels(out, []) == []
+    assert set(out) == set(ops)
+
+
+def test_d020_core_schemas_are_real_objects_at_default_depth(mod: ModuleType) -> None:
+    truncated: set[str] = set()
+    out = mod.slice_ops(
+        ["listJobs", "getJob", "cancelJob", "retryJob", "getHealth"], mod.DEFAULT_DEPTH, truncated
+    )
+    merged: dict[str, object] = {}
+    for v in out.values():
+        if isinstance(v, dict):
+            merged.update(v.get("schemas") or {})
+    for name in D020_CORE_SCHEMAS:
+        assert name in merged, f"核心 schema {name} 未进入切片"
+        assert isinstance(merged[name], dict), name
+
+
+def test_d020_shallow_depth_does_register_truncation(mod: ModuleType) -> None:
+    """守卫自证：depth=1 必须真的检出截断。"""
+    truncated: set[str] = set()
+    mod.slice_ops(["getJob"], 1, truncated)
+    assert truncated, "depth=1 未检出任何截断，守卫已失效"
+
+
+def test_d020_cli_shallow_depth_exits_2_and_writes_nothing(tmp_path: Path) -> None:
+    out = tmp_path / "shallow.json"
+    proc = run_cli("--ops", "getJob", "--depth", "1", out=out)
+    assert proc.returncode == 2, proc.stderr
+    assert not out.exists(), "截断时不得写出切片文件，避免坏上下文被派发"
+    assert "D-020" in proc.stderr
+    assert "truncated_schemas" in proc.stderr
+
+
+def test_d020_cli_default_depth_emits_empty_truncated_schemas(tmp_path: Path) -> None:
+    out = tmp_path / "deep.json"
+    proc = run_cli("--ops", "getJob,listJobs", "--ac", "AC-029,AC-031", out=out)
+    assert proc.returncode == 0, proc.stderr
+    d = json.loads(out.read_text(encoding="utf-8"))
+    assert d["truncated_schemas"] == []
+    assert _sentinels(d, []) == []
+    assert "truncated_schemas=[]" in proc.stderr

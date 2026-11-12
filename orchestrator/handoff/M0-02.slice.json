@@ -476,7 +476,59 @@
      ],
      "additionalProperties": false
     },
-    "Workspace": "TRUNCATED"
+    "Workspace": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80
+      },
+      "source_class": {
+       "type": "string",
+       "enum": [
+        "SYNTHETIC",
+        "AUTHORIZED_DEIDENTIFIED"
+       ]
+      },
+      "authorization_note": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "name",
+      "source_class",
+      "authorization_note"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "createWorkspace": {
@@ -680,5 +732,6 @@
    "`verify_package.py`、DDL 等价、OpenAPI 请求响应及前端生成类型通过。锁和运行环境清楚",
    "命令、锁和报告"
   ]
- }
+ },
+ "truncated_schemas": []
 }

@@ -242,8 +242,138 @@
      ],
      "additionalProperties": false
     },
-    "ObjectRef": "TRUNCATED",
-    "Problem": "TRUNCATED",
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    },
     "QuestionExecute": {
      "type": "object",
      "properties": {
@@ -263,7 +393,396 @@
      ],
      "additionalProperties": false
     },
-    "QuestionPlan": "TRUNCATED"
+    "QuestionPlan": {
+     "type": "object",
+     "properties": {
+      "intent": {
+       "type": "string",
+       "enum": [
+        "VALUE",
+        "DEFINITION",
+        "ANOMALY",
+        "ATTRIBUTION",
+        "COMPOSITE",
+        "REPORT"
+       ]
+      },
+      "scope": {
+       "$schema": "Scope"
+      },
+      "metric_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 1,
+       "maxItems": 35
+      },
+      "group_by": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "channel"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "dimension": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "group",
+          "channel",
+          "subbranch",
+          "segment",
+          "origin",
+          "strategy",
+          "deposit_type"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "condition": {
+       "anyOf": [
+        {
+         "$schema": "QuestionCondition"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "both",
+        "up",
+        "down"
+       ]
+      },
+      "branch_subset": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "focus_branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "claims": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+       },
+       "minItems": 0,
+       "maxItems": 10
+      },
+      "conditional_attribution": {
+       "type": "boolean"
+      },
+      "sort_desc": {
+       "type": "boolean"
+      },
+      "report_type": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "REVIEW",
+          "TOPIC",
+          "OUTCOME_DIAGNOSIS"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "intent",
+      "scope",
+      "metric_ids",
+      "group_by",
+      "dimension",
+      "condition",
+      "direction",
+      "branch_subset",
+      "focus_branch_id",
+      "claims",
+      "conditional_attribution",
+      "sort_desc",
+      "report_type"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": {
+     "type": "object",
+     "properties": {
+      "snapshot_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "periods": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+       },
+       "minItems": 0,
+       "maxItems": 12
+      },
+      "cutoff": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "group": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "subbranch": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "channel_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "origin": {
+       "type": "string",
+       "enum": [
+        "ALL",
+        "hq",
+        "branch"
+       ]
+      },
+      "strategy_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "segment": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 80
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "segment_basis": {
+       "type": "string",
+       "enum": [
+        "DEPLOYMENT",
+        "MONTH_END"
+       ]
+      },
+      "activity_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "$schema": "Baseline"
+      }
+     },
+     "required": [
+      "snapshot_id",
+      "period",
+      "baseline"
+     ],
+     "additionalProperties": false
+    },
+    "Baseline": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "previous",
+        "yoy",
+        "peer",
+        "bank",
+        "hq",
+        "target",
+        "custom",
+        "branch"
+       ]
+      },
+      "period": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "kind"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionCondition": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        ">",
+        "<",
+        ">="
+       ]
+      },
+      "value": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      }
+     },
+     "required": [
+      "metric_id",
+      "operator",
+      "value",
+      "unit"
+     ],
+     "additionalProperties": false
+    }
    }
   },
   "interpretQuestion": {
@@ -387,8 +906,432 @@
      ],
      "additionalProperties": false
     },
-    "QuestionPlan": "TRUNCATED",
-    "Issue": "TRUNCATED",
+    "QuestionPlan": {
+     "type": "object",
+     "properties": {
+      "intent": {
+       "type": "string",
+       "enum": [
+        "VALUE",
+        "DEFINITION",
+        "ANOMALY",
+        "ATTRIBUTION",
+        "COMPOSITE",
+        "REPORT"
+       ]
+      },
+      "scope": {
+       "$schema": "Scope"
+      },
+      "metric_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 1,
+       "maxItems": 35
+      },
+      "group_by": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "channel"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "dimension": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "group",
+          "channel",
+          "subbranch",
+          "segment",
+          "origin",
+          "strategy",
+          "deposit_type"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "condition": {
+       "anyOf": [
+        {
+         "$schema": "QuestionCondition"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "both",
+        "up",
+        "down"
+       ]
+      },
+      "branch_subset": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "focus_branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "claims": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+       },
+       "minItems": 0,
+       "maxItems": 10
+      },
+      "conditional_attribution": {
+       "type": "boolean"
+      },
+      "sort_desc": {
+       "type": "boolean"
+      },
+      "report_type": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "REVIEW",
+          "TOPIC",
+          "OUTCOME_DIAGNOSIS"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "intent",
+      "scope",
+      "metric_ids",
+      "group_by",
+      "dimension",
+      "condition",
+      "direction",
+      "branch_subset",
+      "focus_branch_id",
+      "claims",
+      "conditional_attribution",
+      "sort_desc",
+      "report_type"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": {
+     "type": "object",
+     "properties": {
+      "snapshot_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "periods": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+       },
+       "minItems": 0,
+       "maxItems": 12
+      },
+      "cutoff": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "group": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "subbranch": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "channel_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "origin": {
+       "type": "string",
+       "enum": [
+        "ALL",
+        "hq",
+        "branch"
+       ]
+      },
+      "strategy_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "segment": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 80
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "segment_basis": {
+       "type": "string",
+       "enum": [
+        "DEPLOYMENT",
+        "MONTH_END"
+       ]
+      },
+      "activity_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "$schema": "Baseline"
+      }
+     },
+     "required": [
+      "snapshot_id",
+      "period",
+      "baseline"
+     ],
+     "additionalProperties": false
+    },
+    "Baseline": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "previous",
+        "yoy",
+        "peer",
+        "bank",
+        "hq",
+        "target",
+        "custom",
+        "branch"
+       ]
+      },
+      "period": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "kind"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionCondition": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        ">",
+        "<",
+        ">="
+       ]
+      },
+      "value": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      }
+     },
+     "required": [
+      "metric_id",
+      "operator",
+      "value",
+      "unit"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    },
     "QuestionInput": {
      "type": "object",
      "properties": {
@@ -406,8 +1349,7 @@
       "context"
      ],
      "additionalProperties": false
-    },
-    "Scope": "TRUNCATED"
+    }
    }
   },
   "getQuestion": {
@@ -621,11 +1563,841 @@
      ],
      "additionalProperties": false
     },
-    "QuestionPlan": "TRUNCATED",
-    "AnalysisRow": "TRUNCATED",
-    "Alert": "TRUNCATED",
-    "Definition": "TRUNCATED",
-    "Issue": "TRUNCATED"
+    "QuestionPlan": {
+     "type": "object",
+     "properties": {
+      "intent": {
+       "type": "string",
+       "enum": [
+        "VALUE",
+        "DEFINITION",
+        "ANOMALY",
+        "ATTRIBUTION",
+        "COMPOSITE",
+        "REPORT"
+       ]
+      },
+      "scope": {
+       "$schema": "Scope"
+      },
+      "metric_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 1,
+       "maxItems": 35
+      },
+      "group_by": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "channel"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "dimension": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "branch",
+          "group",
+          "channel",
+          "subbranch",
+          "segment",
+          "origin",
+          "strategy",
+          "deposit_type"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "condition": {
+       "anyOf": [
+        {
+         "$schema": "QuestionCondition"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "both",
+        "up",
+        "down"
+       ]
+      },
+      "branch_subset": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "focus_branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "claims": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+       },
+       "minItems": 0,
+       "maxItems": 10
+      },
+      "conditional_attribution": {
+       "type": "boolean"
+      },
+      "sort_desc": {
+       "type": "boolean"
+      },
+      "report_type": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "REVIEW",
+          "TOPIC",
+          "OUTCOME_DIAGNOSIS"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "intent",
+      "scope",
+      "metric_ids",
+      "group_by",
+      "dimension",
+      "condition",
+      "direction",
+      "branch_subset",
+      "focus_branch_id",
+      "claims",
+      "conditional_attribution",
+      "sort_desc",
+      "report_type"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": {
+     "type": "object",
+     "properties": {
+      "snapshot_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "periods": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+       },
+       "minItems": 0,
+       "maxItems": 12
+      },
+      "cutoff": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "group": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "subbranch": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "channel_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "origin": {
+       "type": "string",
+       "enum": [
+        "ALL",
+        "hq",
+        "branch"
+       ]
+      },
+      "strategy_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "segment": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 80
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "segment_basis": {
+       "type": "string",
+       "enum": [
+        "DEPLOYMENT",
+        "MONTH_END"
+       ]
+      },
+      "activity_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "$schema": "Baseline"
+      }
+     },
+     "required": [
+      "snapshot_id",
+      "period",
+      "baseline"
+     ],
+     "additionalProperties": false
+    },
+    "Baseline": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "previous",
+        "yoy",
+        "peer",
+        "bank",
+        "hq",
+        "target",
+        "custom",
+        "branch"
+       ]
+      },
+      "period": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "kind"
+     ],
+     "additionalProperties": false
+    },
+    "QuestionCondition": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        ">",
+        "<",
+        ">="
+       ]
+      },
+      "value": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      }
+     },
+     "required": [
+      "metric_id",
+      "operator",
+      "value",
+      "unit"
+     ],
+     "additionalProperties": false
+    },
+    "AnalysisRow": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 160
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "MetricComparison"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "key",
+      "label",
+      "metrics"
+     ],
+     "additionalProperties": false
+    },
+    "MetricComparison": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "current": {
+       "$schema": "Measure"
+      },
+      "comparable_current": {
+       "anyOf": [
+        {
+         "$schema": "Measure"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "anyOf": [
+        {
+         "$schema": "Measure"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "delta": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "relative_delta": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "metric_id",
+      "current",
+      "comparable_current",
+      "baseline",
+      "delta",
+      "relative_delta"
+     ],
+     "additionalProperties": false
+    },
+    "Measure": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "value": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "AVAILABLE",
+        "MISSING",
+        "NOT_COMPARABLE",
+        "ZERO_DENOMINATOR"
+       ]
+      },
+      "numerator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "denominator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "definition_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "metric_id",
+      "unit",
+      "value",
+      "state",
+      "numerator",
+      "denominator",
+      "definition_ids",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Alert": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "mom",
+        "peer",
+        "own",
+        "layer",
+        "mix"
+       ]
+      },
+      "object_label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "current": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "baseline": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "change": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "change_unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "threshold": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "threshold_unit": {
+       "type": "string",
+       "enum": [
+        "PCT",
+        "PP",
+        "SIGMA"
+       ]
+      },
+      "threshold_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "baseline_label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "kind",
+      "object_label",
+      "metric_id",
+      "current",
+      "baseline",
+      "change",
+      "change_unit",
+      "threshold",
+      "threshold_unit",
+      "threshold_id",
+      "baseline_label",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Definition": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "formula": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "numerator_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "denominator_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "aggregation": {
+       "type": "string",
+       "enum": [
+        "UNION",
+        "SUM",
+        "DISTINCT",
+        "DIVIDE"
+       ]
+      },
+      "version": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "id",
+      "label",
+      "unit",
+      "formula",
+      "numerator_id",
+      "denominator_id",
+      "aggregation",
+      "version",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
    }
   }
  },
@@ -644,5 +2416,6 @@
   ],
   "artifacts": "CREATE TABLE artifacts (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), id TEXT NOT NULL, kind TEXT NOT NULL,\n    sha256 TEXT NOT NULL CHECK(length(sha256)=64), relative_path TEXT NOT NULL UNIQUE,\n    byte_size INTEGER NOT NULL CHECK(byte_size>=0), created_at TEXT NOT NULL,\n    PRIMARY KEY(workspace_id,id), UNIQUE(workspace_id,kind,sha256)\n) STRICT;",
   "audit": "CREATE TABLE audit (\n    workspace_id TEXT NOT NULL REFERENCES workspaces(id), sequence INTEGER NOT NULL CHECK(sequence>=1),\n    id TEXT NOT NULL, at TEXT NOT NULL, actor_id TEXT NOT NULL, role TEXT NOT NULL, action TEXT NOT NULL,\n    target_kind TEXT NOT NULL, target_id TEXT NOT NULL, outcome TEXT NOT NULL CHECK(outcome IN ('ACCEPTED','DENIED','FAILED')),\n    request_id TEXT NOT NULL, previous_digest TEXT, digest TEXT NOT NULL CHECK(length(digest)=64),\n    PRIMARY KEY(workspace_id,sequence), UNIQUE(workspace_id,id)\n) STRICT;"
- }
+ },
+ "truncated_schemas": []
 }
