@@ -1,35 +1,40 @@
-"""Alembic 运行环境（M0-02 · S2 首迁）。
+"""Alembic 运行环境（M0-02 · S2 首迁；S3a 依 ADR-005 §2.4 裁定 2 重构为单一来源）。
 
 职责只有三件，多一件都不做：
 
-1. 解析数据库连接串 —— 禁止硬编码（D-004 的教训），优先级见 ``resolve_database_url``；
-2. 每个新建连接立即执行 SQLite PRAGMA —— ``foreign_keys=ON`` 是外键负例能被拒绝的前提，
-   ``busy_timeout`` / ``journal_mode`` 取 OPERATIONS.md 的运行口径；
+1. 取连接串 —— **不在本文件解析**，一律转发到 ``campaignlab.infra.db.paths``（唯一来源）；
+2. 每个新建连接立即执行 SQLite PRAGMA —— 常量与回调同样来自 ``infra.db.engine``，不在此复制；
 3. 把控制权交回 alembic 的 online / offline 迁移流程。
 
-本文件刻意 **不** ``import campaignlab``：迁移必须能在裸环境（只有锁文件里的依赖、
-没有应用代码）下独立复现，这是 AC-035「按 M0 锁版本、迁移」可被第三方复核的前提。
-数据目录约定来自 spec/CampaignLab-SDD-v1.0/architecture/OPERATIONS.md:17
-（``CAMPAIGNLAB_DATA_DIR``，默认放在当前用户可控目录）。
+**历史留痕（只加注、不改写）**：S2 版本的本文件曾刻意「不 ``import campaignlab``」，理由是
+迁移要能在裸环境下独立复现（AC-035），并据此自带了一份五级优先级链。ADR-005 §2.4
+**裁定 2（硬约束）** 其后要求解析逻辑**只存在一份**、``migrations/env.py`` 必须 import
+``src/campaignlab/infra/db/paths.py``——否则 ``alembic upgrade`` 与运行期可能作用于两个
+不同的库文件，``Health.schema_revision`` 的判定随之失真。裁定 2 优先，本文件改为 import。
+「可复现」的口径由 Q7 裁定后的 ``uv sync``（从 ``uv.lock`` 重建含 ``campaignlab`` 的环境）
+承担，不再由「env.py 不依赖应用包」承担。
+
+守护：``tests/unit/test_db_paths.py`` 既用 AST 静态断言本文件不再出现第二份优先级链
+（不得出现 ``CAMPAIGNLAB_*`` 字面量、``sqlite:///`` 前缀、``os.environ``），也用行为断言
+把本文件回填到 ``config.attributes`` 的连接串与运行期解析结果**逐字**比对。
 """
 
 from __future__ import annotations
 
-import os
-import sqlite3
 from logging.config import fileConfig
-from pathlib import Path
 
 from alembic import context
 from sqlalchemy import create_engine, event, pool
 
-# 数据目录布局（OPERATIONS.md：数据目录含 state、raw、snapshots、results、exports、tmp、logs）
-_STATE_SUBDIR = "state"
-_DB_FILENAME = "campaignlab.db"
-_SQLITE_PREFIX = "sqlite:///"
-
-# 运行期 PRAGMA。journal_mode=DELETE 依 OPERATIONS.md；WAL 留待后续评估，不在 M0-02 决定。
-_PRAGMAS: tuple[str, ...] = ("foreign_keys=ON", "busy_timeout=5000", "journal_mode=DELETE")
+try:
+    from campaignlab.infra.db import paths
+    from campaignlab.infra.db.engine import apply_pragmas
+except ModuleNotFoundError as exc:  # pragma: no cover - 环境未装好时的可读报错
+    raise RuntimeError(
+        "migrations/env.py 需要 import campaignlab.infra.db.paths（ADR-005 §2.4 裁定 2："
+        "库路径解析必须单一来源）。请先在仓库根执行 `uv sync` 从 uv.lock 重建环境，"
+        "再用 `uv run --no-sync alembic -c migrations/alembic.ini ...` 运行迁移。"
+    ) from exc
 
 config = context.config
 
@@ -40,59 +45,22 @@ if config.config_file_name is not None:
 target_metadata = None
 
 
-def _default_data_dir() -> Path:
-    """未被 CAMPAIGNLAB_DATA_DIR 覆盖时的数据目录（当前用户可控目录）。"""
-    return Path.home() / ".local" / "share" / "campaignlab"
-
-
-def _data_dir_db_url() -> str:
-    raw = os.environ.get("CAMPAIGNLAB_DATA_DIR")
-    data_dir = Path(raw).expanduser() if raw else _default_data_dir()
-    db_path = data_dir / _STATE_SUBDIR / _DB_FILENAME
-    return _SQLITE_PREFIX + db_path.as_posix()
-
-
-def _ensure_parent_dir(url: str) -> None:
-    """SQLite 不会自建父目录；文件型 URL 必须先 mkdir，否则报 unable to open database file。"""
-    if not url.startswith(_SQLITE_PREFIX):
-        return
-    path = Path(url[len(_SQLITE_PREFIX) :])
-    if not path.is_absolute() or path.name in {":memory:", ""}:
-        return
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-
 def resolve_database_url() -> str:
-    """按优先级解析连接串，返回可直接交给 SQLAlchemy 的 URL。
+    """**转发**到单一来源，本函数自身不含任何优先级判断。
 
-    1. ``-x db_path=<path>``        —— CLI / 工具注入（alembic 惯例的 x-arg）
-    2. ``sqlalchemy.url`` 主选项    —— 调用方用 ``Config.set_main_option`` 注入（测试走这条）
-    3. ``CAMPAIGNLAB_DATABASE_URL`` —— 运维显式覆盖
-    4. ``CAMPAIGNLAB_DATA_DIR``     —— OPERATIONS.md 的数据目录口径
-    5. ``~/.local/share/campaignlab`` —— 「默认放在当前用户可控目录」
+    只有 alembic 侧才有的两个来源（``-x db_path=`` 与 ``sqlalchemy.url`` 主选项）在这里取出、
+    原样交给 ``paths.resolve_database_location``；环境变量与默认家目录两级由 ``paths`` 自己读。
+    解析结果同时回填到 ``config.attributes``，供「alembic 侧解析 == 运行期解析」的断言比对。
     """
     x_args = context.get_x_argument(as_dictionary=True)
-    db_path = x_args.get("db_path")
-    if db_path:
-        url = _SQLITE_PREFIX + Path(db_path).expanduser().as_posix()
-    else:
-        from_ini = config.get_main_option("sqlalchemy.url")
-        from_env = os.environ.get("CAMPAIGNLAB_DATABASE_URL")
-        url = (from_ini or "").strip() or (from_env or "").strip() or _data_dir_db_url()
-    _ensure_parent_dir(url)
-    return url
-
-
-def _apply_pragmas(dbapi_connection: object, _connection_record: object) -> None:
-    """连接级 PRAGMA。非 sqlite3 连接（理论上不会出现）直接放过，不做静默假设。"""
-    if not isinstance(dbapi_connection, sqlite3.Connection):
-        return
-    cursor = dbapi_connection.cursor()
-    try:
-        for pragma in _PRAGMAS:
-            cursor.execute(f"PRAGMA {pragma}")
-    finally:
-        cursor.close()
+    location = paths.resolve_database_location(
+        x_db_path=x_args.get("db_path"),
+        ini_url=config.get_main_option("sqlalchemy.url"),
+    )
+    config.attributes[paths.ALEMBIC_URL_ATTRIBUTE] = location.url
+    # SQLite 不会自建父目录；文件型 URL 必须先 mkdir，否则报 unable to open database file。
+    paths.ensure_parent_dir(location)
+    return location.url
 
 
 def run_migrations_offline() -> None:
@@ -111,9 +79,13 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """在线模式：建引擎 -> 挂 PRAGMA 监听 -> 在单连接单事务内跑完迁移。"""
+    """在线模式：建引擎 -> 挂 PRAGMA 监听 -> 在单连接单事务内跑完迁移。
+
+    PRAGMA 常量与回调来自 ``infra.db.engine``（单一来源），故迁移期与运行期的外键口径一致；
+    ``NullPool`` 保证迁移用完即弃，不给后续步骤留下跨线程连接。
+    """
     engine = create_engine(resolve_database_url(), poolclass=pool.NullPool)
-    event.listen(engine, "connect", _apply_pragmas)
+    event.listen(engine, "connect", apply_pragmas)
     try:
         with engine.connect() as connection:
             context.configure(connection=connection, target_metadata=target_metadata)
