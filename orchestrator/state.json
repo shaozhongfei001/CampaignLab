@@ -2,7 +2,7 @@
  "schema": "1.0",
  "phase": "M0",
  "wave": 0,
- "updated_at": "2026-11-12T12:28:41+08:00",
+ "updated_at": "2026-11-12T12:30:01+08:00",
  "budget": {
   "phase_quota": 100,
   "phase_used": 0,
@@ -1268,10 +1268,10 @@
   "wave": 0,
   "gate": "WAVE0_EXIT_PENDING_Q",
   "next_actions": [
-   "1 提交 wave0 交付物与证据（显式路径，禁 git add -A）并推送",
-   "2 派 Q：flash 采集 + max 判定，独立上下文交叉验证 M0-01 九项门禁",
-   "3 依判定置 M0-01 为 PASS 或 PASS_WITH_TODO，回填 commit 与 rc",
-   "4 并行派发 wave1：M0-02（max）与 M0-03（max），写权限已确认不相交"
+   "1 派 Q：flash 采集 + max 判定，独立上下文交叉验证 M0-01 九项门禁（不采信编排器自述）",
+   "2 依判定置 M0-01 为 PASS 或 PASS_WITH_TODO，写 evidence/M0/M0-01/q-verdict.md",
+   "3 并行派发 wave1：M0-02（max，服务入口+28 表首迁）与 M0-03（max，前端壳+令牌+UI-01）",
+   "4 wave1 出口后进 wave2：M0-04 与 M0-03b（flash 量产六类页面状态）"
   ],
   "in_flight_agents": [],
   "dispatch_requirements": [
@@ -1280,6 +1280,11 @@
    "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
    "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串"
   ],
-  "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a"
+  "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
+  "persisted": {
+   "working_tree_clean": true,
+   "head": "d7cb757",
+   "pushed": true
+  }
  }
 }
