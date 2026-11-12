@@ -1,0 +1,108 @@
+/* =============================================================================
+   web/src/styles/tokens.css —— CampaignLab 项目令牌唯一真值（CSS 自定义属性）
+   机械来源：docs/design/token-mapping.md 第 1/2/3 节（ADR-003 实施面，唯一令牌真值）。
+   规则（token-mapping 4.2 / M0-03-design.md 2.1）：
+     1. 本文件是 web/src/** 内唯一允许出现六位十六进制色值的文件。
+        主门禁（仓库根执行）：rg -n 六位十六进制并排除本文件 → 期望 rc=1（无匹配）。
+        注意：CSS 块注释内不得出现星号斜杠序列，否则注释被提前终止、lightningcss 构建报错。
+     2. 变量名与取值逐条照抄 token-mapping.md，不得自创、不得改名、不得增删档位。
+     3. 改颜色只改 token-mapping.md 与本文件；组件层只允许 var(--cl-*)。
+     4. --el-* 覆盖只出现在 element-theme.css；项目级样式覆盖只出现在 project.css。
+     5. spec/frontend-template-spdb-v1.1/css/tokens.css 为只读视觉参照：不 import、不继承其变量名，
+        本文件的阴影/圆角等档位按 token-mapping.md 的「模板 --sh-*」「模板 --r-*」来源列取字面值。
+   ========================================================================== */
+:root {
+  /* ---- 1.1 品牌色阶（token-mapping 1）---- */
+  --cl-brand-700: #003bb3; /* 按下态 → --el-color-primary-dark-2 */
+  --cl-brand-600: #0048d8; /* 主动作、链接、选中 → --el-color-primary */
+  --cl-brand-500: #3368e0; /* 焦点线、次级链接（白底 5.00 AA）→ --el-color-primary-light-3 */
+  --cl-brand-100: #dbe6ff; /* 选中底、标签底 → --el-color-primary-light-8 */
+  --cl-brand-50: #eef3fe;  /* 提示底、行 hover → --el-color-primary-light-9 */
+
+  /* ---- 1.2 中性墨色与面（token-mapping 1）---- */
+  --cl-ink-900: #1a2438;   /* 正文（15.52 AAA）→ --el-text-color-primary */
+  --cl-ink-700: #4a5568;   /* 次要文字（7.53 AAA）→ --el-text-color-regular */
+  --cl-ink-600: #4a5568;   /* 表头文字专用档，替代 ink-500 */
+  --cl-ink-500: #7a8899;   /* 仅禁用态与非文本图标（3.61，禁用于小字）→ --el-text-color-placeholder */
+  --cl-ink-300: #d0d6e0;   /* 边框深档 → --el-border-color-darker/-dark */
+  --cl-ink-200: #e8ecf4;   /* 分割 → --el-border-color-light/-lighter */
+  --cl-ink-100: #f0f4fc;   /* 填充 → --el-fill-color/-light、--el-border-color-extra-light */
+  --cl-ink-50: #f7f9fd;    /* 浅填充 → --el-fill-color-lighter/-extra-light */
+  --cl-canvas: #f5f7fb;    /* 页面底 → --el-bg-color-page */
+  --cl-card: #ffffff;      /* 卡面 → --el-bg-color */
+  --cl-line: #e8ecf4;      /* 分割线 → --el-border-color */
+  --cl-nav-grad: linear-gradient(90deg, #0B2440, #123B63); /* 顶栏（白字 15.61 AAA） */
+
+  /* ---- 1.3 语义色：文字与图标层（AA 达标深色，ADR-003 裁定）---- */
+  --cl-ok-text: #176A48;      /* 成功文字与图标（6.58 AA）→ --el-color-success */
+  --cl-warn-text: #875900;    /* 警示文字与图标（6.07 AA）→ --el-color-warning */
+  --cl-danger-text: #A53232;  /* 错误文字与图标（6.77 AA）→ --el-color-danger */
+
+  /* ---- 1.4 语义色：填充与徽标底层（仅底，禁止承载文字/图标语义）---- */
+  --cl-ok-600: #18a890;
+  --cl-ok-100: #d7f2ec;
+  --cl-ok-50: #eef9f6;
+  --cl-warn-600: #f39c12;
+  --cl-warn-100: #fdeccd;
+  --cl-warn-50: #fff8ec;
+  --cl-danger-600: #e74c3c;
+  --cl-danger-100: #fbdcd8;
+  --cl-danger-50: #fdf3f1;
+  --cl-info-600: #0048d8;
+  --cl-info-100: #dbe6ff;
+  --cl-info-50: #eef3fe;
+
+  /* ---- 1.5 圆角 / 阴影（模板 --r-*、--sh-1..3）---- */
+  --cl-radius-sm: 4px;
+  --cl-radius-md: 8px;
+  --cl-radius-lg: 12px;
+  --cl-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.04);        /* 卡片 */
+  --cl-shadow-2: 0 2px 8px rgba(0, 0, 0, 0.06);        /* 浮层 */
+  --cl-shadow-3: 0 12px 40px rgba(16, 24, 40, 0.16);   /* 抽屉 */
+
+  /* ---- 1.6 结构尺寸（COMMON.md 裁定档，模板 48/196/58 已按 ADR-003 替换）---- */
+  --cl-topbar-h: 56px;
+  --cl-rail-w: 216px;
+  --cl-rail-w-collapsed: 64px;
+
+  /* ---- 1.7 间距体系（COMMON.md：4 / 8 / 12 / 16 / 24 / 32px；列间距与卡片间距 16px）---- */
+  --cl-space-1: 4px;
+  --cl-space-2: 8px;
+  --cl-space-3: 12px;
+  --cl-space-4: 16px;
+  --cl-space-5: 24px;
+  --cl-space-6: 32px;
+
+  /* ---- 1.8 行高与按钮高（COMMON.md：业务表 40 / 密集表 36；按钮 36 / 32）---- */
+  --cl-row-h: 40px;
+  --cl-row-h-dense: 36px;
+  --cl-btn-h: 36px;
+  --cl-btn-h-sm: 32px;
+
+  /* ---- 1.9 浮层宽度（COMMON.md：证据抽屉 480px 窄屏全宽；确认对话框 520px）---- */
+  --cl-drawer-w: 480px;
+  --cl-dialog-w: 520px;
+
+  /* ---- 1.10 字体族与字号档（ADR-003 裁定：模板栈前置 Noto Sans CJK SC）---- */
+  --cl-font-sans: Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+  --cl-font-mono: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+  --cl-fs-body: 14px;
+  --cl-fs-label: 13px;
+  --cl-fs-table: 13px;
+  --cl-fs-table-dense: 12.5px;
+
+  /* ---- 1.11 断点（token-mapping 3：模板缺失，项目新增）----
+     CSS 自定义属性不能用于媒体查询，本组变量是阈值与栅格档位的单一真值文档；
+     S6 的 @media 取值必须与此一致（>1100 / <=1100 / <=800），变量名待编排器确认。 */
+  --cl-bp-rail-collapse: 1100px; /* <=1100：rail 折 64px 图标列、左右内边距 16px、双列可折叠 */
+  --cl-bp-rail-drawer: 800px;    /* <=800：rail 改抽屉、主内容单列、数据表区内横滚、证据抽屉全宽 */
+  --cl-content-max: 1440px;      /* 内容区最高宽 1440px 居中（基准画布 1440x900） */
+
+  /* ---- 2. 图表色板（ECharts 主题，token-mapping 2；运行时由 theme.ts 读 CSS 变量）---- */
+  --cl-c1: #0048d8; /* 7.20 AAA，无限制 */
+  --cl-c2: #3368e0; /* 5.00 AA，无限制 */
+  --cl-c3: #18a890; /* 2.98 FAIL：须配数据标签或等义表 */
+  --cl-c4: #f39c12; /* 2.19 FAIL：同上，且不得单独承载「警示」语义 */
+  --cl-c5: #60c0a8; /* 约 2.4 FAIL：仅填充或次要序列 */
+  --cl-c6: #e74c3c; /* 3.82 仅大字：仅「已触发 / 失败 / 禁止」 */
+}

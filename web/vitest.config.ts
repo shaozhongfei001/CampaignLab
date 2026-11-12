@@ -16,6 +16,13 @@ export default defineConfig({
   ...viteConfig,
   test: {
     environment: "node",
+    // 编排器裁定 Q-S3-A（2026-11-13）：开启 css 处理，使令牌一致性守卫能在 vitest 内读到
+    // web/src/styles/*.css 的原文。vitest 默认 css:false 会把 .css 打成空 stub（实测 ?raw / ?inline
+    // 均得 length=0），导致守卫对 CSS 文件只能 skip —— 而 token-mapping.md §4.1 把「web/src 内除
+    // styles/tokens.css 外不得出现六位十六进制色值」列为 M0-03 **出口条件**，必须可自动断言。
+    // 选 css:true 而非引入 @types/node 走 node:fs：零新增依赖、单行改动、不动 package.json
+    // （依裁定 M0-03-Q8，web/package.json 与 package-lock.json 仅编排器可改）。
+    css: true,
     include: ["src/**/*.spec.ts", "tests/**/*.spec.ts"],
     exclude: ["tests/e2e/**", "node_modules/**", "dist/**", "test-results/**", "playwright-report/**"],
     restoreMocks: true,

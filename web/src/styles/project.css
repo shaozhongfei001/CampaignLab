@@ -1,0 +1,39 @@
+/* =============================================================================
+   web/src/styles/project.css —— 项目级样式覆盖的唯一文件（token-mapping 4.2）。
+   本文件不定义 --cl-*（只在 tokens.css）也不定义 --el-*（只在 element-theme.css），
+   只消费令牌，且不含任何色值字面量（rg 双门禁自证）。
+   S3 只落「令牌直接派生」的最小基线层；布局、组件族与页面样式属 S6（page-component-map.md）。
+   ========================================================================== */
+
+/* 盒模型基线（承载通用约定，不含视觉裁定值） */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 正文层：画布底 / 正文墨色 / 字体栈 / 正文档位（token-mapping 1；COMMON.md 基准 14px） */
+body {
+  margin: 0;
+  background: var(--cl-canvas);
+  color: var(--cl-ink-900);
+  font-family: var(--cl-font-sans);
+  font-size: var(--cl-fs-body);
+}
+
+/* 数字一律等宽（token-mapping 1 末注：模板 .num / .mono 规则） */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.mono {
+  font-family: var(--cl-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 焦点线：2px + offset 2px，色取 --cl-brand-500（ADR-003 裁定档，白底 5.00 AA；
+   S7 keyboard-baseline.spec.ts 的「焦点可见 2px」断言依据） */
+:focus-visible {
+  outline: 2px solid var(--cl-brand-500);
+  outline-offset: 2px;
+}

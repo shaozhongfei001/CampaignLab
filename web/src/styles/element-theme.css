@@ -1,0 +1,132 @@
+/* =============================================================================
+   web/src/styles/element-theme.css —— Element Plus 主题覆盖（CSS 变量方案；M0-03-design.md 2.2，
+   SCSS 变量方案已按 Q6 裁定否决，故本仓库不声明 sass）。
+   规则（token-mapping 4.2 / M0-03-design.md 2.1）：
+     * --el-* 只允许定义在本文件；
+     * 每个值一律是 var(--cl-*)：本文件不含任何色值字面量，因此天然通过 rg 门禁；
+     * --cl-* 令牌只允许定义在 tokens.css，本文件只消费。
+   覆盖项逐条照抄 token-mapping 1「Element Plus 覆盖」列。
+   展开规则（裁定 Q-S3-D，已作为规范条款归入 token-mapping 1）：
+     * 同族档位单调复用 —— Element Plus 档位多于项目档位时，就近复用相邻 --cl-* 档；
+       多出来的 EP 档位是按同族单调复用展开，**不是发明色值**（本文件色值字面量恒为 0）。
+   唯一例外（裁定 Q-S3-E c）：文件末尾的 6 条 --el-color-*-rgb 三元组。
+     EP 内部把 --el-color-*-rgb 直接交给透明度函数组合半透明色，var() 无法参与该组合，
+     故按「硬条件」落地：每个三元组一律由同族基色所绑定的 --cl-* hex 机械换算得到
+     （出处写在同行注释里），并由 web/tests/unit/tokens-guard.spec.ts 逐条复算比对；
+     换算不符即测试红。无守卫断言的例外不成立。
+   可访问性（裁定 Q-S3-E b 与 token-mapping 4.4）：
+     * --el-text-color-secondary 必须绑 var(--cl-ink-700)：EP 默认灰档对白底仅 3.08:1、
+       对画布 2.87:1，违反本项目「次要文字 ≥4.5:1」出口条件；ink-700 为 7.53 / 7.02。
+     * --el-text-color-placeholder / --el-text-color-disabled 绑 var(--cl-ink-500)（3.62 / 3.37），
+       系援引 WCAG 1.4.3 对「禁用/非活动控件与占位提示」的对比度豁免；
+       该豁免必须留在同行注释里，守卫会断言注释在位（删掉注释即测试红）。
+   未映射并保持 EP 默认（裁定 Q-S3-E d，已立缺陷 D-017，M0-03b 冻结前须解决）：
+     --el-component-size-large、--el-font-size-extra-small、--el-font-size-medium、
+     --el-font-size-large、--el-font-size-extra-large。S3 不得为凑档自创 --cl-* 令牌。
+   ========================================================================== */
+:root {
+  /* ---- 主色族（--cl-brand-*）---- */
+  --el-color-primary: var(--cl-brand-600);
+  --el-color-primary-dark-2: var(--cl-brand-700);
+  --el-color-primary-light-3: var(--cl-brand-500);
+  --el-color-primary-light-5: var(--cl-brand-500); /* 表未列档：就近复用 light-3 档 */
+  --el-color-primary-light-7: var(--cl-brand-100); /* 表未列档：就近复用 light-8 档 */
+  --el-color-primary-light-8: var(--cl-brand-100);
+  --el-color-primary-light-9: var(--cl-brand-50);
+
+  /* ---- 成功族（文字层 --cl-ok-text；底层 --cl-ok-600/100/50，仅填充与徽标底）---- */
+  --el-color-success: var(--cl-ok-text);
+  --el-color-success-dark-2: var(--cl-ok-text);    /* 项目无更深档：取等值，避免残留 EP 默认绿 */
+  --el-color-success-light-3: var(--cl-ok-600);
+  --el-color-success-light-5: var(--cl-ok-100);
+  --el-color-success-light-7: var(--cl-ok-100);
+  --el-color-success-light-8: var(--cl-ok-100);
+  --el-color-success-light-9: var(--cl-ok-50);
+
+  /* ---- 警示族 ---- */
+  --el-color-warning: var(--cl-warn-text);
+  --el-color-warning-dark-2: var(--cl-warn-text);  /* 同上：无更深档 */
+  --el-color-warning-light-3: var(--cl-warn-600);
+  --el-color-warning-light-5: var(--cl-warn-100);
+  --el-color-warning-light-7: var(--cl-warn-100);
+  --el-color-warning-light-8: var(--cl-warn-100);
+  --el-color-warning-light-9: var(--cl-warn-50);
+
+  /* ---- 错误族 ---- */
+  --el-color-danger: var(--cl-danger-text);
+  --el-color-danger-dark-2: var(--cl-danger-text); /* 同上：无更深档 */
+  --el-color-danger-light-3: var(--cl-danger-600);
+  --el-color-danger-light-5: var(--cl-danger-100);
+  --el-color-danger-light-7: var(--cl-danger-100);
+  --el-color-danger-light-8: var(--cl-danger-100);
+  --el-color-danger-light-9: var(--cl-danger-50);
+
+  /* ---- 错误族（别名）：裁定 Q-S3-E(a)，error 并入项目 danger 族，档位按 Q-S3-D 单调复用 ---- */
+  --el-color-error: var(--cl-danger-text);
+  --el-color-error-dark-2: var(--cl-danger-text);
+  --el-color-error-light-3: var(--cl-danger-600);
+  --el-color-error-light-5: var(--cl-danger-100);
+  --el-color-error-light-7: var(--cl-danger-100);
+  --el-color-error-light-8: var(--cl-danger-100);
+  --el-color-error-light-9: var(--cl-danger-50);
+
+  /* ---- 信息族（范围与待补提示）---- */
+  --el-color-info: var(--cl-info-600);
+  --el-color-info-dark-2: var(--cl-info-600);
+  --el-color-info-light-3: var(--cl-info-600);
+  --el-color-info-light-5: var(--cl-info-100);
+  --el-color-info-light-7: var(--cl-info-100);
+  --el-color-info-light-8: var(--cl-info-100);
+  --el-color-info-light-9: var(--cl-info-50);
+
+  /* ---- 文字（裁定 Q-S3-E b：secondary 必须达标，禁用/占位显式援引 WCAG 1.4.3 豁免）---- */
+  --el-text-color-primary: var(--cl-ink-900);
+  --el-text-color-regular: var(--cl-ink-700);
+  --el-text-color-secondary: var(--cl-ink-700); /* Q-S3-E(b)：EP 默认档 3.08:1 不达 §4.4 的 4.5:1 */
+  --el-text-color-placeholder: var(--cl-ink-500); /* WCAG 1.4.3 豁免：占位提示（3.62 / 3.37） */
+  --el-text-color-disabled: var(--cl-ink-500); /* WCAG 1.4.3 豁免：禁用态控件文字（3.62 / 3.37） */
+
+  /* ---- 边框（--el-border-color 由 1 节 --cl-line 行指定；hover 档由 EP 自身引用继承）---- */
+  --el-border-color-darker: var(--cl-ink-300);
+  --el-border-color-dark: var(--cl-ink-300);
+  --el-border-color: var(--cl-line);
+  --el-border-color-light: var(--cl-ink-200);
+  --el-border-color-lighter: var(--cl-ink-200);
+  --el-border-color-extra-light: var(--cl-ink-100);
+
+  /* ---- 填充 ---- */
+  --el-fill-color-darker: var(--cl-ink-200);
+  --el-fill-color-dark: var(--cl-ink-200);
+  --el-fill-color: var(--cl-ink-100);
+  --el-fill-color-light: var(--cl-ink-100);
+  --el-fill-color-lighter: var(--cl-ink-50);
+  --el-fill-color-extra-light: var(--cl-ink-50);
+  --el-fill-color-blank: var(--cl-card);
+
+  /* ---- 面 ---- */
+  --el-bg-color-page: var(--cl-canvas);
+  --el-bg-color: var(--cl-card);
+  --el-bg-color-overlay: var(--cl-card);
+
+  /* ---- 圆角 / 阴影 / 控件尺寸 / 字体（1 节各 * 通配行）---- */
+  --el-border-radius-base: var(--cl-radius-md);
+  --el-box-shadow-lighter: var(--cl-shadow-1);
+  --el-box-shadow-light: var(--cl-shadow-2);
+  --el-box-shadow: var(--cl-shadow-2);
+  --el-box-shadow-dark: var(--cl-shadow-3);
+  --el-component-size: var(--cl-btn-h);
+  --el-component-size-small: var(--cl-btn-h-sm);
+  --el-font-family: var(--cl-font-sans);
+  --el-font-size-base: var(--cl-fs-body);
+  --el-font-size-small: var(--cl-fs-label);
+  /* --el-font-size-extra-small / medium / large / extra-large、--el-component-size-large
+     保持 EP 默认：项目无对应令牌，自创即污染冻结面（裁定 Q-S3-E d → 缺陷 D-017）。 */
+
+  /* ---- rgb 三元组（Q-S3-E(c) 唯一例外）：一律由同行注释指定的 --cl-* hex 机械换算，守卫逐条复算 ---- */
+  --el-color-primary-rgb: 0, 72, 216; /* 换算自 --cl-brand-600 */
+  --el-color-success-rgb: 23, 106, 72; /* 换算自 --cl-ok-text */
+  --el-color-warning-rgb: 135, 89, 0; /* 换算自 --cl-warn-text */
+  --el-color-danger-rgb: 165, 50, 50; /* 换算自 --cl-danger-text */
+  --el-color-error-rgb: 165, 50, 50; /* 换算自 --cl-danger-text */
+  --el-color-info-rgb: 0, 72, 216; /* 换算自 --cl-info-600 */
+}
