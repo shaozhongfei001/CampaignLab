@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T03:17:05+08:00",
+  "updated_at": "2026-11-14T04:00:09+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.6389,
+    "flash_share_tasks": 0.6216,
     "flash_share_tokens": 0.6655,
     "phase_quotas": {
       "M0": 100,
@@ -664,7 +664,7 @@
         "verified_by_orchestrator": "编排器独立复验：两文档编码三断言全过（无 BOM/无 CR/尾换行）；ruff format --check 2 files already formatted（rc=0）；外部注册 grep -c = 8（gate >=1）；六位十六进制色值 grep -c = 0（两文档均 0，禁写死色值守住）；web/src 越界 git status --porcelain = 0；六态行号抽样复核——COMMON.md :27 首载 / :28 无记录 / :30 部分可比与待补（同一行）/ :31 校验失败 / :32 过期，与文档对照表逐条一致；章节标题实测 :23「共享状态与操作」",
         "self_review_value": "R4 自复审自查出 6 处行号不准（EvidenceDrawer emit close :29->:30、PageGrid data-narrow/span/media 块、main.ts 样式装载与 provide 块、ConfirmDialog 消费点、S2 参照文件行数），全部以唯一子串替换修正并 assert count==1，修后 G1-G6 复跑全绿 —— loop engineering 自迭代有效",
         "outputs": [
-          "orchestrator/handoff/M0-03-public-components.md(303行/26803B)",
+          "orchestrator/handoff/M0-03-public-components.md(303行/27115B；原记 26803B 为 S10 登记时点值，0419505 的 R9-C/D-037 更正以 1add/1del 替换一行致 +312B、行数不变（A166/P-4 定点更正）)",
           "orchestrator/handoff/M0-03b-freeze.md(331行/33974B)"
         ]
       },
@@ -861,6 +861,47 @@
         "u_items_adjudicated": "R1-R6 -> A152-A157（零返工）；R7/R8 为知会项，编排器独立复验后追认/知悉，不立缺陷",
         "orchestrator_spot_check": "6 件行数+字节数双全等、__all__=11、零 noqa/type:ignore、13+20 测试函数、hard_deny 全未触碰、零 DML、infra→worker 反向边确认（R10-3 纠正措施：抽验面已扩至语义面而非仅计数面）",
         "self_report_discrepancy": "lane 自报 `ruff format --check` = 206 files，编排器实测 207；差值 1 = R10-C 提交(1675d46)新增的 `orchestrator/handoff/Q-VERIFY-WAVE1-brief.md`，属 lane 测量时点早于该提交，**非计数失真**（D-038 形态已排除，不立缺陷）"
+      },
+      {
+        "task": "Q-VERIFY-WAVE1",
+        "subtask": "wave1 出口复核：M0-02（5 gate）+ M0-03（6 gate）共 11 个裸 rc:null 给出真值与 evidence 指针（A109③），并判定两任务能否由 IN_PROGRESS 翻 DONE",
+        "lane": "Q",
+        "agent_id": "01a1d62a-a54a-7ae1-8999-f10c3a19d61a",
+        "nickname": "Newton",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "escalated": false,
+        "escalate_reason": null,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 3,
+        "loop_cap": 3,
+        "tokens": null,
+        "tokens_note": "lane 明示**无计量句柄**（运行环境未向其暴露 token 计数接口），拒绝编造数字，只给主观量级（约 4 轮工具往返、读取约 20 份证据件 + 7 条门禁全输出，估在 70k 预算量级内但无法自证）。按「禁估算填数」如实记 null（本仓第 17 条 null 条目），不参与 flash_share_tokens 的分子与分母。**注**：这是连续第二条 tokens=null 的 max lane（前一条 Volta/M0-04·S3），说明 get_goal() 计量面在本环境下对子智能体不可用，配比护栏的 token 侧因此持续不可测 —— 已如实反映在 guardrail_status，禁以预算数冒充。",
+        "tokens_caliber": "unavailable_no_metering_handle_exposed_to_subagent",
+        "est_tokens_planned": 70000,
+        "overrun_ratio": null,
+        "over_cap": false,
+        "over_cap_note": "自报 tokens=null → 越限比不可计算，如实记 null，禁以预算 70k 冒充实测。无超限旁证：交付 11 件 / 156157 B，loop_used 3/3 未超上限，档位与派单一致（max high，未降档）。R10-4 的预算口径（按被复核面行数估）在本条得到验证：11 gate + 约 20 份证据件的复核面，lane 自估落在预算量级内。",
+        "outputs": [
+          "evidence/M0/Q-VERIFY-WAVE1/00-index.md",
+          "evidence/M0/Q-VERIFY-WAVE1/verdict.md",
+          "evidence/M0/Q-VERIFY-WAVE1/commands.md",
+          "evidence/M0/Q-VERIFY-WAVE1/defects-proposed.md",
+          "evidence/M0/Q-VERIFY-WAVE1/raw/（7 件，含 q-cmdlog.jsonl 全量 110 条命令四元组）"
+        ],
+        "returned_at": "2026-11-14T03:59:07+08:00",
+        "verified_by_orchestrator": "编排器独立复核：① 11 个 gate 的 rc/verdict/evidence 已逐条回填 tasks[M0-02].gates（5）与 tasks[M0-03].gates（6），A109③ 的裸 rc:null 归零；② 编排器亲自重跑全表 G10 pytest（416 passed）、G12 verify_package（PACKAGE PASS 6/6）、G13b npm build（rc=0）与 lane 的 gate2/gate3/gate6 结论一致，未采信自报；③ lane 的 A144 三段式经编排器认领归因后实质为 (a)=0/(b)=0/(c)=0（20 件污染全部是编排器自己的 r10d-volta-s3 落盘，见 A158）；④ lane 上报的 6 项待裁 B1/B3/B7/B8/B9 + P-1..P-6 已全部终裁为 A158–A167，并立 D-039/D-040、FU-31/FU-32。",
+        "scope_violation": false,
+        "open_questions_raised": 6,
+        "u_items_adjudicated": "B1→A164（真 E2E 判归 M1-04）；B3/P-1→A159+D-039；B4→A158（编排器认领污染）；B5/P-2→A160+D-040；B7→A161（工件级取证充分）；B8→A162（前置已满足）；B9/P-3→A163+FU-32（lane F 无罪）；P-4/P-5→A166；P-6→A167",
+        "value_added": "① 消除了 11 个裸 rc:null（A109③ 的唯一合法路径），使 M0-02/M0-03 得以翻 DONE；② 用 10 处变异注入验证了 migration-diff 比较器不是「恒返回 [] 也全绿」的假绿；③ 解析 PNG IHDR 实证截图尺寸，并把「两处副本字节相同」查明为设计双落点而非漂移，避免了一次误判；④ 用祖先核验 + 双 blob 比对**推翻自己对 S5 的假绿怀疑**，洗清 lane F；⑤ 发现 6 项编排器侧流程缺陷（P-1/P-2/P-4/P-5/P-6 + B4 的并发污染），全部属编排器自身，lane 无一自利性归因。",
+        "self_review_value": "本条是本仓迄今质量最高的一次 Q lane 复核：判定与归因分离（把属编排器的事实交回编排器裁）、自证与自我更正并行（两次修正自己的命令错误并把 rc=127 的行保留在 commands.md 里作诚实记录）、拒绝把 stub 夹具的取证上调为真 E2E 的 PASS。",
+        "q_items": "11 gate 全判定（PASS 7 / PASS_WITH_TODO 4 / FAIL 0 / NOT_YET_COLLECTED 0）",
+        "verdict": "M0-02 建议翻 DONE（4 PASS + 1 PASS_WITH_TODO）；M0-03 建议翻 DONE（3 PASS + 3 PASS_WITH_TODO）。编排器采纳，两任务本轮翻 DONE。"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -885,17 +926,17 @@
     },
     "flash_share_recomputed_at": "2026-11-14T02:55:00+08:00",
     "flash_share_detail": {
-      "subtask_entries": 26,
-      "subtask_units_total": 36,
+      "subtask_entries": 27,
+      "subtask_units_total": 37,
       "subtask_units_flash": 23,
       "token_entries_known": 10,
-      "token_entries_null": 16,
+      "token_entries_null": 17,
       "tokens_known_total": 1190000,
       "tokens_known_flash": 792000,
       "dev_lane_units_total": 19,
       "dev_lane_units_flash": 7,
       "recomputed_by": "程序化重算（subtask_log 全量求和，units=subtask_count or 1；flash=tier_used==qwen3.8-flash；dev=task.startswith(M)；tokens 仅计非 null，禁手填禁估算）",
-      "recomputed_at": "2026-11-14T03:09:58+08:00",
+      "recomputed_at": "2026-11-14T03:59:07+08:00",
       "over_cap_entries": [
         {
           "task": "M0-03",
@@ -955,11 +996,24 @@
         "dev_lane_units_total": 18,
         "dev_lane_units_flash": 7
       },
-      "recompute_reason_R10D": "R10-D 回收 Volta/M0-04·S3（max，tokens=null）后按 accounting_rule 程序化重算：entries 25→26、units_total 35→36、units_flash 23（不变，本条为 max）、token_entries_null 15→16、tokens_known_total/flash 均不变（null 不入分子分母）。flash_share_tasks 0.6571→0.6389；flash_share_tokens 与 flash_share_dev_lanes 因本条 tokens=null 且档位为 max 而**保持不变**。禁手填：以上全部由 subtask_log 全量求和得出（复算脚本内联，非人工填数）。"
+      "recompute_reason_R10D": "R10-D 回收 Volta/M0-04·S3（max，tokens=null）后按 accounting_rule 程序化重算：entries 25→26、units_total 35→36、units_flash 23（不变，本条为 max）、token_entries_null 15→16、tokens_known_total/flash 均不变（null 不入分子分母）。flash_share_tasks 0.6571→0.6389；flash_share_tokens 与 flash_share_dev_lanes 因本条 tokens=null 且档位为 max 而**保持不变**。禁手填：以上全部由 subtask_log 全量求和得出（复算脚本内联，非人工填数）。",
+      "previous_snapshot_R10E": {
+        "recomputed_at": "2026-11-14T03:09:58+08:00",
+        "subtask_entries": 26,
+        "subtask_units_total": 36,
+        "subtask_units_flash": 23,
+        "token_entries_known": 10,
+        "token_entries_null": 16,
+        "tokens_known_total": 1190000,
+        "tokens_known_flash": 792000,
+        "dev_lane_units_total": 19,
+        "dev_lane_units_flash": 7
+      },
+      "recompute_reason_R10E": "R10-E 回收 Newton/Q-VERIFY-WAVE1（max，tokens=null）后程序化重算：entries 26→27、units_total 36→37、units_flash 23（不变，本条为 max）、token_entries_null 16→17、tokens_known_total/flash 均不变。flash_share_tasks 0.6389→0.6216；tokens/dev 不变（本条 tokens=null 且 task 名非 M 开头，不入 dev 口径）。禁手填：全部由 subtask_log 全量求和得出。"
     },
     "guardrail_status": {
       "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
-      "actual_tasks": 0.6389,
+      "actual_tasks": 0.6216,
       "actual_tokens": 0.6655,
       "tasks_target_met": true,
       "tokens_target_met": false,
@@ -986,14 +1040,15 @@
         "actual_tasks": 0.6129,
         "actual_tokens": 0.441
       },
-      "recomputed_at": "2026-11-14T03:09:58+08:00",
+      "recomputed_at": "2026-11-14T03:59:07+08:00",
       "verdict_R10": "护栏① flash_share_tasks 0.6364 >= 0.60 -> 达标；护栏② flash_share_tokens 0.5086 <= 0.35 -> 未达标。tasks 侧因 Bohr（flash）入账由 0.6250 升至 0.6364；tokens 侧由 0.4658 升至 0.5086，主因是 Bohr 自报 65k（flash 越限第 3 条）。如实上报不粉饰，不为凑配比降档。",
       "previous_actual_R10A": {
         "actual_tasks": 0.6364,
         "actual_tokens": 0.5086
       },
       "verdict_R10B": "护栏① flash_share_tasks 0.6571 >= 0.60 -> **达标**（由 R10-A 的 0.6364 续升，23/35 单位）；护栏② flash_share_tokens 0.6655 <= 0.35 -> **严重未达标**（由 0.5086 恶化）。恶化的**唯一**增量是 Mencius 一条自报 380k（flash），单独贡献 token 分母的 31.9%。如实上报不粉饰：① 该值 caliber=self_estimate_unverified、自报表述内部不自洽，既不下调（那是粉饰）也不上调；② 根因已定性为**编排器派单设计错**（该卡按 §6.3「跨模块一致性 / 公共冻结件」本应派 max，且 5k 预算按产出份数而非被判定面行数估），**不是为凑配比而降档** —— 恰恰相反，是**该升档没升**；③ 反事实核算：若该条当初按规则派 max（则不计入 flash 分子、且按 max 上限 200k 计），flash_share_tokens 约为 0.5086，仍超标，说明护栏② 是**结构性**问题（历史单批过大 Dirac 181k + 本轮档位误判两层叠加），非单点可解。纠正措施见 R10-4；护栏检查点仍为 wave2 出口，届时若仍不达标则按手册降批规模而非降档。",
-      "round10d_note": "R10-D 重算（Volta S3 = max、tokens=null）：tasks 0.6389（达标 ≥0.60）、tokens 0.6655（仍未达标 ≤0.35）、dev 0.3684。token 侧未达标主因仍是历史两条 flash 越限（Dirac 181k=3.02×、Goodall 83k=1.38×）与 Mencius 380k（R10-4 定性为派单设计错，本应 max）；本条 tokens=null **既不入分子也不入分母**，对 token 占比无影响。**禁为凑配比降档**（手册 6.3 强制 max 清单优先于 6.6 配比护栏）。"
+      "round10d_note": "R10-D 重算（Volta S3 = max、tokens=null）：tasks 0.6389（达标 ≥0.60）、tokens 0.6655（仍未达标 ≤0.35）、dev 0.3684。token 侧未达标主因仍是历史两条 flash 越限（Dirac 181k=3.02×、Goodall 83k=1.38×）与 Mencius 380k（R10-4 定性为派单设计错，本应 max）；本条 tokens=null **既不入分子也不入分母**，对 token 占比无影响。**禁为凑配比降档**（手册 6.3 强制 max 清单优先于 6.6 配比护栏）。",
+      "round10e_note": "R10-E 重算（Newton = max、tokens=null、task 名为 Q-VERIFY-WAVE1 非 M 开头故不入 dev 口径）：tasks 0.6216（达标 ≥0.60）、tokens 0.6655（仍未达标 ≤0.35）、dev 0.3684。**新增结构性观测**：连续两条 max lane（Volta、Newton）的 tokens 均为 null —— 子智能体侧 get_goal() 无计量句柄，故 token 护栏在本环境下**持续不可测**，其 0.6655 只反映历史 10 条有值条目。如实上报不粉饰：不为凑配比降档，也不以预算数冒充实测；token 侧的实质管控改为「派单预算 + loop_cap + 越限比事后追责」（R10-4 的纠正措施①②③）。"
     }
   },
   "tasks": {
@@ -1138,7 +1193,7 @@
       }
     },
     "M0-02": {
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "lane": "S",
       "tier_planned": "max",
       "tier_used": "qwen3.8-max（S1/S2/S3a/S3c 均 max；S3b/S4/S5 计划 flash）",
@@ -1149,33 +1204,57 @@
       "gates": [
         {
           "id": "AC-001",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行1；evidence/M0/Q-VERIFY-WAVE1/raw/gate2-pytest-tests-api.txt；evidence/M0/M0-02/ac.md:20；evidence/M0/M0-02/http/{02-exchange-first-200,03-exchange-replay-401,05,08,09,10}-*.http；http/40-audit-and-db-rows.txt；http/98-run-summary.json",
+          "verdict": "PASS",
+          "basis": "Q lane 亲自重跑 `pytest -q tests/api` rc=0 / 51 passed。98-run-summary.json 实证 exchange 200 → replay 401 SESSION_EXPIRED、两工作区共存（list_total=2）、?q= 过滤只返回 Alpha、health {status:READY, worker:READY, schema_revision:0001_initial_schema}。AC-001 的 Playwright 腿依裁定 Q1 归 M0-03 → 复合口径见 acceptance.wave1_composite。",
+          "verified_by_orchestrator": "编排器复跑全表 G10 pytest rc=0 / 416 passed（含 tests/api 全量），与本 gate 一致；未采信自报。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "AC-034",
-          "rc": null,
-          "evidence": "",
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行2；evidence/M0/M0-02/ac.md:38；evidence/M0/M0-02/http/{12,14,15,16,17,18,19}-*.http；http/98-run-summary.json",
           "authoritative": "过期会话、错误 Host/Origin、跨工作区 ID、上传失败 -> 401/403/404/413 或 422；隔离/路径/日志/ETag 证据可查（spec ACCEPTANCE.md 第 42 行）",
-          "note": "D-008：任务卡原措辞「深链与刷新」属 M0-03/UI-01，已修正"
+          "note": "D-008：任务卡原措辞「深链与刷新」属 M0-03/UI-01，已修正",
+          "verdict": "PASS_WITH_TODO",
+          "basis": "7 个负例逐条核到：bad Host 403 ORIGIN_DENIED、bad Origin 403、>1MiB 413 INPUT_TOO_LARGE、未知字段 422 location=/bogus、无会话 401、未知 token 401（与过期面字节相同）、短 Idempotency-Key 422 location=/header/Idempotency-Key —— 全部落在 AC 要求的 401/403/413/422。TODO：「跨工作区 ID→404」在 M0-02 的 5-op 切片上无触发面（无 op 取 workspace 路径参数）→ deferred_to M0-04/S4（已由 A165 确认该卡承接，并写进 S4 派单文）。",
+          "deferred_to": "M0-04/S4",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "AC-035",
-          "rc": null,
-          "evidence": "",
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行3；evidence/M0/Q-VERIFY-WAVE1/raw/gate3-verify-package.txt；evidence/M0/Q-VERIFY-WAVE1/raw/gate6-npm-typecheck.txt；evidence/M0/Q-VERIFY-WAVE1/raw/q-cmdlog.jsonl（tags H1-H3）；evidence/M0/M0-02/migration-diff.md；web/src/api/types.ts",
           "authoritative": "按 M0 锁版本、迁移、核对包与 API -> verify_package.py、DDL 等价、OpenAPI 请求响应及前端生成类型通过；锁与运行环境清楚（spec ACCEPTANCE.md 第 43 行）",
-          "note": "D-008：任务卡原措辞「并发与重启语义」不属 AC-035，会话过期/重启归 AC-001+AC-034"
+          "note": "D-008：任务卡原措辞「并发与重启语义」不属 AC-035，会话过期/重启归 AC-001+AC-034",
+          "verdict": "PASS",
+          "basis": "四支柱全部由 Q lane 亲自重跑而非采信报告：① verify_package.py rc=0 `PACKAGE PASS 6/6`（含 SQLite DDL 可执行、28 表、integrity + FK 负例）；② DDL 等价见下一 gate；③ OpenAPI 请求响应 `pytest -q tests/api` rc=0 / 51 passed；④ 前端生成类型 `npm run typecheck`(vue-tsc) rc=0，对 5672 行生成物 web/src/api/types.ts。「锁与运行环境清楚」：doctor 打印 level=ENV_DATA_DIR|DEFAULT_DATA_DIR 与 data_dir/db 的 source=，contract=1.0.1 source=contracts/openapi.json。",
+          "verified_by_orchestrator": "编排器本轮全表 G12 `PACKAGE PASS 6/6` rc=0、G13b npm build rc=0，与支柱①④一致。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "alembic 首迁与 sqlite-v1.sql 结构比对通过",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行4；evidence/M0/M0-02/migration-diff.md；evidence/M0/Q-VERIFY-WAVE1/raw/q-cmdlog.jsonl（tags H1,H2）；evidence/M0/Q-VERIFY-WAVE1/raw/gate4-alembic-current.txt",
+          "verdict": "PASS",
+          "basis": "本波最强证据件：点名比较器 `infra/db/ddl_compare.py::compare_schema`（空列表==等价）、以 sha256 `ec9ddfbc…` 钉住参考件 contracts/sqlite-v1.sql、实测 28 张业务表、7 条判据（表集合 / table_info 六元组 / foreign_key_list 八元组 / 索引列表与信息 / table_list.strict 全 1 / 逐对象空白归一后的 sqlite_master.sql / integrity_check + foreign_key_check）。决定性的一点：对参考 DDL 注入 10 处单点变异（加表、删表、改列名、改默认值、改 CHECK、丢 STRICT、改部分索引 WHERE、改 FK action、删显式索引、悬空 FK）并要求**逐处被检出**，全部 PASS → 破掉「比较器恒返回 [] 也全绿」的假绿。Q lane 另在 scratch data dir 亲自重跑 upgrade head + current → `0001_initial_schema (head)` rc=0。",
+          "note": "本 gate 的派单命令在裸树上达不到期望值（默认 data dir 未 provision）→ 见 D-039；Q lane 补 CAMPAIGNLAB_DATA_DIR + 预迁移后精确复现期望值，反证 S5 的 HEALTHY 自报为真。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "契约测试（口径依裁定 Q2/Q3 收窄）",
-          "rc": null,
-          "evidence": "",
-          "authoritative": "HTTP 层：Problem 结构、Idempotency-Key 重放一次生效、createWorkspace 的 ETag 发布；DTO/单测层：Job 202 语义与 If-Match 412/428；HTTP 端到端 202 与 412 deferred_to 拥有对应 op 的后续任务"
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行5；evidence/M0/Q-VERIFY-WAVE1/raw/gate2-pytest-tests-api.txt；tests/api/test_contract_http.py:83,395,404-416；tests/api/test_contract_declarations.py:107-124；tests/api/test_contract_http.py:8",
+          "authoritative": "HTTP 层：Problem 结构、Idempotency-Key 重放一次生效、createWorkspace 的 ETag 发布；DTO/单测层：Job 202 语义与 If-Match 412/428；HTTP 端到端 202 与 412 deferred_to 拥有对应 op 的后续任务",
+          "verdict": "PASS",
+          "basis": "rc=0 / 51 passed，与 S4 自报逐字一致。收窄口径已真实落地（用修正后的 grep：`--include='*.py'` 置于 `--` 之前）：Problem 结构 application/problem+json 在 test_contract_http.py:83；Idempotency-Key 重放断言 status/ETag/body 相等且只写一次在 :404-416；createWorkspace `ETag: \"1\"` 在 :395 与 declarations:124；If-Match 412/428 以「声明层不可达 + 可执行探针（发不匹配 If-Match 仍得 201）」双证在 declarations:107-124；Job 202 语义**写在代码里**的 deferred_to: M0-04/S4。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         }
       ],
       "acs": [
@@ -1411,10 +1490,13 @@
         "S3d": "46dca2b feat(M0-02/S3d)：application 服务与 repositories、api/deps.py 三端口实体化（14 文件）",
         "S4": "本提交：tests/api/{conftest.py(193),test_contract_declarations.py(191),test_contract_http.py(436)}，51 passed；覆盖 5 个已实现 operationId 的 200/201/400/401/403/409/413/422 分支 + Problem/Issue 结构 + ETag + 幂等重放 + FU-12 正向 health",
         "S5": "本提交（R10-A）：evidence/M0/M0-02/ac.md + http/**（24 件：编号 .http 19 = 01–12、14–20；辅助 40/90/96/97/98）+ evidence/M0/summaries/M0-02.md；commands.md 追加 S5 段（90 行纯追加）、migration-diff.md 追加 S5 复核（22 行纯追加）。AC-001 PASS / AC-034 PASS_WITH_TODO / AC-035 PASS；doctor `PASS=5 WARN=0 FAIL=0 RESULT=HEALTHY`；FU-7 已取证（http/20 = status DEGRADED / worker READY / schema_revision UNMIGRATED）；D-033 实锤复现（幂等重放正文非逐字节相同：首次 DTO 序 vs 重放字典序，状态码/ETag/字段值全一致）-> 归 FU-21。编排器抽验：2 处 tracked 修改 numstat 90/0、22/0 纯追加；源码/测试/配置零改动；_runtime/ 已删；明文令牌零残留（仅存 sha256 前 12 位）。抽验另发现证据计数五处失真 -> 立 D-038 并同批更正、索引补全 2 行。**M0-02 暂不翻 DONE**：仍需 wave1 出口 Q 复核 + AC 取证回填（A109），且须等 Mencius 交回 web/** 后再派。"
-      }
+      },
+      "done_at": "2026-11-14T03:59:07+08:00",
+      "done_basis": "A109 的唯一合法路径 = Q lane wave 出口复核报告：4 PASS + 1 PASS_WITH_TODO（AC-034 跨工作区 404 → M0-04/S4）；0 FAIL、0 NOT_YET_COLLECTED。5/6 个 gate 的裸 rc:null 已由 Newton 亲自重跑补齐真值与 evidence 指针（A109③ 消解）。M0-02 的三条前置全部满足：① wave1 出口 Q 复核 ✔ ② AC 证据回填 ✔ ③ Mencius 交回 web/** ✔（A162 编排器侧认定）。PASS_WITH_TODO 的语义 = 本阶段判据已满足、余留义务已定址且有主，**非**未完成。",
+      "q_review": "Q-VERIFY-WAVE1 / Newton / evidence/M0/Q-VERIFY-WAVE1/verdict.md / 2026-11-14T03:59:07+08:00"
     },
     "M0-03": {
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "lane": "F",
       "tier_planned": "max",
       "tier_used": "",
@@ -1425,33 +1507,60 @@
       "gates": [
         {
           "id": "AC-001 页面侧",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行6；evidence/M0/M0-03/playwright-readiness.json；web/tests/unit/**（277 tests）；evidence/M0/Q-VERIFY-WAVE1/raw/gate5-npm-test.txt",
+          "verdict": "PASS_WITH_TODO",
+          "basis": "277 tests + `--list` 12 tests / 2 projects。但 playwright-readiness.json 自带 caveat：当前全走 `stubApi.ts` 的 `page.route` 合成夹具，**不是真 E2E** → Q lane 明确拒绝上调为 PASS。TODO = 真 E2E（B1），后端 S3b/S3d 已就位故**新近变为可行**，但无主 → 由 A164 判归 M1-04（最早同时具备真实后端端点与页面面的任务），并记 FU-31 改卡。",
+          "deferred_to": "M1-04（A164）",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "AC-034",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行7；web/tests/**/problem-presentation.spec.ts（5 命中，含正向对照 rc=0）",
+          "verdict": "PASS",
+          "basis": "Problem 呈现面 5 处命中，且 Q lane 依 R10-5 的固化规则补跑了必命中的正向对照 grep（避免 BRE/ERE 造成的 rc=1 假绿）。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "vue-tsc 通过",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行8；evidence/M0/Q-VERIFY-WAVE1/raw/gate6-npm-typecheck.txt",
+          "verdict": "PASS",
+          "basis": "Q lane 亲自重跑 `npm run typecheck`（vue-tsc）rc=0、零诊断。",
+          "verified_by_orchestrator": "编排器本轮全表 G13b `npm --prefix web run build` rc=0（✓ built），与类型面一致。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "vitest 通过",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行9；evidence/M0/Q-VERIFY-WAVE1/raw/gate5-npm-test.txt",
+          "verdict": "PASS",
+          "basis": "`12 files / 277 tests`，与派单预期**完全一致**；S5 transcript 里旧的 4 files/56 tests 已被 HEAD 取代（属陈旧记录而非矛盾）。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "1440x900 与 1024x768 截图",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行10；evidence/M0/ui/**；evidence/M0/M0-03/**；web/tests/e2e/ui-01-screenshots.spec.ts:18-19；evidence/M0/Q-VERIFY-WAVE1/raw/q-cmdlog.jsonl",
+          "verdict": "PASS_WITH_TODO",
+          "basis": "Playwright **真可用**（1.65.0 rc=0；browsers.json 要 rev 1254，缓存内 chromium-1254 + headless_shell-1254 对得上；`--list` rc=0）。Q lane **解析 PNG IHDR** 实测尺寸 1440x900 / 1024x768、签名有效。两处副本字节相同是 ui-01-screenshots.spec.ts:18-19 的双落点**设计如此**，非漂移（已列入「非缺陷」清单，禁再重开）。TODO = 比特级可复现需执行该 spec，而它写入 evidence/M0/ui/** 与 evidence/M0/M0-03/**，两处均在 Q lane 的 hard_deny → 由 A161 裁定：M0 出口接受「尺寸+签名+工具链+用例发现」级取证，比特级复现随 A135 一并归 M1-04。",
+          "deferred_to": "M1-04（A161 / A135）",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         },
         {
           "id": "公共组件冻结清单",
-          "rc": null,
-          "evidence": ""
+          "rc": 0,
+          "evidence": "evidence/M0/Q-VERIFY-WAVE1/verdict.md §1 行11；orchestrator/handoff/M0-03-public-components.md；orchestrator/handoff/M0-03b-freeze.md:108-119；git ls-tree 5d16d4d",
+          "verdict": "PASS_WITH_TODO",
+          "basis": "`git ls-tree 5d16d4d` 实测 14 项 = 13 件 + .gitkeep，与冻结清单对上；`web/src/components/state/**` 6 件由 M0-03b-freeze.md:108-119 另行冻结 → **无覆盖缺口**。TODO = 该冻结文档自身已陈旧：台账字节数 26803 vs 实测 27115（P-4/A166），且 :20/:30/:255 断言「state/ 不存在」在 HEAD 已为假、:20 附带的守卫现在会打印 STATE_DIR_EXISTS（P-5/A166）→ 由编排器本轮定点更正 + 加 as-of 标记。",
+          "q_review": "Q-VERIFY-WAVE1 / Newton / 2026-11-14T03:59:07+08:00",
+          "rc_source": "Q lane Newton 亲自重跑（subprocess.run().returncode）；编排器另独立重跑全表相关门禁复核，未采信自报"
         }
       ],
       "acs": [
@@ -1521,7 +1630,7 @@
         "S7": "5d16d4d：web/tests/**（11 文件）键盘基线参数化",
         "S8": "5d16d4d：vitest 单测脚手架 + AC-001 断言 + 深链断言（framework/FRONTEND.md:12）",
         "S9": "5d16d4d + evidence/M0/ui/{ui-01-desktop-1440x900.png,ui-01-laptop-1024x768.png,ui-01-visual-notes.md} + evidence/M0/M0-03/playwright-readiness.json",
-        "S10": "本提交：orchestrator/handoff/M0-03-public-components.md（303 行/26803B），13 件公共组件的 props/slots/emits 契约表（30 行 grep 实抽）、依赖关系、冻结边界、消费方指引、与 26 页覆盖对账"
+        "S10": "本提交：orchestrator/handoff/M0-03-public-components.md（303 行/27115B；原记 26803B 为 S10 登记时点值，0419505 的 R9-C/D-037 更正以 1add/1del 替换一行致 +312B、行数不变（A166/P-4 定点更正）），13 件公共组件的 props/slots/emits 契约表（30 行 grep 实抽）、依赖关系、冻结边界、消费方指引、与 26 页覆盖对账"
       },
       "note_round8": "S1–S10 **全部交付**（10/10）。待 wave1 出口由 Q lane 复核 gates 与 AC 取证回填（A109），故 status 暂维持 IN_PROGRESS，禁在无取证的情况下自行判 DONE",
       "scope_sync_A128": {
@@ -1540,7 +1649,10 @@
           }
         ],
         "note": "依 A5「卡字面量为准」修正两处路径前缀缺失（state 记 handoff/... 而卡面与磁盘实路径均为 orchestrator/handoff/...）；仓库内无顶层 handoff/ 目录。原值留存于 superseded，不改写历史（A19）。"
-      }
+      },
+      "done_at": "2026-11-14T03:59:07+08:00",
+      "done_basis": "A109 的唯一合法路径 = Q lane wave 出口复核报告：3 PASS + 3 PASS_WITH_TODO（AC-001 页面侧真 E2E / 截图比特级 / 冻结清单文档漂移）；0 FAIL、0 NOT_YET_COLLECTED。5/6 个 gate 的裸 rc:null 已由 Newton 亲自重跑补齐真值与 evidence 指针（A109③ 消解）。M0-02 的三条前置全部满足：① wave1 出口 Q 复核 ✔ ② AC 证据回填 ✔ ③ Mencius 交回 web/** ✔（A162 编排器侧认定）。PASS_WITH_TODO 的语义 = 本阶段判据已满足、余留义务已定址且有主，**非**未完成。",
+      "q_review": "Q-VERIFY-WAVE1 / Newton / evidence/M0/Q-VERIFY-WAVE1/verdict.md / 2026-11-14T03:59:07+08:00"
     },
     "M0-03b": {
       "status": "PASS_WITH_TODO",
@@ -5022,6 +5134,64 @@
         "A109",
         "A144"
       ]
+    },
+    {
+      "id": "D-039",
+      "task": "编排器（门禁目录 / Q lane 派单文模板）",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "title": "派单 gate 命令不自带 provision，在裸克隆树上达不到自己的期望值：gate1 `bash scripts/doctor.sh` 期望 RESULT=HEALTHY 实得 PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED；gate4 `alembic current` 期望 head=0001_initial_schema 实得 rc=0 但无 revision 行。根因是默认 data dir `~/.local/share/campaignlab` 不存在。构成每个 wave 出口的常驻假 RED 风险。",
+      "found_by": "Q lane Newton（Q-VERIFY-WAVE1，P-1 / B3）；编排器复核确认并上调严重度",
+      "file": "orchestrator/defects/D-039.md",
+      "found_at": "2026-11-14T03:59:07+08:00",
+      "closed_at": null,
+      "blocking": false,
+      "blocking_note": "不阻塞产品交付：代码行为正确（未迁移的默认 data dir 本就应该报 DEGRADED，doctor 的提示可操作）。阻塞的是**门禁可复现性** —— 本项目共 11 个 wave，每个 wave 出口都要派 Q lane 跑同一批 gate，若不修则每轮都会产生一次假 RED 与一次人工归因，复利面大，故 severity 由 lane 建议的 Medium 上调为 MAJOR。",
+      "owner": "编排器（门禁目录 + 派单文模板；`scripts/**` 属编排器写权，lane 被 deny）",
+      "responsibility": "编排器侧：派单文把 gate 命令与其期望值当成一对契约下发，却未验证该命令在裸树上能否产出该期望值 —— 命令隐含依赖了宿主既有状态（已 provision 的 data dir）。lane 侧无责：Q lane 不仅如实报出偏差，还自行补 provision 复现了期望值并反证 S5 的 HEALTHY 自报为真。",
+      "root_cause": "gate 命令的**环境前置条件**未随命令一起下发。`scripts/doctor.sh` 与 `alembic current` 都读取默认 data dir（`~/.local/share/campaignlab`），该目录在全新环境里不存在；S5 lane 当初取证时用 `CAMPAIGNLAB_DATA_DIR` 注入（evidence/M0/M0-02/ac.md:5），但派单文抄命令时漏掉了注入步骤，于是期望值（来自注入后的环境）与命令（在裸环境执行）不自洽。",
+      "measured": "按派单原文执行：doctor → `PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED`（raw/gate1-doctor.txt）；`alembic current` → rc=0、无 revision 行（raw/gate4-alembic-current.txt）。补 provision 后（`CAMPAIGNLAB_DATA_DIR=/tmp/qverify-data` + 建 OPERATIONS.md 的 7 个子目录 + `uv run --no-sync alembic -c migrations/alembic.ini upgrade head`）：doctor → `PASS=5 WARN=0 FAIL=0 RESULT=HEALTHY` rc=0；`current` → `0001_initial_schema (head)` rc=0（raw/q-cmdlog.jsonl tags H1/H2/H3）。",
+      "evidence": "evidence/M0/Q-VERIFY-WAVE1/raw/gate1-doctor.txt、raw/gate4-alembic-current.txt、raw/q-cmdlog.jsonl（H1/H2/H3）；evidence/M0/M0-02/ac.md:5（S5 的注入先例）；对照 evidence/M0/ORCHESTRATOR/r10d-volta-s3/raw/G14_doctor.txt（RESULT: HEALTHY）与 G14b_cli_doctor.txt（PASS=3 WARN=2 FAIL=0 DEGRADED）—— 两个 doctor 面结论不同属既有口径（rule_same_name_tools 要求分字段记录），本缺陷的修复须同时覆盖两面。",
+      "fix_scope": "① 门禁目录（`resume.self_check_gates_rc0.gates` 的 G14 / G14b / alembic 类条目的 cmd 字段）；② Q lane 派单文模板（`orchestrator/handoff/Q-VERIFY-*-brief.md` 的 gate 段）；③ 新增固化规则 `rule_gate_command_must_be_self_provisioning`。不动产品代码、不动 `scripts/doctor.sh` 的判定逻辑（其行为正确）。",
+      "fix_detail": "待实施。修复形态：gate 命令改为自带 provision 前缀（scratch `CAMPAIGNLAB_DATA_DIR` + 建 7 子目录 + `upgrade head`）再断言期望值；**不采用**「把期望值放宽为裸树 DEGRADED」的方案（A159：那会把真实故障态洗白成通过判据，削弱 AC-035 与 FU-7 的 UNMIGRATED 取证面）。派单前置检查新增一条：每条 gate 命令连同其期望值必须在裸克隆树上复现，跑不出即判派单缺陷。",
+      "followup": "rule_gate_command_must_be_self_provisioning（A159 立规）",
+      "related": [
+        "A159",
+        "D-040",
+        "A156",
+        "FU-7"
+      ],
+      "related_adjudications": [
+        "A159"
+      ]
+    },
+    {
+      "id": "D-040",
+      "task": "M0-02（migrations/env.py 与 alembic 装配面）+ 编排器（gate 排序）",
+      "severity": "MINOR",
+      "status": "OPEN",
+      "title": "看似只读的 `alembic current` 有宿主写副作用：在默认 env 下创建 `~/.local/share/campaignlab/state/campaignlab.db`（0 字节），导致随后重跑 doctor 的 WARN 文案改变（data_dir「does not exist」→「writable but missing OPERATIONS.md subdirs」；database「does not exist」→「intact but no alembic_version」），两个 gate 因此既不幂等也顺序相关。",
+      "found_by": "Q lane Newton（Q-VERIFY-WAVE1，P-2 / B5）；编排器复核确认并下调严重度",
+      "file": "orchestrator/defects/D-040.md",
+      "found_at": "2026-11-14T03:59:07+08:00",
+      "closed_at": null,
+      "blocking": false,
+      "blocking_note": "不阻塞：副作用落在**仓库外**（`~/.local/share/campaignlab`），对 A144 三段式、提交树与产品行为均无影响。且 D-039 修复后（gate 命令统一注入 scratch `CAMPAIGNLAB_DATA_DIR`）该副作用会落到临时目录、不再污染宿主默认位置 —— 即主要触发路径被 D-039 覆盖，故 severity 由 lane 建议的 Medium 下调为 MINOR。仍独立立单，因为「只读命令有写副作用」这一性质在 M5-01/M5-02 取证与 `verify_artifact_index` 类只读校验里会再次咬人。",
+      "owner": "M0-02 的 migrations 装配面（`migrations/env.py`）+ 编排器（gate 排序与只读性实测）",
+      "responsibility": "双侧。产品侧：`alembic current` 经由 `migrations/env.py` 建 engine 并 connect，SQLite 在 connect 时即创建 db 文件（SQLite 既定行为），故副作用来自「连接」而非「查询」本身 —— 一个对外表现为只读的命令不应产生持久写效果。编排器侧：写派单文时把 `alembic current` **假定**为只读并排在 doctor 之前，未实测其只读性，正是这个未验证的假定造成顺序依赖。",
+      "root_cause": "「只读」被当成命令的**标签**而非需要实证的**性质**。alembic 的 current 子命令必须建立数据库连接才能读 alembic_version，而 SQLite 的连接语义即「文件不存在则创建」。",
+      "measured": "`~/.local/share/campaignlab/state/campaignlab.db` mtime 2026-11-14 02:32:51、0 字节；gate1 在 gate4 前后的 WARN 文案实测发生变化（raw/q-cmdlog.jsonl tags G1/G2）。Q lane 未删该产物（删除也是变更，不归它裁）—— 处置正确。",
+      "evidence": "evidence/M0/Q-VERIFY-WAVE1/raw/q-cmdlog.jsonl（tags G1/G2，含 gate1 前后文案对照）；宿主 `~/.local/share/campaignlab/state/` 的 mtime 实测",
+      "fix_scope": "① `migrations/env.py` 或 gate 命令层：使只读状态查询不落盘（或统一注入 scratch data dir，随 D-039 一并落地）；② 编排器侧立规 `rule_readonly_gate_must_be_idempotent`；③ gate 排序要求：有副作用的 gate 排在其观测面相关 gate 之后，或在派单文标注顺序依赖。**本轮不实施代码修复**，避免动 M0-02 已翻 DONE 的交付面。",
+      "fix_detail": "待实施。优先随 D-039 的 provision 方案一并消解（scratch data dir 后副作用不再落在宿主默认位置）；若后续 M5-01/M5-02 的取证需要真正的只读状态查询，再考虑给 alembic 装配面加「不落盘探测」路径。",
+      "followup": "rule_readonly_gate_must_be_idempotent（A160 立规）",
+      "related": [
+        "A160",
+        "D-039"
+      ],
+      "related_adjudications": [
+        "A160"
+      ]
     }
   ],
   "change_requests": [
@@ -5278,49 +5448,7 @@
       "⑦ 每次回收后程序化重算 flash_share（units=subtask_count or 1；dev=task.startswith('M')），wave2 出口复核两护栏，禁为凑配比降档",
       "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
-    "in_flight_agents": [
-      {
-        "agent_id": "01a1d62a-a54a-7ae1-8999-f10c3a19d61a",
-        "nickname": "Newton",
-        "lane": "Q",
-        "task": "Q-VERIFY-WAVE1",
-        "subtask": "wave1 出口复核：M0-02（5 gate）+ M0-03（6 gate）共 11 个裸 rc:null 给出真值与 evidence 指针（A109 ③），并判定两任务能否由 IN_PROGRESS 翻 DONE",
-        "tier": "qwen3.8-max",
-        "reasoning_effort": "high",
-        "budget": "70k",
-        "budget_basis": "R10-4 纠正措施②：按被复核面行数估（11 gate + 约 20 份证据件 + 7 条重跑门禁），非按报告份数估",
-        "tier_basis": "§6.3 max 强制清单（跨模块一致性判定：需在 AC 原文 / 公共件契约表 / 冻结文档 / 证据面之间对齐）+ R10-4 纠正措施①（输入含冻结文档与公共件契约表者一律 max）。**非为凑 token 配比而升档** —— 反事实：该判定若交 flash，按 Mencius 先例极可能重演 76× 越限。",
-        "loop_cap": 3,
-        "dispatched_at": "2026-11-14T03:20:00+08:00",
-        "brief": "orchestrator/handoff/Q-VERIFY-WAVE1-brief.md",
-        "write_set": [
-          "evidence/M0/Q-VERIFY-WAVE1/**"
-        ],
-        "hard_deny": [
-          "orchestrator/state.json（子智能体无台账写权）",
-          "src/**",
-          "web/**",
-          "tests/**",
-          "contracts/**",
-          "spec/**",
-          "migrations/**",
-          "docs/**",
-          "orchestrator/handoff/**",
-          "evidence/M0/M0-02/**",
-          "evidence/M0/M0-03/**",
-          "evidence/M0/M0-04/**（Volta 在飞）"
-        ],
-        "git_write": "FORBIDDEN（禁一切 git 写）",
-        "authorized_untracked_exclusion": [
-          "src/campaignlab/infra/artifacts.py",
-          "tests/integration/jobs/",
-          "tests/unit/test_artifacts.py",
-          "evidence/M0/M0-04/"
-        ],
-        "authorized_exclusion_reason": "Volta(M0-04/S3) 同树在飞的未入库产物；已在派单文授权其从 A144(c) 计数中排除，并要求报告排除前后两个数字（禁只报排除后的 0）",
-        "fulltable_restriction": "禁跑全仓 pytest / mypy / ruff .（Volta 半成品会造成假 RED）；门禁命令已在 brief 第 6 节做路径限定"
-      }
-    ],
+    "in_flight_agents": [],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -5833,7 +5961,7 @@
       "counts": {
         "pytest_passed": 416,
         "mypy_source_files": 77,
-        "ruff_formatted_files": 208,
+        "ruff_formatted_files": 214,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -5842,33 +5970,34 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 208,
+          "total": 214,
           "in_scope_py": 79,
-          "in_scope_md": 129,
+          "in_scope_md": 135,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-14T03:15:10+08:00",
+          "measured_after": "2026-11-14T04:00:09+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式（R10-D 双时点实测）：**add 前** tracked 201（py 75 + md 126）+ untracked 11 == ruff 报数 212；**add 后（= 待提交树）** tracked 208（py 79 + md 129）+ untracked 4（全为在飞 Q lane 件，不入分母）== ruff 报数 212；**提交后** HEAD 树 == 208，Q lane 4 件仍 untracked 故工作树侧 ruff 报数仍为 212。HEAD 基线为 py 75 + md 126 = 201。复现命令见 reproduce_py / reproduce_md / identity_cmd / identity_cmd_R10D。",
+          "identity": "A101 恒等式（R10-E 双时点实测）：**add 前** tracked 208（py 79 + md 129）+ untracked 6（Q lane 4 md + D-039/D-040）== ruff 报数 214；**add 后（= 待提交树）** tracked 214（py 79 + md 135）+ untracked 0 == ruff 报数 214；**提交后** HEAD 树 == 214。本提交**不触碰任何 .py**，故 py 分母 79 与 pytest/mypy 数值均不变。复现命令见 reproduce_py / reproduce_md / identity_cmd / identity_cmd_R10E。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
-            "本提交入库的 7 件（add 前属 untracked、add 后转 tracked，故 post-add 的 untracked 计数已不含它们）：+4 py（src/campaignlab/infra/artifacts.py、tests/integration/jobs/{__init__,test_artifact_write}.py、tests/unit/test_artifacts.py — Volta/M0-04·S3）",
-            "+2 md（evidence/M0/M0-04/{commands,s3-artifacts}.md — Volta/M0-04·S3 证据）",
-            "+1 md（orchestrator/handoff/round10-lane-returns-raw.md — 编排器自产，rule_close_agent_returns_raw_report 要求的 lane 原始回报存档）"
+            "本提交入库的 6 件 in-scope .md（add 前属 untracked、add 后转 tracked）：+4 md（evidence/M0/Q-VERIFY-WAVE1/{00-index,commands,defects-proposed,verdict}.md — Newton/Q-VERIFY-WAVE1 证据）",
+            "+2 md（orchestrator/defects/{D-039,D-040}.md — 编排器自产缺陷单，由台账 dict 单源生成）",
+            "另 5 件非 in-scope 计数的证据文件（raw/gate{1..6}-*.txt 6 件中的 6 件 + raw/q-cmdlog.jsonl）随同入库：依 `why_md_counted` 的探针结论（.txt / 无扩展名文件不入 ruff format 计数），它们**不改变分母**，故 md 增量恰为 6 而非 11。",
+            "modified-not-counted（已在 HEAD 树内，只改内容不加分母）：orchestrator/handoff/round10-lane-returns-raw.md（+86/-0）、orchestrator/handoff/M0-03-public-components.md（+17/-0）。"
           ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "post-add 仍余 4 件 untracked in-scope .md，**全部**属在飞 Q lane Newton/Q-VERIFY-WAVE1（`evidence/M0/Q-VERIFY-WAVE1/{00-index,commands,defects-proposed,verdict}.md`）；依 rule_counts_same_commit「在飞 lane 的未入库文件不计入分母、守护只从已提交树取数」**不计入** counts.ruff_formatted_files，随 Q-VERIFY-WAVE1 的独立提交刷新（届时 md 分母 +4）。编排器实测断言：post-add untracked 清单逐条以 `evidence/M0/Q-VERIFY-WAVE1/` 开头，无第三类来源。",
+          "untracked_component_note": "post-add untracked in-scope .py/.md = **0**：R10-D 台账里预告的「在飞 Q lane 4 件」已全部随本提交入库，加上编排器自产的 D-039/D-040 两件，md 分母 129→135。工作树侧再无未入库 in-scope 件，A101 恒等式退化为 tracked == ruff 报数。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 201,
-          "untracked_component_sum_check": "post-add: 79 py + 129 md = 208 ；+ untracked 4 = 212 == ruff 报数 212 ✔",
-          "untracked_not_ignored_in_scope": 4,
+          "prev_total": 208,
+          "untracked_component_sum_check": "post-add: 79 py + 135 md = 214 ；+ untracked 0 = 214 == ruff 报数 214 ✔",
+          "untracked_not_ignored_in_scope": 0,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
           "previous_values": "91（2026-11-13T05:33:25+08:00，在飞中间态）；88（04:58:57）；64（02:46:54）；63（02:07:05）；56（01:37:27）；53（00:42:29）；46（23:30:05）；37（D-006 前）。按「历史值只加注不改写」保留于本字段。 || 127（提交B后、D-025 落盘前）；125（Round 5 回收前）；101（Round 4 快照） || 188（D-036 提交后 0e5c093 的 total）；186（Round 9 首件 D-035 提交后）；181（Round 8 checkpoint）",
-          "tracked_py_md": 208,
-          "untracked_py_md": 4,
+          "tracked_py_md": 214,
+          "untracked_py_md": 0,
           "round6_progression": "128（提交C 时）-> 144（S3d 在飞时实测，含未跟踪）-> 146（批次4 入库 + 守护 + D-026.md）-> 147（D-027.md 入库）；本提交后 untracked 归 0、tracked 147",
           "sampling_discipline": "counts 一律在「工作树 == 待提交树」时采样（本次 S3d 12 个文件已 git add、其余全入库，untracked=0），且在台账写入之后、commit 之前完成",
           "historical_value_147": "2026-11-13T10:49:12+08:00 实测 147（py 51 + md 96）。该次测量早于 D-028.md 落盘与本台账写入（updated_at 10:56:43），故对『待提交树』而言偏小 1。原值按 D-011 体例保留于此，不改写。",
@@ -5880,12 +6009,13 @@
           "caliber_note_R9_d036": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74->75 = 新增 tests/unit/test_slice_self_consistency.py；in_scope_md 112->113 = 新增 orchestrator/defects/D-036.md；total 186->188。本轮改动的三份 orchestrator/handoff/*.slice.json 属 .json、evidence/**/fulltable.log 属 .log，**均不在 ruff format 作用域**（只纳管 .py 与 .md），故不计入分母。上一轮的 caliber_note（D-035：+5 个 tests 包标记）按「原值保留不改写」体例留存，不以本条覆盖。",
           "caliber_note_R9_content_review": "counts 为**本次提交后的树**口径（A101）。in_scope_md 113->119 = 新增 6 份 .md（5 份复核报告 + D-037.md）；in_scope_py 75 不变（无新增 .py）。M0-03-public-components.md 属**已跟踪文件的行内更正**，不改文件数。本键只记本轮推导，上一轮 caliber_note_R9_d036 与更早的 caliber_note 按「原值保留不改写」体例留存。",
           "prev_total_note": "prev_total 为**滚动指针**（= 上一轮的 total），本轮由 181 更正为 188；181 属 Round 8 值、在 D-036 轮未随 total 更新。历史序列一律以 previous_values 为权威归档（只加注不改写）。",
-          "identity_cmd_R10D": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同过滤 | wc -l ；两者之和 == `uv run --no-sync ruff format --check .` 报的 N（本轮实测 208 + 4 == 212）"
+          "identity_cmd_R10D": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同过滤 | wc -l ；两者之和 == `uv run --no-sync ruff format --check .` 报的 N（本轮实测 208 + 4 == 212）",
+          "identity_cmd_R10E": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同过滤 | wc -l ；两者之和 == `uv run --no-sync ruff format --check .` 报的 N（本轮实测 214 + 0 == 214）"
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T03:15:10+08:00",
-        "counts_refresh_reason": "R10-D：Volta/M0-04·S3 的 4 py + 2 md 与编排器自产 1 md（lane 原始回报存档）入库；全表 18/18 gate 实测 pytest 416 passed / mypy 77 source files / ruff format 212 files already formatted。counts 与新增文件同一次提交刷新（A101 / rule_counts_same_commit）。",
+        "counts_refreshed_at": "2026-11-14T04:00:09+08:00",
+        "counts_refresh_reason": "R10-E：Newton/Q-VERIFY-WAVE1 的 11 件证据（4 md + 6 txt + 1 jsonl）与编排器自产 D-039/D-040 两件 md 入库；**本提交不含任何 .py 改动**，故 pytest_passed 416 与 mypy_source_files 77 沿用 R10-D 全表实测值不变，仅 ruff 分母 208→214（md 129→135、py 79 不变）。counts 与新增文件同一次提交刷新（A101 / rule_counts_same_commit）。本轮未重跑全表的依据见 resume.round10e_verification.note。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -5950,7 +6080,17 @@
         },
         "ruff_lint_scope_files_note_R10D": "稳定分母（in-scope 纯 Python）R10-D 实测 79，较上轮 75 增 4 = artifacts.py + tests/integration/jobs/{__init__,test_artifact_write}.py + tests/unit/test_artifacts.py；复现命令 = reproduce_py。",
         "pytest_passed_note_R10D": "全表实测 G10 rc=0 / `416 passed, 6 warnings`（evidence/M0/ORCHESTRATOR/r10d-volta-s3/fulltable.log，87.0s）；较上轮 356 增 60 = Volta/M0-04·S3 新增用例，**既有 356 例零回归**。上次记录值 356 移入 previous_values_R10D（只加注不改写）。",
-        "mypy_source_files_note_R10D": "全表实测 G9 rc=0 / `Success: no issues found in 77 source files`；较上轮 73 增 4 = S3 的 4 个新 py 件（mypy strict 干净，`# type: ignore` 0 处）。历史值 73 保留于 previous_values_R10D。"
+        "mypy_source_files_note_R10D": "全表实测 G9 rc=0 / `Success: no issues found in 77 source files`；较上轮 73 增 4 = S3 的 4 个新 py 件（mypy strict 干净，`# type: ignore` 0 处）。历史值 73 保留于 previous_values_R10D。",
+        "previous_values_R10E": {
+          "in_scope_py": 79,
+          "in_scope_md": 129,
+          "total": 208,
+          "ruff_formatted_files": 208,
+          "pytest_passed": 416,
+          "mypy_source_files": 77,
+          "counts_refreshed_at": "2026-11-14T01:20:00+08:00"
+        },
+        "ruff_lint_scope_files_note_R10E": "稳定分母（in-scope 纯 Python）R10-E 实测 79，与 R10-D 的 79 **持平**：本提交只入库 .md/.txt/.jsonl 证据与台账，无新增 .py；复现命令 = reproduce_py。"
       },
       "denominator_history": [
         {
@@ -8065,6 +8205,53 @@
         "result": "DONE",
         "tokens_self_reported": null,
         "tokens_caliber": "unavailable_null_get_goal_returned_null"
+      },
+      {
+        "agent_id": "01a1d62a-a54a-7ae1-8999-f10c3a19d61a",
+        "nickname": "Newton",
+        "lane": "Q",
+        "task": "Q-VERIFY-WAVE1",
+        "subtask": "wave1 出口复核：M0-02（5 gate）+ M0-03（6 gate）共 11 个裸 rc:null 给出真值与 evidence 指针（A109 ③），并判定两任务能否由 IN_PROGRESS 翻 DONE",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "budget": "70k",
+        "budget_basis": "R10-4 纠正措施②：按被复核面行数估（11 gate + 约 20 份证据件 + 7 条重跑门禁），非按报告份数估",
+        "tier_basis": "§6.3 max 强制清单（跨模块一致性判定：需在 AC 原文 / 公共件契约表 / 冻结文档 / 证据面之间对齐）+ R10-4 纠正措施①（输入含冻结文档与公共件契约表者一律 max）。**非为凑 token 配比而升档** —— 反事实：该判定若交 flash，按 Mencius 先例极可能重演 76× 越限。",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T03:20:00+08:00",
+        "brief": "orchestrator/handoff/Q-VERIFY-WAVE1-brief.md",
+        "write_set": [
+          "evidence/M0/Q-VERIFY-WAVE1/**"
+        ],
+        "hard_deny": [
+          "orchestrator/state.json（子智能体无台账写权）",
+          "src/**",
+          "web/**",
+          "tests/**",
+          "contracts/**",
+          "spec/**",
+          "migrations/**",
+          "docs/**",
+          "orchestrator/handoff/**",
+          "evidence/M0/M0-02/**",
+          "evidence/M0/M0-03/**",
+          "evidence/M0/M0-04/**（Volta 在飞）"
+        ],
+        "git_write": "FORBIDDEN（禁一切 git 写）",
+        "authorized_untracked_exclusion": [
+          "src/campaignlab/infra/artifacts.py",
+          "tests/integration/jobs/",
+          "tests/unit/test_artifacts.py",
+          "evidence/M0/M0-04/"
+        ],
+        "authorized_exclusion_reason": "Volta(M0-04/S3) 同树在飞的未入库产物；已在派单文授权其从 A144(c) 计数中排除，并要求报告排除前后两个数字（禁只报排除后的 0）",
+        "fulltable_restriction": "禁跑全仓 pytest / mypy / ruff .（Volta 半成品会造成假 RED）；门禁命令已在 brief 第 6 节做路径限定",
+        "retired_at": "2026-11-14T03:59:07+08:00",
+        "retired_reason": "已回收并入库（R10-E）：11 个 gate 全部给出实测 rc + evidence 指针（A109③ 裸 null 归零）、判定 PASS 7 / PASS_WITH_TODO 4 / FAIL 0；编排器独立复核后采纳其 DONE 建议，M0-02 与 M0-03 翻 DONE；其上报 6 项待裁 B1/B3/B4/B7/B8/B9 与 P-1..P-6 全部终裁为 A158–A167，并立 D-039/D-040、FU-31/FU-32",
+        "result": "DONE",
+        "tokens_self_reported": null,
+        "tokens_caliber": "unavailable_no_metering_handle_exposed_to_subagent",
+        "dispatched_at_caliber": "hand_written_skewed_forward_~39min（A167/P-6）：原值 03:20:00 为前任编排器手填的圆整值，实测超前宿主钟约 39 分钟；按 append-only 不改写原值，另加本注记，retired_at 为机器取值"
       }
     ],
     "round3_returns": {
@@ -9136,6 +9323,40 @@
           "A155",
           "A156",
           "A135"
+        ]
+      },
+      {
+        "id": "FU-31",
+        "at": "2026-11-14T03:59:07+08:00",
+        "status": "OPEN",
+        "item": "M1-04 卡文与派单文必须新增/承接三项页面级真实数据义务：① **AC-001 真 E2E**（A164）：Playwright 打**真实后端**，禁用 `stubApi.ts` 的 `page.route` 合成夹具，覆盖 exchange → list → filter → health 全链，并在 `acceptance.wave1_composite.AC-001` 回填终值；② **截图比特级基线**（A161 / A135）：重采 1440x900 与 1024x768，建立可复现的比特级基线；③ **first-load 骨架形状消费面**（A149 / FU-28）：页面直接使用 `FirstLoadSkeleton` 或经 `variant.render` 承载，禁给 `ViewState` 扩 props。",
+        "owner": "编排器（M1-04 卡文 + 派单文）",
+        "source": "A161 / A164 · Q-VERIFY-WAVE1 的 B1 / B7",
+        "trigger": "M1-04 派单前（wave 4）",
+        "ruling_id": "A161,A164",
+        "why_deferred": "M1-04 status=TODO、当前无在飞 lane；三项义务都需要「真实后端端点 + 真实页面数据」同时就位，M1-04 是最早满足该条件的节点（deps = M0-03, M1-01, M1-02, M1-03）。",
+        "related": [
+          "A135",
+          "A149",
+          "A161",
+          "A164",
+          "FU-28"
+        ]
+      },
+      {
+        "id": "FU-32",
+        "at": "2026-11-14T03:59:07+08:00",
+        "status": "OPEN",
+        "item": "修复 G5c 守卫腐化（A163）：`grep -rn '300[012]' web/*.config.* web/playwright.config.ts` 会命中 `web/vite.config.ts:32` 的**注释**（'host 3000/3001/3002 measured BUSY (NOTE-01)…'），使原本 rc=1 的守卫在 HEAD 变 rc=0。二选一：把模式收窄为只匹配**非注释行**，或改写该注释使其不含 `3000/3001/3002` 字面量。owner 属 F lane 写权（`web/vite.config.ts`）。附带要求：修复时须按 R10-5 固化规则用 `-E`（ERE），并对「rc=1 无命中」型守卫补一条必命中的正向对照。",
+        "owner": "编排器（派 F lane，档位 qwen3.8-flash：单文件注释/模式收窄，无跨模块判断）",
+        "source": "A163 · Q-VERIFY-WAVE1 的 B9 / P-3",
+        "trigger": "M1-04 派单前（`web/vite.config.ts` 属 F lane 写权，随下一次 F lane 派单一并处理）",
+        "ruling_id": "A163",
+        "why_deferred": "非阻塞（不影响任何产品行为，仅影响一条已入库 transcript 的 as-of-HEAD 可复现性）；且该文件属 F lane 写权，编排器不宜自办以免与后续 F lane 冲突。",
+        "related": [
+          "A163",
+          "R10-5",
+          "rule_grep_alternation_requires_ERE"
         ]
       }
     ],
@@ -10570,6 +10791,158 @@
         ],
         "action_taken": "design §11 追记 A157 条；归属 **S2b-1**（S2b 的前置子步骤，与 A153 的白名单守护同批），**单独一次提交**，禁与 S2b 主体交付（`integrity.py`+`deps.py`）混提交。",
         "self_note": "判「是否提升为公共件」的准据不是「有没有第二个使用者」（那只是充分条件），而是「**两处实现若分叉，是否会让某一方的语义失效**」。本例分叉会让 integrity 变成假绿 → 必须提升。反之若分叉只造成风格差异，则应保持私有以免无谓扩公共面。"
+      },
+      {
+        "id": "A158",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B4，独立复验后终裁）",
+        "question": "Q lane 的 A144(c)（写权外未跟踪新文件）实测 = 20 ≠ 0：20 件全在 `evidence/M0/ORCHESTRATOR/r10d-volta-s3/raw/`，不在派单授权的排除清单内。lane 如实报为未通过、未自行扩大排除范围，请裁定：扩排除清单，还是改在静默点重测？",
+        "ruling": "**编排器认领全部 20 件的归因，判 Q lane 的 A144 三段式实质全 0（通过）；同时把根因定性为编排器的调度缺陷而非 lane 缺陷，并固化「静默点重测」规则（不采用「无脑扩排除清单」的方案）。** 理由：① lane 的归因是**时间戳实证**而非口说（该目录 02:39:32 创建、文件 02:40:54–02:41:03 写入，晚于其最后一次落盘 02:32:56 六分钟以上），且该计数在其复核期间由 18→20 增长，证明是活体并发写入 —— 编排器复核该时间线与本轮 R10-D 全表复验脚本的落盘时刻完全吻合，**归因成立**；② 扩排除清单会把「编排器自己的在飞产物」变成 Q lane 的永久盲区，等于让复核方对编排器的写权面失去监督，方向错误；③ 正解是**消除并发窗口**，而非放宽判据。",
+        "evidence": [
+          "编排器复核：`evidence/M0/ORCHESTRATOR/r10d-volta-s3/` 正是本轮全表复验脚本 `.orch_tmp/ft_r10d.py` 的落盘目录（v1 于 02:40 前后写出 18 件 raw，v2 重跑补齐至 18 件 + fulltable.log + gates.json），与 lane 实测的 20 件同源",
+          "lane 的 A144(a)=1（`orchestrator/state.json`，`51 4`，mtime 02:29:31）同样归因编排器：diff 内容正是编排器在写该 lane 自己的派单记录（task/lane/budget/write_set/hard_deny）+ 7 行 M0-04/Volta；编排器核对 state.json 的写入历史确认属实 → **归 lane 的 (a) = 0**",
+          "lane 的 A144(b)（写权内 deleted）= 0，全为新建，平凡成立",
+          "lane 未自行扩大排除范围、且把「再排除 orchestrator 目录则为 0」明确标注为 **NOT authorized - shown, not applied** → 越界自证纪律执行到位（A144 三段式的立法意图达成）"
+        ],
+        "action_taken": "① 台账记 Q lane 的 A144 实质结论为 (a)=0/(b)=0/(c)=0，并保留其原始实测值与归因（不改写 lane 的原始记录，append-only）；② 固化规则 `rule_orchestrator_evidence_must_not_overlap_q_lane_window`：编排器的全表复验/证据落盘**不得**与 Q lane 在飞窗口重叠；若不可避免，必须在派单文的 `authorized_untracked_exclusion` 中**逐路径**预授权编排器自己的证据目录，并在 Q lane 回报后由编排器认领归因；③ 追加要求：Q lane 的 A144(c) 必须在**静默点**（自身全部交付落盘后、且编排器确认无并发写入）复测一次并记为 final re-measure（lane 本轮已自发这么做，§5.1，值得固化为标准动作）。",
+        "self_note": "这是本仓第一例「**编排器自己污染了复核方的越界自证**」。教训比 lane 侧更深：复核判据的设计必须假定编排器也在同一个工作树里并发写盘。凡「以工作树洁净度为判据」的守卫，都必须显式区分「谁的在飞产物」，否则就会把编排器自己的行为算成 lane 的越界。已把「静默点复测」与「逐路径预授权」写进规则。"
+      },
+      {
+        "id": "A159",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B3 / P-1，独立复验后终裁）",
+        "question": "派单给 Q lane 的 gate1（`bash scripts/doctor.sh` 期望 `RESULT=HEALTHY`）与 gate4（`alembic current` 期望 `head=0001_initial_schema`）在**裸树上达不到自己的期望值**：实测 doctor → `PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED`、alembic current → rc=0 但无 revision 行。根因是默认 data dir `~/.local/share/campaignlab` 不存在。要不要给 gate 命令补 `CAMPAIGNLAB_DATA_DIR` + 预迁移，还是把期望值放宽为「裸树 DEGRADED」？",
+        "ruling": "**立缺陷 D-039（severity=MAJOR，归属编排器的门禁目录/派单文模板），采用「补 provision + 预迁移」方案，不放宽期望值。** 理由：① 放宽期望值为 DEGRADED 会把「未迁移」这一真实故障态洗白成通过判据，直接削弱 AC-035「锁与运行环境清楚」与 FU-7 的 UNMIGRATED 取证面 —— 门禁的价值就在于它能判红，降低期望值等于自毁判据；② Q lane 已实测证明补上 provision 后**精确复现**两个期望值（`RESULT=HEALTHY` / `PASS=5 WARN=0 FAIL=0`、`0001_initial_schema (head)` rc=0），方案可行且已验证；③ 这**反证了 S5 lane 的 HEALTHY 自报为真**（其 ac.md:5 已写明用 `CAMPAIGNLAB_DATA_DIR` 注入），故不构成对产品代码或既有证据的质疑。定性：**派单/门禁目录缺陷，不是产品缺陷** —— 未迁移的默认 data dir 本就**应该**报 DEGRADED，doctor 的行为正确且提示可操作。",
+        "evidence": [
+          "Q lane 实测原始件：evidence/M0/Q-VERIFY-WAVE1/raw/gate1-doctor.txt、raw/gate4-alembic-current.txt（按派单原文执行的结果）",
+          "Q lane 修正后复跑：raw/q-cmdlog.jsonl 的 tags H1/H2/H3 —— `CAMPAIGNLAB_DATA_DIR=/tmp/qverify-data` + 建 OPERATIONS.md 的 7 个子目录 + `uv run --no-sync alembic -c migrations/alembic.ini upgrade head` → `current` 得 `0001_initial_schema (head)` rc=0、doctor 得 `PASS=5 WARN=0 FAIL=0 RESULT=HEALTHY` rc=0",
+          "既有正面参照：evidence/M0/M0-02/ac.md:5 记载 S5 lane 即用 `CAMPAIGNLAB_DATA_DIR` 注入 → 期望值 HEALTHY 本身是有据的，缺的是派单文没把 provision 步骤写进命令",
+          "本轮编排器全表 G14 实测 `RESULT: HEALTHY` rc=0、G14b `PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED` rc=0 —— 两个 doctor 面结论不同，正因为 `scripts/doctor.sh` 与 CLI doctor 检查面不同（rule_same_name_tools 要求分字段记录）；该差异属既有口径，不在本缺陷范围内，但 D-039 的修复必须同时覆盖两个面"
+        ],
+        "action_taken": "① 立 D-039（owner=编排器，severity=MAJOR，blocking=false）：门禁目录与所有 Q lane 派单文中的 doctor / alembic 类 gate 命令必须自带 provision（`CAMPAIGNLAB_DATA_DIR` 指向 scratch 目录 + 建 7 子目录 + `upgrade head`）再断言期望值；② 严重度**上调**为 MAJOR（Q lane 建议 Medium）：理由是它构成**每个后续 wave 出口的常驻假 RED 风险**，而本项目共 11 个 wave、每个 wave 出口都要跑 Q lane，复利面大；③ 立规 `rule_gate_command_must_be_self_provisioning`：任何写入派单文的 gate 命令必须在**裸克隆树**上可复现其期望值，禁依赖宿主既有状态。",
+        "self_note": "派单文里的 gate 命令是**契约**，不是提示。本轮暴露的形态是「命令与其期望值不自洽」—— 写命令的人假定了一个未被命令建立的环境。通用检查法：把每条 gate 命令连同其期望值，在 `git clone` 出来的裸树上跑一遍；跑不出期望值就是派单缺陷。该检查应加入派单前置条件清单。"
+      },
+      {
+        "id": "A160",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B5 / P-2，独立复验后终裁）",
+        "question": "gate4（`alembic current`）在默认 env 下有**宿主副作用**：创建了 `~/.local/share/campaignlab/state/campaignlab.db`（0 字节，02:32:51），导致随后重跑 gate1 的 WARN 文案改变（data_dir「does not exist」→「writable but missing OPERATIONS.md subdirs」；database「does not exist」→「intact but no alembic_version」）。两个 gate 因此既不幂等也顺序相关。lane 未删该产物（删除也是变更，不归它裁）。",
+        "ruling": "**立缺陷 D-040（severity=MINOR，归属 M0-02 的 `migrations/env.py` / alembic 装配 + 编排器的 gate 排序），并追认 lane「不删」的处置正确。** 理由：① 一个**看似只读**的查询（`alembic current`）产生写副作用，违反最小惊讶原则，也让任何依赖它的门禁失去可重复性；② 严重度定为 MINOR 而非 Q lane 建议的 Medium —— 因为副作用落在**仓库外**（`~/.local/share/campaignlab`），对 A144 三段式、对提交树、对产品行为均无影响，且 D-039 修复后（gate 命令自带 `CAMPAIGNLAB_DATA_DIR` 指向 scratch 目录）该副作用会自然落到临时目录、不再污染宿主默认位置，即 D-040 的**主要触发路径被 D-039 的修复覆盖**；③ 但仍需独立立单，因为「只读命令有写副作用」这一性质本身在 M5-01/M5-02 的取证与 `verify_artifact_index` 类只读校验里会再次咬人。",
+        "evidence": [
+          "Q lane 实测：raw/q-cmdlog.jsonl tags G1/G2 记录了 gate1 在 gate4 前后的 WARN 文案变化；`~/.local/share/campaignlab/state/campaignlab.db` mtime 02:32:51、0 字节",
+          "编排器复核归因链：`alembic current` → `migrations/env.py` 建 engine 并 connect → SQLite 在 connect 时即创建 db 文件（SQLite 的既定行为），故副作用来自「连接」而非「查询」本身；这与 A156 追加的 doctor 同盘检查属同一类「装配期即产生文件系统效果」的形态",
+          "lane 明确记录「我没有删它（删除也是变更，不归我裁）」→ 与 A144 三段式、只读区纪律一致，处置正确"
+        ],
+        "action_taken": "① 立 D-040（owner=M0-02 的 migrations 装配面 + 编排器 gate 排序，severity=MINOR，blocking=false）；② 修复方向（不在本轮实施，避免动 M0-02 已 DONE 的交付面）：`alembic current` 类只读命令应可在不落盘的前提下报告状态，或由 gate 命令统一注入 scratch `CAMPAIGNLAB_DATA_DIR`（随 D-039 一并落地）；③ 编排器侧立规 `rule_readonly_gate_must_be_idempotent`：任何被标为「只读」的 gate 必须在连续两次执行间保持宿主与仓库状态不变，派单前须实测两遍并比对；④ gate 排序要求：有副作用的 gate 必须排在其观测面相关 gate **之后**，或在派单文标注顺序依赖。",
+        "self_note": "「只读」是一个**需要实证的性质**，不是一个可以假定的标签。本轮的教训是：编排器在写派单文时把 `alembic current` 当只读命令排在 doctor 之前，正是这个未实证的假定造成了顺序依赖。已把「只读性需实测两遍比对」写进规则。"
+      },
+      {
+        "id": "A161",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B7，独立复验后终裁）",
+        "question": "截图 gate 的**比特级可复现**取证需要执行 `web/tests/e2e/ui-01-screenshots.spec.ts`，而它会写入 `evidence/M0/ui/**` 与 `evidence/M0/M0-03/**` —— 两处都在 Q lane 的 hard_deny 内。是给一次性写权重采，还是接受「尺寸 + 签名 + 工具链 + 用例发现」级取证作为 M0 出口？",
+        "ruling": "**接受现有取证级别作为 M0 出口充分条件，不给 Q lane 一次性写权；比特级复现随 A135 一并 deferred_to M1-04。** 理由：① Q lane 的取证已达**工件级**：解析 PNG IHDR 实测尺寸 1440x900 / 1024x768、签名有效、Playwright 工具链真可用（1.65.0 rc=0、browsers.json 要 rev 1254 且缓存内 chromium-1254 + headless_shell-1254 对得上）、`--list` rc=0 证明用例可被发现 —— 这四条已覆盖「截图确实由真实浏览器按真实视口产出」的全部可伪点；② 比特级复现要求**重跑并覆写既有证据件**，这与 Q lane 的只读复核角色根本冲突（复核方一旦能改写被复核面，其判定就失去独立性），给一次性写权是**用判据独立性换取一项并不缺的证据**，得不偿失；③ A135 已把 M0-03b/S4 的截图取证推迟到 M1-04（页面真实数据接入后），比特级复现在那之前本就无意义（当前页面走 stub 夹具）。",
+        "evidence": [
+          "Q lane 的工件级取证：raw/q-cmdlog.jsonl 内的 PNG IHDR 解析记录、`playwright --version` rc=0、`browsers.json` rev 与缓存目录比对、`--list` rc=0",
+          "两处副本字节相同已由 lane 查明为**设计如此**（ui-01-screenshots.spec.ts:18-19 单次运行双落点），并附 sha256 程序化比对（2f3bf97a… / 35981b0e…）→ 排除「漂移」误判，已列入 lane 的「非缺陷」清单",
+          "A135（既有裁定）：M0-03b/S4 截图推迟至 M1-04；A149/FU-28 亦把 first-load 骨架形状的消费面推到 M1-04 → 页面真实数据面在 M0 出口尚未存在，比特级基线无稳定对象"
+        ],
+        "action_taken": "① 截图 gate 记 PASS_WITH_TODO，`deferred_to: M1-04（A161 / A135）`；② FU-31 承接：M1-04 派单文必须包含「重采 1440x900 与 1024x768 截图并建立比特级基线（真实后端数据，非 stub）」；③ 立规 `rule_q_lane_never_gets_write_on_reviewed_surface`：Q lane 的 hard_deny **不得**为其自身取证需要而临时开口；若某项取证只能通过改写被复核面获得，则该项取证在 M0 出口判为「工件级充分、比特级 deferred」，并转交具备写权的开发 lane。",
+        "self_note": "复核方的写权是**不可让渡的独立性资产**。本轮 lane 主动上报冲突而非自行开口，是正确的；编排器的正确回应也不是「特批一次」，而是重新界定该项取证在**本阶段**需要达到的强度。取证强度应与阶段匹配：M0 是骨架期，工件级足够；M1-04 页面接真实数据后，才谈得上比特级基线。"
+      },
+      {
+        "id": "A162",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B8，编排器侧事实认定）",
+        "question": "M0-02 翻 DONE 的第三条前置是「等 Mencius 交回 web/**」。Q lane 报「看似成立」（HEAD 上 web/** 已完整、M0-03 的 S1–S10 全 DONE），但明示这是**编排器侧事实**、无法从工作树测得，故不自裁。",
+        "ruling": "**认定该前置已满足。** 依据是编排器侧的台账与提交历史（非工作树推断）：M0-03b（lane F / Mencius）已于提交 `69db892` 回收并入库，其 12 件交付经编排器独立复验合格，`resume.in_flight_agents_previous` 中该 lane 的 `retired_at` / `result=DONE` 已登记，`web/**` 的写权已随 lane 退役而释放；M0-03 的 S1–S10 亦全为 DONE。故 M0-02 的三条前置（① wave1 出口 Q 复核 ② AC 证据回填 A109 ③ web/** 交回）**全部满足**。",
+        "evidence": [
+          "提交历史：`69db892 feat(M0-03b/S2+S3)` 已入库（HEAD 链 …→eaf02dd→69db892→1675d46→f9ad2f0）",
+          "台账：resume.in_flight_agents_previous 内 Mencius(Lagrange-R9) 条目 retired_reason = 「已回收：12 件交付经编排器独立复验合格并入库（R10-B）」、result=DONE",
+          "工作树：Q lane 实测 web/** 完整、M0-03 S1–S10 全 DONE（与本认定一致，但本认定的**权威依据是台账与提交历史**，工作树只是佐证）"
+        ],
+        "action_taken": "M0-02 的三条 DONE 前置全部认定满足 → 本提交把 `tasks[\"M0-02\"].status` 由 IN_PROGRESS 翻为 **DONE**（连同 M0-03，依 A109 的唯一合法路径 = Q lane wave 出口复核报告）。",
+        "self_note": "lane 拒绝自裁一个它测不到的事实，是正确的角色纪律（B8 的处置方式本身值得肯定）。编排器的对应义务是：**凡 lane 上报「属编排器侧事实」的项，必须在同一轮内给出明确认定并留痕**，禁让它悬着 —— 悬置的前置条件会让任务永久停在 IN_PROGRESS。已按此处置。"
+      },
+      {
+        "id": "A163",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B9 / P-3，独立复验后终裁）",
+        "question": "**守卫腐化**：已入库的 M0-03/S5 transcript 记录 `[G5c] grep -rn '300[012]' web/*.config.* web/playwright.config.ts` → `rc=1 expect=1 OK`、无输出；但在 HEAD `1675d46` 逐字重跑得 rc=0、1 命中 = `web/vite.config.ts:32` 的**注释**（'host 3000/3001/3002 measured BUSY (NOTE-01)…'）。已入库 transcript 是否应在 wave 出口承担 as-of-HEAD 复检义务？",
+        "ruling": "**① lane F（S5）无罪，判定为证据陈旧 / 守卫腐化，不是假绿、不是造假、不是产品缺陷。② 确立「as-of-HEAD 复检义务」：wave 出口的 Q lane 必须对已入库 transcript 中被当作通过判据的守卫做 as-of-HEAD 重跑，红点按「陈旧」而非「造假」归类并定位引入提交。③ 本例的具体修复归 M0-03b 面（收窄 grep 模式使其不匹配注释，或改写该注释），由 FU-32 承接，不在本轮实施。** 采信 lane 的祖先核验而非表象：`git merge-base --is-ancestor c9ef997 9832fd1` → NOT_ANCESTOR，且 `git show 9832fd1:web/vite.config.ts | grep -cE '300[012]'` = 0 vs HEAD = 1 → 采集时点该行确实不存在，rc=1 当时为真。",
+        "evidence": [
+          "Q lane 的祖先核验与双 blob 比对：raw/q-cmdlog.jsonl tags P3-G5c-verbatim / P4-c9ef997-ancestry / Q1-c9-ancestry-full / Q2-vite-at-S5 / Q3-vite-at-HEAD",
+          "被引证据件：evidence/M0/M0-03/S5-gate-transcript.txt 的 G5c 区块",
+          "lane 的自我更正记录：一开始怀疑 S5 假绿，**查祖先后推翻自己**并在文档中显式洗清 lane F —— 符合 rule_no_trust_handoff_summary_assertions 的立法意图（断言必须实测复核）"
+        ],
+        "action_taken": "① 固化规则 `rule_committed_transcript_requires_as_of_head_recheck`：wave 出口 Q lane 必须把「已入库 transcript 中被引用为通过判据的守卫」逐条 as-of-HEAD 重跑；出现红点时**必须**用 `git merge-base --is-ancestor` + 双 blob 比对定位引入提交，据此区分「陈旧」与「造假」，禁只凭当前 rc 下结论；② 立 FU-32：把 G5c 的模式收窄为只匹配非注释行（或改写 `web/vite.config.ts:32` 的注释），owner=M0-03b 面，trigger=M1-04 派单前（该文件属 F lane 写权）；③ 追加通用要求：凡以「grep 无命中」为通过判据的守卫，其模式必须排除注释与文档字符串，否则会随任何提及该字面量的注释而腐化 —— 本例正是这一形态。",
+        "self_note": "「grep 无命中」型守卫有一类**结构性脆弱**：它把整个文件（含注释）当作被检面，于是任何后来者写一句提到该字面量的注释就会让守卫变红，且红得「看起来像真的违规」。这与 R10-5（BRE 交替符假绿）是同一族问题的两面：**假绿来自模式写错，假红来自被检面过宽**。固化要求：此类守卫必须显式声明被检面（如只检非注释行、只检特定 AST 节点），并在守卫旁注明「本守卫对注释敏感/不敏感」。"
+      },
+      {
+        "id": "A164",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B1，独立复验后终裁）",
+        "question": "**唯一实质缺口 B1**：AC-001 的真 E2E（Playwright 打真实后端，而非 `stubApi.ts` 的 `page.route` 合成夹具）当前**无人认领**。wave1 的复合 AC-001 = HTTP 腿 PASS + 页面腿 stub-only，故整体尚未完全消解。lane 无法自行派任务，请裁定归属。",
+        "ruling": "**判归 M1-04**（deps = M0-03, M1-01, M1-02, M1-03），并立 FU-31 改卡；复合 AC-001 在 wave1 出口记 **PASS_WITH_TODO**（不记 FAIL、也不记 PASS）。选 M1-04 而非更早或更晚的理由：① 它是**最早**同时具备两个必要条件的任务 —— 真实后端端点（M1-01/02/03 交付 import/compare 等 op）与真实页面面（M0-03 交付组件与路由），在此之前做真 E2E 只能继续 stub；② 它已在 A135 / A149 / A161 三项裁定中承接了「页面接真实数据后」的同类义务（截图比特级基线、first-load 骨架形状消费面），把真 E2E 放这里可与那两项共用同一次真实数据环境搭建，边际成本最低；③ 不放 M5-02（47 条 AC 的终验任务）—— 那会让 AC-001 的缺口一直悬到项目末期，且 M5-02 的角色是**终验**而非补做实现级取证。",
+        "evidence": [
+          "DAG 实测：M1-04 deps = ['M0-03','M1-01','M1-02','M1-03']，wave 4；M0-03 本轮翻 DONE，M1-01..03 在 wave3 L1 lane 串行 → M1-04 是第一个「后端端点 + 页面面」同时就位的节点",
+          "Q lane 实测：当前页面侧 277 tests 全走 `stubApi.ts` 的 `page.route` 合成夹具，playwright-readiness.json **自带该 caveat** → 证据面本身诚实，不存在「用 stub 冒充 E2E」的问题",
+          "既有裁定的一致性：A135（截图推迟 M1-04）、A149/FU-28（first-load 骨架形状归 M1-04 等四张页面卡）、A161（截图比特级基线归 M1-04）→ 真 E2E 归 M1-04 与既有排期同构，不新增串行依赖"
+        ],
+        "action_taken": "① `tasks[\"M0-03\"].gates[\"AC-001 页面侧\"]` 与 `tasks[\"M0-02\"].gates[\"AC-001\"]` 均记 rc=0，复合口径写入 `acceptance.wave1_composite.AC-001 = PASS_WITH_TODO`，`deferred_to: M1-04`；② 立 FU-31：M1-04 卡文与其派单文必须新增 gate「AC-001 真 E2E：Playwright 打真实后端（禁 stubApi 的 page.route 夹具），覆盖 exchange → list → filter → health 全链」，并在 `acceptance.wave1_composite.AC-001` 回填终值；③ 本裁定不阻塞 M0-02 / M0-03 翻 DONE —— 两任务的 gate 全为 PASS / PASS_WITH_TODO、0 FAIL，PASS_WITH_TODO 的语义即「本阶段判据已满足、余留义务已定址且有主」。",
+        "self_note": "「无人认领的余留义务」是长程无人值守里最危险的一类缺口：它不会让任何门禁变红，只会让某条 AC 永远停在「差一点」。Q lane 把它显式报为 B1 而非默默记 PASS，是本波最有价值的一次判定纪律执行。编排器的对应义务是**当场给出 owner + 写进那张卡的 gate**，禁只记 followup（同 A156 的 self_note）。"
+      },
+      {
+        "id": "A165",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B2，独立复验后终裁）",
+        "question": "B2：M0-02 的 AC-034 余留项「跨工作区 ID → 404」标注 `deferred_to: M0-04/S4`，请确认那张任务卡**真的**承接了该义务。",
+        "ruling": "**确认承接，并把它升格为 S4 的显式派单要求（不只靠 deferred_to 标注）。** 编排器复核：M0-02 的 5-op 切片中确无 op 取 workspace 路径参数，故该项在 M0-02 无触发面、deferred 是正确处置；而 M0-04/S4 交付 `listJobs` / `getJob` / `cancelJob` / `retryJob` 四个端点，其中 `getJob` / `cancelJob` / `retryJob` 均取 job 路径参数并须在跨工作区访问时返回 404 `RESOURCE_NOT_FOUND`（`domain/errors.py` 的既有 code，不新增），故 S4 是该义务的**唯一自然落点**。但仅凭 `deferred_to` 字符串不足以保证落地 —— 它不是卡内 gate，lane 不一定会读到。",
+        "evidence": [
+          "Q lane 实测：M0-02 切片的 5 个 op 无一取 workspace 路径参数 → 无触发面，deferred 成立",
+          "既有实现面：`RESOURCE_NOT_FOUND` 在 `domain/errors.py` 的 14 个 DomainError 子类内（ResourceNotFound），20 码注册表已含该 code → S4 无需扩注册表",
+          "S4 的交付面（M0-04 卡内档位表）= `src/campaignlab/api/jobs.py`，正是这四个端点的落点"
+        ],
+        "action_taken": "① S4 派单文列入硬性 gate：「跨工作区访问 `getJob` / `cancelJob` / `retryJob` 必须 404 `RESOURCE_NOT_FOUND`，禁 403（避免泄露资源存在性）」并附负例用例名；② `tasks[\"M0-02\"].gates[\"AC-034\"].deferred_to` 保留 `M0-04/S4` 原值不改写，另在 S4 的 subtask 说明中登记该承接关系；③ 立规 `rule_deferred_to_must_become_a_gate`：任何 `deferred_to` 标注在**承接卡派单前**必须由编排器转写为该卡的一条显式 gate，禁以标注代替 gate（标注无强制力，lane 未必读到）。",
+        "self_note": "`deferred_to` 是**台账里的字符串**，不是**卡里的判据**。本轮之前它一直只是前者。已把「转写为 gate」定为强制动作 —— 这与 A156 / A164 的 self_note 是同一条原则的第三次出现：凡余留义务，必须落到某个具体子任务的**可判定 gate** 上，否则等于没派。"
+      },
+      {
+        "id": "A166",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 P-4 / P-5，独立复验后终裁）",
+        "question": "两处文档漂移：**P-4** 台账把 `orchestrator/handoff/M0-03-public-components.md` 记为「303 行 / 26803 B」，实测 303 行 / **27115 B**（+312 B）；**P-5** 该文档 :20/:30/:255 断言 `web/src/components/state/` 不存在、:20 还附带一个期望输出 `STATE_DIR_ABSENT` 的守卫，而 HEAD 上该目录已有 6 个文件（守卫现在会打印 `STATE_DIR_EXISTS`）。",
+        "ruling": "**两项均判为文档漂移，不是产品缺陷，不立缺陷单；由编排器本轮定点更正（P-4）与 append-only 追加 as-of 标记 + 前向指针（P-5）。** 定性依据：① P-4 的漂移有明确成因且可追 —— `git show --numstat 0419505 -- orchestrator/handoff/M0-03-public-components.md` = `1 1`，即 S10 登记指针**之后**，R9-C/D-037 的更正替换了其中一行，字节数随之变化而行数不变；这是「指针登记与后续更正未同批」的时序问题，与 D-038 同类但量级小得多（+312 B，且行数仍相符）；② P-5 的**冻结覆盖并无缺口** —— `state/**` 的 6 件已由 `M0-03b-freeze.md:108-119` 另行冻结，故这是一致性/陈旧问题而非治理漏洞；但它有实际杀伤力：后续 lane 若逐字跑 :20 的守卫会得到一个意外 RED，形态与 A163 的守卫腐化同族。",
+        "evidence": [
+          "P-4：Q lane 程序化 `os.stat` 实测 27115 B（raw/q-cmdlog.jsonl）；编排器复核 `git show --numstat 0419505 -- <该文件>` = `1  1`，证实「S10 登记后又被改过一行」",
+          "P-5：`git show --numstat 69db892 -- web/src/components web/tests` 显示 6 个组件文件 + 6 个 spec 文件全为纯追加；`orchestrator/handoff/M0-03b-freeze.md:108-119` 已冻结这 6 件 → 覆盖无缺口",
+          "Q lane 的严重度建议：P-4 = Low、P-5 = Low-Medium（理由是未来 lane 逐字跑守卫会吃到意外 RED）→ 编排器采纳该分级，但因两者皆非产品面且均可由编排器当轮修好，故不立单、直接更正"
+        ],
+        "action_taken": "① 台账中该指针的字节数更正为实测 27115 B，并按「历史值只加注不改写」保留 26803 于同键的 note 中（体例同 D-038）；② `M0-03-public-components.md` **纯 EOF 追加** as-of 标记与前向指针：注明 :20/:30/:255 的「state/ 不存在」为 **S10 采集时点（commit 5d16d4d）的事实**，HEAD 上已由 M0-03b/S2 落地 6 件、其冻结权威在 `M0-03b-freeze.md:108-119`，:20 的守卫**禁再逐字执行**；原文一字未改；③ 立规 `rule_snapshot_doc_requires_as_of_marker`：凡记录「某路径不存在 / 某文件 N 行 N 字节」这类**时点快照**的冻结文档，必须在同处标注采集 commit，且后续任务落地该路径时由编排器追加前向指针，禁让快照静默失真。",
+        "self_note": "P-4 与 P-5 是同一根因的两个表现：**快照型断言没有绑定采集时点**。字节数、行数、「目录不存在」都是时点事实，一旦写下就开始腐烂。项目里已有正确的范式（counts 的 `measured_after` / `previous_values_*`、gates 的 `measured_at` + history），只是没推广到冻结文档。已把 as-of 标记定为强制。"
+      },
+      {
+        "id": "A167",
+        "round": 10,
+        "at": "2026-11-14T03:59:07+08:00",
+        "source": "编排器（Round 10-E：回收 Newton/Q-VERIFY-WAVE1 时其上报 B6 / P-6，独立复验后终裁）",
+        "question": "台账时间戳超前宿主钟：Q lane 会话期间写入的 state.json 带 `updated_at` / `dispatched_at` = `2026-11-14T03:20:00+08:00`，而当时宿主钟读 `2026-11-14 02:41:10 +0800`，约 39 分钟超前。",
+        "ruling": "**确认成立，定性为编排器侧流程缺陷（手填时间戳），非 lane 问题、非产品缺陷；本轮起所有台账时间戳一律机器取值，并修正该 lane 的 dispatched_at 记录方式。** 复核确认：本轮编排器自身写入的 `NOW` 全部由 `time.strftime` 从系统钟取得（如 A152–A157 的 at、Volta 的 retired_at = 03:09:58、R10-7 = 03:15:10），而 `03:20:00` 这一整点是**手填的圆整值**，正是超前的来源。危害：若台账时间戳被用于排序或计算证据年龄，会产生错序（本轮 Q lane 的 A144 归因就依赖 mtime 时序，若它信了台账时间戳而非文件 mtime，归因会反）。",
+        "evidence": [
+          "Q lane 实测：raw/q-cmdlog.jsonl tags L2-state-added-lines / L5-state-mtime-vs-now；state.json 的 mtime 与宿主 `date` 的差值",
+          "编排器复核：`03:20:00` 为整点圆整值（手填特征），而本轮所有机器取值时间戳均为非圆整秒（03:09:58、03:15:10、03:25:xx）→ 两类来源可区分",
+          "反证归因链未受污染：Q lane 的 A144 归因用的是**文件 mtime**（02:32:56 vs 02:39:32/02:40:54–02:41:03）而非台账时间戳，故其结论仍然成立（见 A158）"
+        ],
+        "action_taken": "① 固化规则 `rule_ledger_timestamp_must_be_machine_derived`：state.json 内一切时间戳（updated_at / dispatched_at / retired_at / measured_at / at / found_at / closed_at）必须由脚本从系统钟取值写入，**禁手填、禁圆整到分**；写入脚本须在输出里回显所用时间戳以便审计；② 本轮 Q lane 的 `dispatched_at` 保留原值 `03:20:00`（append-only，不改写历史），另在其退役条目加 `dispatched_at_caliber: hand_written_skewed_forward_~39min（A167）` 与机器取值的 `retired_at`；③ 时序判定一律以**文件 mtime 与 git 提交序**为权威，台账时间戳仅作参考 —— 已写入规则。",
+        "self_note": "手填时间戳在有人值守时无害（人会自己纠错），在无人值守长程里则是**静默的排序毒药**。本轮侥幸没出错，只因为 Q lane 选择了 mtime 而非台账时间做归因依据 —— 这是 lane 的judgment 好，不是流程可靠。已把「机器取值」定为硬规则，并显式规定时序权威为 mtime / git 序。"
       }
     ],
     "round7_predispatch": {
@@ -12213,6 +12586,38 @@
           "A109",
           "D-009"
         ]
+      },
+      {
+        "id": "R10-8",
+        "at": "2026-11-14T04:00:09+08:00",
+        "what": "编排器自写的 R10-E stage-1 驱动 `.orch_tmp/r10e_stage1.py` **在 STEP4h 抛 AssertionError 终止**：该步用 `assert blob.count(\"26803\") == 2` 断言台账里陈旧字节数指针的出现次数，实测为 **5**。崩溃点在 STEP5 写盘之前，故 `state.json` **完全未被改动**；但 STEP1（Newton 原始回报 EOF 追加至 `round10-lane-returns-raw.md`，86 add/0 del）、STEP2（D-039/D-040 两件 .md）、STEP3（`M0-03-public-components.md` 的 as-of 标记 EOF 追加，17 add/0 del）**已落工作树**，且三步**均无幂等守卫**——盲目重跑会把两段 EOF 追加**重复写入**，直接污染两份只增不改的存档。",
+        "rule_broken": "无既有规则被违反 —— 与 R10-6 同属**规则空白**：`rule_evidence_writer_preflight` 只管「输出路径先 assert + 增量落盘 + py_compile」，未覆盖两类新形态：① 断言常数取自**改动前**语料却用于**改动后**语料（作用域错配）；② 会写工作树的步骤缺少崩溃后可安全重跑的幂等守卫。",
+        "detection": "stage-1 实跑时由断言自身拦下（`AssertionError: 5`）；编排器随后**程序化枚举全部 5 处出现位置**定位根因，而非直接放宽断言：2 处来自 `state.json` 既有的 P1/P2 指针，3 处来自**本轮新增**的台账文本（A166 的 question 与 action_taken 各 1、门禁 verdict 文本 1）。",
+        "correction": "① **改断言口径**：不再对裸字面量计数，改为断言两个**唯一指针模式** `M0-03-public-components.md(303行/26803B)` 与 `M0-03-public-components.md（303 行/26803B）` 各恰 1 处，并显式断言 `c_before == 5`（2 陈旧指针 + 3 本轮新增台账文本）；② **加不变式断言**：替换后 `blob.count(\"26803\")` 必须**等于**替换前（历史值只加注不改写，注记文本自身含 26803 故总数守恒）、`/26803B)` 与 `/26803B）` 必须**双双不再出现**（无裸陈旧指针残留）、`27115B` 计数 >= 2；③ **补幂等守卫**：STEP1 以 `## lane Q · Newton · agent_id 01a1d62a-…` 为 marker，命中即跳过追加，并**同时断言 `old_raw.endswith(add)`**——即已落盘的那一段与本次 payload 字节级相同，从而证明跳过是安全的、崩溃那次未写坏任何内容；STEP3 以 `## as-of 标记与前向指针（A166 / P-5` 为 marker 同理跳过；④ 重跑前过 `python3 -m py_compile`；⑤ 实跑结果：STEP1/STEP3 双双打印 SKIP、numstat 仍为 `86 add / 0 del` 与 `17 add / 0 del`（**零重复追加**），STEP4a–4i 全绿，stage1 快照落盘。",
+        "impact": "**无台账失真、无数据损失、无错误裁定**：state.json 在崩溃时未被触碰（STEP5 在其后），三份已落工作树的产物被守卫验证为完整且正确，原样保留后继续入库。代价为 1 轮定位诊断（4 次只读探查）与一次重跑。**次生风险已被主动消除**：若当时盲目重跑，两份只增不改的存档会各多出一段重复内容，而重复段落在 append-only 语义下属**不可逆污染**（无法在不改写历史的前提下清除）。",
+        "rule_added": "rule_scratch_driver_assertions_must_be_scope_qualified：编排器自用脚本中任何对「字面量/子串出现次数」的断言，① 常数必须由**同一语料的同一次测量**得出，禁用改动前测得的常数去断言改动后的语料；② 优先断言**唯一模式**（带上下文的完整指针串）而非裸数字；③ 若目的是「不丢历史」，必须同时给出**不变式**（替换前后总数守恒）与**负向断言**（陈旧形态不再出现）。rule_scratch_driver_steps_must_be_idempotent：任何会写工作树的步骤必须自带 marker 幂等守卫，且守卫命中时必须**验证已落盘内容与本次 payload 一致**（如 endswith 断言）后才可跳过；使长程无人值守流程在任意步骤崩溃后都能安全重跑。立规原因：R10-8。",
+        "related": [
+          "rule_evidence_writer_preflight",
+          "rule_ledger_write_structure_preserving",
+          "R10-6",
+          "A166"
+        ]
+      },
+      {
+        "id": "R10-9",
+        "at": "2026-11-14T04:00:09+08:00",
+        "what": "stage-1 驱动的 STEP4h 为做「字符串级定点替换」而执行 `blob = json.dumps(s)` → `s2 = json.loads(blob)` → `s = s2`，**把 `s` 重新绑定成了一个全新对象**；而模块级别名 `r`（第 140 行 `r = s['resume']`）仍指向**旧的** resume 字典。于是 STEP4i 的 `r['round10e_verification'] = {…}` 写进了**即将被丢弃的旧对象**，STEP5 落盘的却是新对象 `s`——该键**静默丢失**。更糟的是脚本仍以 rc=0 正常结束并打印 `STAGE1_OK … bare_null=96`，因为它读的也是同一个旧别名 `r`，值确实存在。**这是一次「成功假象」下的证据丢失**。",
+        "rule_broken": "无既有规则被违反 —— 又是一处**规则空白**。`rule_ledger_write_structure_preserving` 约束的是「怎么写」，`rule_evidence_writer_preflight`（R10-6 立）约束的是「路径先 assert + 增量落盘 + py_compile」，两者都未覆盖「对象被整体重建后，既有别名是否还指向活对象」这一形态。",
+        "detection": "**不是**被 stage-1 自己的任何断言发现的，而是被下游 stage-2 在读该键时抛 `KeyError: 'round10e_verification'` 撞出来的 —— 即**跨阶段消费方**充当了守门人。若 stage-2 恰好不读这个键，整块 wave1 出口复核记录（11 门回填依据、6 项问题的归因认领、A158–A167 索引、本轮不重跑全表的理由）就会**永久消失且无人察觉**，台账只会显示 M0-02/M0-03 翻 DONE 却查无判据来源。",
+        "correction": "① 在 `s = s2` 之后**立即重绑定** `r = s['resume']` 并加活体断言 `assert r is s['resume']`；② 把 stage-1 的收尾从「打印成功」升级为「磁盘可验证」：写盘后**重新从磁盘读回** `json.loads(out.read_text())`，逐项断言本轮全部预期新增键与终态（round10e_verification 存在且 gates_backfilled == 11、A167 为末条裁定且裁定总数 +10、M0-02/M0-03 == DONE、in_flight_agents 为空、subtask_log +1、编码三性 no-BOM/no-CR/ends-NL）；③ stage-2 增列 promote 前置校验：先断言 stage1 快照含本轮全部预期新增键，再提升为 state.json；④ 立规两条（见 rule_added）。修补后重跑 STEP6 磁盘复读校验全绿，与内存态一致。",
+        "impact": "**未造成台账失真**：stage1 快照尚未 promote，`state.json` 仍是 R10-D 的已提交版本（M0-02/M0-03 仍为 IN_PROGRESS），发现即修、零回滚成本。但**确已构成一次静默证据丢失（未遂）**，属 R10-6「证据丢失」的同类形态而**危险性更高**——R10-6 是崩溃可见、本轮是成功假象。若未被下游拦下，后果是 A109 的唯一合法出口路径（Q lane wave 复核）在台账上失去落点，M0-02/M0-03 的 DONE 将成为无据裁定。",
+        "rule_added": "rule_state_rebuild_invalidates_aliases：凡对台账对象执行过 `json.loads(json.dumps(...))` 式**整体重建**（字符串级替换、深拷贝回灌等），其后**所有既有别名一律视为失效**，必须在重建点集中重绑定并加 `x is y` 活体断言；禁止跨重建点复用旧别名。rule_stage_output_must_be_reread_from_disk：多阶段流水线的每个 stage，收尾必须**从磁盘重新读回**产物并对本轮全部预期新增键与终态逐项断言，禁以「内存里读得到」或「打印了 OK」作为成功判据。立规原因：R10-9。",
+        "related": [
+          "R10-6",
+          "R10-8",
+          "rule_ledger_write_structure_preserving",
+          "A109"
+        ]
       }
     ],
     "q_verify_wave1": {
@@ -12255,7 +12660,72 @@
       "concurrency_note": "本轮全表复验与在飞 Q lane（Newton/Q-VERIFY-WAVE1）**时间窗重叠**：Newton 于其 A144(c) 自证中如实报出「写权外未跟踪新文件 20 件，全在 `evidence/M0/ORCHESTRATOR/r10d-volta-s3/`，非我产出，记 IN_FLIGHT_CONTAMINATION，再排除则为 0」。编排器**认领该归因**：那 20 件正是本脚本 v1/v2 的落盘产物（目录 02:39:32 创建、文件 02:40:54–02:41:03 写入，晚于 Newton 最后一次落盘 02:32:56）。处置：不修改 Newton 的原始记录（append-only），其 A144(c) 的**实质结论为 0**（自有产出零越界）；并已固化「编排器全表复验应尽量避开 Q lane 在飞窗口，或事先把编排器证据目录加入 Q lane 的排除授权」的处置要求（见 round10d_self_note）。",
       "superseded": "本条取代 resume.self_check_gates_rc0.fulltable_evidence 的 round9-d036 快照（旧值移入 previous_R10D，append-only）"
     },
-    "round10d_r7_r8_ack": "R7（未改 `infra/__init__.py`）**追认**：编排器实测 `src/campaignlab/infra/__init__.py` 仅 1 行 docstring、无 `__all__`、无任何 re-export → 该包既有约定就是「不做包级 re-export，调用方直接 import 子模块」，lane 处置与既有约定一致，非缺口。R8（两次在飞红灯）**知悉，不立缺陷**：两守护的分母均取 HEAD 提交树（`tests/unit/test_counts_freshness.py:73-77` 用 `git ls-tree -r HEAD`），故在「台账已更新、自身文件尚未入库」窗口内**按设计必然 RED**，是 A101 的既定形态（本仓已第 7 次实证：提交前 RED、提交后转绿）；共性根因 = 台账与其自身在飞文件的入库时序窗口，非实现缺陷。追加要求：编排器全表复验时必须把这两个守护的 RED 归因写明，禁当未知红灯反复排查。"
+    "round10d_r7_r8_ack": "R7（未改 `infra/__init__.py`）**追认**：编排器实测 `src/campaignlab/infra/__init__.py` 仅 1 行 docstring、无 `__all__`、无任何 re-export → 该包既有约定就是「不做包级 re-export，调用方直接 import 子模块」，lane 处置与既有约定一致，非缺口。R8（两次在飞红灯）**知悉，不立缺陷**：两守护的分母均取 HEAD 提交树（`tests/unit/test_counts_freshness.py:73-77` 用 `git ls-tree -r HEAD`），故在「台账已更新、自身文件尚未入库」窗口内**按设计必然 RED**，是 A101 的既定形态（本仓已第 7 次实证：提交前 RED、提交后转绿）；共性根因 = 台账与其自身在飞文件的入库时序窗口，非实现缺陷。追加要求：编排器全表复验时必须把这两个守护的 RED 归因写明，禁当未知红灯反复排查。",
+    "in_flight_agents_note_round10e": "R10-E（2026-11-14T03:59:07+08:00）：Newton（01a1d62a…，lane Q，Q-VERIFY-WAVE1）已回收，原始回报全文已追加存档至 `orchestrator/handoff/round10-lane-returns-raw.md`（纯 append，numstat 删除行 0）。**在飞 lane 归零**（Volta 已于 R10-D 退役）→ 开发 lane 配额 3/3 全空、QA 配额 1/1 空，可派满。",
+    "round10e_verification": {
+      "at": "2026-11-14T03:59:07+08:00",
+      "trigger": "Q-VERIFY-WAVE1 回收 = wave1 出口；M0-02 / M0-03 翻 DONE 的台账落地",
+      "source_report": "evidence/M0/Q-VERIFY-WAVE1/{00-index,verdict,commands,defects-proposed}.md + raw/（7 件，含 q-cmdlog.jsonl 110 条四元组）",
+      "gates_backfilled": 11,
+      "bare_rc_null_remaining": 96,
+      "verdict_tally": {
+        "PASS": 7,
+        "PASS_WITH_TODO": 4,
+        "FAIL": 0,
+        "NOT_YET_COLLECTED": 0
+      },
+      "tasks_flipped_to_done": [
+        "M0-02",
+        "M0-03"
+      ],
+      "adjudications": [
+        "A158",
+        "A159",
+        "A160",
+        "A161",
+        "A162",
+        "A163",
+        "A164",
+        "A165",
+        "A166",
+        "A167"
+      ],
+      "defects_filed": [
+        "D-039（MAJOR，派单 gate 命令不自带 provision，常驻假 RED 风险）",
+        "D-040（MINOR，alembic current 只读命令有宿主写副作用致 gate 顺序依赖）"
+      ],
+      "followups_filed": [
+        "FU-31（M1-04 承接真 E2E + 截图比特级基线 + first-load 骨架）",
+        "FU-32（G5c 守卫腐化收窄，F lane 写权）"
+      ],
+      "rules_added": [
+        "rule_orchestrator_evidence_must_not_overlap_q_lane_window（A158）",
+        "rule_gate_command_must_be_self_provisioning（A159）",
+        "rule_readonly_gate_must_be_idempotent（A160）",
+        "rule_q_lane_never_gets_write_on_reviewed_surface（A161）",
+        "rule_committed_transcript_requires_as_of_head_recheck（A163）",
+        "rule_deferred_to_must_become_a_gate（A165）",
+        "rule_snapshot_doc_requires_as_of_marker（A166）",
+        "rule_ledger_timestamp_must_be_machine_derived（A167）",
+        "rule_scratch_driver_assertions_must_be_scope_qualified（R10-8）",
+        "rule_scratch_driver_steps_must_be_idempotent（R10-8）",
+        "rule_state_rebuild_invalidates_aliases（R10-9）",
+        "rule_stage_output_must_be_reread_from_disk（R10-9）"
+      ],
+      "orchestrator_self_findings": "Q lane 上报的 6 项问题（P-1/P-2/P-4/P-5/P-6 + B4 并发污染）**全部归因编排器自身**，无一属 lane 或产品代码；其中 P-3 由 lane 主动查祖先推翻自己对 lane F 的假绿怀疑，编排器采纳并洗清 lane F（A163）。",
+      "note": "本轮未重跑全表：R10-D 的全表复验（18/18 PASS、416 passed）距本提交仅数十分钟，且本提交只改台账/证据/文档、**未触碰任何 .py**（py 分母 79 不变）。依 rule_precommit_full_table，提交前仍跑 pytest 守护面（counts_freshness / state_ledger）与 ruff 双门，全表留待下一 wave 出口由编排器独占补跑。",
+      "bare_rc_null_scope": "repo_wide_all_24_tasks",
+      "bare_rc_null_wave1_scope": 0,
+      "bare_rc_null_scope_note": "**口径澄清（防误读，编排器自纠）**：本键 `bare_rc_null_remaining = 96` 是**全仓 24 个任务**的 `gates[].rc is None` 总数，其中绝大多数属**尚未执行的后续 wave**（wave3–wave7）的门禁占位；Newton 报告 §7 的 「No gate in this wave remains a bare `rc:null`」是**wave1 作用域**结论，两者不矛盾。**wave1 作用域实测 = 0**：M0-02 的 5 个 + M0-03 的 6 个共 11 个门禁，本轮已由 Q lane 亲自重跑补齐实测 rc 与 evidence 指针，A109③ 在 wave1 出口**已消解**（程序化断言见 stage-1 STEP4c：`assert g['rc'] is None and g['evidence'] == ''` 逐门成立后才回填，回填后该 11 门无一为 null）。全仓 96 的归零**不作为 wave1 出口的判据**，而是各后续 wave 出口按同一 A109③ 规则逐 wave 消解；编排器不得以「全仓仍有 null」为由拒绝 wave1 出口，也不得以「wave1 已归零」为由宣称全仓归零。",
+      "stage1_crash_self_corrections": [
+        "R10-8（STEP4h 断言口径错误：裸字面量计数常数取自改动前语料；且 STEP1/STEP3 缺幂等守卫，盲目重跑会重复污染两份 append-only 存档 —— 已修，重跑双双 SKIP、numstat 仍 86/0 与 17/0）",
+        "R10-9（STEP4h 的 `s = json.loads(json.dumps(s))` 整体重建后别名 `r` 悬空，致 STEP4i 的 round10e_verification 静默丢失而脚本仍打印成功 —— 由本 stage-2 的 KeyError 拦下，已重绑定并加磁盘复读校验）"
+      ],
+      "self_corrections_added": [
+        "R10-8",
+        "R10-9"
+      ]
+    }
   },
   "acceptance": {
     "baseline_total": 35,
@@ -12742,7 +13212,28 @@
         "AC-MR-11"
       ],
       "authority": "AC 编号与主证据列一律引 spec/**/qa/ACCEPTANCE.md 与月度 append 原文，禁转述（D-011）"
-    }
+    },
+    "wave1_composite": {
+      "AC-001": {
+        "m0_02_leg": "PASS (HTTP)",
+        "m0_03_leg": "PASS_WITH_TODO (页面侧，stub 夹具)",
+        "composite": "PASS_WITH_TODO",
+        "note": "真 E2E 未消解 = B1，判归 M1-04（A164）"
+      },
+      "AC-034": {
+        "m0_02_leg": "PASS_WITH_TODO (跨工作区 404 → M0-04/S4)",
+        "m0_03_leg": "PASS (Problem 呈现)",
+        "composite": "PASS_WITH_TODO",
+        "note": "B2：已由 A165 确认 M0-04/S4 承接并写进其派单文"
+      },
+      "AC-035": {
+        "m0_02_leg": "PASS",
+        "m0_03_leg": "n/a",
+        "composite": "PASS",
+        "note": "四支柱全部由 Q lane 亲自重跑；编排器全表 G12/G13b 复核一致"
+      }
+    },
+    "wave1_composite_note": "wave1（M0-02 + M0-03）出口的复合 AC 口径，来源 = Q lane Newton 的 evidence/M0/Q-VERIFY-WAVE1/verdict.md §6，编排器采纳并回填。复合口径的语义：一条 AC 有多个 leg 时，任一 leg 为 PASS_WITH_TODO 则复合为 PASS_WITH_TODO（禁向上取整为 PASS）。余留义务均已定址有主：AC-001 真 E2E → M1-04（A164/FU-31）；AC-034 跨工作区 404 → M0-04/S4（A165）。"
   },
   "contract": {
     "live_dir": "contracts",

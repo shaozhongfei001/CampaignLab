@@ -1,0 +1,13 @@
+# gate: gate6-npm-typecheck
+# cwd: /home/szf/dev/CampaignLab/web
+# cmd: export PATH="$HOME/.local/share/node/bin:$HOME/.local/bin:$PATH" && npm run typecheck
+# rc: 0
+# wall_s: 3.1
+# sha256_body: cd16afc2c9deb20e
+
+
+> campaignlab-web@0.0.0 typecheck
+> vue-tsc --noEmit -p tsconfig.json
+
+
+--- STDERR ---

@@ -301,3 +301,20 @@ AppBar.vue / AppShell.vue ──▶ @/api/endpoints (Health, Session)
 - D5（工具链偏差）：抽取 slot 与页面消费点时，PowerShell 会剥除 `bash -lc` 内层双引号，导致 `<slot` / `<AlertBanner` 里的 `<` 被 bash 当重定向（实测报错 `bash: line 1: AlertBanner|: No such file or directory`）；已改走 `python3 /mnt/d/.../probe.py` 通道（C9），未使用 `\$?` 采集 rc。
 - U-1（交编排器裁定）：`AlertBanner.vue` / `EmptyState.vue` 是否需要**物理迁入** `web/src/components/state/`？迁入会改 `web/src/pages/**` 的 import 路径，而 `pages/**` 在 M0-03b 的 `scope_deny` 内 → 本清单按「**不迁移，原址冻结 + `state/` 内组合复用**」裁定；若编排器要求迁移，须同时放开 `pages/**` 并作为独立 CR。
 - U-2（交编排器裁定）：`web/tests/e2e/**` 未列入 M0-03b 的 `scope_allow`，但六态截图（S4）需要一个可渲染六态的 harness；请裁定扩 `web/tests/e2e/state/**` 或指定其他落点。
+
+---
+
+## as-of 标记与前向指针（A166 / P-5，编排器于 2026-11-14T03:36:33+08:00 纯 EOF 追加；上文一字未改）
+
+> 本文档第 20 / 30 / 255 行断言 `web/src/components/state/` **不存在**，第 20 行并附带一个期望输出
+> `STATE_DIR_ABSENT` 的守卫。该断言是**本清单采集时点（S10，commit `5d16d4d`）的事实**，在 HEAD 上**已为假**：
+> M0-03b/S2 已落地该目录的 6 个文件（`69db892`，实测 6 组件 + 6 spec，全为纯追加）。
+
+- **禁再逐字执行第 20 行的守卫**：它现在会打印 `STATE_DIR_EXISTS`，属**预期的陈旧红**，不是违规、不是回归。
+- **`state/**` 6 件的冻结权威已转移**至 `orchestrator/handoff/M0-03b-freeze.md:108-119`；本文档仍是
+  13 件公共组件（props/slots/emits 契约表、依赖关系、消费方指引、26 页覆盖对账）的权威，**两者无覆盖缺口**。
+- **台账字节数已定点更正（A166 / P-4）**：本文件实测 **303 行 / 27115 B**；台账原记 `26803 B` 为 S10 登记时点值，
+  其后 `0419505`（R9-C / D-037 更正）以 `1 add / 1 del` 替换了其中一行，致 +312 B 而行数不变。原值按
+  「历史值只加注不改写」保留于台账同键的注记中。
+- 立规（`rule_snapshot_doc_requires_as_of_marker`）：凡记录「某路径不存在 / 某文件 N 行 N 字节」这类**时点快照**的
+  冻结文档，必须在同处标注采集 commit；后续任务落地该路径时，由编排器追加前向指针，禁让快照静默失真。

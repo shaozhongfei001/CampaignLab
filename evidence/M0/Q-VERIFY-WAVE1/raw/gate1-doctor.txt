@@ -1,0 +1,17 @@
+# gate: gate1-doctor
+# cwd: /home/szf/dev/CampaignLab
+# cmd: export PATH="$HOME/.local/bin:$HOME/.local/share/node/bin:$PATH" && uv run --no-sync python -m campaignlab doctor
+# rc: 0
+# wall_s: 0.3
+# sha256_body: e8104bf8b5fc9a5e
+
+[doctor] host=127.0.0.1 port=8000 data_dir=/home/szf/.local/share/campaignlab
+[doctor] db=sqlite:////home/szf/.local/share/campaignlab/state/campaignlab.db level=DEFAULT_DATA_DIR source=默认 .local/share/campaignlab/state/campaignlab.db
+PASS  version   app=0.0.0 contract=1.0.1 source=/home/szf/dev/CampaignLab/contracts/openapi.json
+PASS  binding   127.0.0.1:8000 回环且空闲，可 serve
+WARN  data_dir  /home/szf/.local/share/campaignlab 尚不存在（首次 serve/迁移时创建）；level=DEFAULT_DATA_DIR
+WARN  database  /home/szf/.local/share/campaignlab/state/campaignlab.db 不存在（level=DEFAULT_DATA_DIR source=默认 .local/share/campaignlab/state/campaignlab.db）；先执行 alembic upgrade head
+PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s
+  PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED
+
+--- STDERR ---

@@ -1,0 +1,11 @@
+# gate: gate4-alembic-current
+# cwd: /home/szf/dev/CampaignLab
+# cmd: export PATH="$HOME/.local/bin:$PATH" && uv run --no-sync alembic -c migrations/alembic.ini current
+# rc: 0
+# wall_s: 0.5
+# sha256_body: 05242902ac83e4e9
+
+
+--- STDERR ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
