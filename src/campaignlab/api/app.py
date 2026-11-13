@@ -33,6 +33,7 @@ from campaignlab.api.common import (
     problem_response,
     request_id_of,
 )
+from campaignlab.api.deps import HealthService, SessionService, WorkspaceService
 from campaignlab.clock import Clock, SystemClock
 from campaignlab.config import AppConfig, load_config
 
@@ -86,11 +87,27 @@ def create_app(
     *,
     clock: Clock | None = None,
     guard: OriginHostGuard | None = None,
+    session_service: SessionService | None = None,
+    health_service: HealthService | None = None,
+    workspace_service: WorkspaceService | None = None,
 ) -> FastAPI:
     """构造 FastAPI 应用。
 
-    三个参数全部**可注入**（配置／时钟／回环白名单），因此测试能确定性地触发
-    小 TTL、413 与 403 分支，而不必改进程环境或 sleep（ADR-005 §2.3）。
+    六个参数全部**可注入**（配置／时钟／回环白名单／三个用例服务），因此测试能确定性地
+    触发小 TTL、413 与 403 分支，而不必改进程环境或 sleep（ADR-005 §2.3）。
+
+    后三个参数是 **S3d 的纯追加式扩围**：既有三个参数的语义与默认行为一字未改，
+    ``openapi_url=docs_url=redoc_url=None``、中间件添加顺序（guard 最内 → CORS →
+    request_id 最外，``install_error_handlers`` 最后）、守卫就地翻译 ``DomainError``
+    的行为全部保持原样；本文件也**没有**新增任何 ``include_router``
+    （``api/session.py`` / ``api/workspaces.py`` 的挂载属 S3b，Round 7）。
+
+    **不注入就不装配**（刻意的，不是遗漏）：三个服务缺省时 ``app.state`` 上根本不存在
+    对应属性，``api/deps.py`` 的提供器会显式 ``RuntimeError`` → 500 Problem。
+    在本函数里静默构造默认实现会有两个后果：① 测试注入的小 TTL 配置被真实默认值悄悄
+    替换，413／过期用例假绿；② ``tests/unit/test_api_app.py`` 钉住的「服务未装配 →
+    ``/api/v1/health`` 返回 500 Problem」这条既有行为被破坏（该文件不在 S3d 写权限内）。
+    真实装配由 ``cli.cmd_serve`` 与测试侧显式完成。
     """
     cfg = config if config is not None else load_config()
     resolved_clock: Clock = clock if clock is not None else SystemClock()
@@ -106,6 +123,13 @@ def create_app(
     app.state.config = cfg
     app.state.clock = resolved_clock
     app.state.guard = resolved_guard
+    # ---- S3d 追加：仅在显式注入时挂载（见 create_app docstring 的「不注入就不装配」）----
+    if session_service is not None:
+        app.state.session_service = session_service
+    if health_service is not None:
+        app.state.health_service = health_service
+    if workspace_service is not None:
+        app.state.workspace_service = workspace_service
 
     # 添加顺序即嵌套顺序（后加者在外层）：guard 最内 → CORS → request_id 最外。
     # 故 CORS 预检 OPTIONS 不会先被回环守卫拦下，而每个响应都带 X-Request-Id。

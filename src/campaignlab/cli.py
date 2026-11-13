@@ -315,23 +315,58 @@ def cmd_serve(args: argparse.Namespace) -> int:
         print(f"[serve] 拒绝启动：{exc}", file=sys.stderr)
         return 2
 
+    # S3d（裁定 Q9/§9.10）：装配用例服务与 worker，原「会话服务未装配」WARN 随之移除。
+    # import 全部留在函数内：doctor 不该为一个用不到的 HTTP 栈付导入成本（既有口径）。
     from campaignlab.api.app import create_app
+    from campaignlab.application import build_database_runtime
+    from campaignlab.application.health_service import HealthService
+    from campaignlab.application.session_service import (
+        SessionService,
+        SessionStore,
+        SessionTokenStore,
+    )
+    from campaignlab.application.worker import WorkerSupervisor
+    from campaignlab.application.workspace_service import WorkspaceService
+    from campaignlab.clock import SystemClock
 
-    app = create_app(config)
+    clock = SystemClock()
+    runtime = build_database_runtime(database_url=config.database_url)
+    tokens = SessionTokenStore(ttl_seconds=config.token_ttl_seconds)
+    worker = WorkerSupervisor(
+        clock=clock,
+        engine=runtime.engine,
+        heartbeat_ttl_seconds=config.worker_heartbeat_ttl_seconds,
+    )
+    app = create_app(
+        config,
+        clock=clock,
+        session_service=SessionService(
+            tokens=tokens, sessions=SessionStore(ttl_seconds=config.session_ttl_seconds)
+        ),
+        health_service=HealthService(
+            config=config, clock=clock, engine=runtime.engine, worker=worker
+        ),
+        workspace_service=WorkspaceService(engine=runtime.engine, clock=clock, config=config),
+    )
     print(
         f"[serve] actor={identity.actor_id} roles={len(identity.allowed_roles)} "
         f"contract={config.contract_version} db={config.database_url}",
         file=sys.stderr,
     )
     print(f"[serve] http://{config.host}:{config.port}/api/v1/health", file=sys.stderr)
-    # 一次性入口令牌的铸造与 URL fragment 交付属 S3d 的 SessionTokenStore（design §2），
-    # S3c 不代实现；在 S3d 落地前 serve 起来的是「无令牌换取通道」的服务，故显式告知。
-    if importlib.util.find_spec("campaignlab.application.session_service") is None:
-        print(
-            "[serve] WARN 会话服务未装配（属 M0-02/S3d）：/session/exchange 暂不可用",
-            file=sys.stderr,
-        )
+    # design §2：入口令牌一次性、60s 有效、只存进程内存；进程重启即失效（AC-035）。
+    token = tokens.mint(identity, clock.now())
+    print(
+        f"[serve] entry_token={token} ttl={config.token_ttl_seconds}s 一次性"
+        "（换取通道：POST /api/v1/session/exchange）",
+        file=sys.stderr,
+    )
     import uvicorn
 
-    uvicorn.run(app, host=config.host, port=config.port, log_level="info")
+    worker.start()
+    try:
+        uvicorn.run(app, host=config.host, port=config.port, log_level="info")
+    finally:
+        worker.stop()
+        runtime.dispose()
     return 0
