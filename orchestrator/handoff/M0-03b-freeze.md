@@ -68,7 +68,7 @@
 
 「不靠颜色区分」的四条**非颜色载体**（六态各自至少具备前三条，第四条按需）：
 
-1. **文案**：每态有唯一标题；错误态的标题来自服务端原文，其余来自 `copyOf(state)`（逐字引 `ui/COMMON.md` 对应行，见 §3.3）。
+1. **文案**：每态有唯一**可判定标识**（根元素 `data-state="<字面量>"`）；错误态的标题来自服务端原文，其余来自 `copyOf(state)`（逐字引 `ui/COMMON.md` 对应行，见 §3.3）。〔**A150 更正（R10）**：原记「每态有唯一标题」——与 §3.3 的 `partial-comparable` / `pending-fill` 共用 `COMMON.md:30` 首句相冲突。裁定：逐字文案是**硬约束**、唯一标题降为**软目标**，两态的区分由 `data-state` + hint + 缺项区（`—` + 原因）三者共同承载；**禁**为造唯一标题而改写 `ui/COMMON.md` 原文（spec 侧只读区，且属文案漂移）。〕
 2. **机器可读属性**：根元素恒有 `data-state="<字面量>"`，测试与走查用属性选择器定位，不取 `computed color`。
 3. **语义角色**：`role="alert"`（失败 / 过期）与 `role="status"`（其余四态）二分，读屏可区分。
 4. **动作键**：`data-action="<ViewStateAction>"` 落在每个动作按钮上，动作集合本身即区分手段；图标按钮必须有名称（`:38`）。
@@ -182,7 +182,7 @@ props：
 | `reason` | `string \| undefined` | 否 | `undefined` | 与 `—` 同现（`:36`） |
 | `showPrevious` | `boolean \| undefined` | 否 | `false` | 「上一结果」标识（`:29`），只呈现不计算 |
 | `keepInput` | `boolean \| undefined` | 否 | `false` | 提示保留本地输入（`:31` / `:32`）；组件**不持有**表单状态 |
-| `context` | `ViewStateContext \| undefined` | 否 | 由当前路由推导 | 传给 `resolveVariants()`（§4.2） |
+| `context` | `ViewStateContext \| undefined` | 否 | `undefined`（未传即三字段 null，组件不猜） | 传给 `resolveVariants()`（§4.2）；消费页面**必须显式传入**（M3-P02 接入见 FU-27）。〔**A148 更正（R10）**：原记「由当前路由推导」不可采纳——读路由属数据获取副作用，与 A137 直接冲突；**编排器复核实测（R10-5 更正）**：`grep -rnE -- "from ['\"]vue-router"`、`grep -rnE -- 'useRoute'`、`grep -rnE -- 'import\(|require\('` 在 `state/` + `tests/unit/state/` 上均 **rc=1、0 命中**（无运行期路由依赖）；`grep -rnE -- 'vue-router|useRoute'` 有 **1 命中**，是 `ViewState.vue:22` 的**注释行**（正是记录「context 默认值需 vue-router、与 A137 冲突故不用」），非依赖边。〕 |
 
 emits：
 
@@ -247,7 +247,7 @@ export function resolveVariants(ctx: ViewStateContext): readonly ViewStateVarian
 
 规则：
 
-- **R-1 单向依赖**：`state/` 内的冻结件**不得** import 任何页面、features 或月报模块；依赖方向恒为「页面 / 月报模块 → `state/` → `registry`」。这是「不改冻结件即可接入」的结构保证。
+- **R-1 单向依赖**：`state/` 内的冻结件**不得** import 任何页面、features 或月报模块；依赖方向恒为「页面 / 月报模块 → `state/` → `registry`」。这是「不改冻结件即可接入」的结构保证。〔**A145 豁免（R10）**：**唯一例外**是 `@/features/shared/problemPresentation` 的 `presentationOf()` —— §1.2/F-B 强制 `stateFromError()` 只消费它（禁在 `state/` 自建 problem code 白名单），且 F-2 强制组合的 `AlertBanner.vue:3` 早已有同一条依赖边（既有先例，非新增耦合形态）。立法意图澄清：R-1 防的是**业务特性**耦合，而 `features/shared/` 是跨特性共享的表现层纯函数、不持业务状态。除此一处外 R-1 全文仍生效；实测 `state/` 内 `features` 依赖边恰 1 条（`viewState.ts:19`）。〕
 - **R-2 幂等注册**：同 `id` 重复注册即覆盖，并在 dev 下告警；`resolveVariants` 按注册顺序返回，`ViewState` 取**最后一个**命中的 variant 生效（后注册者可细化，但不能取消前者的 `appliesTo`）。
 - **R-3 能力上界**：variant 只能做三件事——覆盖文案（`copy`）、追加动作键（`extraActions`，取值仍限 `ViewStateAction`）、替换呈现（`render`）。**不能**新增 `ViewStateKind` / `ViewStateAction` 字面量、不能改 props 名、不能移除 `data-state` / `role`。
 - **R-4 可测性传递**：S2 的参数化用例必须以工厂函数形式导出（六态 × 视口标签矩阵），M3-P02 注册 variant 后**复用同一矩阵**对自己复跑一遍；`render` 替换若不满足四条非颜色载体，用例即判红。
@@ -299,7 +299,7 @@ export function resolveVariants(ctx: ViewStateContext): readonly ViewStateVarian
 ### S2 六态参数化 vitest 用例展开（`qwen3.8-flash` / 3k）
 
 - 输入：本文 §1.2、§1.3、§3.3、§3.4、§3.5、§4.2；`M0-03-public-components.md` §2.1 / §2.7；静态断言口径参照 `web/tests/unit/breakpoint-guard.spec.ts`（实测 327 行）；`web/tests/unit/tokens-guard.spec.ts`（实测 268 行）是令牌守卫，别混用。
-- 产出（只写 `web/tests/unit/state/**`）：`viewState.spec.ts`、`viewStateCopy.spec.ts`（逐字断言 `copyOf` 与 `ui/COMMON.md` 行原文一致）、`firstLoadSkeleton.spec.ts`、`missingValue.spec.ts`、`registry.spec.ts`。
+- 产出（只写 `web/tests/unit/state/**`）：`viewState.spec.ts`、`viewStateCopy.spec.ts`（逐字断言 `copyOf` 与 `ui/COMMON.md` 行原文一致）、`firstLoadSkeleton.spec.ts`、`missingValue.spec.ts`、`registry.spec.ts`。〔**A151 追认（R10）**：另含 `stateMatrix.ts`（405 行）——它**不是 spec**（编排器实测 `describe(` / `it(` / `expect(` 均 0 命中，vitest `include` 为 `*.spec.ts`），是 R-4「S2 的参数化用例必须以工厂函数形式导出」的必要落点：5 个 spec 互相 import 会把对方用例在本文件重复注册一遍，故共享层必须独立成模块。**spec 仍恰为上述 5 个**，§7 的 spec 数量与命名约束未被突破。〕
 - 矩阵：`describe.each` 六态 × 视口标签 `{1440x900, 1024x768}`；断言项 = `data-state`、`role` / `aria-live` / `aria-busy`、文案逐字、动作键集合与 `data-action`、`—` + 原因、`failed` / `stale-412` 的 `request_id` 可见。
 - 门禁：`cd web && npm run test -- tests/unit/state`、`cd web && npm run typecheck`、`cd web && npm run lint`（各 rc=0；用例数以 rc 为判据，**不写死**）。
 - 禁止：不得改 `web/src/**`（那是 S3）；**不得在 vitest 里谎称做了真实视口渲染**——1024x768 在 node/jsdom 下只能做静态断言（断点阈值与 `data-narrow` 语义），真实视口截图归 S4；桩数据只内联在测试文件；不得出现「按 status 过滤工作区」（F-6）；不得引用未从两份 QA 文件抄录的 AC 编号（D-011）。
@@ -325,7 +325,39 @@ export function resolveVariants(ctx: ViewStateContext): readonly ViewStateVarian
 - **U-3**：数字单位换算（`:36` 后半句）本次**不纳入冻结面**（F-E）。若编排器希望提前抽公共件，请指定落点（`web/src/features/shared/` 在本卡 `scope_deny` 内，`state/` 内新建会与 M1-04 / M3-04 重复）。
 - **U-4**：`partial-comparable` / `pending-fill` 的**服务器数据源尚未在活契约中落地**（可比性条 `StatusBand` 属 UI-10，首次交付 M2-04）。本卡只冻结**呈现契约**，两态的触发值由页面显式传入、桩数据内联在测试；请确认这一口径，或把两态的实现推迟到 M2-04（则 S2 的矩阵对这两态只断言呈现、不断言数据来源）。
 - **U-5**：卡内 U-2 已提出 `state.json` 的 `tasks["M0-03b"].scope` 只有 2 项，未含冻结登记文件与证据落点。本文件已按卡 `scope_allow` 产出，**请编排器同步 `state.json`**（本 lane 无权改）。
-- **U-6**：越界自证 gate 用 `git diff --name-only HEAD`，**对未跟踪的新文件不敏感**（新增越界文件不会出现在 diff 里）。建议编排器把口径补成 `git diff --name-only HEAD -- web/src` + `git status --porcelain web/src` 双检；本文件基线值：两者皆为 0 / 空。
+- **U-6**：越界自证 gate 用 `git diff --name-only HEAD`，**对未跟踪的新文件不敏感**（新增越界文件不会出现在 diff 里）。建议编排器把口径补成 `git diff --name-only HEAD -- web/src` + `git status --porcelain web/src` 双检；本文件基线值：两者皆为 0 / 空。〔**R10 收口**：本建议已采纳并两次演进——A139 立「双检」，A144 进一步收紧为「三段式」（写权外 tracked 修改 0 / 写权内 numstat `deleted==0` / 写权外未跟踪新文件 0），已写进 `resume.dispatch_requirements` 第 8 与第 12 条，**U-6 关闭**。〕
 - **U-7**：`M0-03-public-components.md` §7 登记的 D1（`ConfirmDialog` 打开时未主动聚焦，Esc 依赖焦点已在框内）与 D3（`DataTable` 缺 36px 密集档与宽表冻结首列）**都不能在 M0-03b 期间修**（越界）。请裁定走独立 CR 还是并入 M0-03 收尾。
 - **偏差自报（本 S1 轮）**：抽取阶段踩到 PowerShell 引号陷阱两次——(1) `bash -lc` 内层双引号被 PS 剥除，导致 `<slot` / `<AlertBanner` 的 `<` 被 bash 当重定向（实测 `bash: line 1: AlertBanner|: No such file or directory`）；(2) 内层 `#` 未加引号时被 bash 当行注释，吞掉整条命令的剩余部分（实测 `grep` 只收到 `-nE` 而报 usage）。修法：一律改走 `python3 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/laneF_freeze/*.py` 通道，rc 由 `subprocess.run(...).returncode` 采集，不使用 `\$?`。写入用 `open(..., "w", encoding="utf-8", newline="\n")` 等价路径（`pathlib.Path.write_text`），写后回读断言：无 BOM、无 `\r`、以 `\n` 结尾。
 - **刻意没做的事**：没有创建 `web/src/components/state/**` 任何文件；没有改 `AlertBanner.vue` / `EmptyState.vue`；没有跑全仓 `pytest` / `mypy` / `ruff .` / `doctor` / `verify` / `npm run build`（另有 3 条 lane 同树在飞，只跑路径限定门禁）；没有执行任何 git 写操作；没有把 AC-032 写成本卡 gate；没有在文档里写死任何六位十六进制色值。
+## 9. R10 编排器裁定：S2+S3 回收时的 7 项终裁（A145–A151）
+
+> 来源：lane F（Mencius，`qwen3.8-flash`）交付 M0-03b/S2+S3 时上报 7 项「需编排器裁定」，均在冻结面内取了唯一可行解、未自行扩 scope。编排器**不采信自报**，逐项独立复验后裁定如下。全部 7 项的实现**均已验收**，本章只补口径与文书，**不要求任何返工**。
+
+| # | 争议 | 裁定 | 依据（编排器实测） |
+|---|---|---|---|
+| ① | §4.2 R-1 禁 `state/` import `features/**`，而 §1.2/F-B 要求 `stateFromError()` 消费 `presentationOf()`（住在 `features/shared/`） | **A145**：给 R-1 加**唯一豁免**（`features/shared/problemPresentation`） | `viewState.ts:19` 恰 1 条依赖边；`AlertBanner.vue:3` 同边已在先；`state/` 内 `features` 命中总数 = 1 |
+| ② | A137「公共件无数据获取副作用」的字面 vs `ApiError` 只能 `import type` | **A146**：判据 = **运行期模块边**，非字面文本。`import type` 在 `verbatimModuleSyntax` 下整条擦除 → 0 运行期边 → 合规。**禁**为凑字面零引用而新增 `ApiError` 结构镜像类型（两处定义必分叉，那才是真契约漂移） | `@/api/` 命中 3 = 注释 1 + `import type` 2（`viewState.ts:18`、`ViewState.vue:28`）；`fetch(`/`axios`/`XMLHttpRequest` 非注释命中 **0** |
+| ③ | dev 水槽三导出 + `data-dev-assert` 是否须走 CR | **A147**：**均不需 CR**。`data-dev-assert` 是 DOM data 属性，不改 props/emits/slots，不构成 §5:281 的签名变更；dev 水槽是 `viewState.ts` 的模块级导出但 **barrel 未 re-export**（§3.1:113 的「新增导出须走 CR」条件未触发），公共 API 面零扩张 | `index.ts` 全文 17 行只导出 `viewState`/`registry`/三组件的冻结面；水槽消费者仅 `registry.ts:14`、`ViewState.vue:35`、`registry.spec.ts:19`（按模块路径） |
+| ④ | §3.4 `context` 默认「由当前路由推导」不可满足 | **A148**：**A137 优先**。未传即三字段 null（F-A 组件不猜）；§3.4 该行已更正；**M3-P02 接入必须显式传 `context`**（立 FU-27，trigger = M3-P02 派单前） | `from 'vue-router'` / `useRoute` / `import(` / `require(` 四项 ERE 守卫在 `state/`+`tests/unit/state/` 上均 **rc=1、0 命中**；`vue-router` 字样仅 1 处注释（`ViewState.vue:22`），非依赖边（**R10-5**：原先引的「命中 0」是 BRE 假绿，已更正） |
+| ⑤ | `FirstLoadSkeleton` 的 `heading/headCells/cardCount` 不在 `ViewState` 冻结 props 内，是否 append `skeleton` props | **A149**：**不 append、不扩冻结面、不走 CR**。骨架形状属**页面级差异知识**，放进公共件会让 `ViewState` 承载页面语义（违 F-A）；`variant.render` 已是既有扩展点，足以承载。页面可**直接用 `FirstLoadSkeleton`** 或经 `variant.render` 注入（立 FU-28，写进 M1-04/M2-04/M3-04/M4-03 页面卡） | `ViewState` props 面与 §3.4 冻结表逐字一致，未被扩 |
+| ⑥ | §1.3「每态唯一标题」与 §3.3「partial/pending 共用 `COMMON.md:30` 首句」冲突；动作名文案来源不足 | **A150**：**§3.3 逐字文案优先**（硬约束），§1.3 降为「每态唯一**可判定标识**」；动作名与「上一结果」一律取 `ui/COMMON.md` :28/:29/:30/:32 原文子串并逐字校验（含正/负例自证）——**采纳** | `viewStateCopy.spec.ts` 54 例全绿（编排器复跑 rc=0）；`state/` 内 `@media`/`data-narrow`/`matchMedia` 命中 0 |
+| ⑦ | `stateMatrix.ts` 超出 §7 所列 5 个 spec 名 | **A151**：**追认**。R-4 要求矩阵工厂化，工厂必须有非 spec 落点（.spec 互 import 会重复注册用例）；它是 helper，§7 的 spec 数量与命名约束未被突破。§7 S2 产出段已 append-only 追记 | `describe(`/`it(`/`expect(` 在 `stateMatrix.ts` 内命中 **0**；唯一 `test(` 命中是正则 `/\d/.test(text)`，非用例注册 |
+
+### 9.1 编排器独立复验结论（不采信自报，全部亲自重跑）
+
+- **交付面**：`web/src/components/state/` 6 件 + `web/tests/unit/state/` 6 件 = **12 件**，逐件行数与自报**全等**（258/129/87/54/62/17 与 281/183/168/88/78/405），全部无 BOM、无 CR、有尾换行；`state/` 内**无第 7 个文件**（§5:285 的 CR 条件未触发）。
+- **越界自证（A144 三段式）**：(a) `git diff --name-only HEAD` **全仓为空**（写权外 tracked 修改 0，且写权内也为 0 —— 本卡全为新建文件）；(b) 无 tracked 修改故 numstat 无行，`deleted==0` 平凡成立；(c) `git status --porcelain web` 12 行**全部**落在 `web/src/components/state/` 与 `web/tests/unit/state/` 内，写权外未跟踪新文件 **0**。
+- **前端四门禁（cwd=`/home/szf/dev/CampaignLab/web`，编排器亲自重跑）**：`npm run test -- tests/unit/state` rc=0 → **5 files / 173 tests passed**；`npm run test` rc=0 → **12 files / 277 tests passed**；`npm run typecheck`（`vue-tsc --noEmit`）rc=0；`npm run lint`（`eslint .`）rc=0；`npm run build` rc=0 → `dist/assets/index-*.css 377.54 kB`、`✓ built in 511ms`。与自报逐项一致。
+- **既有守卫未被新 CSS 触发**：`breakpoint-guard` 扫描 38 文件、`web/src` 内 `@media` 断点 6 条全部落在 `AppShell.vue:31/36`、`EvidenceDrawer.vue:50`、`PageGrid.vue:15`、`SideRail.vue:24/30`（**均在 `state/` 外**），违规条数 **0**；`tokens-guard` 11 例全绿（`state/` 内零色值字面量）。
+- **守卫口径自我更正（R10-5）**：编排器首轮复验时对 `vue-router|useRoute` 与 `features` 两条守卫误用 **BRE**（`grep -rn` 未加 `-E`），BRE 下 `|` 是**字面量**而非交替，导致「有匹配」被误报成 `rc=1 无匹配`的**假绿**（这是 R9-4「`-` 开头模式被当选项 → rc=2 假红」的镜像陷阱）。已改 `-E` 重跑并逐条更正结论；两条守卫的**实质结论不变**（`@/features` 依赖边确为 1 条、路由依赖确为 0 条），但引用证据已换成正确的 ERE 命令与命中数。固化规则 `rule_grep_alternation_requires_ERE`。
+- **ruff / mypy 不适用**：本卡产物为 TS/Vue，`pyproject.toml:51` 的 `extend-exclude` 含 `web`、`:68` 的 mypy `exclude` 含 `web/`，不在 Python 作用域；`in_scope_py` 恒 75。
+
+### 9.2 本轮成本教训（如实入账，不粉饰）
+
+Mencius 自报 token ≈ **3.8e5**，而派单预算仅 **5k** → 越限 **76×**，是本仓最严重的单条越限（前值：Dirac 181k=3.02×、Bohr 65k=5.42×）。根因**不是档位选错，而是编排器派单设计错**：
+
+1. 该卡表面是「S2 用例展开 + S3 件内样板」（看似量产型 → 按 §6.3 派 flash），实质要在 **331 行冻结文档 + 303 行组件契约表 + `ui/COMMON.md` 逐字文案 + 13 件既有公共组件**之间做**跨文档一致性判定**，并处理 7 处冻结面内部冲突 —— 按 §6.3「跨模块一致性」与「公共冻结件」两条硬规则，**本应派 max**。
+2. 5k 的预算是按「产出份数」估的，不是按「被判定面行数」估的（与 Epicurus 的 33k 教训同源，见 A143 `cost_lesson`）。331+303 行的冻结面逐条对码本身就远超 5k。
+3. 7 处冲突意味着必然多轮 loop（实测 `loop_used=3`，含一次「模板重排误删动作区→补回并全文校验」的返工），每轮都要重读冻结面。
+
+**纠正措施（记 R10-4）**：① 凡卡文含「冻结文档 / 公共件契约表 / 逐字文案对齐」输入者，一律按 §6.3 判 **max**，禁因「动作看似量产」而降档；② flash 预算一律按「被判定面行数 × 每行单价 + loop 轮数」估，禁按产出份数估；③ 派单前先做一次**冲突面预扫**（本卡的 7 处冲突全部可在派单前由编排器扫出），冲突 ≥3 处即升档或拆卡。

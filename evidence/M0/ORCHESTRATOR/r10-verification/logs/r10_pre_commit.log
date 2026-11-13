@@ -1,0 +1,39 @@
+===== ruff_format_batch =====
+CWD=/home/szf/dev/CampaignLab
+CMD=uv run --no-sync ruff format --check evidence/M0/M0-02/ac.md evidence/M0/M0-02/commands.md evidence/M0/M0-02/migration-diff.md evidence/M0/summaries/M0-02.md orchestrator/defects/D-038.md
+RC=0
+5 files already formatted
+----- end ruff_format_batch (rc=0) -----
+===== pytest_counts_and_ledger =====
+CWD=/home/szf/dev/CampaignLab
+CMD=uv run --no-sync pytest -q tests/unit/test_counts_freshness.py tests/unit/test_state_ledger.py
+RC=1
+..F........                                                              [100%]
+=================================== FAILURES ===================================
+_________ test_committed_tree_denominator_matches_authoritative_counts _________
+
+    def test_committed_tree_denominator_matches_authoritative_counts() -> None:
+        tree = _head_tree_paths()
+        measured_py = len(_in_scope(tree, PY_SUFFIXES))
+        measured_md = len(_in_scope(tree, MD_SUFFIXES))
+        counts, composition = _ledger()
+        ledger_py = _int_field(composition, "in_scope_py", COMPOSITION_LABEL)
+        ledger_md = _int_field(composition, "in_scope_md", COMPOSITION_LABEL)
+        ledger_total = _int_field(composition, "total", COMPOSITION_LABEL)
+        ledger_ruff = _int_field(counts, "ruff_formatted_files", COUNTS_LABEL)
+        stamp = _refresh_stamp(counts)
+    
+        assert measured_py == ledger_py, (
+            f"① py 分母失真：HEAD 提交树实测 {measured_py} != 台账 in_scope_py {ledger_py}（{stamp}）"
+        )
+>       assert measured_md == ledger_md, (
+            f"② md 分母失真：HEAD 提交树实测 {measured_md} != 台账 in_scope_md {ledger_md}（{stamp}）"
+        )
+E       AssertionError: ② md 分母失真：HEAD 提交树实测 119 != 台账 in_scope_md 122（台账刷新时点=2026-11-14T02:20:00+08:00／原因=Round 10 / M0-02·S5 取证面入库 + D-038 立单后重采样：新增 3 个作用域内 .md（evidence/M0/M0-02/ac.md、evidence/M0/summaries/M0-02.md、orchestra）
+E       assert 119 == 122
+
+tests/unit/test_counts_freshness.py:190: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_counts_freshness.py::test_committed_tree_denominator_matches_authoritative_counts
+1 failed, 10 passed in 0.15s
+----- end pytest_counts_and_ledger (rc=1) -----

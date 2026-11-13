@@ -1,0 +1,101 @@
+===== A137_runtime_edge =====
+CWD=/home/szf/dev/CampaignLab
+CMD=grep -rnE "@/api/" web/src/components/state | grep -vE "^[^:]+:[0-9]+: *(\*|//|/\*)" | grep -vc "^.*import type"
+RC=0
+all_hits=3 comment_hits=1 non_comment=2 of_which_import_type=2
+VERDICT=PASS_no_runtime_api_edge
+===== fetch_axios (ERE, 修 R9-4 的 rc=2) =====
+CMD=grep -rnE "\bfetch\(|axios|XMLHttpRequest" web/src/components/state
+RC=0
+web/src/components/state/viewState.ts:10: *     verbatimModuleSyntax 会把它整条擦除，运行时不存在指向 api/** 的模块边；不 fetch、不 axios、
+web/src/components/state/ViewState.vue:17: *          不 fetch、不 axios；state 为必填 prop，触发值全部由页面显式传入（F-A 组件不猜）。
+===== media_query_and_narrow_guards =====
+PAT=@media RC=1 N=0
+<no match>
+PAT=data-narrow RC=1 N=0
+<no match>
+PAT=matchMedia RC=1 N=0
+<no match>
+===== vitest_state =====
+CWD=/home/szf/dev/CampaignLab
+CMD=npm run test -- tests/unit/state
+RC=0
+
+> campaignlab-web@0.0.0 test
+> vitest run --passWithNoTests tests/unit/state
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/szf/dev/CampaignLab/web[39m
+
+ [32m✓[39m tests/unit/state/firstLoadSkeleton.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/state/missingValue.spec.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m tests/unit/state/registry.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/state/viewStateCopy.spec.ts [2m([22m[2m54 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m tests/unit/state/viewState.spec.ts [2m([22m[2m71 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m173 passed[39m[22m[90m (173)[39m
+[2m   Start at [22m 02:00:08
+[2m   Duration [22m 342ms[2m (transform 45%, import 36%, tests 16%, worker 2%)[22m
+===== vitest_full =====
+CWD=/home/szf/dev/CampaignLab
+CMD=npm run test
+RC=0
+ [32m✓[39m tests/unit/api-client.spec.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/unit/state/firstLoadSkeleton.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m tests/unit/state/registry.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m tests/unit/state/missingValue.spec.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+[90mstdout[2m | tests/unit/breakpoint-guard.spec.ts[2m > [22m[2m断点变量一致性守卫（token-mapping §3 · Q-S3-C）[2m > [22m[2m汇总：扫描到的 @media 断点条数与变量映射（Shell 布局落地后本表须非空）
+[22m[39m[breakpoint-guard] 扫描文件 38 个（排除 src/api/types.ts）
+[breakpoint-guard] tokens.css 断点变量 --cl-bp-rail-collapse=1100px, --cl-bp-rail-drawer=800px, --cl-content-max=1440px
+[breakpoint-guard] web/src 内 @media 断点条数 = 6
+[breakpoint-guard]   web/src/components/AppShell.vue:31 1100px -> --cl-bp-rail-collapse
+[breakpoint-guard]   web/src/components/AppShell.vue:36 800px -> --cl-bp-rail-drawer
+[breakpoint-guard]   web/src/components/EvidenceDrawer.vue:50 800px -> --cl-bp-rail-drawer
+[breakpoint-guard]   web/src/components/PageGrid.vue:15 800px -> --cl-bp-rail-drawer
+[breakpoint-guard]   web/src/components/SideRail.vue:24 1100px -> --cl-bp-rail-collapse
+[breakpoint-guard]   web/src/components/SideRail.vue:30 800px -> --cl-bp-rail-drawer
+[breakpoint-guard] 违规条数 = 0
+
+ [32m✓[39m tests/unit/breakpoint-guard.spec.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/tokens-guard.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/state/viewStateCopy.spec.ts [2m([22m[2m54 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/state/viewState.spec.ts [2m([22m[2m71 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+ [32m✓[39m tests/unit/project-baseline.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[32m277 passed[39m[22m[90m (277)[39m
+[2m   Start at [22m 02:00:09
+[2m   Duration [22m 788ms[2m (transform 48%, import 41%, tests 9%, worker 2%)[22m
+===== typecheck =====
+CWD=/home/szf/dev/CampaignLab
+CMD=npm run typecheck
+RC=0
+
+> campaignlab-web@0.0.0 typecheck
+> vue-tsc --noEmit -p tsconfig.json
+===== lint =====
+CWD=/home/szf/dev/CampaignLab
+CMD=npm run lint
+RC=0
+
+> campaignlab-web@0.0.0 lint
+> eslint .
+===== build =====
+CWD=/home/szf/dev/CampaignLab
+CMD=npm run build
+RC=0
+
+> campaignlab-web@0.0.0 build
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 83 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.39 kB │ gzip:  0.27 kB
+dist/assets/index-BL_mlG_f.css  377.54 kB │ gzip: 51.33 kB
+dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB
+
+✓ built in 511ms

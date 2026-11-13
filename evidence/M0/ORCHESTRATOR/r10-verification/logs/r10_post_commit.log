@@ -1,0 +1,20 @@
+===== post_commit_counts_guard =====
+CWD=/home/szf/dev/CampaignLab
+CMD=uv run --no-sync pytest -q tests/unit/test_counts_freshness.py
+RC=0
+.....                                                                    [100%]
+5 passed in 0.07s
+===== post_commit_ledger =====
+CWD=/home/szf/dev/CampaignLab
+CMD=uv run --no-sync pytest -q tests/unit/test_state_ledger.py
+RC=0
+......                                                                   [100%]
+6 passed in 0.02s
+===== HEAD tree recount =====
+HEAD_TREE py 75 md 122 sum 197
+LEDGER   py 75 md 122 total 197 ruff 197
+MATCH True
+===== index vs disk set equality =====
+disk 19 index 19
+disk-index [] index-disk []
+SET_EQUAL True

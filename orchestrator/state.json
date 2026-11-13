@@ -2,12 +2,12 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T02:20:00+08:00",
+  "updated_at": "2026-11-14T02:55:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.6364,
-    "flash_share_tokens": 0.5086,
+    "flash_share_tasks": 0.6571,
+    "flash_share_tokens": 0.6655,
     "phase_quotas": {
       "M0": 100,
       "M1": 150,
@@ -762,12 +762,72 @@
           "FU-7",
           "FU-21"
         ]
+      },
+      {
+        "task": "M0-03b",
+        "subtask": "S2 六态参数化 vitest + S3 件内样板收敛（S4 截图依 A135 推迟至 M1-04）",
+        "lane": "F",
+        "agent_id": "01a1d5e5-ed0e-7b51-a7fc-15d54bca2bbf",
+        "nickname": "Mencius(Lagrange-R9)",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "escalated": false,
+        "escalate_reason": null,
+        "result": "DONE",
+        "subtask_count": 2,
+        "loop_used": 3,
+        "loop_cap": 3,
+        "tokens": 380000,
+        "tokens_note": "子智能体自报 ≈3.8e5（原文「输入 ≈3.4e5 / 输出 ≈4e5 的 1/10 量级，即输出 ≈4e4」，表述内部不自洽）；无计量句柄可核，按「如实上报不粉饰」入账，不下调也不上调",
+        "tokens_caliber": "self_estimate_unverified",
+        "est_tokens_planned": 5000,
+        "overrun_ratio": 76.0,
+        "over_cap": true,
+        "over_cap_note": "flash 档上限 60k -> 自报 380k 越限 6.33×；相对派单预算 5k 越限 **76×**，本仓最严重单条越限（前值 Dirac 181k=3.02×、Goodall 83k=1.38×、Bohr 65k=5.42×）",
+        "overrun_drivers": [
+          "被判定面极大：331 行冻结文档 + 303 行组件契约表 + ui/COMMON.md 逐字文案 + 13 件既有公共组件（398 行），需交叉比对而非抽样",
+          "冻结面内部存在 7 处冲突（R-1 vs F-B/F-2、A137 字面 vs import type、§3.4 context 默认值、§3.4 vs §3.5 骨架 props、§1.3 唯一标题 vs §3.3 逐字文案、§7 清单 vs R-4 工厂、CR 边界判定），每处都要重读上下文取证",
+          "loop_used=3 触顶（含一次「模板重排误删动作区 -> 补回并全文校验」的返工），每轮重读冻结面",
+          "产出 12 件共 1810 行（含 405 行矩阵工厂），一次性落盘"
+        ],
+        "cost_lesson": "**根因是编排器派单设计错，不是档位选错也不是模型失控**：① 该卡动作看似量产型（用例展开 + 样板收敛）故按 §6.3 派 flash，但实质是跨文档一致性判定，按 §6.3「跨模块一致性」「公共冻结件」两条硬规则**本应派 max**；② 5k 预算按「产出份数」估，未按「被判定面行数」估（与 A143 的 Epicurus cost_lesson 同源，未吸取）；③ 7 处冲突全部可在**派单前**由编排器扫出，冲突 ≥3 处即应升档或拆卡。纠正措施记 R10-4。",
+        "returned_at": "2026-11-14T02:55:00+08:00",
+        "commit": "本提交（R10-B）",
+        "verified_by_orchestrator": "编排器独立复验（不采信自报，全部亲自重跑）：① 12 件逐件行数与自报**全等**（258/129/87/54/62/17 与 281/183/168/88/78/405），编码三断言全过，state/ 内无第 7 个文件；② 越界自证 A144 三段式全过（lane 交回时点 git diff --name-only HEAD 为空、git status --porcelain -uall web 的 12 行全在两个写权目录内）；③ 前端四门禁亲自重跑全 rc=0：vitest state 5 files/173 tests、全量 12 files/277 tests、typecheck、lint、build（css 377.54 kB / 83 modules / 511ms），与自报逐项一致；④ breakpoint-guard 违规 0、tokens-guard 11 例全绿；⑤ 11 条定点守卫实测（commands.md 第 15-25 行）；⑥ 7 项上报冲突逐项复验后终裁 A145-A151，**实现零返工**。",
+        "orchestrator_correction": "**R10-5**：编排器首轮复验时对 `vue-router|useRoute` 与 `features` 两条守卫误用 BRE（未加 -E），BRE 下 `|` 是字面量 -> 「有匹配」被误报成 rc=1「无匹配」的**假绿**（R9-4「rc=2 假红」的镜像陷阱）。改 ERE 重跑后真值：`vue-router` 字样 1 命中且为注释（ViewState.vue:22），`from 'vue-router'`/`useRoute`/`import(`/`require(` 四项均 0 命中；`@/features` 恰 1 命中（viewState.ts:19）。**两条裁定的实质结论不变**，但引用证据已换成正确命令，冻结文档 §9.1 与 :185 行内更正均已同步修正。固化 rule_grep_alternation_requires_ERE。",
+        "outputs": [
+          "web/src/components/state/{ViewState.vue(258),viewState.ts(129),FirstLoadSkeleton.vue(87),registry.ts(54),MissingValue.vue(62),index.ts(17)}",
+          "web/tests/unit/state/{viewState.spec.ts(281),registry.spec.ts(183),viewStateCopy.spec.ts(168),missingValue.spec.ts(88),firstLoadSkeleton.spec.ts(78),stateMatrix.ts(405)}"
+        ],
+        "adjudications_triggered": [
+          "A145",
+          "A146",
+          "A147",
+          "A148",
+          "A149",
+          "A150",
+          "A151"
+        ],
+        "followups_triggered": [
+          "FU-26",
+          "FU-27",
+          "FU-28"
+        ],
+        "related": [
+          "A135",
+          "A137",
+          "D-034",
+          "M0-03b-freeze.md"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
     "dispatched_not_yet_returned": 0,
-    "flash_share_dev_lanes": 0.3125,
+    "flash_share_dev_lanes": 0.3889,
     "flash_share_口径": {
       "all_lanes": "19/31=0.6129",
       "dev_lanes_only_excl_Q": "4/15=0.2667",
@@ -784,19 +844,19 @@
         "recomputed_at": "2026-11-13T10:49:12+08:00"
       }
     },
-    "flash_share_recomputed_at": "2026-11-14T02:20:00+08:00",
+    "flash_share_recomputed_at": "2026-11-14T02:55:00+08:00",
     "flash_share_detail": {
-      "subtask_entries": 24,
-      "subtask_units_total": 33,
-      "subtask_units_flash": 21,
-      "token_entries_known": 9,
+      "subtask_entries": 25,
+      "subtask_units_total": 35,
+      "subtask_units_flash": 23,
+      "token_entries_known": 10,
       "token_entries_null": 15,
-      "tokens_known_total": 810000,
-      "tokens_known_flash": 412000,
-      "dev_lane_units_total": 16,
-      "dev_lane_units_flash": 5,
+      "tokens_known_total": 1190000,
+      "tokens_known_flash": 792000,
+      "dev_lane_units_total": 18,
+      "dev_lane_units_flash": 7,
       "recomputed_by": "程序化重算（subtask_log 全量求和，units=subtask_count or 1；flash=tier_used==qwen3.8-flash；dev=task.startswith(M)；tokens 仅计非 null，禁手填禁估算）",
-      "recomputed_at": "2026-11-14T02:20:00+08:00",
+      "recomputed_at": "2026-11-14T02:55:00+08:00",
       "over_cap_entries": [
         {
           "task": "M0-03",
@@ -832,12 +892,23 @@
         "dev_lane_units_flash": 4,
         "recomputed_at": "2026-11-13T13:23:04+08:00"
       },
-      "detail_staleness_corrected_R10": "R10 自我更正：R9 追加 Epicurus 条目后只重算了 flash_share_tasks/tokens/dev_lanes 三个标量，未同步刷新 flash_share_detail 与 guardrail_status.actual_*，导致 detail 停在 22 entries/31 units/0.6129 的旧值。本批一并同步，并固化规则：任何 subtask_log 追加必须同批刷新 detail 与 guardrail_status.actual_*（记 R10-2）。"
+      "detail_staleness_corrected_R10": "R10 自我更正：R9 追加 Epicurus 条目后只重算了 flash_share_tasks/tokens/dev_lanes 三个标量，未同步刷新 flash_share_detail 与 guardrail_status.actual_*，导致 detail 停在 22 entries/31 units/0.6129 的旧值。本批一并同步，并固化规则：任何 subtask_log 追加必须同批刷新 detail 与 guardrail_status.actual_*（记 R10-2）。",
+      "previous_snapshot_R10A": {
+        "subtask_entries": 24,
+        "subtask_units_total": 33,
+        "subtask_units_flash": 21,
+        "token_entries_known": 9,
+        "tokens_known_total": 810000,
+        "tokens_known_flash": 412000,
+        "dev_lane_units_total": 16,
+        "dev_lane_units_flash": 5,
+        "recomputed_at": "2026-11-14T02:20:00+08:00"
+      }
     },
     "guardrail_status": {
       "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
-      "actual_tasks": 0.6364,
-      "actual_tokens": 0.5086,
+      "actual_tasks": 0.6571,
+      "actual_tokens": 0.6655,
       "tasks_target_met": true,
       "tokens_target_met": false,
       "verdict": "护栏① flash_share_tasks 已达标（0.6129 >= 0.60）；护栏② flash_share_tokens 未达标（0.441 > 0.35）。如实上报不粉饰，历史诊断与纠正措施保留于 diagnosis / corrective_action / round4_update。",
@@ -863,8 +934,13 @@
         "actual_tasks": 0.6129,
         "actual_tokens": 0.441
       },
-      "recomputed_at": "2026-11-14T02:20:00+08:00",
-      "verdict_R10": "护栏① flash_share_tasks 0.6364 >= 0.60 -> 达标；护栏② flash_share_tokens 0.5086 <= 0.35 -> 未达标。tasks 侧因 Bohr（flash）入账由 0.6250 升至 0.6364；tokens 侧由 0.4658 升至 0.5086，主因是 Bohr 自报 65k（flash 越限第 3 条）。如实上报不粉饰，不为凑配比降档。"
+      "recomputed_at": "2026-11-14T02:55:00+08:00",
+      "verdict_R10": "护栏① flash_share_tasks 0.6364 >= 0.60 -> 达标；护栏② flash_share_tokens 0.5086 <= 0.35 -> 未达标。tasks 侧因 Bohr（flash）入账由 0.6250 升至 0.6364；tokens 侧由 0.4658 升至 0.5086，主因是 Bohr 自报 65k（flash 越限第 3 条）。如实上报不粉饰，不为凑配比降档。",
+      "previous_actual_R10A": {
+        "actual_tasks": 0.6364,
+        "actual_tokens": 0.5086
+      },
+      "verdict_R10B": "护栏① flash_share_tasks 0.6571 >= 0.60 -> **达标**（由 R10-A 的 0.6364 续升，23/35 单位）；护栏② flash_share_tokens 0.6655 <= 0.35 -> **严重未达标**（由 0.5086 恶化）。恶化的**唯一**增量是 Mencius 一条自报 380k（flash），单独贡献 token 分母的 31.9%。如实上报不粉饰：① 该值 caliber=self_estimate_unverified、自报表述内部不自洽，既不下调（那是粉饰）也不上调；② 根因已定性为**编排器派单设计错**（该卡按 §6.3「跨模块一致性 / 公共冻结件」本应派 max，且 5k 预算按产出份数而非被判定面行数估），**不是为凑配比而降档** —— 恰恰相反，是**该升档没升**；③ 反事实核算：若该条当初按规则派 max（则不计入 flash 分子、且按 max 上限 200k 计），flash_share_tokens 约为 0.5086，仍超标，说明护栏② 是**结构性**问题（历史单批过大 Dirac 181k + 本轮档位误判两层叠加），非单点可解。纠正措施见 R10-4；护栏检查点仍为 wave2 出口，届时若仍不达标则按手册降批规模而非降档。"
     }
   },
   "tasks": {
@@ -1414,12 +1490,12 @@
       }
     },
     "M0-03b": {
-      "status": "TODO",
+      "status": "PASS_WITH_TODO",
       "lane": "F",
       "tier_planned": "max",
-      "tier_used": "qwen3.8-max high（S1）",
+      "tier_used": "qwen3.8-max high（S1）+ qwen3.8-flash high（S2+S3，Mencius）",
       "attempt": 0,
-      "tokens": 0,
+      "tokens": 380000,
       "commit": "",
       "branch": "m0-framework",
       "gates": [
@@ -1467,15 +1543,15 @@
       "tier_override_at": "2026-11-13T04:25:00+08:00",
       "subtask_progress": {
         "S1": "DONE",
-        "S2": "TODO",
-        "S3": "TODO",
-        "S4": "TODO"
+        "S2": "DONE",
+        "S3": "DONE",
+        "S4": "DEFERRED(A135)"
       },
       "subtask_progress_evidence": {
         "S1": "本提交：orchestrator/handoff/M0-03b-freeze.md（331 行/33974B）——六态与 ui/COMMON.md 行号逐条对齐（:27 首载 / :28 无记录 / :30 部分可比与待补 / :31 校验失败 / :32 过期，编排器已抽样复核原文一致）、props/slots/事件契约、外部注册扩展点方案（命中 8 处，gate 要求 >=1）、CR 边界、给 S2-S4 的派单就绪清单",
-        "S2": "TODO：web/tests/unit/state/** 六态参数化 vitest（flash 3k）",
-        "S3": "TODO：web/src/components/state/** 件内样板收敛（flash 2k）",
-        "S4": "**BLOCKED**：截图需 e2e harness，而 web/tests/e2e/** 不在 scope_allow（Lagrange U-2）-> 裁定前无可执行输入，见 resume.round8_pending_rulings_F"
+        "S2": "本提交（R10-B）：web/tests/unit/state/** 6 件 = 5 个 spec（viewState 281 / registry 183 / viewStateCopy 168 / missingValue 88 / firstLoadSkeleton 78）+ stateMatrix.ts 405（R-4 矩阵工厂，A151 追认，非 spec）。门禁（编排器亲自重跑，cwd=web）：npm run test -- tests/unit/state rc=0 -> 5 files / 173 tests；npm run test rc=0 -> 12 files / 277 tests；typecheck rc=0；lint rc=0。六态 × 视口标签矩阵齐备；窄屏腿按 A135 用「断点不改变语义呈现 + matchMedia mock + 源码级宽度纪律」取证，未在 vitest 里谎称做了真实视口渲染（state/ 内 @media / data-narrow / matchMedia 命中均 0）。",
+        "S3": "本提交（R10-B）：web/src/components/state/** 恰 6 件 = ViewState.vue 258 / viewState.ts 129 / FirstLoadSkeleton.vue 87 / registry.ts 54 / MissingValue.vue 62 / index.ts 17（与 §3.2 冻结清单逐一对应，无第 7 个文件 -> §5:285 的 CR 条件未触发）。门禁：typecheck / lint / build 各 rc=0（build 产物 dist/assets/index-*.css 377.54 kB、83 modules、511ms）；tokens-guard 11 例全绿（零色值字面量）；breakpoint-guard 违规 0（web/src 内 6 条 @media 全在 state/ 外）。越界自证按 A144 三段式：写权外 tracked 修改 0、写权内无 tracked 修改（全为新建）、git status --porcelain -uall web 的 12 行全部落在两个写权目录内。7 项上报冲突经编排器独立复验后终裁为 A145-A151，**实现零返工**。",
+        "S4": "**DEFERRED(A135)**：六态 × 2 视口截图需 e2e harness，而 web/tests/e2e/** 不在 M0-03b 的 scope_allow（U-2）；A135 已裁推迟至 M1-04 同批采集。本卡不产出 evidence/M0/M0-03b/**（该落点由 §7 的 S4 段规定）；S2/S3 的门禁证据按 rule_no_tmp_only_evidence 落在 evidence/M0/ORCHESTRATOR/r10-verification/（含 logs/ 3 份原始日志）。"
       },
       "s4_screenshot_deferral_A135": {
         "at": "2026-11-14T00:57:19+08:00",
@@ -1483,7 +1559,9 @@
         "completion_caliber": "本卡完成面 = 六态呈现契约冻结登记（orchestrator/handoff/M0-03b-freeze.md）+ web/tests/unit/state/ 单测 + 越界自证双检为 0；判 **PASS_WITH_TODO** 而非 PASS，TODO 项即六态截图。",
         "why_not_a_b": "(a) 为截图扩 web/tests/e2e/state/** 会让冻结卡持有页面级 harness 写权，与 A134「不越界」同一原则；(b) 另指定落点等于新增第三套证据口径，且 playwright/vitest 配置与依赖（web/*.config.*、web/package.json）在本卡 scope_deny 内、仅编排器可改。",
         "handoff": "M1-04 派单文必须显式承接：六态截图取证 + D-034 的 #2（DataTable 36px 密集档/宽表冻结首列）与 #4（AppShell 透传 drawer/entryActive）点名处理（依 A140）。"
-      }
+      },
+      "pass_with_todo_note_R10": "S2/S3 已 DONE 并经编排器独立复验合格（evidence/M0/ORCHESTRATOR/r10-verification/verify-report.md）；唯一 TODO 是 S4 六态截图，依 A135 推迟至 M1-04（需 e2e harness，而 web/tests/e2e/** 不在本卡 scope_allow，见 U-2 / resume.round8_pending_rulings_F）。故任务级判 PASS_WITH_TODO 而非 DONE；TODO 项已定址到 M1-04 并由 A135 承载，不另立 FU（避免与 A135 双头记账）。",
+      "tokens_note_R10": "S2+S3 由 Mencius 自报 ≈3.8e5（无计量句柄、表述内部不自洽，按「如实上报不粉饰」入账，caliber=self_estimate_unverified）；派单预算仅 5k -> 越限 76×，为本仓最严重单条越限。根因判定为编排器派单设计错（详见 round10_self_corrections.R10-4 与冻结文档 §9.2）：该卡实质是「331 行冻结文档 + 303 行组件契约表 + COMMON.md 逐字文案 + 13 件既有公共组件」之间的跨文档一致性判定，按 §6.3「跨模块一致性 / 公共冻结件」两条硬规则本应派 max，且 5k 预算是按产出份数而非被判定面行数估的。"
     },
     "M0-04": {
       "status": "IN_PROGRESS",
@@ -5172,31 +5250,6 @@
           "migrations/**",
           "src/campaignlab/api/jobs.py（S4）"
         ]
-      },
-      {
-        "agent_id": "01a1d5e5-ed0e-7b51-a7fc-15d54bca2bbf",
-        "nickname": "Mencius(Lagrange-R9)",
-        "lane": "F",
-        "task": "M0-03b",
-        "subtask": "S2 六态参数化 vitest + S3 件内样板收敛（S4 截图依 A135 推迟至 M1-04）",
-        "tier": "qwen3.8-flash",
-        "budget": "5k",
-        "loop_cap": 3,
-        "dispatched_at": "2026-11-14T01:27:21+08:00",
-        "write_set": [
-          "web/src/components/state/**",
-          "web/tests/unit/state/**"
-        ],
-        "hard_deny": [
-          "web/src/pages/**",
-          "web/src/features/**",
-          "web/src/components/**（state/ 以外，含 D-034 四件禁夹带修）",
-          "web/*.config.*",
-          "web/package.json",
-          "web/src/api/types.ts",
-          "M0-03b-freeze.md（S1 已冻结）"
-        ],
-        "note": "派单后补发情报：state/ 目录实测不存在、ViewState 全域 0 命中 -> S3 是**按冻结登记新建**而非补齐既有文件（与 freeze.md:115/:117/:331 一致）"
       }
     ],
     "dispatch_requirements": [
@@ -5624,7 +5677,7 @@
       "counts": {
         "pytest_passed": 356,
         "mypy_source_files": 73,
-        "ruff_formatted_files": 197,
+        "ruff_formatted_files": 200,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -5633,9 +5686,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 197,
+          "total": 200,
           "in_scope_py": 75,
-          "in_scope_md": 122,
+          "in_scope_md": 125,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -5673,8 +5726,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T02:20:00+08:00",
-        "counts_refresh_reason": "Round 10 / M0-02·S5 取证面入库 + D-038 立单后重采样：新增 3 个作用域内 .md（evidence/M0/M0-02/ac.md、evidence/M0/summaries/M0-02.md、orchestrator/defects/D-038.md）-> in_scope_md 119->122、total 194->197、ruff_formatted_files 194->197；in_scope_py 恒为 75（本批零 .py 变更，Volta/M0-04·S3 的 src/campaignlab/infra/artifacts.py 仍在飞未入库，按 A101「分母只从已提交树取」不计入）。http/ 下 24 件为 .http/.txt/.json，不在 ruff format 作用域，故不影响分母。",
+        "counts_refreshed_at": "2026-11-14T02:55:00+08:00",
+        "counts_refresh_reason": "Round 10 / M0-03b·S2+S3 复验证据入库后重采样：新增 3 个作用域内 .md（evidence/M0/ORCHESTRATOR/r10-verification/ 的 00-index.md、commands.md、verify-report.md）-> in_scope_md 122->125、total 197->200、ruff_formatted_files 197->200；in_scope_py 恒 75（本批零 .py）。同批修改 orchestrator/handoff/M0-03b-freeze.md（331->363 行，已跟踪件的行内更正 + 追加 §9，不改分母）；logs/*.log 3 份不在 ruff format 作用域（仅 .py/.md 计入）；Mencius 的 12 件产物全在 web/ 下，依 pyproject.toml:51 extend-exclude 与 :68 mypy exclude 一律不计入分母。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -5713,6 +5766,13 @@
           "total": 194,
           "ruff_formatted_files": 194,
           "counts_refreshed_at": "2026-11-14T01:20:00+08:00"
+        },
+        "previous_values_R10A": {
+          "in_scope_py": 75,
+          "in_scope_md": 122,
+          "total": 197,
+          "ruff_formatted_files": 197,
+          "counts_refreshed_at": "2026-11-14T02:20:00+08:00"
         }
       },
       "denominator_history": [
@@ -7754,6 +7814,36 @@
         "retired_reason": "已回收：交付抽验合格并入库（R10-A），发现证据计数失真已立 D-038 同批更正",
         "result": "DONE",
         "tokens_self_reported": 65000
+      },
+      {
+        "agent_id": "01a1d5e5-ed0e-7b51-a7fc-15d54bca2bbf",
+        "nickname": "Mencius(Lagrange-R9)",
+        "lane": "F",
+        "task": "M0-03b",
+        "subtask": "S2 六态参数化 vitest + S3 件内样板收敛（S4 截图依 A135 推迟至 M1-04）",
+        "tier": "qwen3.8-flash",
+        "budget": "5k",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T01:27:21+08:00",
+        "write_set": [
+          "web/src/components/state/**",
+          "web/tests/unit/state/**"
+        ],
+        "hard_deny": [
+          "web/src/pages/**",
+          "web/src/features/**",
+          "web/src/components/**（state/ 以外，含 D-034 四件禁夹带修）",
+          "web/*.config.*",
+          "web/package.json",
+          "web/src/api/types.ts",
+          "M0-03b-freeze.md（S1 已冻结）"
+        ],
+        "note": "派单后补发情报：state/ 目录实测不存在、ViewState 全域 0 命中 -> S3 是**按冻结登记新建**而非补齐既有文件（与 freeze.md:115/:117/:331 一致）",
+        "retired_at": "2026-11-14T02:55:00+08:00",
+        "retired_reason": "已回收：12 件交付经编排器独立复验合格并入库（R10-B）；7 项上报冲突终裁为 A145-A151，实现零返工",
+        "result": "DONE",
+        "tokens_self_reported": 380000,
+        "tokens_caliber": "self_estimate_unverified"
       }
     ],
     "round3_returns": {
@@ -8745,6 +8835,52 @@
           "A144"
         ],
         "rule_ref": "resume.gate_measurement_caliber.rule_evidence_count_must_be_programmatic"
+      },
+      {
+        "id": "FU-26",
+        "at": "2026-11-14T02:55:00+08:00",
+        "status": "OPEN",
+        "item": "M1-04 页面接入前复核 `state/viewState.ts` 的 dev 水槽三导出（`ViewStateDevNotice` / `VIEW_STATE_DEV_NOTICES` / `pushViewStateNotice`）是否仍必要：它因 no-console + A137（http.ts 水槽不可用）而成为 `state/` 内唯一 dev 可观测通道；若届时已有统一 dev 日志件可替代，则把水槽迁出 `state/`（保持公共冻结件面最小）。**约束（即时生效）**：禁任何 lane 从 `index.ts` barrel 导出这三者；`state/` 内文件数须恒为 6。",
+        "owner": "编排器（M1-04 派单前复核）",
+        "source": "A147 / M0-03b·S3",
+        "trigger": "M1-04 派单前（wave3，L1 lane）",
+        "ruling_id": "A147",
+        "why_deferred": "A147 已判定其不需 CR 且未扩公共 API 面（barrel 未 re-export），当前无违约、无运行期影响；迁出属优化而非修复，与页面接入同批做成本最低。",
+        "related": [
+          "A147",
+          "A137"
+        ]
+      },
+      {
+        "id": "FU-27",
+        "at": "2026-11-14T02:55:00+08:00",
+        "status": "OPEN",
+        "item": "**M3-P02 派单前**，把「`ViewState` 的 `context` 必须由消费页面**显式传入**，未传即三字段 null 且 `resolveVariants()` 命中不到任何 variant」写进其卡文硬约束段，并点名 §4.3 第 2 步（月报 variant 注册）依赖此条。卡文须同时给出 `context` 三字段的取值来源（页面自身持有的路由/工作区信息，**不得**让公共件去读路由）。",
+        "owner": "编排器（M3-P02 卡文）",
+        "source": "A148 / M0-03b·S3",
+        "trigger": "M3-P02 派单前（wave7）；不构成即时阻塞",
+        "ruling_id": "A148",
+        "why_deferred": "M3-P02 尚未开工（status=TODO），其上游 M3-01..M3-04 均未派单；A148 的落法已在代码与冻结文档双侧固化，不会丢失。",
+        "related": [
+          "A148",
+          "A137",
+          "A135"
+        ]
+      },
+      {
+        "id": "FU-28",
+        "at": "2026-11-14T02:55:00+08:00",
+        "status": "OPEN",
+        "item": "把「first-load 的**具体骨架形状**（`heading` / `headCells` / `cardCount`）由页面**直接使用 `FirstLoadSkeleton`** 或经 **`variant.render`** 承载，`ViewState` 只渲染默认骨架、**不** append `skeleton` props」写进 M1-04 / M2-04 / M3-04 / M4-03 四张页面卡的派单文，禁这些 lane 自行给 `ViewState` 扩 props（会触发 §5:281 的 CR 并吃串行合并代价）。",
+        "owner": "编排器（四张页面卡卡文）",
+        "source": "A149 / M0-03b·S3",
+        "trigger": "各卡派单前（M1-04/M2-04 在 wave3，M3-04 在 wave6，M4-03 在 wave7）",
+        "ruling_id": "A149",
+        "why_deferred": "四卡均 status=TODO、当前无在飞 lane；A149 已写进冻结文档 §9，派单时直接引用即可。",
+        "related": [
+          "A149",
+          "A135"
+        ]
       }
     ],
     "commit_backfill_round6": {
@@ -9267,7 +9403,7 @@
       }
     ],
     "gate_measurement_caliber": {
-      "at": "2026-11-14T02:20:00+08:00",
+      "at": "2026-11-14T02:55:00+08:00",
       "source": "D-027 / R6-2",
       "rule_rc": "门禁命令一律 `set -o pipefail` 或不接管道；rc 必须由被测命令本身产生，禁取自 tail/head/grep 等管道尾端",
       "rule_double_judge": "rc 与输出文本必须双判，任一不符即判红：pytest 匹配 'N passed' 且不含 'failed'；ruff check 含 'All checks passed'；ruff format --check 匹配 'N files already formatted' 且不含 'would be reformatted'；mypy 含 'Success: no issues found in N source files'；doctor RC=0 且逐项核对 PASS/WARN/FAIL；check_contracts 含 'CONTRACT CHECK PASS' 且登记项==实测差异",
@@ -9288,7 +9424,8 @@
       "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。 **扩展（R9-5）**：列表型历史键（键名含 previous / history / log / returns / adjudications / corrections 者）**禁整体覆盖，一律 append-only**；写入脚本必须先用 HEAD 版本断言 `len(new) >= len(old)` 且 old 的每一项在 new 中逐条字节级保留（`json.dumps(..., sort_keys=True)` 比对），否则视为缺陷。实证：R9-5 曾用赋值覆盖 in_flight_agents_previous，丢弃 6 条历史 lane 记录并丢 status 键，被提交前语义 diff 的 REMOVED_KEY 计数拦下。",
       "rule_scope_deny_precedence": "scope_allow 与 scope_deny 字面重叠时**一律 deny 优先**；且 deny 必须在 state.json tasks[id].scope_deny **显式登记**（只写在卡内视为未生效，因编排器复验与 lane 越界自证都以台账为机械口径）。已应用：M3-04（A130，排除 review/monthly/ 与 features/monthly/ 归 M3-P02）、M4-03（A141，排除 report/monthly/ 归 M4-P01）。新增同型重叠时按此规则登记，禁逐案另裁。",
       "rule_grep_dash_pattern_needs_separator": "以 `-` 开头的 grep/rg 模式**必须**加 `--` 分隔选项与模式（如 `grep -rn -- --cl-row-h-dense web/src`），否则模式被当选项 -> rc=2、hits=0，与「真无匹配」（rc=1）表象相同而形成假绿。配套纪律：一切「hits=0 / 输出 0」型结论必须同时记 rc，**rc=2 一律判红并修命令重跑，禁记为 1、禁当无匹配**（D-024 的 rc 语义 + R9-4 实证）。",
-      "rule_evidence_count_must_be_programmatic": "（R10 / D-038）证据面任何「共 N 件 / N 个请求 / N 条」的计数必须由脚本对目录或 JSON 数组**实测生成**，禁手工累加；摘要与索引必须由**同一脚本**同时产出，杜绝两处口径分叉。取证类子任务卡文的出口判据须含机器断言「编号件集合 == 索引行集合」（集合相等，非计数相等），不满足即判 RED、不得回报 DONE。另：不同编号体系（如 commands.md 的 V1–V13 校验项编号 与 http/NN-*.http 的文件序号）禁混为一谈。"
+      "rule_evidence_count_must_be_programmatic": "（R10 / D-038）证据面任何「共 N 件 / N 个请求 / N 条」的计数必须由脚本对目录或 JSON 数组**实测生成**，禁手工累加；摘要与索引必须由**同一脚本**同时产出，杜绝两处口径分叉。取证类子任务卡文的出口判据须含机器断言「编号件集合 == 索引行集合」（集合相等，非计数相等），不满足即判 RED、不得回报 DONE。另：不同编号体系（如 commands.md 的 V1–V13 校验项编号 与 http/NN-*.http 的文件序号）禁混为一谈。",
+      "rule_grep_alternation_requires_ERE": "（R10-5）凡 grep 模式含 `|`、`+`、`?`、`{}`、`()` 者**一律加 `-E`**（或用 `-F` 明确声明字面量匹配）。BRE 下 `|` 是**字面量**，`grep -rn 'a|b'` 实际在找字符串 \"a|b\"，必然 0 命中并返回 rc=1，看起来像「守卫通过」——这是 R9-4（模式以 `-` 开头被当选项 -> rc=2 **假红**）的**镜像陷阱**：**rc=1 也可能是假绿，不能一律当作「无匹配=通过」**。配套硬要求：任何「rc=1 无匹配」型守卫在被引用为**通过判据**之前，必须再跑一条**必命中**的正向对照 grep（同一目录、同类模式、已知存在的目标），证明该命令本身能命中；无对照即不得作为证据引用。实证：R10 首轮对 `vue-router|useRoute` 与 `features` 两条守卫误用 BRE，把「1 命中（注释）」与「1 命中（真实依赖边）」双双误报为 0 命中，改 ERE 后才发现；两条裁定结论侥幸未受影响，但引用证据一度失真。"
     },
     "round7_adjudications": [
       {
@@ -9980,6 +10117,113 @@
         ],
         "action_taken": "resume.dispatch_requirements **append-only** 追加第 12 条（A144 三段式越界自证），既有 11 条逐字未动；本裁定与 D-038、M0-02/S5 入库同批提交（因 A144 正是验收 Bohr 追加行为的法律依据，分离提交会造成中间态悬空引用）。",
         "self_note": "教训：A139 立的时候只考虑了「新建文件型」写权（源码/测试 lane），没考虑「追加型」写权（取证/摘要 lane）。凡口径规则，立单时必须枚举写权的**三种形态**（新建 / 追加 / 定点改写）分别给判据，否则总有一类现实场景无判别力。同类风险面：A137（公共件无副作用）对 `import type` 的处置也是事后由 lane F 上报才补口径（本轮 Mencius 回报的 7 项待裁即属此类，另立裁定承载）。"
+      },
+      {
+        "id": "A145",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "M0-03b-freeze.md §4.2 R-1 禁 `state/` import 任何 features 模块，而 §1.2/F-B 又强制 `stateFromError()` 只消费 `presentationOf()`（住在 `features/shared/problemPresentation`），且 §2 F-2 强制组合的 `AlertBanner.vue:3` 已有同一条依赖边 —— 冻结文档自相矛盾，实现方无法两全。",
+        "ruling": "**R-1 加唯一豁免**：`state/` 禁 import 页面 / features / 月报模块，**唯 `@/features/shared/problemPresentation` 的 `presentationOf()` 除外**。三条理由：① **F-B 是更硬的约束**——它禁止在 `state/` 自建 problem code 白名单（否则 code 枚举会在两处漂移），要满足 F-B 就只能消费 `presentationOf()`；② **既有先例**——F-2 强制 `ViewState` 组合 `AlertBanner`，而 `AlertBanner.vue:3` 早已 import 同一模块，故该依赖边不是 `state/` 新引入的耦合形态；③ **立法意图澄清**——R-1 防的是**业务特性**耦合（页面/月报模块的业务状态），而 `features/shared/` 是跨特性共享的表现层**纯函数**、不持业务状态，不在 R-1 防范对象内。除此一处外 R-1 全文仍生效。",
+        "evidence": [
+          "编排器实测：`grep -rnE -- '@/features' web/src/components/state` -> rc=0、**恰 1 命中** = `viewState.ts:19`；与 `presentationOf` 正向 grep 交叉一致",
+          "`web/src/components/AlertBanner.vue:3` 同一 import（既有先例）",
+          "`viewState.ts:128` 是唯一消费点：`presentationOf(error).bucket === \"CONFLICT\" ? \"stale-412\" : \"failed\"` —— 未自建任何 code 字面量，F-B 守住"
+        ],
+        "action_taken": "冻结文档 :250 行内追加 A145 豁免措辞（原句逐字保留）+ §9 表格登记。",
+        "self_note": "冻结文档在 S1 由 max 档产出，却在 S2/S3 落地时才暴露内部矛盾 —— 说明**冻结类文档的自洽性必须在冻结前做一次「规则 × 强制项」交叉矩阵检查**（本例是 R-1 与 F-B/F-2 三方冲突）。立为后续 S1 型任务的出口判据。本轮共发现 4 例同源缺口（A145/A148/A149/A151）。"
+      },
+      {
+        "id": "A146",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "A137 规定公共件「禁调 api / 无数据获取副作用」。`stateFromError()` 的入参类型是 `ApiError`（来自 `@/api/http`），在 `verbatimModuleSyntax` 下只能写 `import type`。字面上算不算违反 A137？若要求字面零 `@/api/` 引用，就必须在 `state/` 内新增 `ApiError` 的结构镜像类型。",
+        "ruling": "**A137 的判据是「运行期模块边」，不是字面文本**。`import type` 在 `verbatimModuleSyntax: true` 下编译期整条擦除，产物里不存在指向 `api/**` 的模块边 -> **合规**。故：① **禁**为凑「字面零引用」而新增 `ApiError` 结构镜像类型 —— 两处定义必然分叉，那才是真正的契约漂移（且 `@/api/http` 的 `ApiError` 受 openapi-typescript 链路约束，镜像件会脱离该约束）；② 采纳实现方提出的**机器门禁口径**并升为通用规则：公共件内 `@/api/` 的**非注释**命中必须**全部**是 `import type` 行，且 `fetch(` / `axios` / `XMLHttpRequest` 非注释命中必须为 0。",
+        "evidence": [
+          "编排器实测（ERE）：`@/api/` 在 `state/` 内命中 **3** = 注释 1（`viewState.ts:9`）+ `import type` 2（`viewState.ts:18`、`ViewState.vue:28`）-> 非注释 2 且全为 `import type`，运行期 api 边 **0**",
+          "`grep -rnE -- '\\bfetch\\(|axios|XMLHttpRequest' web/src/components/state` -> rc=0、2 命中**均为注释**（`viewState.ts:10`、`ViewState.vue:17`），非注释 **0**",
+          "`npm run typecheck`（`vue-tsc --noEmit`）rc=0 且 `npm run build` rc=0 -> 擦除生效有产物级佐证"
+        ],
+        "action_taken": "§9 表格登记。A137 原文已在 `resume.dispatch_requirements` 第 11 条，本裁定是其**判据细化**，不另改该条以免覆盖历史文本。",
+        "self_note": "首轮复验时编排器对 `fetch\\(|axios` 用了 BRE 且括号未闭合 -> **rc=2**（命令自身错误），按 R9-4 判红改 ERE 重跑才拿到真值。rc=2 一律不得当作「无匹配」。"
+      },
+      {
+        "id": "A147",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "`viewState.ts` 新增 dev 水槽三导出（`ViewStateDevNotice` / `VIEW_STATE_DEV_NOTICES` / `pushViewStateNotice`，因 no-console + A137 使 http.ts 水槽不可用），`ViewState.vue` 根元素新增 `data-dev-assert` 契约违例标记。实现方认为按 §5 第 2 行须走 CR，请裁定。",
+        "ruling": "**两项均不需 CR，追认通过**：① `data-dev-assert` 是 DOM data 属性，**不改 props / emits / slots**，不构成 §5:281「改 `state/` 六文件的签名、枚举字面量、slot 名、emit 载荷」的 CR 条件；且它把「契约违例」变成**可断言的可观测面**（`viewState.spec.ts:273/279` 已用它做负例断言），有正向测试价值。② dev 水槽三导出是 `viewState.ts` 的**模块级**导出，但 **barrel 未 re-export** —— §3.1:113 的「`index.ts` 只 re-export 5-9，新增导出须走 CR」条件**未触发**，公共 API 面零扩张。**附带约束（对后续 lane 即时生效）**：禁任何 lane 从 barrel 导出这三者；测试按模块路径直接 import 属允许形态；`state/` 内文件数须恒为 6（§5:285）。",
+        "evidence": [
+          "编排器实测 `index.ts` 全文 17 行：导出行 **7** 条，其中含 dev 水槽符号者 **0** 条 -> barrel 面未扩",
+          "水槽消费者实测仅 3 处：`registry.ts:14`、`ViewState.vue:35`、`registry.spec.ts:19`（按模块路径，非 barrel）",
+          "`state/` 内文件数实测 **6** -> §5:285 未触发",
+          "`data-dev-assert` 实测 3 处：`ViewState.vue:144`（绑定）+ `viewState.spec.ts:273/279`（断言）"
+        ],
+        "action_taken": "§9 表格登记；立 **FU-26**（M1-04 页面接入前复核该 dev 水槽是否仍必要，若可被统一 dev 日志件替代则迁出 `state/`）。",
+        "self_note": "实现方主动上报而不自行决定是正确的（§8 明写「交编排器裁定，实现方不得自行决定」）；但它没意识到 barrel 未导出即不触发 §3.1:113 —— 说明 CR 边界表应把「模块级导出」与「barrel 导出」显式分开表述，已在 §9 澄清。"
+      },
+      {
+        "id": "A148",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "§3.4 冻结表把 `context` 的默认值写作「由当前路由推导」，但读路由需要 `vue-router` 依赖，与 A137「触发值由页面显式传入 / 组件无数据获取副作用」直接冲突。实现方落为「未传即三字段 null」。",
+        "ruling": "**A137 优先，§3.4 的默认值表述更正为 `undefined`（未传即三字段 null，组件不猜）**。理由：① A137 是编排器级裁定且已写进 `dispatch_requirements` 第 11 条，效力高于单卡冻结文档的表格描述；② 「由当前路由推导」本质是组件自取环境数据，正是 F-A「组件不猜」所禁；③ 该落法使 `state/` 对 `vue-router` 零依赖，可测试性更好（node 环境无需 mock router）。**硬约束下游**：`resolveVariants()` 需 `context` 才能命中 variant，故**凡要启用外部注册 variant 的消费页面必须显式传 `context`** —— 特别是 §4.3 第 2 步的 **M3-P02**（月报 variant 注册方），立 **FU-27**，trigger = M3-P02 派单前，须写进其卡文。",
+        "evidence": [
+          "编排器实测四条 ERE 守卫（`state/` + `tests/unit/state/`）：`from ['\"]vue-router` rc=1/0 命中、`useRoute` rc=1/0 命中、`import\\(|require\\(` rc=1/0 命中 -> **无运行期路由依赖**",
+          "`vue-router` 字样仅 **1** 处命中且为**注释**（`ViewState.vue:22`，内容恰是记录本冲突与落法）",
+          "**R10-5 更正**：首轮误用 BRE（`grep -rn 'vue-router|useRoute'`），BRE 下 `|` 是字面量 -> rc=1 假「零命中」；改 `-E` 重跑后拿到上述真值。**实质结论不变**，引用证据已换成正确命令"
+        ],
+        "action_taken": "冻结文档 :185 表格行内更正（原记保留可见）+ §9 表格登记 + §9.1 追加 R10-5 说明；立 FU-27。",
+        "self_note": "`context` 默认值这一格是 S1 冻结时**未验证可实现性**就写下的（写文档时无代码可对照）。教训：冻结表的「默认值」列必须标注**由谁提供**（组件内建 / 消费方传入），否则「由 X 推导」这类措辞会隐含一条未被审查的依赖边。"
+      },
+      {
+        "id": "A149",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "§3.5 的 `FirstLoadSkeleton` 有 `heading` / `headCells` / `cardCount` 三个 props，但都不在 §3.4 `ViewState` 的冻结 props 面内 -> 经 `ViewState` 渲染 first-load 时只能出默认骨架，具体形状无从传入。实现方问：是否给 `ViewState` append 一个 `skeleton` props（须走 CR）？",
+        "ruling": "**不 append、不扩冻结面、不走 CR**。裁定：`ViewState` 的 first-load 只渲染**默认骨架**；页面若需具体骨架形状有两条合法路径 —— ① **直接使用 barrel 导出的 `FirstLoadSkeleton`**（已在冻结面内、props 齐备）；② 经 **`variant.render`** 注入（§4.2 R-3 明列 variant 可「替换呈现」，正是为此类页面级差异预留的扩展点）。理由：骨架形状（标题/表头/卡片数量）是**页面级差异知识**，放进公共件会让 `ViewState` 承载页面语义，直接违反 F-A「组件不猜」；且 append props 会触发 §5:281 的 CR，把本可零成本解决的问题变成串行合并代价。",
+        "evidence": [
+          "编排器实测：`ViewState` 的 props 面与 §3.4 冻结表逐字一致、未被扩（typecheck rc=0 + 12 件行数与自报全等）",
+          "`FirstLoadSkeleton.vue` 87 行、已由 barrel 导出（`index.ts` 导出行含 `export { default as FirstLoadSkeleton }`）-> 路径 ① 可用",
+          "§4.2 R-3 原文：variant 只能做三件事——覆盖文案 / 追加动作键 / **替换呈现（`render`）** -> 路径 ② 是既有扩展点、非新增机制",
+          "实现方已在 `ViewState.vue:24-25` 注释写明同一落法，与本裁定一致"
+        ],
+        "action_taken": "§9 表格登记；立 **FU-28**：把该口径写进 M1-04 / M2-04 / M3-04 / M4-03 四张页面卡的派单文，trigger = 各卡派单前，并禁这些 lane 自行给 `ViewState` 扩 props。",
+        "self_note": "这是 §3.4 与 §3.5 两张冻结表之间的**接口缺口**，同 A145/A148 一样属 S1 冻结文档内部不一致。三例同源 -> 已把「冻结类文档出口须做规则 × 强制项交叉矩阵检查」记入 A145 的 self_note，作为 S1 型任务的通用出口判据。"
+      },
+      {
+        "id": "A150",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "§1.3 要求「每态有唯一标题」，而 §3.3 的逐字文案表里 `partial-comparable` 与 `pending-fill` **共用** `ui/COMMON.md:30` 首句 -> 二者标题必然相同，两条冻结约束不可同时满足。另 F-4 的「文案三来源」不足以覆盖动作名（创建/导入/清空筛选/导出/重新获取/复跑）与「上一结果」标识。",
+        "ruling": "**§3.3 的逐字文案优先（硬约束），§1.3 的「唯一标题」降为「唯一可判定标识」**。裁定：① `partial-comparable` / `pending-fill` **允许**共用 `COMMON.md:30` 首句，两态区分由 `data-state` + hint + 缺项区（`—` + 原因）三者共同承载 —— 这恰符合 §1.3 本章的立法目的（「不靠颜色区分」的四条**非颜色载体**），标题只是载体之一，`data-state` 才是机器可判定的主载体；② **禁**为造唯一标题而改写 `ui/COMMON.md` 原文（spec 侧只读区，且属文案漂移，会连带触发 §5:282 的 CR）；③ 动作名与「上一结果」一律取 `ui/COMMON.md` :28/:29/:30/:32 的**原文子串**并逐字校验（含正/负例自证）—— **采纳**实现方落法，这比自造文案更安全（D-011：只引原文）。",
+        "evidence": [
+          "编排器亲自重跑 `npm run test -- tests/unit/state` rc=0 -> `viewStateCopy.spec.ts` **54 例**全绿（逐字断言 `copyOf` 与 `COMMON.md` 行原文一致）",
+          "`data-state` 机器可读属性实测存在且被断言（§1.3 第 2 条载体）；`state/` 内 `@media` / `data-narrow` / `matchMedia` 命中均 **0**（rc=1 真无匹配）-> 未靠布局差异偷偷区分两态",
+          "全量回归 `npm run test` rc=0 -> 12 files / **277** tests；`tokens-guard` 11 例全绿（零色值字面量）"
+        ],
+        "action_taken": "冻结文档 :71 行内更正（原记「每态有唯一标题」保留可见）+ §9 表格登记。",
+        "self_note": "§1.3 的「唯一标题」是**目标性表述**被写成了**约束性表述**，与 §3.3 的逐字表撞上。教训同 A148：冻结文档里每条约束都要标注它是**硬约束**（可机器判定、违反即 RED）还是**软目标**（尽力满足、冲突时让位），否则实现方无从取舍。"
+      },
+      {
+        "id": "A151",
+        "round": 10,
+        "at": "2026-11-14T02:55:00+08:00",
+        "source": "编排器（Round 10：回收 Mencius/M0-03b·S2+S3 时其上报的 7 项待裁，逐项独立复验后终裁）",
+        "question": "R-4 要求「S2 的参数化用例必须以工厂函数形式导出（六态 × 视口标签矩阵），M3-P02 注册 variant 后复用同一矩阵对自己复跑一遍」，但 §7 的 S2 产出清单只列了 5 个 `.spec.ts`。实现方另建 `stateMatrix.ts`（405 行）承载工厂，问是否追认。",
+        "ruling": "**追认 `stateMatrix.ts`**。理由：① R-4 要求矩阵**工厂化并可被复用**，工厂必须有一个**非 spec** 的落点 —— vitest 的 `include` 是 `*.spec.ts`，若把工厂放进任一 `.spec.ts`，其他 spec import 它时会把对方用例在本文件**重复注册一遍**（用例数虚增、失败定位错乱），技术上不可行；② 它是 **helper 而非 spec**，§7 约束的是「spec 的数量与命名」，**spec 仍恰为 5 个**，语义未被突破；③ 它正是 M3-P02 复用矩阵的对接点，不建它 R-4 无法落地。",
+        "evidence": [
+          "编排器实测（ERE）：`stateMatrix.ts` 内 `\\bdescribe\\(` / `\\bit\\(` / `\\bexpect\\(` 均 **rc=1、0 命中** -> 确非 spec；唯一 `test(` 命中是正则 `/\\\\d/.test(text)`（字符串方法，非用例注册）",
+          "`web/tests/unit/state/` 实测 6 件 = 5 个 `.spec.ts` + 1 个 `stateMatrix.ts`；vitest reporter 实测 `Test Files 5 passed (5)` -> **只收集了 5 个 spec**，佐证 helper 未被当测试文件",
+          "该文件头部注释已自述此理（「本文件不是 spec（vitest include 为 *.spec.ts）：从 .spec 互相 import 会把对方的用例在本文件里重复注册一遍」）"
+        ],
+        "action_taken": "冻结文档 §7 的 S2 产出段 append-only 追记 A151（原 5 个 spec 名逐字保留）+ §9 表格登记。",
+        "self_note": "§7 的产出清单写死了 5 个文件名，却没给 R-4 的工厂留落点 —— 又一处冻结文档内部缺口（第四例）。通用处置：**清单类条款应写「至少含」而非「恰好含」**，除非「恰好」本身是约束（如 `state/` 的 6 文件数是 CR 边界，就必须写「恰好」）。"
       }
     ],
     "round7_predispatch": {
@@ -11552,7 +11796,7 @@
       "ruling": "A143"
     },
     "in_flight_agents_note_round9": "并发纪律核验：开发 lane 3 条（Bohr/S、Volta/S、Mencius/F）+ QA 1 条（Epicurus 已回收）=> 符合「开发 lane <=3 + QA 1」。三条开发 lane 写权**两两不相交**（evidence/M0/M0-02 vs src/campaignlab/infra/artifacts.py+tests vs web/src/components/state+web/tests/unit/state），且各自 hard_deny 覆盖他方写权。上一轮 Round 8 的 Ramanujan（D-016-batch5）句柄已失效，移入 in_flight_agents_previous。子智能体一律禁 git 写；全表复验编排器独占；多 lane 同树只跑路径限定门禁、非自有文件红点只归因不修。",
-    "in_flight_agents_note_round10": "Round 10：Bohr（M0-02/S5）已回收并入 in_flight_agents_previous（第 9 条），M0-02 的 subtask_progress.S5 转 DONE；M0-02 任务级 status 仍为 IN_PROGRESS，因 wave1 出口 Q 复核 + AC 取证回填（A109）未做，且须等 Mencius 交回 web/** 后再派（避免同工作树争用）。仍在飞 2 条：Jason(Volta-R9) M0-04/S3（max，写权 src/campaignlab/infra/artifacts.py + tests/**，工作树已见 artifacts.py）、Mencius(Lagrange-R9) M0-03b/S2+S3（flash，已回报待入账，写权 web/src/components/state/** + web/tests/unit/state/**）。",
+    "in_flight_agents_note_round10": "Round 10：Bohr（M0-02/S5）与 Mencius（M0-03b/S2+S3）均已回收并入 in_flight_agents_previous（8->10 条，append-only，旧条目逐条字节级保留）；M0-02 的 S5 转 DONE（任务级仍 IN_PROGRESS，待 wave1 出口 Q 复核 + A109 取证回填）；M0-03b 判 PASS_WITH_TODO（S2/S3 DONE、S4 依 A135 推迟至 M1-04）。**仍在飞 1 条**：Jason(Volta-R9)，M0-04/S3 原子制品写入（qwen3.8-max，预算 28k，loop_cap 3），写权 src/campaignlab/infra/artifacts.py + tests/integration/jobs/** + tests/unit/test_artifacts.py + evidence/M0/M0-04/**；工作树已见 artifacts.py 与 tests/integration/jobs/。其回收后解锁 M0-04/S2b（max，A110），再 S4（携 A111/A112/A114 + FU-20/FU-21）。因工具链仍被 Volta 占用，全表复验（pytest / mypy / ruff . / doctor / check_contracts）继续推迟；依 rule_precommit_full_table「lane 全部回报即解禁工具链」，Volta 回收后由编排器独占复跑并把 fulltable.log 入库。",
     "round10_self_corrections": [
       {
         "id": "R10-1",
@@ -11577,6 +11821,24 @@
         "rule_broken": "rule_no_trust_handoff_summary_assertions：不得只按上一轮摘要圈定的问题面抽验。",
         "correction": "改为对该任务证据面做**全量计数对账**（每个「N 件/N 个/N 条」声称都用脚本实测复核）后再立单，D-038 因此记全 5 处而非 1 处。固化为 rule_evidence_count_must_be_programmatic 的抽验侧对应动作。",
         "impact": "若只修 1 处，ac.md 的「23 个请求」与 commands.md 的「驱动 23」会继续误导 M5-01 取证。"
+      },
+      {
+        "id": "R10-4",
+        "at": "2026-11-14T02:55:00+08:00",
+        "what": "M0-03b/S2+S3 派给 flash 档、预算 5k，实际自报 ≈380k（越限 76×，本仓最严重单条），过程中撞上冻结文档内部 7 处冲突、loop 触顶 3 轮含一次返工。",
+        "rule_broken": "手册 §6.3 的 max 强制清单含「跨模块一致性」与「公共冻结件」两条；本卡实质是在 331 行冻结文档 + 303 行组件契约表 + COMMON.md 逐字文案 + 13 件既有公共组件之间做跨文档一致性判定，**本应派 max**。编排器只看动作表象（「用例展开 + 样板收敛」像量产型）就派了 flash；预算也按「产出份数」估而非按「被判定面行数」估（与 A143 的 Epicurus cost_lesson 同源，未吸取）。",
+        "correction": "三条纠正措施：① 凡卡文输入含「冻结文档 / 公共件契约表 / 逐字文案对齐」者一律按 §6.3 判 **max**，禁因动作看似量产而降档；② flash 预算一律按「被判定面行数 × 每行单价 + loop 轮数」估，禁按产出份数估；③ **派单前先做冲突面预扫** —— 本卡 7 处冲突全部可在派单前扫出（R-1 vs F-B、§3.4 context、§3.4 vs §3.5、§1.3 vs §3.3、§7 vs R-4 都是文档内两行互斥），冲突 ≥3 处即升档或拆卡。",
+        "impact": "flash_share_tokens 由 0.5086 恶化至 0.6655（护栏②严重未达标）；但**交付质量未受损**（12 件逐件复验合格、四门禁全绿、7 项裁定零返工），损失是成本与护栏数字，非正确性。已如实入账不粉饰、不下调自报值。",
+        "counterfactual": "若当初派 max：该条不计入 flash token 分子，flash_share_tokens 约 0.5091（412000/810000）—— 仍超标，主因回到历史 Dirac 181k，说明护栏②是**结构性**问题（历史单批过大 + 本轮档位误判两层），非单点可解。"
+      },
+      {
+        "id": "R10-5",
+        "at": "2026-11-14T02:55:00+08:00",
+        "what": "编排器复验 Mencius 交付时，对 `vue-router|useRoute` 与 `from ... features|@/features` 两条守卫误用 BRE（`grep -rn` 未加 `-E`）。BRE 下 `|` 是字面量，两条都返回 rc=1、0 命中，被当成「守卫通过」的**假绿**并已写进 A148 的引用证据。",
+        "rule_broken": "R9-4 只覆盖了「模式以 `-` 开头 -> rc=2 假红」，未覆盖「BRE 交替失效 -> rc=1 假绿」；且 `rule_rc` 的 rc 语义表把 1 一律解释为「无匹配（守卫期望）」，未要求对「无匹配」本身做可信性验证。",
+        "correction": "① 改 `-E` 重跑拿真值：`vue-router` 字样 1 命中（ViewState.vue:22 注释），`from 'vue-router'` / `useRoute` / `import(` / `require(` 四项 ERE 守卫均 rc=1、0 命中 -> **A148 实质结论不变**；`@/features` 恰 1 命中（viewState.ts:19）-> **A145 实质结论不变**。② 已写进冻结文档 :185 与 §9.1 的引用证据全部换成正确的 ERE 命令与命中数（原错误表述显式更正，非静默替换）。③ 固化 `rule_grep_alternation_requires_ERE`，并加配套硬要求：任何「rc=1 无匹配」型守卫作为通过判据引用前，必须再跑一条必命中的正向对照 grep。",
+        "impact": "**未造成错误裁定**（两条裁定结论均正确），但引用证据一度失真；若未被本轮自查抓出，Q lane 复核时会按错误命令复跑得到「0 命中」并误信 A148 的依据链。属证据可信性缺陷，非结论缺陷。",
+        "detection": "自查触发点：r10_gen_evidence.py 用 ERE 重跑同一模式时得到 measured=1，与前一轮 BRE 的 0 命中**矛盾** -> 立即停手查实，未直接采信任一版本。这正是「同一守卫用两种口径交叉」的价值，已写进规则的对照要求。"
       }
     ]
   },
