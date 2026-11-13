@@ -31,9 +31,6 @@ KNOWN_MISSING: frozenset[str] = frozenset(
         "M2-04",
         "M3-04",
         "M3-P02",
-        "M4-P01",
-        "M5-01",
-        "M5-02",
         "M5-03",
         "M5-P01",
     }

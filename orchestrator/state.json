@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T09:47:18+08:00",
+  "updated_at": "2026-11-13T10:33:50+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.5,
+    "flash_share_tasks": 0.5714,
     "flash_share_tokens": 0.441,
     "phase_quotas": {
       "M0": 100,
@@ -403,6 +403,36 @@
         "scope_violation": "NONE（编排器复核：13 条改动全在派单写集内；未执行任何 git 写操作、未 sudo、未改 tests/unit/test_task_cards.py 等既有测试、未改 spec/**、contracts/**、pyproject.toml、web/**）",
         "loop_rounds_used": 1,
         "gate_note": "出口条件 python -m campaignlab doctor rc 1->0 达成；L 循环 1 轮内定位修复全部红点，未启用第 2 轮"
+      },
+      {
+        "task": "D-016-batch4",
+        "subtask": "补卡批次4（3 张：M4-P01/M5-01/M5-02）+ KNOWN_MISSING 9->6",
+        "lane": "T",
+        "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
+        "nickname": "Planck",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 3,
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal=null/remainingTokens=null/completionBudgetReport=null，无计量句柄；按纪律记 null，禁估算。客观量：38 次工具调用（exec_command 37 + get_goal 1）、卡正文合计 50683 B（M4-P01 20081 + M5-01 15269 + M5-02 15333）、中间脚本 12 个（仓库外 .orch_tmp/laneT4/）、loop 用 1/2",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；无计量值故不判越限，以客观量留痕。批次演进：181k/8卡(22.6k每卡) -> 50k/4卡(12.5k每卡) -> 批次3 越限 -> 批次4 三卡正文 50683 B(16.9k每卡)，纠正措施第①条（降到 2-3 张）与第③条（context 分节）已执行",
+        "returned_at": "2026-11-13T10:30:54+08:00",
+        "commit": "PENDING(本提交)",
+        "outputs": [
+          "orchestrator/tasks/M4-P01.md(20081B/head36/tail23/total71)",
+          "orchestrator/tasks/M5-01.md(15269B/head37/tail22/total66)",
+          "orchestrator/tasks/M5-02.md(15333B/head35/tail23/total66)",
+          "tests/unit/test_task_cards.py（仅删 KNOWN_MISSING 3 行，numstat 0\\t3）"
+        ],
+        "orchestrator_reverify": "编排器独立复验（禁采信自报）：以纯 python3 复现 test_task_cards.py 的 4 条断言与 test_task_card_narrative.py 的 6 条断言，全 23 卡全绿（A1 分母 29 True；A2 unregistered/recovered 均空；A3 6==6；A4 orphan 空；A5 缺段 空；B1 23>=12；B2/B3/B4 超限均空；B5 表头非四列 空；B6 豁免集精确）；三卡 head/tail/total 与表头逐字、BOM/CR/尾换行、bytes 与自报全等；git diff --numstat 实测 0\\t3 且删的正是 M4-P01/M5-01/M5-02 三行；三份切片指纹编排器自算 109729/73a9bcf1c483adbd、3781/87bfe2b0db49373d、14977/4ed7f37be9e8039a 与 rules §8 表全等；自曝的 0 字节误建文件 '=19' 实测已不存在；pytest 级复验在 S3d 回收时一并完成（205 passed 含两个卡片守护）",
+        "u_items_raised": 20,
+        "u_items_adjudicated": "A49-A68（见 resume.round6_adjudications）",
+        "self_declared_deviations": 8,
+        "value_added": "U-4 主动暴露 waves[8] serial 次序与 deps 不自洽（编排器普查后立 D-026 并新增机器守护，属本批最高价值上报）；U-1 暴露 M5-02 的 acs=[] 与 gates「35 条」和 plan「47 条」的口径冲突；U-6/U-6 主动暴露编排器自己写的两份 context 与切片实取不符（键集、truncated_schemas=None vs []）；自曝脚本 bug（flash 理由漏写 6 行）与误建 0 字节文件 '=19' 并已清除，未掩饰"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -410,29 +440,29 @@
     "dispatched_not_yet_returned": 0,
     "flash_share_dev_lanes": 0.2,
     "flash_share_口径": {
-      "all_lanes": "9/18=0.5",
+      "all_lanes": "12/21=0.5714",
       "dev_lanes_only_excl_Q": "2/10=0.2",
-      "tokens_coverage": "7/13 条回传用量，6 条记 null（Gauss、Aquinas、Locke、Hilbert 均无用量自省通道，按禁估算口径记 null）",
+      "tokens_coverage": "7/14 条回传用量，7 条记 null（无计量句柄者一律记 null，禁估算）",
       "why_below_target": "Round 4 三条开发 lane（Gauss/Aquinas/Heisenberg）全为 max 档：M0-02/S3a 是 ADR-005 §2.4 的公共冻结件与数据库单一来源（手册 §6.3 强制 max），M0-03/S5 与 M0-04/S1 为设计/契约对齐件（§6.3 设计先行必然形态）。dev lane flash 占比 2/9=0.2222，如实入账不粉饰、不为凑配比降档。",
       "projection_at_wave1_exit": "M0-02(2 max + 3 flash) + M0-03(4 max + 6 flash) = 9/15 = 0.600 恰达护栏",
       "guardrail_checkpoint": "wave2 出口；不足则降档并记理由（首选 M0-03/S10 降 flash + max 复审）",
-      "recomputed_at": "2026-11-13T09:03:26+08:00",
+      "recomputed_at": "2026-11-13T10:30:54+08:00",
       "recomputed_by": "程序化重算（禁手填）",
       "recovery_plan": "Round 5 起回补：M0-02/S3b+S4+S5（3 个 flash）∥ M0-03/S6-S9（4 个 flash）∥ M0-04/S4-S8（5 个 flash）∥ D-016 批次3（flash 4-5 张 + 预抽摘要）。仅 M0-02/S3c+S3d 与 M0-04/S2 保持 max（§6.3 强制项）。"
     },
-    "flash_share_recomputed_at": "2026-11-13T09:03:26+08:00",
+    "flash_share_recomputed_at": "2026-11-13T10:30:54+08:00",
     "flash_share_detail": {
-      "subtask_entries": 13,
-      "subtask_units_total": 18,
-      "subtask_units_flash": 9,
+      "subtask_entries": 14,
+      "subtask_units_total": 21,
+      "subtask_units_flash": 12,
       "token_entries_known": 7,
-      "token_entries_null": 6,
+      "token_entries_null": 7,
       "tokens_known_total": 712000,
       "tokens_known_flash": 314000,
       "dev_lane_units_total": 10,
       "dev_lane_units_flash": 2,
-      "recomputed_by": "程序化重算（subtask_log 全量求和，禁手填）",
-      "recomputed_at": "2026-11-13T09:03:26+08:00",
+      "recomputed_by": "程序化重算（subtask_log 全量求和，units=subtask_count or 1；dev=task.startswith('M')；禁手填）",
+      "recomputed_at": "2026-11-13T10:30:54+08:00",
       "over_cap_entries": [
         {
           "task": "M0-03",
@@ -448,11 +478,12 @@
           "tokens": 181000,
           "limit": 60000
         }
-      ]
+      ],
+      "recompute_caliber_verified": "口径已用 Round 5 的 13 条历史条目反向验证可复现：units_total 18、units_flash 9、tokens_known 712000、tokens_flash 314000、dev 2/10，与当时记录逐字全等，故本次 14 条的重算可信"
     },
     "guardrail_status": {
       "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
-      "actual_tasks": 0.5,
+      "actual_tasks": 0.5714,
       "actual_tokens": 0.441,
       "tasks_target_met": false,
       "tokens_target_met": false,
@@ -463,8 +494,9 @@
       "round4_update": "【2026-11-13T06:55:00+08:00 Round 4 回收后重算】flash_share_tasks 0.4444->0.5（+4 flash 子任务单位来自 Archimedes 批次2），flash_share_tokens 0.4356->0.441（Heisenberg 56k 为 max 档入账，Archimedes 50k 为 flash 档入账；Gauss 与 Aquinas 记 null 不入分母）。两项护栏仍未达标，如实上报不粉饰。tasks 占比由 0.4444 升至 0.5，方向正确；tokens 占比小幅上升系 max 档设计任务的 56k 进入已知分母所致，非降档失控。批次2 单卡成本 12.5k（批次1 为 22.6k/卡），纠正措施实测有效，批次3 沿用。",
       "batch3_status": "RETURNED_VERIFIED_OVER_CAP",
       "corrective_action_next": "批次 4 起：① 每批降到 2-3 张卡（批次3 的 4 卡正文 96231 B 是主因，单卡 20-28 KB）；② 把「卡正文生成量」显式计入预算而非只算输入侧；③ context 分节交付（按卡拆成 4 个小节文件，让 lane 只读自己那节）；④ 沿用定点抽取配方与预生成切片。批次演进：181k/8卡(22.6k每卡,越限3.02×) -> 50k/4卡(12.5k每卡) -> 批次3 越限(自陈,无计量值)",
-      "updated_at": "2026-11-13T08:42:00+08:00",
-      "round5_update": "【2026-11-13T09:03:26+08:00 Round 5 回收后重算】subtask_log 11->13 条（+Pasteur/F flash、+Hilbert/S max；Locke/T flash 已于本轮入账）。flash_share_tasks 8->0.5、flash_share_tokens 0.441->0.441、dev lane 2->0.2。两项护栏仍未达标，如实上报不粉饰。Hilbert 与 Locke 的 tokens 均记 null（无计量句柄），故 tokens 分母只含 known 条目，占比对 null 条目不敏感——这是口径缺陷而非达标，已在 tokens_coverage 注明。Round 6 计划 S3d(max) ∥ D-016 批次4(flash)，flash 单位数 +3；禁为凑配比降档（S3d 属手册 §6.3 强制 max）。"
+      "updated_at": "2026-11-13T10:30:54+08:00",
+      "round5_update": "【2026-11-13T09:03:26+08:00 Round 5 回收后重算】subtask_log 11->13 条（+Pasteur/F flash、+Hilbert/S max；Locke/T flash 已于本轮入账）。flash_share_tasks 8->0.5、flash_share_tokens 0.441->0.441、dev lane 2->0.2。两项护栏仍未达标，如实上报不粉饰。Hilbert 与 Locke 的 tokens 均记 null（无计量句柄），故 tokens 分母只含 known 条目，占比对 null 条目不敏感——这是口径缺陷而非达标，已在 tokens_coverage 注明。Round 6 计划 S3d(max) ∥ D-016 批次4(flash)，flash 单位数 +3；禁为凑配比降档（S3d 属手册 §6.3 强制 max）。",
+      "round6_batch4_update": "【2026-11-13T10:30:54+08:00 Round 6 批次4 回收后重算】subtask_log 13->14 条（+Planck/T flash，subtask_count=3）。flash_share_tasks 0.5->0.5714（12/21）、flash_share_tokens 0.441->0.441（Planck tokens 记 null 不入分母，故不变）、dev lane 0.2 不变（D-016 属 T lane 非 dev）。两项护栏仍未达标，如实上报不粉饰：tasks 0.5714 < 0.60（差 0.0286，即再 1 个 flash 单位或减 1 个 max 单位即达标）、tokens 0.441 > 0.35（分母只含 7 条 known，其中两条历史越限 264k 是主因，剔除后为 0.195）。禁为凑配比降档：S3d 属手册 6.3 强制 max（应用服务与仓储、并发与租约），Round 7 的 S3b 与批次5 均为 flash，占比将自然回升。检查点仍为 wave2 出口。"
     }
   },
   "tasks": {
@@ -2077,7 +2109,8 @@
         "AC-035"
       ],
       "deps": [
-        "M4-03"
+        "M4-03",
+        "M4-P01"
       ],
       "scope": [
         "scripts/",
@@ -2089,7 +2122,32 @@
       "depth": 12,
       "height": 3,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "deps_prev": [
+        "M4-03"
+      ],
+      "deps_correction_note": "【D-026 / A59 · 2026-11-13T10:30:54+08:00】waves[8] 是 mode=serial、次序 M4-P01 -> M5-01，原 deps 只有 ['M4-03']（属 wave7），未表达该 serial 次序，派单器只读 deps 会并行放行。补登 M4-P01，原值留 deps_prev；守护 tests/unit/test_wave_deps_consistency.py 钉住。",
+      "card": {
+        "file": "orchestrator/tasks/M5-01.md",
+        "delivered_at": "2026-11-13T10:30:54+08:00",
+        "by": "Planck(D-016 批次4, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          37,
+          28,
+          72
+        ],
+        "limits": [
+          60,
+          40,
+          200
+        ],
+        "bytes": 16055,
+        "header_four_column": true,
+        "required_sections_lack": [],
+        "orchestrator_reverify": "编排器以纯 python3 复现两个守护测试的全部断言（全 23 卡），本卡 head/tail/total/表头/四必需节/BOM/CR/尾换行逐项实测吻合自报",
+        "orchestrator_annotation": "卡尾追加 5 行纯增量追注（D-026/A59）：说明 front matter 的 deps 行是交付时台账快照、权威值以 state.json 为准、已立 D-026 并新增守护；上文字节未改写。追注后 head/tail/total = 37/28/72（上限 60/40/200）"
+      }
     },
     "M5-02": {
       "status": "TODO",
@@ -2117,7 +2175,55 @@
           "evidence": ""
         }
       ],
-      "acs": [],
+      "acs": [
+        "AC-001",
+        "AC-002",
+        "AC-003",
+        "AC-004",
+        "AC-005",
+        "AC-006",
+        "AC-007",
+        "AC-008",
+        "AC-009",
+        "AC-010",
+        "AC-011",
+        "AC-012",
+        "AC-013",
+        "AC-014",
+        "AC-015",
+        "AC-016",
+        "AC-017",
+        "AC-018",
+        "AC-019",
+        "AC-020",
+        "AC-021",
+        "AC-022",
+        "AC-023",
+        "AC-024",
+        "AC-025",
+        "AC-026",
+        "AC-027",
+        "AC-028",
+        "AC-029",
+        "AC-030",
+        "AC-031",
+        "AC-032",
+        "AC-033",
+        "AC-034",
+        "AC-035",
+        "AC-MR-01",
+        "AC-MR-02",
+        "AC-MR-03",
+        "AC-MR-04",
+        "AC-MR-05",
+        "AC-MR-06",
+        "AC-MR-07",
+        "AC-MR-08",
+        "AC-MR-09",
+        "AC-MR-10",
+        "AC-MR-11",
+        "AC-MR-12"
+      ],
       "deps": [
         "M5-01"
       ],
@@ -2132,7 +2238,29 @@
       "depth": 13,
       "height": 2,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "acs_prev": [],
+      "acs_correction_note": "【D-026 / A62 · 2026-11-13T10:30:54+08:00】本卡是「独立 QA 全量走查（47 条 AC）」，原 acs=[] 使 AC<->任务 双向对账在该卡失效。47 = baseline_total(35) + monthly_total(12) == acceptance.total == acceptance_denominator。gates[0] 的「35 条」原文不改写（D-013/D-014），以 A62 追注指向。",
+      "card": {
+        "file": "orchestrator/tasks/M5-02.md",
+        "delivered_at": "2026-11-13T10:30:54+08:00",
+        "by": "Planck(D-016 批次4, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          35,
+          23,
+          66
+        ],
+        "limits": [
+          60,
+          40,
+          200
+        ],
+        "bytes": 15333,
+        "header_four_column": true,
+        "required_sections_lack": [],
+        "orchestrator_reverify": "编排器以纯 python3 复现两个守护测试的全部断言（全 23 卡），本卡 head/tail/total/表头/四必需节/BOM/CR/尾换行逐项实测吻合自报"
+      }
     },
     "M5-03": {
       "status": "TODO",
@@ -2563,7 +2691,8 @@
         "M4-01",
         "M4-02",
         "M4-03",
-        "M3-P01"
+        "M3-P01",
+        "M3-04"
       ],
       "scope": [
         "src/campaignlab/domain/monthly_report/",
@@ -2579,7 +2708,34 @@
       "depth": 12,
       "height": 3,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "deps_prev": [
+        "M4-01",
+        "M4-02",
+        "M4-03",
+        "M3-P01"
+      ],
+      "deps_correction_note": "【D-026 / A54 · 2026-11-13T10:30:54+08:00】本卡 scope 含 web/tests/e2e/monthly_report/，证据面依赖 M3-04 交付的 web/src/pages/review/ 与 web/src/features/charts/；M3-04 在 wave6、本卡在 wave8，补登不产生环也不改变既有次序（Kahn 复算 29/29）。原值留 deps_prev。",
+      "card": {
+        "file": "orchestrator/tasks/M4-P01.md",
+        "delivered_at": "2026-11-13T10:30:54+08:00",
+        "by": "Planck(D-016 批次4, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          36,
+          23,
+          71
+        ],
+        "limits": [
+          60,
+          40,
+          200
+        ],
+        "bytes": 20081,
+        "header_four_column": true,
+        "required_sections_lack": [],
+        "orchestrator_reverify": "编排器以纯 python3 复现两个守护测试的全部断言（全 23 卡），本卡 head/tail/total/表头/四必需节/BOM/CR/尾换行逐项实测吻合自报"
+      }
     },
     "M5-P01": {
       "status": "TODO",
@@ -3375,6 +3531,79 @@
       ],
       "regression_guard": "① 文档内禁写死契约指纹/行数/文件数等易漂移量（D-006/D-012/D-014），必须指向 counts 键；② 每次 CR 重切契约后，编排器必须 git grep 全仓旧指纹字面量并逐处区分「前瞻期望值（必改）」与「历史留痕（只加注）」，且必须逐条勾销 BLK 清单，禁只改部分",
       "orchestrator_self_correction": "责任在编排器：BLK-Q3 已把「设计 §5 V1」明列入必须同批更新清单并判 MAJOR（若漏做），CR-002 第 6b 步普查后仍漏掉该行。本单即该遗漏的补正与留痕"
+    },
+    {
+      "id": "D-026",
+      "task": "规划台账（M5-01 / M4-P01 / M5-02 的 deps 与 acs）",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "title": "任务台账 deps/acs 与 waves 计划不自洽：waves[8] 的 serial 次序（M4-P01 -> M5-01）未被 tasks[M5-01].deps 表达（派单器只读 deps 会并行放行）；tasks[M5-02].acs 为空而该卡是 47 条 AC 全量走查；tasks[M4-P01].deps 漏登 e2e 面依赖的 M3-04",
+      "found_by": "D-016 批次4 的 T lane（Planck / qwen3.8-flash）U-4 与 U-1 上报；编排器未采信自报，独立复核实测成立并做全库普查",
+      "file": "orchestrator/defects/D-026.md",
+      "found_at": "2026-11-13T10:30:54+08:00",
+      "closed_at": "2026-11-13T10:30:54+08:00",
+      "measured": {
+        "serial_order_violations": [
+          [
+            "wave0",
+            "M0-01",
+            "M0-P01",
+            "两任务均已交付(PASS_WITH_TODO/DONE)，wave0 已闭合 → 登记显式豁免不追溯改账"
+          ],
+          [
+            "wave8",
+            "M4-P01",
+            "M5-01",
+            "deps 原为 ['M4-03'] → 已补登 M4-P01"
+          ]
+        ],
+        "m5_02_acs_before": [],
+        "m5_02_acs_after_count": 47,
+        "acceptance_totals": {
+          "baseline_total": 35,
+          "monthly_total": 12,
+          "total": 47
+        },
+        "m4_p01_deps_before": [
+          "M4-01",
+          "M4-02",
+          "M4-03",
+          "M3-P01"
+        ],
+        "m4_p01_deps_after": [
+          "M4-01",
+          "M4-02",
+          "M4-03",
+          "M3-P01",
+          "M3-04"
+        ],
+        "m3_04_wave": 6,
+        "m4_p01_wave": 8,
+        "dangling_deps": 0,
+        "kahn_topological_order": "29/29（无环）",
+        "wave_coverage": "11 波覆盖 29 任务、重复归属 0、遗漏 0、幽灵任务 0",
+        "acs_audit": "tasks[*].acs 引用 99 次、去重 47、非法 0、未被认领 0（修正前）"
+      },
+      "blocking": false,
+      "blocking_note": "不阻塞本轮派单（wave8/wave9 尚远）；但若不修，M5-01 的固定环境全量回归会跑在未闭环的月报面上，取证无效",
+      "fix_detail": "台账三处更正（原值一律留 deps_prev/acs_prev + 更正说明）+ 新增机器守护 tests/unit/test_wave_deps_consistency.py（8 条断言）；waves 与 docs/** 未改（waves[8] 次序本就正确，错在 deps 未表达）；wave0 同类形态按不改写历史登记豁免并钉住豁免集精确性",
+      "fix_scope": [
+        "orchestrator/state.json -> tasks[M5-01].deps / tasks[M4-P01].deps / tasks[M5-02].acs",
+        "orchestrator/defects/D-026.md（新增）",
+        "tests/unit/test_wave_deps_consistency.py（新增守护）",
+        "orchestrator/tasks/M5-01.md（卡尾纯增量追注）",
+        "orchestrator/handoff/D-016-batch4-M5-01.md 与 -M5-02.md（编排器自身错误的更正追注）"
+      ],
+      "guard_verified_by": "编排器以系统 python3 直接 import 并逐个调用 8 个 test_* 函数：修正前如实判红 2 条（test_serial_wave_order_is_expressed_by_deps / test_full_sweep_card_claims_all_47），写入台账修正后复跑 8/8 全绿；未用 pytest（pytest 级复跑见 S3d 回收提交）",
+      "related_adjudications": [
+        "A49",
+        "A54",
+        "A59",
+        "A61",
+        "A62",
+        "A63",
+        "A67"
+      ]
     }
   ],
   "change_requests": [
@@ -3642,12 +3871,14 @@
         "reasoning_effort": "high",
         "budget": "40k",
         "loop_cap": 2,
-        "status": "IN_FLIGHT",
+        "status": "RETURNED_PENDING_COMMIT",
         "dispatched_at": null,
         "dispatched_at_note": "前序会话派出，未写回 state.json 即中断；无计量留痕，按纪律记 null（禁估算）。在飞事实由接管后 wait_agent(timeout=20s)→timed_out=true 实测证明。",
         "verified_in_flight_at": "2026-11-13T09:47:18+08:00",
         "write_scope": "src/campaignlab/**（含 api/deps.py、api/app.py、cli.py，A40 扩围；禁改已冻结签名）、tests/unit/<新增>、evidence/M0/M0-02/**",
-        "exit_condition": "doctor rc=0 且 WARN worker 项消失；api/deps.py 内 NotImplementedError 计数=0；lease_until 赋值只在 application/worker.py；jobs 表 INSERT/UPDATE 只在 repositories.py；既有 166 用例一个不少"
+        "exit_condition": "doctor rc=0 且 WARN worker 项消失；api/deps.py 内 NotImplementedError 计数=0；lease_until 赋值只在 application/worker.py；jobs 表 INSERT/UPDATE 只在 repositories.py；既有 166 用例一个不少",
+        "returned_at": "2026-11-13T10:33:50+08:00",
+        "reverify": "编排器独立复验 18 项（G1-G18）全 rc=0：pytest 205 passed/0 failed（基线 166 + 新增 39）、mypy 48 files、ruff check 通过、ruff format 144 files（恒等式 tracked 132 + untracked 12 == 144）、doctor rc=0 且 WARN worker -> PASS worker（PASS=3 WARN=2 FAIL=0 DEGRADED）、deps.py NotImplementedError=0、PROBLEM_CODES=20、check_contracts 13-13、spec/contracts dirty=0、lease_until 的 Python 层赋值只在 worker.py:142、jobs 表 INSERT/UPDATE 只在 repositories.py(404/470)、既有测试仅 test_task_cards.py 被改（属 T lane，非 S lane）、app.py +26/-2（删的 2 行是 docstring 文字）、deps.__all__ 9 项逐字未变、三 Protocol 成员面已实体化"
       },
       {
         "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
@@ -3663,7 +3894,9 @@
         "entry_doc": "orchestrator/handoff/D-016-batch4-rules.md",
         "status_at_this_commit": "IN_FLIGHT",
         "exit_condition": "head<=60/tail<=40/total<=200/表头逐字四列/REQUIRED_SECTIONS 四节齐备；自算切片指纹与 rules 第8节全等；纯 python3 复现三守护断言且 23+6==29；numstat==0\\t3；工具链调用 0 次；未做 git 写；U 项照实上交不自裁",
-        "hard_forbids": "禁 git 写、禁 sudo、禁 pytest/mypy/ruff/uv/npm/node/vite/vitest/playwright、禁整读 openapi.json 与 state.json 与任何 slice 全文、禁碰 S lane 在飞的 src/campaignlab/** 未跟踪文件"
+        "hard_forbids": "禁 git 写、禁 sudo、禁 pytest/mypy/ruff/uv/npm/node/vite/vitest/playwright、禁整读 openapi.json 与 state.json 与任何 slice 全文、禁碰 S lane 在飞的 src/campaignlab/** 未跟踪文件",
+        "status": "RETURNED_VERIFIED",
+        "returned_at": "2026-11-13T10:33:50+08:00"
       }
     ],
     "dispatch_requirements": [
@@ -5391,6 +5624,28 @@
         "over_cap": true,
         "over_cap_note": "目标 ≤45k；子智能体 §8 自陈越限（4 卡正文 96231 B + context 全文一次读入）。tokens 记 null（get_goal 无计量句柄，禁估算）",
         "key_note": "本键为补正：此前 card_gap 只有 batch3_predispatch（派单前置），缺回收态台账，现补齐与 batch1/batch2 同构的 batch3 条目"
+      },
+      "batch4": {
+        "at": "2026-11-13T10:33:50+08:00",
+        "cards": [
+          "M4-P01",
+          "M5-01",
+          "M5-02"
+        ],
+        "by": "Planck(qwen3.8-flash)",
+        "known_missing_before": 9,
+        "known_missing_after": 6,
+        "remaining": [
+          "M1-04",
+          "M2-04",
+          "M3-04",
+          "M3-P02",
+          "M5-03",
+          "M5-P01"
+        ],
+        "identity": "磁盘卡 23 + KNOWN_MISSING 6 == 29",
+        "status": "DELIVERED_VERIFIED",
+        "next": "批次5 候选 M1-04/M2-04/M3-04（wave4，slack>0）或 M3-P02（wave7）；FU-5：批次5 卡须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs 并落 A31 的页面证据归属；A61/A67 防复发：context 生成前必须 dump 切片实际键集"
       }
     },
     "cr002_merge": {
@@ -6409,7 +6664,230 @@
       ],
       "conclusion": "Round 5 三槽全部释放，Round 6 可用槽 >=2（手册 §15.11 满足）"
     },
-    "in_flight_agents_note_round6": "接管更正：state.json 原 in_flight_agents=[] 与事实不符——S lane(Godel/S3d) 实际在飞，已于 predispatch 提交 76cf311 补录。本条（dispatch 记录提交）追加 T lane(Planck/D-016批次4)，Round 6 双 lane 并行成型。两 lane 写集不相交（S 只写 src/campaignlab/**+tests/unit/<新增>+evidence/M0/M0-02/**；T 只写 orchestrator/tasks/{M4-P01,M5-01,M5-02}.md + tests/unit/test_task_cards.py 的 3 行删除），工具链不争用（S 独占 .venv，T 纯 python3）。编排器在两 lane 任一在飞期间禁跑工具链（NOTE-10）。"
+    "in_flight_agents_note_round6": "Round 6 双 lane 均已回收：T/Planck（批次4 补卡，DONE，随本提交入库）与 S/Godel（M0-02-S3d，18 项门禁独立复验全绿，随下一提交入库）。本提交只含 T lane 产物 + 编排器治理件，**不夹带 S lane 任何在飞/已交付产物**（src/campaignlab/** 与 tests/unit/test_s3d_*.py 保持未跟踪，由下一提交单独入库）。counts 采样按纪律推迟到 S lane 提交（届时工作树 == 已提交树，pytest 205/mypy 48/ruff 144 才是该提交的真值）。",
+    "round6_adjudications": [
+      {
+        "id": "A49",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-1",
+        "question": "AC-MR-10 原文要求 409 SNAPSHOT_SUPERSEDED，该 code 既不在活契约也不在 20 码注册表，如何落地？",
+        "ruling": "维持 D-022 的**选项 A**（复用语义标签，零契约变更）：实现用已在 20 码内的 code，SNAPSHOT_SUPERSEDED 字样承载在 Problem.detail 与 Issue.code（自由串 1-96，非冻结面）。卡内「不实现该 code、不扩注册表」的写法**认可，无需返工**。D-022 仍 pending_owner，最迟 wave5 派单前终裁；若终裁为选项 B，须同步 check_contracts 分母、PROBLEM_CODES(20->22)、涉及 20 码分母的既有用例，并按 D-020 的 --depth 5 重切**全部**切片（含本轮新增的 M0-02-S3b.slice.json，指纹全变）。",
+        "action_taken": "无代码动作；裁定入库，M4-P01/M5-02 卡内写法保持"
+      },
+      {
+        "id": "A50",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-2",
+        "question": "src/campaignlab/api/monthly_reports.py 在 scope 内，但活契约月报专属 operationId 实测 0 个，该 scope 字面量语义为何？",
+        "ruling": "**Planck 的实测成立且与既有台账一致**：D-022 第 1 节第 6 项已记载「活契约 80 个 operationId 全集中无任何月报专属 operationId」，v1.0.1 增量只有 2 个可选属性（ReviewCreate.profile、Review.monthly_review）+ 7 个 Monthly* schema + 2 个 source-json 节点，**未新增 op**。故裁定：`api/monthly_reports.py` 保留在 scope 内，语义确定为**月报增量的非路由承载模块**（Monthly* DTO 的 API 侧装配、profile='BANK_MONTHLY_V1' 判别、runReview/getReview 月报分支所需的请求/响应模型），**禁在其中新建任何路由**（新建路由＝新增 operationId＝CR 级变更，触碰 check_contracts 分母与全部切片指纹）；路由仍走既有 op（runReview/getReview/createReport/getReport/correctSnapshot），写权按 A14/A15/A36 归属不变。卡内「按非路由领域/DTO 模块撰写」**认可，无需返工**。",
+        "action_taken": "无代码动作；M4-P01 派单文须原样承接本条"
+      },
+      {
+        "id": "A51",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-3",
+        "question": "analysis_results.kind 的 CHECK 不含 monthly_review，Review.monthly_review 与 artifacts 的权威映射为何？",
+        "ruling": "与 **A6 一致**（原文：28 张参考表无 reviews/diagnoses/estimates/questions；月报评审四类分析对象一律落 analysis_results（kind 判别）+ artifacts（大对象/制品），不得新增表；新增表属 CR 级变更）。**禁扩 kind 的 CHECK 枚举**（contracts/sqlite-v1.sql:102 仅 comparison/review/diagnosis/question）。权威映射裁定：月报评审行落 `analysis_results(kind='review')` 且 `input_json.profile='BANK_MONTHLY_V1'`；其大对象/制品一律落 `artifacts(kind='COMPUTATION')`，由该 analysis_results 行的 output 侧制品引用键指向。**M3-P01 负责落地该映射，M4-P01 只做回归/cross_ref 取证**；本条为二者唯一权威口径，消除 M3-P01 U-2 与 M4-P01 U-3 的重复裁定风险。",
+        "action_taken": "无代码动作；M3-P01 与 M4-P01 派单文均须引用本条"
+      },
+      {
+        "id": "A52",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-4",
+        "question": "actions/action_followups 写权、listAudit 读入口、export 四 op 是否存在第二 owner？本卡需否直写 needs_review？",
+        "ruling": "**确认无第二 owner**。A14/A15/A36 原文有效：export 四 op（listExports/createExport/getExport/downloadExport）归 M4-02（api/exports.py）；actions/action_followups 的写权 + listAudit 读入口归 M4-02；createReport/getReport 归 M4-01。M4-P01 只 cross_ref/调用。若实现期确需本卡直写 needs_review，**必须走 CR 扩 scope**，禁自行扩（手册 6.4）。",
+        "action_taken": "无代码动作"
+      },
+      {
+        "id": "A53",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-5",
+        "question": "AC-025..030 的 primary 归属读法是否正确？",
+        "ruling": "**确认与 acceptance.primary_owner 实取一致**（编排器复算 47 条 owner 全表，18 组分组与卡内矩阵逐组比对，mismatched_groups=[]）：AC-025/026 → M4-01；AC-027/028/030 → M4-02；AC-029 → M0-04；M4-P01 仅出现在 cross_ref。故本卡 gates 末条只承担「回归/cross_ref 取证」、不声明 primary，**写法正确**。",
+        "action_taken": "无代码动作"
+      },
+      {
+        "id": "A54",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-6",
+        "question": "tasks[M4-P01].deps 是否应补登 M3-04？",
+        "ruling": "**采纳补登**。编排器实测：M3-04 属 wave6、M4-P01 属 wave8（wave6 < wave8，补登不产生环、不改变既有次序，Kahn 复算 29/29）；M4-P01 的 scope 含 web/tests/e2e/monthly_report/，其证据面确实需要 M3-04 交付的 web/src/pages/review/ 与 web/src/features/charts/。",
+        "action_taken": "同一提交内 tasks[M4-P01].deps += M3-04（原值留 deps_prev + 更正说明）；纳入 D-026"
+      },
+      {
+        "id": "A55",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M4-P01 U-7",
+        "question": "listReports 的 status 查询参数是否被 CR-002 一并移除？",
+        "ruling": "**确认二者不互相覆盖**。CR-002/ADR-006 的移除范围**仅** listWorkspaces（活契约实测其参数为 cursor/limit/q，无 status/sort）；listReports/listActions/listJobs/listEvidence/listAudit/listExports 的 status 查询参数**依然有效**（活契约实测均在），禁一并删除。S3b 派单文将再次点名该边界。",
+        "action_taken": "无代码动作；S3b/S4 派单文承接"
+      },
+      {
+        "id": "A56",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-1",
+        "question": "scripts/ 既有 5 个门禁件可否修改？",
+        "ruling": "**认可「只新增、不改既有」**（check_contracts.py / check_frontend_baseline.py / contract_slice.py / doctor.sh / verify.sh）。若回归确需改 verify.sh 的调用面，属**工具契约变更**，必须走 CR 并同步检查每个工具的读取路径与版本戳来源（D-004 的直接教训：contract_slice.py 曾把 openapi/pages/DDL 全钉在 spec/ 且 spec_version 硬编码，活契约升 1.0.1 后仍静默按 1.0.0 派单）；外部编排命令一律记录在 evidence/M5/，禁在 M5-01 内自行改既有门禁件。",
+        "action_taken": "无代码动作；M5-01 派单文承接"
+      },
+      {
+        "id": "A57",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-2",
+        "question": "三条 QA/回归线的 evidence 目录是否互不包含？",
+        "ruling": "**确认**：evidence/M5/（M5-01）/ evidence/M5-qa/（M5-02）/ evidence/monthly/M5-P01/（M5-P01）三线互不包含，与 waves[9].constraint 及各自 scope 一致。跨线引用只准只读引用路径，禁写入他线目录。",
+        "action_taken": "无代码动作"
+      },
+      {
+        "id": "A58",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-3",
+        "question": "M5-01 是否应覆盖 AC-MR？",
+        "ruling": "**确认不覆盖**。tasks[M5-01].acs = AC-029/031/032/035（4 条，均在 35 条基线口径内）；MONTHLY-DELTA-PLAN.md:22 只把 AC-MR 全量走查扩给 M5-02。故 M5-01 禁自行扩 acs；其月报面只做「不回归破坏」级别的顺带量测，取证归 M5-02/M5-P01。",
+        "action_taken": "无代码动作"
+      },
+      {
+        "id": "A59",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-4",
+        "question": "waves[8] 是 serial（M4-P01 -> M5-01），但 tasks[M5-01].deps 只有 [M4-03]，是否补登？",
+        "ruling": "**采纳，判为真实缺陷 D-026（MAJOR）**。手册 6.2 的「依赖齐备」判据读 deps，而 waves[*].mode=serial 是另一套次序表达；二者不等价时派单器会把 wave8 两任务当可并行放行，违反「月报报告闭环完成后才做固定环境全量回归」（MONTHLY-DELTA-PLAN.md:36），且 M5-01 的性能/备份恢复/断网回归会跑在未闭环的月报面上，取证无效。**编排器全库普查同类形态共 2 处**：wave8（本处，已修）与 wave0（M0-01 -> M0-P01，两任务已交付 PASS_WITH_TODO/DONE、wave0 已闭合，追溯改 deps 属改写历史且不改变任何派单行为 → 登记为守护的显式豁免集 SERIAL_ORDER_EXEMPT，并钉住豁免集必须精确等于该对且两者状态仍属已交付态，豁免失效即判红）。",
+        "action_taken": "同一提交内 tasks[M5-01].deps += M4-P01（原值留 deps_prev）；立 orchestrator/defects/D-026.md；新增守护 tests/unit/test_wave_deps_consistency.py（8 条断言，修正前如实判红 2 条、修正后 8/8 全绿）；M5-01.md 卡尾追加 5 行纯增量追注（front matter 快照不改写）"
+      },
+      {
+        "id": "A60",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-5",
+        "question": "gates 末 3 条（性能/容量）无可判红判据，OPERATIONS.md:24 只写「首轮工程目标」，如何裁定？",
+        "ruling": "**裁定：以 spec 的 OPERATIONS.md:24 三项数值本身作为可判红判据**——P95 <= 2 秒、1000 案例 <= 60 秒、10 万行导入 <= 60 秒。理由：该三项是 spec 唯一给出的量化目标，M5-01 的定位就是「固定环境全量回归/性能」，若不当判据用则该卡无判红能力。附加硬条件：① 量测方法、样本、环境事实（CPU/内存/磁盘/DB 路径/数据规模）必须在 evidence/M5/ 命令级留痕，禁「人工确认」；② 实测不达即**判红并立缺陷单**交项目负责人裁定是否放宽，**禁自行放宽阈值**；③ 该三项属工程目标而非 AC 原文，gates 中必须标注来源行号（D-011：AC 编号只引原文，禁把工程目标写成 AC）。",
+        "action_taken": "无代码动作；M5-01 派单文须原样承接三项阈值与三条附加硬条件"
+      },
+      {
+        "id": "A61",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-01 U-6",
+        "question": "编排器产出的 D-016-batch4-M5-01.md §2 与切片实取不符（称含 pages/ddl 键、truncated_schemas=None）。",
+        "ruling": "**编排器自身错误，实测成立并已更正**。M5-01.slice.json（3781 B）顶层只有 5 键（spec_version/source/operations/acceptance_rows/truncated_schemas），无 pages、无 ddl；truncated_schemas 实测为 []（空列表）而非 None。卡已按切片实取撰写，**无需返工**。",
+        "action_taken": "在 D-016-batch4-M5-01.md 末尾追加第 9 节「编排器更正追注」（纯增量，上文 1-8 节字节不改写）；防复发：批次 5 起 context 生成脚本必须先 json.load 后 dump 实际键集与 truncated_schemas 真值再撰写，禁按批次 4 模板类推"
+      },
+      {
+        "id": "A62",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-1",
+        "question": "tasks[M5-02].acs=[] 且 gates[0] 写「35 条」，而 MONTHLY-DELTA-PLAN.md:22 与本卡定位是 47 条，以何为准？",
+        "ruling": "**裁定 47 为准**。真实 AC = AC-001..AC-035（35）+ AC-MR-01..AC-MR-12（12）= 47 == acceptance.total == acceptance_denominator == 守护分母；AC-101/AC-202 **不是** AC 编号（是 ACCEPTANCE.md:10 中 AC-002 描述里的活动编号，D-011）。M5-02 是「独立 QA 全量走查」，其 acs 必须是全集，否则 AC<->任务 双向对账在该卡失效（47 条覆盖率靠其他卡凑齐，故既有守护测不到该形态）。gates[0] 的「35 条」原文**不改写**，以追注指向本条。",
+        "action_taken": "同一提交内 tasks[M5-02].acs 由 [] 补为 47 条枚举（原值留 acs_prev + 更正说明）；守护 test_full_sweep_card_claims_all_47 钉住；纳入 D-026；在 D-016-batch4-M5-02.md 第 9 节追注留痕"
+      },
+      {
+        "id": "A63",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-2",
+        "question": "证据目录冲突：MONTHLY-DELTA-PLAN.md:23 写 evidence/M5/M5-02/，而 state.json scope 与 waves[9].constraint 写 evidence/M5-qa/。",
+        "ruling": "**裁定以 state.json 的 scope 与 waves[9].constraint（evidence/M5-qa/）为权威**。理由：state.json 是状态真值（手册 15.3），且 evidence/M5/ 已划归 M5-01，若 M5-02 写入 evidence/M5/M5-02/ 会与 M5-01 的写权交叠、破坏 wave9 两 lane 的写集不相交。MONTHLY-DELTA-PLAN.md:23 属文档笔误，登记为 errata；本轮**不改 docs/**（避免与 M5-02 实现期写权冲突及无关 diff），由 M5-03 交付 docs/delivery/HANDOVER.md 时一并更正。",
+        "action_taken": "errata 登记于 D-016-batch4-M5-02.md 第 9 节追注；M5-02 派单文须写明 evidence/M5-qa/ 为唯一证据目录；M5-03 派单文承接 docs 更正"
+      },
+      {
+        "id": "A64",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-3",
+        "question": "D-022 未终裁时，QA 复跑遇到 SNAPSHOT_CONFLICT 该如何判？",
+        "ruling": "**认可卡内写法**：复跑遇 SNAPSHOT_CONFLICT 记「符合暂用口径（选项 A），待 D-022 终裁」，**禁直接判 FAIL**、也禁判 PASS_WITHOUT_NOTE；须在 qa-reports/m5-02/ 里逐条留该标注。终裁后由编排器统一回溯所有带该标注的行。",
+        "action_taken": "无代码动作；M5-02 派单文承接"
+      },
+      {
+        "id": "A65",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-4",
+        "question": "scope 通配 orchestrator/defects/D-*.md 字面可覆盖 M5-P01 的 DMR-*，是否收紧？",
+        "ruling": "**采纳收紧**（Planck 的自我收敛正确）。M5-02 只准新建 orchestrator/defects/D-<数字>.md，编号必须接续 D-026 之后且连续无缺号（受 test_state_ledger.py 的 D-NNN 形态与连续性断言约束）；DMR-* 是 waves[9].constraint 划给 M5-P01 的写权，M5-02 **禁建禁改**。派单文将把 scope 字面量写为 orchestrator/defects/D-[0-9]*.md。注意：wave9 两 lane 并行时，两者都可能新建缺陷单 → D-026 之后的编号分配由**编排器独占**，两 lane 一律以 U 项上交待编号，禁自行占号（避免编号冲突破坏连续性断言）。",
+        "action_taken": "无代码动作；M5-02/M5-P01 派单文均须承接「编号由编排器独占分配」"
+      },
+      {
+        "id": "A66",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-5",
+        "question": "「独立 QA 环境与开发环境隔离」无可判红判据。",
+        "ruling": "**裁定四项命令级可取证判据**（缺一即判红，禁以「人工确认」替代）：① 独立检出路径——git rev-parse --show-toplevel 与开发树不同；② 独立数据目录——CAMPAIGNLAB_DATA_DIR 指向非开发路径，且 python -m campaignlab doctor 报告的 data_dir/db 路径随之改变；③ 独立虚拟环境——python -c 'import sys;print(sys.prefix)' 与开发树 .venv 不同；④ 端口不冲突——3000/3001/3002 实测 BUSY、5173（vite）与 8000（后端，decisions.dev_proxy_target）为开发占用，QA 环境须用其他端口并留探测输出。四项实测输出落 evidence/M5-qa/。",
+        "action_taken": "无代码动作；M5-02 派单文须原样承接四项判据"
+      },
+      {
+        "id": "A67",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-6",
+        "question": "编排器产出的 D-016-batch4-M5-02.md §2 键集与 §3 owner 表与实取不符。",
+        "ruling": "**编排器自身错误，实测成立并已更正**。M5-02.slice.json（14977 B）实测只有 4 键（spec_version/source/acceptance_rows/truncated_schemas），无 operations/pages/ddl；§3 的 owner 表实测为空表，47 条 owner 的权威实取在该文件 §6.1 全表与 acceptance.primary_owner。卡已按 §6.1 + primary_owner 实取撰写，**无需返工**。",
+        "action_taken": "在 D-016-batch4-M5-02.md 末尾追加第 9 节「编排器更正追注」（纯增量）；防复发同 A61"
+      },
+      {
+        "id": "A68",
+        "round": 6,
+        "at": "2026-11-13T10:33:50+08:00",
+        "source": "Planck/M5-02 U-7",
+        "question": "本卡切片无 operations，AC-030/AC-MR-10 的字段级比对需外部证据，由谁提供？",
+        "ruling": "**采纳：由编排器定点抽取**。M5-02 派单前由编排器按 AC 定点抽取所需 op 的字段级切片（含 200 响应 schema 与 Problem 分支），落 orchestrator/handoff/M5-02-ops.slice.json 并登记 bytes/sha16 指纹；Q lane **禁整读** 443309 B 活契约（成本与越限风险）。抽取口径沿用 --depth 5 与 A18/PRE-3 断言（('missing' not in d) and d['truncated_schemas'] == []）。",
+        "action_taken": "编排器待办：M5-02 派单前产出 M5-02-ops.slice.json（wave9 前置）"
+      }
+    ],
+    "round6_returns": {
+      "at": "2026-11-13T10:33:50+08:00",
+      "wave": 1,
+      "round": 6,
+      "mode": "parallel-2-lanes",
+      "lanes": {
+        "T/D-016-batch4": {
+          "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
+          "nickname": "Planck",
+          "tier": "qwen3.8-flash",
+          "result": "DONE",
+          "commit": "PENDING(本提交)",
+          "tokens_self_reported": null,
+          "tokens_note": "get_goal 无计量句柄（goal/remainingTokens/completionBudgetReport 全 null），按纪律记 null，禁估算",
+          "objective": "38 次工具调用；卡正文合计 50683 B（20081+15269+15333）；loop 1/2；中间脚本 12 个（仓库外）",
+          "returned_at": "2026-11-13T10:33:50+08:00",
+          "outputs": [
+            "orchestrator/tasks/M4-P01.md",
+            "orchestrator/tasks/M5-01.md",
+            "orchestrator/tasks/M5-02.md",
+            "tests/unit/test_task_cards.py（KNOWN_MISSING 9->6，numstat 0\\t3）"
+          ],
+          "reverify": "吻合（编排器以纯 python3 复现两个卡片守护的全部 10 条断言、全 23 卡全绿；三卡 head/tail/total/表头/bytes/BOM/CR/尾换行逐项与自报全等；numstat 0\\t3 且删的正是三行；三份切片指纹编排器自算全等；自曝的 0 字节误建文件 '=19' 实测已不存在）",
+          "u_items": 20,
+          "adjudications": "A49-A68",
+          "deviations_self_declared": 8,
+          "deviations_note": "8 条自曝偏差全部核过：①M5-02 的 acs 对账 False 属台账问题（已立 D-026/A62 修）②两份 context 与切片不符属编排器错误（A61/A67 已追注更正）③flash 理由漏写 6 行是其自身脚本 bug（已自修，未增删行、未降档）④误建 0 字节 '=19' 已清除（编排器实测不存在）⑤手册只读 5 段中的 3 段（属预算自律，卡体例从 M4-01/M3-P01 实读复现，可接受）⑥gates 段各追加 1 条标注为非原文的切片新鲜度行（编排器**接受**：与既有卡体例一致且已显式标注来源，未改写 state.json gates 原文）⑦未做 47 条矩阵行级实跑（属 M5-02 实现期义务，非补卡范围，正确）⑧三卡正文 50683 B 高于批次3 单卡均值但单卡 <=20 KB 在纠正措施区间内（如实记账）",
+          "verdict": "ACCEPTED（无需返工；20 条 U 项全部裁定，其中 3 条导致台账/文档更正，1 条立 D-026）"
+        },
+        "S/M0-02-S3d": {
+          "agent_id": "01a1d275-7c5b-7dc0-9ddf-677eef887e4a",
+          "nickname": "Godel",
+          "tier": "qwen3.8-max",
+          "result": "RETURNED_PENDING_COMMIT",
+          "note": "已回报并经编排器独立复验 18 项门禁全部吻合；台账与提交随下一提交（S lane）入库，本提交不夹带其任何产物"
+        }
+      },
+      "in_flight": [
+        "01a1d275-7c5b-7dc0-9ddf-677eef887e4a (Godel/S3d，已回报待提交)"
+      ]
+    }
   },
   "acceptance": {
     "baseline_total": 35,
