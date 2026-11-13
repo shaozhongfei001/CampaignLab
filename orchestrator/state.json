@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T11:08:43+08:00",
+  "updated_at": "2026-11-13T11:34:54+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -927,6 +927,21 @@
           "schedule_impact": "wave1 收尾再顺延一轮：原 R5-2 计划 {S3d ∥ S3b}(R6) -> {S4,S5}(R7)，现 S3d(R6) -> S3b(R7) -> S4(R8) -> S5(R8/R9)。wave2 最早开启时点由 Round 7 顺延至 Round 8"
         },
         "rounds_superseded_note": "【2026-11-13T09:41:17+08:00】原 round 字段（S3d=5/S3b=5/S4=6/S5=6）系 R5-2 时期的排布，已被 R5-3 全串行裁定取代：S3d=6、S3b=7、S4=8、S5=8（S5 视 S4 回收时点排 8 或 9）。按 A19 不改写原值，另立 round_v2 字段，引用轮次一律以 round_v2 为准。依据：api/deps.py 实测 SessionService/WorkspaceService 为空端口 + 4 处 raise NotImplementedError（PRE-5）。"
+      },
+      "scope_waivers_round7": {
+        "granted_at": "2026-11-13T11:34:54+08:00",
+        "granted_to": "M0-02/S3b（Round 7，qwen3.8-flash）",
+        "basis": "A85",
+        "items": [
+          {
+            "path": "src/campaignlab/api/app.py",
+            "mode": "mount-only <=6 行",
+            "allow": "在 :149 挂载位追加 include_router(session.router) 与 include_router(workspaces.router) 两行 + 必要 import；必须落在 A69「显式注入才挂载」分支内（与 health.router（:147）同侧）",
+            "deny": "CORS／中间件／异常处理装配、openapi_url=None 等设置一字不改；禁挂载 jobs.router（A84：归 M0-04/S4）",
+            "numstat_rule": "<=6 add / 0 del"
+          }
+        ],
+        "s4_scope_narrowed_by_A84": "M0-02/S4（Round 8）产出收窄为 tests/api/**，不碰 api/app.py 与 api/jobs.py"
       }
     },
     "M0-03": {
@@ -1082,7 +1097,7 @@
       "tier_override_at": "2026-11-13T04:25:00+08:00"
     },
     "M0-04": {
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "lane": "S",
       "tier_planned": "max",
       "tier_used": "",
@@ -1137,6 +1152,45 @@
           "tests/integration/jobs/**"
         ],
         "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
+      },
+      "scope_waivers_round7": {
+        "granted_at": "2026-11-13T11:34:54+08:00",
+        "granted_to": "M0-04/S2（Round 7，qwen3.8-max）",
+        "basis": "A82 / A83",
+        "items": [
+          {
+            "path": "src/campaignlab/infra/db/repositories.py",
+            "mode": "append-only",
+            "allow": "只准给 JobRepository 新增方法（认领/状态迁移/终态写入/重试入队）",
+            "deny": "禁改既有 insert/get/list_ready/touch_lease 的签名、函数体与 SQL 文本；禁改 job_from_row、5 个 Record dataclass 既有字段、其余 4 个 Repository 类；禁在其他文件出现 INSERT INTO jobs / UPDATE jobs",
+            "numstat_rule": "N add / 0 del（出现删除行即判越界）",
+            "basis": "A81 / A82 / FU-10"
+          },
+          {
+            "path": "src/campaignlab/application/worker.py",
+            "mode": "append-only + 1 行等价替换",
+            "allow": "新增模块级 compute_lease_deadline(now, *, lease_seconds) -> str 并纳入 __all__；把 heartbeat() 内 :142 的内联表达式改为调用它（值语义逐字节等价）",
+            "deny": "heartbeat() 其余语句、_run/start/stop/status/poll_once、全部 property、WORKER_* 三常量、WorkerSupervisor.__init__ 签名一字不改",
+            "numstat_rule": "纯追加；唯一允许的删除行 = :142 原表达式 1 行",
+            "basis": "A83 / A70 判据①修订 / A90②"
+          }
+        ],
+        "explicitly_not_waived": [
+          "src/campaignlab/api/app.py（A90①：挂载归 M0-04/S4，Round 8）",
+          "src/campaignlab/api/jobs.py（S4 的产出，本轮 S2 不得创建）",
+          "migrations/**（首迁归 M0-02）",
+          "spec/**",
+          "contracts/**",
+          "orchestrator/state.json",
+          "scripts/**",
+          "web/**"
+        ]
+      },
+      "s1_delivered": {
+        "commit": "0adf66e",
+        "output": "orchestrator/handoff/M0-04-design.md",
+        "lines": 101,
+        "note": "S1 设计已入库；其 §10 的 N1-N8 八项未决已由 A81/A84/A86-A91 全部裁定或消解"
       }
     },
     "M1-01": {
@@ -3737,6 +3791,36 @@
         "A80"
       ],
       "followup": "FU-8"
+    },
+    {
+      "id": "D-029",
+      "task": "编排器自身（任务卡 scope 归属对账）／M0-02／M0-04",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "title": "M0-02 卡「修订档位表 v3」的 S4 行把 src/campaignlab/api/jobs.py 与 api/app.py 的 jobs 挂载（A10 最小例外 <=3 行）越权分配给 M0-02/S4，与 5 处权威（两侧 state.json.scope、M0-04 卡 scope_allow 与档位表 S4 行、api/app.py:3-6 与 :150 的权威注释）相左，构成双主写与越界写风险",
+      "found_by": "编排器本人（Round 7 派单前置检查：为判定 S3b 与 M0-04/S2 写集是否相交而逐字比对四处权威时发现）",
+      "file": "orchestrator/defects/D-029.md",
+      "found_at": "2026-11-13T11:34:54+08:00",
+      "closed_at": "2026-11-13T11:34:54+08:00",
+      "measured": {
+        "offending_line": "orchestrator/tasks/M0-02.md 修订档位表 v3 的 S4 行「产出」列",
+        "authorities_agreeing_on_M0_04_S4": 5,
+        "api_jobs_py_exists": false,
+        "api_dir_listing": [
+          "__init__.py",
+          "app.py",
+          "common.py",
+          "deps.py",
+          "health.py"
+        ],
+        "app_py_mount_placeholders": ":149 -> S3b(session/workspaces)；:150 -> M0-04/S4(jobs)",
+        "code_rework": "0（派单前发现，api/jobs.py 实测不存在）"
+      },
+      "ruling": "A84（api/jobs.py 与其 app.py 挂载唯一 owner=M0-04/S4；M0-02/S4 收窄为 tests/api/**）+ A85（app.py:149 的 session/workspaces 挂载位归 S3b，须落 A69「不注入就不装配」分支、<=6 行）",
+      "card_disposition": "按「历史值只加注不改写」：卡尾追加 6 行 blockquote，v3 的 S4 行原文字节保留；git diff --numstat 实测 6 add / 0 del",
+      "card_line_budget": "split-total 190 -> 196（守护上限 200，余量 4）；head/表头未动；卡片守护 12 passed",
+      "recurrence_guard": "FU-15：新增 tests/unit/test_card_output_scope.py，解析每张非 LEGACY 卡档位表「产出」列的路径字面量并断言全部落在 tasks[id].scope 允许前缀内（现守护只查卡<->tasks 键双向对账与必需段落，不查产出列越界，属盲区）",
+      "commit": "PENDING(Round 7 predispatch)"
     }
   ],
   "change_requests": [
@@ -4237,7 +4321,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 148,
+        "ruff_formatted_files": 149,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4246,17 +4330,17 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 148,
+          "total": 149,
           "in_scope_py": 51,
-          "in_scope_md": 97,
+          "in_scope_md": 98,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T11:08:43+08:00",
+          "measured_after": "2026-11-13T11:34:54+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "tracked(148 = py 51 + md 97) + untracked(0) == 148 == ruff format --check 报数，成立",
+          "identity": "tracked(149 = py 51 + md 98) + untracked(0) == 149 == ruff format --check 报数，成立",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4274,12 +4358,13 @@
           "untracked_py_md": 18,
           "round6_progression": "128（提交C 时）-> 144（S3d 在飞时实测，含未跟踪）-> 146（批次4 入库 + 守护 + D-026.md）-> 147（D-027.md 入库）；本提交后 untracked 归 0、tracked 147",
           "sampling_discipline": "counts 一律在「工作树 == 待提交树」时采样（本次 S3d 12 个文件已 git add、其余全入库，untracked=0），且在台账写入之后、commit 之前完成",
-          "historical_value_147": "2026-11-13T10:49:12+08:00 实测 147（py 51 + md 96）。该次测量早于 D-028.md 落盘与本台账写入（updated_at 10:56:43），故对『待提交树』而言偏小 1。原值按 D-011 体例保留于此，不改写。"
+          "historical_value_147": "2026-11-13T10:49:12+08:00 实测 147（py 51 + md 96）。该次测量早于 D-028.md 落盘与本台账写入（updated_at 10:56:43），故对『待提交树』而言偏小 1。原值按 D-011 体例保留于此，不改写。",
+          "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。"
         },
         "ruff_lint_scope_files": 24,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T11:08:43+08:00",
-        "counts_refresh_reason": "S3d 提交前在『工作树==待提交树』时点重采样（纪律：台账写入之后、commit 之前）：ruff_formatted_files 147->148（+1 = orchestrator/defects/D-028.md，md 96->97）；pytest_passed 213、mypy_source_files 49、contract_registered_nodes 13、acceptance_denominator/resolvable 47、frontend_baseline_rows 8、live_openapi_sha16 592571099d638251 均实测未变。见 R6-3。",
+        "counts_refreshed_at": "2026-11-13T11:34:54+08:00",
+        "counts_refresh_reason": "Round 7 predispatch 落盘后重采样：ruff_formatted_files 148->149（+1 = orchestrator/defects/D-029.md，md 97->98）；M0-02.md 为纯增量加注（6 add / 0 del）不改变分母；pytest/mypy/契约节点/AC 分母/openapi 指纹待本提交树全表复跑后确认。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -4484,8 +4569,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T11:08:43+08:00",
-      "counts_refresh_reason": "S3d 提交前在『工作树==待提交树』时点重采样（纪律：台账写入之后、commit 之前）：ruff_formatted_files 147->148（+1 = orchestrator/defects/D-028.md，md 96->97）；pytest_passed 213、mypy_source_files 49、contract_registered_nodes 13、acceptance_denominator/resolvable 47、frontend_baseline_rows 8、live_openapi_sha16 592571099d638251 均实测未变。见 R6-3。",
+      "counts_refreshed_at": "2026-11-13T11:34:54+08:00",
+      "counts_refresh_reason": "Round 7 predispatch 落盘后重采样：ruff_formatted_files 148->149（+1 = orchestrator/defects/D-029.md，md 97->98）；M0-02.md 为纯增量加注（6 add / 0 del）不改变分母；pytest/mypy/契约节点/AC 分母/openapi 指纹待本提交树全表复跑后确认。",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -6925,6 +7010,13 @@
         "item": "新增机器守护 tests/unit/test_counts_freshness.py：从 git 重算 ruff format 分母（tracked py+md 去 spec/prototype/web + untracked 同口径），断言 == state.json counts.ruff_formatted_files，并断言 == `ruff format --check .` 报数；不一致即判红，杜绝 R6-3 类的时点失真再次进入权威 counts。归 Round 7/8 的独立 flash 小片（<=8k），可与 FU-8（alembic head 收口）同批。",
         "owner": "编排器（Round 7/8 派单）",
         "source": "R6-3"
+      },
+      {
+        "id": "FU-15",
+        "at": "2026-11-13T11:34:54+08:00",
+        "item": "新增守护 tests/unit/test_card_output_scope.py：解析每张非 LEGACY 卡档位表「产出」列的路径字面量，断言其全部落在 state.json -> tasks[id].scope 的允许前缀内，越界即判红并打印越界路径与所属任务。现守护（test_task_cards.py）只查卡<->tasks 键双向对账与必需段落，不查产出列越界，属 D-029 的机器盲区。归 Round 8 独立 flash 小片（<=8k），可与 FU-8（alembic head 收口）、FU-14（counts 新鲜度守护）同批。",
+        "owner": "编排器（Round 8 派单）",
+        "source": "D-029"
       }
     ],
     "commit_backfill_round6": {
@@ -7455,6 +7547,173 @@
       "rule_new_file_gate": "编排器自己新写的 .py/.md 在入库前必须先过 ruff format + ruff check + mypy（.py）与 BOM/CR/尾换行（全部）",
       "rule_counts_sampling_point": "counts/门禁采样必须发生在『工作树==待提交树』且『台账与缺陷单已落盘』之后、commit 之前；任何在门禁跑完后新增的 .md/.py（含缺陷单、证据档、守护测试）都必须触发重采样。提交前断言：counts.ruff_formatted_files == 实测 ruff format --check 报数 == tracked(py+md) + untracked。依据 R6-3。",
       "rule_same_name_tools": "同名多工具的门禁（实例：CLI `python -m campaignlab doctor` 与 `bash scripts/doctor.sh`）必须分字段记录且每字段附 cmd，禁把两者混记在一个 doctor 键下。依据 R6-4。"
+    },
+    "round7_adjudications": [
+      {
+        "id": "A81",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §10-N5 + M0-02 卡 v3 的 S3d 行硬规则",
+        "question": "N5 提议 worker/store.py::JobStore 为唯一写 jobs.state/attempt/lease_*/result_json/problem_json/revision 的模块；M0-02 卡 v3 的 S3d 行亦写「JobStore 是唯一写 jobs 表的模块」。但 S3d 实际交付把 INSERT INTO jobs(:404) 与 UPDATE jobs(:470) 落在 infra/db/repositories.py::JobRepository，且 A70 判据②已固化「SQL 写只在 repositories」、FU-10 明载「禁新增 UPDATE jobs 落点」。三者冲突，谁是 jobs 表的唯一 SQL 写点？",
+        "ruling": "**否决 N5 与卡片 v3 的 JobStore 口径**：`JobRepository`（src/campaignlab/infra/db/repositories.py）是**唯一**含 `INSERT INTO jobs` / `UPDATE jobs` 的模块，维持 A70 判据②与 FU-10 不变。`JobStore` 若设立只能是**调用 JobRepository 的薄封装、禁裸 SQL**。M0-02 卡 v3 的 S3d 行该句判为**已被 S3d 实际交付与 A70 取代**（卡片只加注不改写，本条即注记）。依据实测：grep -rnE 'INSERT INTO jobs|UPDATE jobs' src/campaignlab/ --include=*.py 命中 3 行全在 repositories.py（:8 docstring、:404、:470）。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A82",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "A81 的落地前提（M0-04/S2 写权）",
+        "question": "M0-04 的 scope_deny 明列 src/campaignlab/infra/db/**，但 A81 要求终态写入仍走 JobRepository，而 JobRepository 实测只有 insert/get/list_ready/touch_lease 四个方法，无任何状态迁移与终态写入方法（Godel 偏差3 已声明归 M0-04）。S2 如何在不违反 scope_deny 的前提下取得终态写入能力？",
+        "ruling": "给 M0-04/S2 一处**窄口径 append-only 豁免**：允许对 `src/campaignlab/infra/db/repositories.py` **纯追加**——只准给 `JobRepository` 新增方法（认领/状态迁移/终态写入/重试入队等）。**禁改**既有 4 个方法（insert/get/list_ready/touch_lease）的签名、函数体与 SQL 文本；**禁改** `job_from_row`、5 个 Record dataclass 的既有字段、其余 4 个 Repository 类；**禁**在任何其他文件出现 `INSERT INTO jobs`/`UPDATE jobs`。交付须附守护测试断言：① 匹配 `INSERT INTO jobs|UPDATE jobs` 的文件集合 == {repositories.py}；② 既有 4 方法签名逐字未变（用 inspect.signature 钉住）。git diff --numstat 对该文件必须为「N add / 0 del」，出现删除行即判越界。",
+        "action_taken": "豁免写入 tasks['M0-04'].scope_waivers_round7；派单文逐字引用"
+      },
+      {
+        "id": "A83",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "A70 判据① 与 M0-04 租约计算点的冲突",
+        "question": "A70 判据①固化「lease_until 的 Python 赋值唯一点 = application/worker.py:142」。M0-04/S2 的认领路径（QUEUED->RUNNING + 取租约）同样需要一个 lease_deadline 值；若在 worker/** 内另算一次，就出现第二个计算点，判据①被破坏。M0-02 卡 v3 又规定 heartbeat() 是唯一写 jobs.lease_until 的入口、「M0-04/S2 只调用不自建」，但 heartbeat() 是 WorkerSupervisor 的实例方法（依赖 _lease_token/_engine），S2 的仓储层无法直接复用其计算式。",
+        "ruling": "允许 M0-04/S2 对 `src/campaignlab/application/worker.py` 做**唯一一处 append-only 追加**：新增模块级函数 `compute_lease_deadline(now: datetime, *, lease_seconds: int) -> str`（纳入 `__all__`，按 A77/A78 进 public_frozen 扩围），并把 `heartbeat()` 内 :142 的内联表达式改为调用它，**值语义逐字节等价**（同为 `(now + timedelta(seconds=...)).isoformat()`）。`heartbeat()` 的其余语句、`_run`/`start`/`stop`/`status`/`poll_once`/全部 property、`WORKER_*` 三个常量、`WorkerSupervisor.__init__` 签名**一字不改**。A70 判据①据此**修订**为：「租约期限的 Python 计算唯一点 = `application/worker.py::compute_lease_deadline`；`worker/**` 只准 import 调用、禁重算」。守护：断言全仓 `+ timedelta(` 形式的租约计算表达式只出现在 `compute_lease_deadline` 函数体内。numstat 对该文件须为纯追加（唯一允许的删除行 = :142 原表达式 1 行，且必须替换为对 compute_lease_deadline 的调用）。",
+        "action_taken": "A70 判据①修订；豁免写入 tasks['M0-04'].scope_waivers_round7"
+      },
+      {
+        "id": "A84",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "D-029",
+        "question": "M0-02 卡 v3 的 S4 行把 api/jobs.py 与 app.py 的 jobs 挂载分给 M0-02/S4，与 5 处权威相左。谁是唯一 owner？",
+        "ruling": "`src/campaignlab/api/jobs.py` 与其在 `api/app.py` 的挂载（A10 最小例外 <=3 行）**唯一 owner = M0-04/S4**。**M0-02/S4（Round 8）产出收窄为 `tests/api/**`**（v2 档位表 S4 行口径：契约测试参数化 202/409/412/422 各分支、Problem 结构、ETag 与 412、Idempotency-Key 重放一次生效），**不碰 api/app.py、不碰 api/jobs.py**。立 D-029（MAJOR/CLOSED）并按「只加注不改写」在卡尾追加 6 行。",
+        "action_taken": "D-029.md 入库 + M0-02.md 卡尾加注 6 行（numstat 6 add / 0 del）+ FU-15 防再发守护"
+      },
+      {
+        "id": "A85",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "api/app.py:149 挂载位归属（S3b）",
+        "question": "app.py:149 预留了 session/workspaces 的挂载位注释，但 M0-02 的 state.json scope 不含 api/app.py；S3d 已把 app.py 改造为 A69「不注入就不装配」（health.router 在 :147 的显式注入分支内）。S3b 追加两行挂载该落在哪一侧？",
+        "ruling": "`api/app.py:149` 的挂载位归 **M0-02/S3b（Round 7）**：追加 `app.include_router(session.router)` 与 `app.include_router(workspaces.router)` 两行，且**必须落在 A69「显式注入才挂载」的分支内**（与 `health.router`（:147）同侧），不得让未注入服务的 app 装配出必然 500 的路由。`app.py` 总变更 **<=6 行**（含必要的 import），其余部分（CORS／中间件／异常处理装配／`openapi_url=None` 等设置）**一字不改**。S3b 因此获得对 `api/app.py` 的窄口径豁免，记入 tasks['M0-02'].scope_waivers_round7。",
+        "action_taken": "豁免写入 tasks['M0-02'].scope_waivers_round7；S3b 派单文逐字引用"
+      },
+      {
+        "id": "A86",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §10-N4",
+        "question": "N4 称 tests/unit/test_job_dto.py 同时在 M0-02/S4 与 M0-04/S7 白名单内，请求裁定 S7 为追加式或改落 test_job_dto_m004.py。",
+        "ruling": "**N4 的前提实测不成立**：`tests/unit/test_job_dto.py` 当前**不存在**（ls tests/unit/ 实测 18 个文件无此项）；`state.json -> tasks['M0-02'].scope` 14 项**不含**该路径；M0-02 卡 v2 的 S4 行产出为 `tests/api/**`、v3 的 S4 行产出为 `api/jobs.py`+`app.py`（已由 A84 判归 M0-04）——两版均未含 `tests/unit/test_job_dto.py`。故**唯一 owner = M0-04/S7**（`tasks['M0-04'].scope` 实测含该路径），**无需改卡、无需追加式约束**。若 S7 派单时该文件已被他人创建，S7 须回报而非自行改写。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A87",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §3 与 §10-N1（切片指纹与 TRUNCATED）",
+        "question": "设计文档第 3 行记录切片 sha16=8dc116f109a51c14 / bytes=23095 / 7 处 TRUNCATED，并建议 T lane 重切补全 ObjectRef/Problem。当前实测值为何？是否重切？",
+        "ruling": "**N1 已消解，不再重切**：`orchestrator/handoff/M0-04.slice.json` 已由 D-020 以 `--depth 5` 重切（见 resume.slices_d020_reslice），实测 **35392 B / sha16 `dd83346fca3b34f5` / TRUNCATED 字面量 0 处 / truncated_schemas=[]**，含 5 op（listJobs/getJob/cancelJob/retryJob/getHealth）+ 2 AC（AC-029/AC-031）+ 5 张 DDL（jobs/jobs__indexes/artifacts/idempotency/audit），占活契约 8.0%。设计文档第 3 行的旧指纹属**重切前**历史值，按 D-011 只加注不改写。**不再重切的理由**：契约本体未变（仍 443309 B / 592571099d638251），重切会使全项目 11 份切片指纹漂移（A49 已述该代价），而设计文档已按 §2 从活契约定向补取所需 schema，收益不匹配。S2 派单文以新指纹为期望值，但**禁写死**、一律指向 `counts.live_openapi_sha16`（A75/D-012/D-014）。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A88",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §10-N7 三项口径",
+        "question": "① listJobs.status 契约无 enum/pattern（仅 1-60），是否取逗号分隔多值？② JOB_CAPACITY 的「待办」计数取非终态还是仅 QUEUED？Retry-After 取值？③ JOB_INTERRUPTED 不在 20 码注册表内，如何落地？",
+        "ruling": "三项**全部确认**设计文档的取法：① `status` 取**逗号分隔多值**（单值为其子集，向后兼容；6 态名全连恰 58 字符 <= 契约 60 上限）；② `JOB_CAPACITY` 的「待办」取**非终态**计数（`QUEUED|RUNNING|CANCEL_REQUESTED`，对应 JOBS.md:7「默认工作区最多 10 个待办」），`Retry-After=3`（JOBS.md:5 退避值，落在契约 1-3600 内），**不改取「仅 QUEUED」**；③ `JOB_INTERRUPTED` **禁**提升为 `Problem.code`（会污染 ADR-005 冻结的 20 码注册表），置于 `Problem.issues[0].code`（自由串 1-96，非冻结面）+ `Problem.code='INTERNAL_ERROR'` + `status=500` —— 与 A49／D-022 选项 A 同型（复用语义标签、零契约变更、禁扩注册表）。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A89",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §10-N8",
+        "question": "集成测试桩放哪？result_ref 与 artifacts.kind 的断言口径？",
+        "ruling": "**确认**设计文档取法：测试桩只准注册在 `tests/integration/jobs/conftest.py`，**src 内禁放桩**；`result_ref` 断言口径用 `ObjectRef(kind='job', id=<job_id>)`（`job` 在 21 枚举内）；`artifacts.kind` 取常量 `'JOB_RESULT'`（DDL 无 enum，本裁定即其权威来源）。`kind` 的**业务映射**（VALIDATE_IMPORT->import、COMPARE->comparison、REPORT->report、EXPORT->export …）仍归 M1/M2，本卡**禁发明**。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A90",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "M0-04-design.md §10-N2 与 N3",
+        "question": "N2 称 4 个 jobs 路由无处注册（app.py/deps.py 均不在 scope_allow），请求最小例外；N3 称 poll_once() 与 Health.worker 心跳在 application/worker.py（M0-04 scope_deny），9 条迁移实现必须在 worker/**，请求允许 S2 改 poll_once() 体做单点委托。",
+        "ruling": "① **N2 已生效、无需再裁**：`api/app.py:3-6` 与 `:150` 已由 S3c/S3d 写入 A10 最小例外的权威注释（`include_router(jobs.router)` 一类挂载语句 <=3 行，属 M0-04/S4），owner 见 A84；**S2 不得触碰 api/app.py**（挂载归 Round 8 的 S4）。② **N3 经实测已消解**：S3d 交付的 `WorkerSupervisor.poll_once(*, now)` 已实现「`list_ready(limit=batch_size)` -> 按 `record.kind` 取 handler -> `heartbeat()` 取租约 -> 调用 handler -> 计 claimed」，未注册 kind 一律跳过。故 S2 只需经构造函数 `handlers=` 注册 handler，**禁改 poll_once 函数体**、**禁**按 N3 原文做委托改造；handler 内的终态写入经 A82 追加的 JobRepository 方法完成。S2 实测可用的构造签名为 `WorkerSupervisor(*, clock, engine, jobs=None, heartbeat_ttl_seconds=15, lease_seconds=30, poll_interval_seconds=0.2, batch_size=8, handlers=None)`，`WORKER_LEASE_SECONDS=30`。",
+        "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A91",
+        "round": 7,
+        "at": "2026-11-13T11:34:54+08:00",
+        "source": "api/common.py 实测缺 JobPage（编排器派单前置实测发现）",
+        "question": "`listJobs` 的 200 响应是 `JobPage{items(0-100), next_cursor}`，但实测 `api/common.py.__all__` 52 项含 `Job`/`ObjectRef`/`WorkspacePage` 而**无 `JobPage`** -> 该 DTO 无落点。谁追加？",
+        "ruling": "`JobPage` 由 **M0-04/S4** 在 `src/campaignlab/api/common.py` **append-only** 追加（与既有 `WorkspacePage` 同构：`items` + `next_cursor`，字段序、校验口径、`__all__` 位置一律对齐 `WorkspacePage`），按 A77/A78 纳入 **public_frozen 扩围**，此后禁改签名禁移除。**M0-02/S4 禁抢先添加**（避免双主写，与 A84 同理）。S2 不做 HTTP 层，本轮不涉及；本条为 Round 8 派单前置裁定，先行入库以免 S4 派单时临时阻塞。`api/common.py` 属 M0-02 的 scope、且已列为公共冻结件，故 S4 的该处追加须记为窄口径 append-only 豁免（numstat 对该文件须 0 删除行）。",
+        "action_taken": "无代码动作；裁定入库"
+      }
+    ],
+    "round7_predispatch": {
+      "at": "2026-11-13T11:34:54+08:00",
+      "round": 7,
+      "wave": 1,
+      "mode": "parallel-3-lanes",
+      "concurrency_precedent": "Round 5 已实测 3 lane 并发（Hilbert/max S3c、Pasteur/flash M0-03 S6-S9、Locke/flash D-016 批次3），Round 6 为 2 lane；两槽已于本接管点 close_agent 释放（Godel 01a1d275…、Planck 01a1d295…）",
+      "lanes": [
+        {
+          "lane": "S",
+          "task": "M0-02",
+          "subtask": "S3b DTO 与路由样板铺开",
+          "tier": "qwen3.8-flash",
+          "budget": "14k",
+          "loop_cap": 3,
+          "write_set": [
+            "src/campaignlab/api/session.py(new)",
+            "src/campaignlab/api/workspaces.py(new)",
+            "src/campaignlab/api/app.py(<=6 行挂载，A85 豁免)",
+            "tests/unit/test_s3b_routes.py(new)"
+          ]
+        },
+        {
+          "lane": "S",
+          "task": "M0-04",
+          "subtask": "S2 认领/续租/取消/重试实现",
+          "tier": "qwen3.8-max",
+          "reasoning_effort": "high",
+          "budget": "50k",
+          "loop_cap": 2,
+          "write_set": [
+            "src/campaignlab/worker/**(new)",
+            "src/campaignlab/infra/db/repositories.py(append-only，A82 豁免)",
+            "src/campaignlab/application/worker.py(append-only + :142 等价替换，A83 豁免)",
+            "tests/unit/test_worker_runner.py(new)",
+            "tests/unit/test_job_repository_terminal.py(new)",
+            "orchestrator/handoff/M0-04-design.md(append-only 加注)"
+          ]
+        },
+        {
+          "lane": "T",
+          "task": "D-016-batch5",
+          "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+          "tier": "qwen3.8-flash",
+          "budget": "24k",
+          "loop_cap": 2,
+          "write_set": [
+            "orchestrator/tasks/M1-04.md(new)",
+            "orchestrator/tasks/M2-04.md(new)",
+            "orchestrator/tasks/M3-04.md(new)",
+            "tests/unit/test_task_cards.py(KNOWN_MISSING 6->3)"
+          ]
+        }
+      ],
+      "write_set_disjointness": "三方两两不相交（实测逐路径比对）：A 只碰 api/{session,workspaces,app}.py 与 tests/unit/test_s3b_routes.py；B 只碰 worker/**、repositories.py、application/worker.py、两个新 test_worker*/test_job_repository* 与 M0-04-design.md；C 只碰三张新卡与 test_task_cards.py。无一路径被两方同时写入。",
+      "PRE_4_5_dependency_check": {
+        "PRE-4（写集不相交）": "PASS（见上）",
+        "PRE-5（被依赖模块成员面可用性，R5-3 新增判据）": "PASS —— 实测：api/deps.py 的 NotImplementedError=0、全 src=0；SessionService={cookie,exchange,resolve}、WorkspaceService={create_workspace,list_workspaces}、HealthService={snapshot}（inspect 实取，非采信自报）；api/common.py.__all__ 52 项含 Job/ObjectRef/Problem/Issue/WorkspacePage/accepted_response/problem_response/etag/check_if_match/encode_cursor/decode_cursor/canonical_json/idempotency_envelope/replay_from_envelope/request_digest/validate_idempotency_key/PROBLEM_CODES/status_to_code；job_from_row(record: JobRecord) -> Job；JobRepository={insert,get,list_ready,touch_lease}；JobRecord 17 字段；WorkerSupervisor 构造与 6 个公开方法；engine.__all__ 5 项、paths.__all__ 16 项、idempotency.__all__ 4 项、audit.__all__ 4 项、AppConfig.data_dir 存在",
+        "PRE-5 唯一缺口": "api/common.py 无 JobPage -> 已由 A91 裁定归 M0-04/S4（Round 8），不阻塞本轮 S2（S2 不做 HTTP 层）",
+        "M0-04/S2 前置（N6：S3c 与 S3d 均已交付并入库）": "PASS —— S3c=f457ec9、S3d=46dca2b，两者均已 push，behind/ahead=0/0",
+        "R5-3 串行链": "S3c(R5 已交付) -> S3d(R6 已交付 46dca2b) -> **S3b(R7 本轮)** -> S4(R8) -> S5(R8/R9)，本轮派 S3b 符合改判后的次序"
+      },
+      "toolchain_contention_mitigation": "三 lane 同处一个工作树，并发跑全仓门禁会互撞在飞的半成品文件而得到假 RED（手册第 746 行明载该窗口）。故本轮派单文对三 lane 一律规定：① 只准跑**路径限定**的门禁——`ruff check <自有路径>`、`ruff format --check <自有路径>`、`mypy <自有路径>`、`pytest -q <自有测试文件>`；② **禁**跑全仓 `pytest` / `mypy` / `ruff check .` / `ruff format --check .` / `bash scripts/doctor.sh` / `bash scripts/verify.sh` / 任何 `npm`/`node`/`vite`/`vitest`/`playwright`（全表复验是编排器回收后的独占动作）；③ 若看见非自有文件的红点（尤其 application/worker.py、worker/**、api/*.py、tests/unit/test_task_cards.py 等对方在飞路径），**禁自行修复、禁改对方文件**，只在回报中列出并归因；④ 一律不执行任何 git 写操作（add/commit/push/checkout/stash/reset/branch/tag/rebase/merge），交付物留在工作区由编排器统一复验后分任务提交。",
+      "batch5_card_choice_reason": "KNOWN_MISSING 实测 6 张：M1-04/M2-04/M3-04/M3-P02/M5-03/M5-P01。按 waves 实测（29/29 全覆盖、无重复无孤儿）缺卡的最近波次是 **wave4（M1-04、M2-04 与 M1-P01 并行）** 与 **wave6（M3-04 与 M4-01 并行）**，故批次 5 取这 3 张；M3-P02（wave7）、M5-P01（wave9）、M5-03（wave10）留批次 6。手册 15.5：无拆解表不得 spawn，故这 3 个任务在补卡前不可派单。",
+      "fu5_carryover": "FU-5 要求批次 5 补 M1-04/M2-04 卡时把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属 -> 已写进 Lane C 派单文",
+      "gates_before_dispatch": "见 resume.self_check_gates_rc0.round7_predispatch_gates（本提交树全表实跑）"
     }
   },
   "acceptance": {
