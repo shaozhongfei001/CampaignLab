@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T00:42:34+08:00",
+  "updated_at": "2026-11-14T00:58:54+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1225,8 +1225,8 @@
         "web/tsconfig*.json",
         "evidence/M0/ui/**",
         "evidence/M0/M0-03/**",
-        "handoff/M0-03-design.md",
-        "handoff/M0-03-public-components.md",
+        "orchestrator/handoff/M0-03-design.md",
+        "orchestrator/handoff/M0-03-public-components.md",
         "web/package.json（仅编排器可改）",
         "web/package-lock.json（仅编排器可改）"
       ],
@@ -1280,7 +1280,24 @@
         "S9": "5d16d4d + evidence/M0/ui/{ui-01-desktop-1440x900.png,ui-01-laptop-1024x768.png,ui-01-visual-notes.md} + evidence/M0/M0-03/playwright-readiness.json",
         "S10": "本提交：orchestrator/handoff/M0-03-public-components.md（303 行/26803B），13 件公共组件的 props/slots/emits 契约表（30 行 grep 实抽）、依赖关系、冻结边界、消费方指引、与 26 页覆盖对账"
       },
-      "note_round8": "S1–S10 **全部交付**（10/10）。待 wave1 出口由 Q lane 复核 gates 与 AC 取证回填（A109），故 status 暂维持 IN_PROGRESS，禁在无取证的情况下自行判 DONE"
+      "note_round8": "S1–S10 **全部交付**（10/10）。待 wave1 出口由 Q lane 复核 gates 与 AC 取证回填（A109），故 status 暂维持 IN_PROGRESS，禁在无取证的情况下自行判 DONE",
+      "scope_sync_A128": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "added": [],
+        "superseded": [
+          {
+            "index": 6,
+            "old": "handoff/M0-03-design.md",
+            "new": "orchestrator/handoff/M0-03-design.md"
+          },
+          {
+            "index": 7,
+            "old": "handoff/M0-03-public-components.md",
+            "new": "orchestrator/handoff/M0-03-public-components.md"
+          }
+        ],
+        "note": "依 A5「卡字面量为准」修正两处路径前缀缺失（state 记 handoff/... 而卡面与磁盘实路径均为 orchestrator/handoff/...）；仓库内无顶层 handoff/ 目录。原值留存于 superseded，不改写历史（A19）。"
+      }
     },
     "M0-03b": {
       "status": "TODO",
@@ -1345,6 +1362,13 @@
         "S2": "TODO：web/tests/unit/state/** 六态参数化 vitest（flash 3k）",
         "S3": "TODO：web/src/components/state/** 件内样板收敛（flash 2k）",
         "S4": "**BLOCKED**：截图需 e2e harness，而 web/tests/e2e/** 不在 scope_allow（Lagrange U-2）-> 裁定前无可执行输入，见 resume.round8_pending_rulings_F"
+      },
+      "s4_screenshot_deferral_A135": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "ruling": "A135（F-U-2 BLOCKING 终裁）：采选项 (c) —— S4 六态截图**不在本卡取证**，推迟到首个消费 ViewState 的页面任务 M1-04，落点 evidence/M1/M1-04/screenshots/（已由 A128 同步进 tasks[M1-04].scope）。",
+        "completion_caliber": "本卡完成面 = 六态呈现契约冻结登记（orchestrator/handoff/M0-03b-freeze.md）+ web/tests/unit/state/ 单测 + 越界自证双检为 0；判 **PASS_WITH_TODO** 而非 PASS，TODO 项即六态截图。",
+        "why_not_a_b": "(a) 为截图扩 web/tests/e2e/state/** 会让冻结卡持有页面级 harness 写权，与 A134「不越界」同一原则；(b) 另指定落点等于新增第三套证据口径，且 playwright/vitest 配置与依赖（web/*.config.*、web/package.json）在本卡 scope_deny 内、仅编排器可改。",
+        "handoff": "M1-04 派单文必须显式承接：六态截图取证 + D-034 的 #2（DataTable 36px 密集档/宽表冻结首列）与 #4（AppShell 透传 drawer/entryActive）点名处理（依 A140）。"
       }
     },
     "M0-04": {
@@ -1734,13 +1758,25 @@
         "web/src/features/import/",
         "web/src/features/scope/",
         "web/tests/unit/data/",
-        "web/tests/e2e/data/"
+        "web/tests/e2e/data/",
+        "orchestrator/handoff/M1-04-design.md",
+        "evidence/M1/M1-04/",
+        "evidence/M1/summaries/M1-04.md"
       ],
       "blockers": [],
       "depth": 7,
       "height": 1,
       "slack": 7,
-      "critical": false
+      "critical": false,
+      "scope_sync_A128": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "added": [
+          "orchestrator/handoff/M1-04-design.md",
+          "evidence/M1/M1-04/",
+          "evidence/M1/summaries/M1-04.md"
+        ],
+        "note": "依 A5「卡字面量为准」+ A128（U-2 终裁）把卡 scope_allow 的 D-008 补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      }
     },
     "M2-01": {
       "status": "TODO",
@@ -2006,13 +2042,27 @@
         "web/src/pages/cases/",
         "web/src/features/diff/",
         "web/tests/unit/rules/",
-        "web/tests/e2e/coupon/"
+        "web/tests/e2e/coupon/",
+        "orchestrator/handoff/M2-04-design.md",
+        "web/tests/unit/cases/",
+        "evidence/M2/M2-04/",
+        "evidence/M2/summaries/M2-04.md"
       ],
       "blockers": [],
       "depth": 6,
       "height": 1,
       "slack": 8,
-      "critical": false
+      "critical": false,
+      "scope_sync_A128": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "added": [
+          "orchestrator/handoff/M2-04-design.md",
+          "web/tests/unit/cases/",
+          "evidence/M2/M2-04/",
+          "evidence/M2/summaries/M2-04.md"
+        ],
+        "note": "依 A5「卡字面量为准」+ A128（U-2 终裁）把卡 scope_allow 的 D-008 补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      }
     },
     "M3-01": {
       "status": "TODO",
@@ -2216,13 +2266,30 @@
         "web/src/pages/review/",
         "web/src/features/charts/",
         "web/tests/unit/review/",
-        "web/tests/e2e/review/"
+        "web/tests/e2e/review/",
+        "orchestrator/handoff/M3-04-design.md",
+        "evidence/M3/M3-04/",
+        "evidence/M3/summaries/M3-04.md"
       ],
       "blockers": [],
       "depth": 9,
       "height": 4,
       "slack": 2,
-      "critical": false
+      "critical": false,
+      "scope_sync_A128": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "added": [
+          "orchestrator/handoff/M3-04-design.md",
+          "evidence/M3/M3-04/",
+          "evidence/M3/summaries/M3-04.md"
+        ],
+        "note": "依 A5「卡字面量为准」+ A128（U-2 终裁）把卡 scope_allow 的 D-008 补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      },
+      "scope_deny": [
+        "web/src/pages/review/monthly/",
+        "web/src/features/monthly/"
+      ],
+      "scope_deny_note_A130": "依 A130（U-5 终裁）：scope_allow `web/src/pages/review/` 与 M3-P02 写权面字面重叠，**deny 优先**。台账侧显式登记（禁只写卡内，否则视为未生效）。M3-P02 写权 = web/src/pages/review/monthly/ 与 web/src/features/monthly/（waves[7].L4）。"
     },
     "M4-01": {
       "status": "TODO",
@@ -2429,7 +2496,11 @@
           80
         ]
       },
-      "gate_literal_ruling_A28": "gates 字面「AC-025 至 AC-028、AC-030 页面侧」中的 AC-026/AC-027 经查 primary_owner 的 cross_ref 均不含 M4-03 -> 本卡对二者不承担取证义务，只对 acs 登记的 AC-025/AC-028/AC-030 承担 cross_ref。gates 历史值不改写。"
+      "gate_literal_ruling_A28": "gates 字面「AC-025 至 AC-028、AC-030 页面侧」中的 AC-026/AC-027 经查 primary_owner 的 cross_ref 均不含 M4-03 -> 本卡对二者不承担取证义务，只对 acs 登记的 AC-025/AC-028/AC-030 承担 cross_ref。gates 历史值不改写。",
+      "scope_deny": [
+        "web/src/pages/report/monthly/"
+      ],
+      "scope_deny_note_A141": "依 A141（FU-24 终裁）+ A130 deny 优先规则：本卡 scope_allow `web/src/pages/report/` 字面包含 M4-P01 的写权面 `web/src/pages/report/monthly/` -> 显式登记排除。wave7（本卡）先于 wave8（M4-P01），无并发冲突，但登记后写权无歧义。月报页面（UI-21/22/24/26）的 DTO 消费面由本卡切片承载（22 op 已全覆盖 M4-P01 的 20 个页面引用 op，差集 0）。"
     },
     "M5-01": {
       "status": "TODO",
@@ -4299,7 +4370,7 @@
       "closed_at": null,
       "blocking": false,
       "blocking_note": "不阻塞 M0-03b 与页面任务派单；但其中 ConfirmDialog 聚焦与 StatusTag 五 tone 同形**两项关联 AC-032**（primary owner = M5-01），**必须在 M5-01 取证前处理**。",
-      "owner": "M0-03 收尾，或独立 CR（二选一，待下次开工终裁 F-U-7 时确定）",
+      "owner": "M0-03 收尾（A140 终裁；不采独立 CR）",
       "responsibility": "既有实现缺陷（公共组件在 M0-03 早期子任务落地时即存在），非 Round 8 lane 失职；Lagrange 在 M0-03b/S1 期间**只上报、不夹带修复**（web/src/components/** 属已冻结面、web/src/pages/** 属 scope_deny），处置判定为正确。",
       "measured": {
         "source": "resume.round8_pending_rulings_F.items[F-U-7] 原文",
@@ -4318,7 +4389,21 @@
       "followup": null,
       "related_adjudications": [
         "A121"
-      ]
+      ],
+      "owner_adjudicated_A140": {
+        "at": "2026-11-14T00:57:19+08:00",
+        "severity_confirmed": "MINOR",
+        "blocking_confirmed": false,
+        "owner_ruling": "M0-03 收尾。理由：#1/#3 有 AC-032 硬时限（须 M5-01 取证前修毕），走独立 CR 会引入契约/变更登记链路的时间成本；而 web/src/components/** 写权本就归 M0-03（tasks[M0-03].scope 含 web/src/**），由其收尾子任务承接是写权最短路径。",
+        "split": "#1 ConfirmDialog 聚焦 + #3 StatusTag 非颜色维度 -> M0-03 收尾，M5-01 取证前完成并留证；#2 DataTable 36px 密集档/宽表冻结首列 + #4 AppShell 透传 drawer/entryActive -> 随首个消费方页面任务（M1-04 / M2-04），须在对应派单文显式点名，禁单方扩权。",
+        "content_review_not_waived": "path_caliber 仍为 PENDING_CONTENT_REVIEW：owner 落定**不解除**内容级复核义务，13 件组件契约表逐条对代码须在 M0-03 收尾前完成；修单时禁凭记忆填文件路径与行号（D-012/D-014）。",
+        "related": [
+          "A140",
+          "F-U-7",
+          "AC-032",
+          "M5-01"
+        ]
+      }
     },
     {
       "id": "D-035",
@@ -4856,7 +4941,11 @@
       "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串",
       "补卡 lane（D-016）必须以 orchestrator/handoff/D-016-batch2-context.md 为唯一 spec/手册入口；禁整读 spec/**、contracts/openapi.json(443309B)、docs/delivery/LONG-HORIZON-ORCHESTRATION.md(758 行)、orchestrator/state.json(183065B)；手册只读 §3.2(174-204)/§6.3(312-333)/§6.4(334-383)/§15.5(656-679)/§15.6(680-694)",
       "PRE-3 断言口径（A18 更正）：判定切片新鲜且目标全命中须断言 ('missing' not in slice) and slice['truncated_schemas']==[]；禁断言 slice['missing']==[]（contract_slice.py 仅在有未命中目标时才写 missing 键，全命中时键不存在，断言会 KeyError）。守卫命令的 cwd 口径：一律在仓库根 /home/szf/dev/CampaignLab 执行（D-024 的教训：在 web/ 下跑 grep 'web/*.config.*' 通配不展开 -> rc=2 假绿）",
-      "门禁记账四元组与 rc 语义（D-024 的教训）：门禁表每行必须记 cwd + 命令 + rc + 关键输出四元组，缺 cwd 的行视为无效证据；rc 语义严格区分 0=有匹配 / 1=无匹配（守卫期望）/ 2=命令自身错误（必须判红并修命令，禁记为 1）；凡 grep 守卫使用相对路径通配（web/*、src/* 等），派单文与 design 表格必须同时写明 cwd，且一律在仓库根 /home/szf/dev/CampaignLab 执行。编排器复验时对一切「rc=1 无匹配」型守卫必须亲自重跑，不采信 lane 自报 rc。"
+      "门禁记账四元组与 rc 语义（D-024 的教训）：门禁表每行必须记 cwd + 命令 + rc + 关键输出四元组，缺 cwd 的行视为无效证据；rc 语义严格区分 0=有匹配 / 1=无匹配（守卫期望）/ 2=命令自身错误（必须判红并修命令，禁记为 1）；凡 grep 守卫使用相对路径通配（web/*、src/* 等），派单文与 design 表格必须同时写明 cwd，且一律在仓库根 /home/szf/dev/CampaignLab 执行。编排器复验时对一切「rc=1 无匹配」型守卫必须亲自重跑，不采信 lane 自报 rc。",
+      "越界自证必须**双检**（A139／F-U-6）：① git diff --name-only HEAD -- <scope根> | grep -vE '<允许前缀正则>' | wc -l ② git status --porcelain <scope根> | grep -vE '<允许前缀正则>' | wc -l；两条都必须为 0（前者管已跟踪修改、后者管未跟踪新文件，单用 diff 对新建文件假绿）。两条一律在仓库根 /home/szf/dev/CampaignLab 执行，按门禁四元组（cwd+命令+rc+关键输出）记账；编排器对一切「输出 0」型守卫亲自重跑，不采信 lane 自报。",
+      "lane F 页面卡「栏一 primary AC 为空」是**正确结果而非缺漏**（A132／U-7）：依 acceptance.primary_owner.basis，页面呈现面一律记 cross_ref。派单文须明载此口径，禁 lane 因栏一空而自行主张 primary 或停摆回报。同理，lane F 的 operations 段是**消费面**（A127），消费 ≠ 有写入口；凡涉写操作的 UI 入口必须在写权归属卡卡文里显式点名该页面（A131／U-6）。",
+      "派单文模板口径（A133／W-1）：档位表表头第二列统一写「档位」（手册 §15.5 四列硬约束：子任务／档位／预估 token／写权落点），禁写「模型」；AC 原文唯一权威路径统一写 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md，月报增量 AC 同时给 spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/ACCEPTANCE-MONTHLY.md。",
+      "公共件（web/src/components/**）一律**无数据获取副作用**（A137／F-U-4）：一切状态触发值由消费页面显式以 props 传入，组件内禁调 api；真实数据接线归对应页面卡（partial-comparable／pending-fill 归 M2-04/UI-10）。"
     ],
     "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
     "persisted": {
@@ -8315,11 +8404,13 @@
       {
         "id": "FU-24",
         "at": "2026-11-14T00:29:01+08:00",
-        "status": "PENDING",
+        "status": "ADJUDICATED",
         "item": "M4-P01（lane S，但 scope 含 `web/src/pages/report/monthly/` 与 `web/tests/e2e/monthly_report/`，属**混合卡**）的页面消费面切分口径待裁：其切片 `operations` 现为 8 个「本卡实现面」op，而其 4 个页面（UI-21／22／24／26 月报面）的 meta 引用 20 个 op。裁定选项：(a) 维持实现面 8 op 不动，月报页面的 DTO 消费面由 M4-03（lane F，已含 22 op）承载，M4-P01 只做后端 + monthly 子目录页面；(b) 为 M4-P01 另出一份**前端消费面切片**（如 M4-P01-web.slice.json），与实现面切片并存；(c) 按 lane F 口径直接扩其 operations 到 21 op。**建议 (a)**（成本最低、与 A127 的 lane 语义边界一致，且 M4-03 重切后已覆盖 22 个 op 含全部月报页面所需）。",
         "owner": "编排器（若裁 (b)/(c) 需同步改卡文与 scope）",
         "source": "D-036 / A127",
-        "trigger": "M4-P01 派单前（wave8，mode=serial，次序 M4-P01 -> M5-01）"
+        "trigger": "M4-P01 派单前（wave8，mode=serial，次序 M4-P01 -> M5-01）",
+        "ruling_id": "A141",
+        "resolution": "采选项 (a)：M4-P01 切片不重切（operations 维持 8 个实现面 op，sha16 73a9bcf1c483adbd），月报页面 DTO 消费面由 M4-03 单一承载。机械验证：M4-P01 的 20 个页面引用 op 全部落在 M4-03 重切后的 22 op 内（差集 0），且 M4-03 的 5 页含 M4-P01 的 4 页。附带依 A130 deny 优先在 tasks[M4-03].scope_deny 登记 web/src/pages/report/monthly/。"
       }
     ],
     "commit_backfill_round6": {
@@ -8860,7 +8951,8 @@
       "rule_verify_worktree_after_vm_restart": "发现 /tmp 内容异常丢失（疑似 VM 重启）时，**必须先核验三者再继续**：① 工作树改动是否仍在（ext4 持久，通常完好）② HEAD 与 ahead/behind ③ state.json 是否被半写（原子写 + os.replace 保证不会）。核验通过后才可重跑门禁；禁直接重跑覆盖，禁假定改动已丢失而重做。",
       "rule_ruff_e501_counts_east_asian_width": "ruff 的 E501 按**东亚字符宽度**计（中文算 2，非 Python 的 len()）：实测一行 85 个字符（含中文）被报 117 > 100、96 字符被报 123 > 100。写含中文的单行 docstring/注释时必须按宽度而非字符数控制在 line-length=100 内，超长改为多行 docstring。",
       "rule_semantic_homomorphism_before_invariant": "把某一口径推广为不变量或守护测试之前，必须先核对该口径在各类对象上的**语义是否同构**；同名不同义即不得统一钉死。范例（R9-2 / A127）：切片 `operations` 段在 lane F（纯前端卡）是「本卡**消费面**」——页面要调的 op 必须全在切片内，否则违反 D-011/D-012 的禁回读活契约而硬阻塞；在 lane D/S（后端卡）是「本卡**实现面**」——只含本卡要实现的 op，切片里的 pages 段仅作上下文参考，页面引用的他人 op 不必也不应进入。故「切片自洽性」不变量只对 lane F 成立。配套要求：批量改动落地后、提交前必须做一次角色/lane 归属复核，不得只凭机械校验通过就提交。",
-      "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。"
+      "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。",
+      "rule_scope_deny_precedence": "scope_allow 与 scope_deny 字面重叠时**一律 deny 优先**；且 deny 必须在 state.json tasks[id].scope_deny **显式登记**（只写在卡内视为未生效，因编排器复验与 lane 越界自证都以台账为机械口径）。已应用：M3-04（A130，排除 review/monthly/ 与 features/monthly/ 归 M3-P02）、M4-03（A141，排除 report/monthly/ 归 M4-P01）。新增同型重叠时按此规则登记，禁逐案另裁。"
     },
     "round7_adjudications": [
       {
@@ -9043,7 +9135,8 @@
         "source": "Round 8 predispatch / D-031 歧义①（UI-20）",
         "question": "UI-20 `/w/:workspace_id/estimate`（nav 组「仿真与验收」）：nav 指向 M2-04（pages/cases/），但 AC-024 的 cross_ref 点名 M3-04，且 M3-04.scope 只有 web/src/pages/review/。代码归属判给谁？",
         "ruling": "**判归 M2-04**（页面目录 `web/src/pages/cases/estimate/`）。理由：nav 组 <-> scope 目录一致性是既有权威映射（nav_to_scope_dir：「仿真与验收」-> M2-04 pages/cases/），且判给 M3-04 需扩其 scope（D-008 同型缺项）。**AC-024 的归属不变**（primary 仍 M3-04）：M2-04 卡内登记 AC-024 为「本页呈现的他人 primary AC（cross_ref）」并注明「页面渲染证据由 M2-04 提供、AC-024 取证归属 M3-04」；M3-04 卡内同样登记并点名 M2-04。与 UI-14/UI-15 同规则处理，保持可复现性。",
-        "action_taken": "批次5 派单文写入；无需改 state.json 的 scope"
+        "action_taken": "批次5 派单文写入；无需改 state.json 的 scope",
+        "correction_note_A129": "【A129 更正注记 · 原文不改写】本条裁定文中「AC-024 primary 仍 M3-04」一句属笔误：台账 acceptance.primary_owner.AC-024 实测 primary=M3-02、cross_ref=[M3-04]，且 primary_owner 47 条自洽并经守护校验。**以台账为准**（A129）。M3-04 对 AC-024 只承担页面呈现 cross_ref，UI-20 页面证据归 M2-04。"
       },
       {
         "id": "A103",
@@ -9301,6 +9394,205 @@
         ],
         "action_taken": "回滚 M1-P01/M3-P01/M4-02/M4-P01 四份切片到 HEAD 字节（git checkout -- 显式路径，sha16 逐位核对：2f80df94417b2efa / 30c776e4e6a51bbd / febd8628e02b0d02 / 73a9bcf1c483adbd）；只落地 M1-04/M3-04/M4-03 三份 lane F 切片；守护只钉 ops 自洽性（**不钉 AC 自洽性**，因 A126 已裁 gate 面与 acs 口径分离、cross_ref AC 原文权威落点是卡内逐字引用 + qa/ACCEPTANCE.md 行号，钉死会与 A126 冲突）；M4-P01 混合卡另立 FU-24",
         "self_note": "审计初版把不变量无差别套到全部含页面切片并已重切 4 张后端卡，属**过度泛化**；在提交前查 tasks[*].lane 与卡内角色自述才发现，已回滚（零数据损失）。教训：把某一口径推广为不变量前，必须先核对该口径在各类对象上的**语义**是否同构 —— 本例中 operations 段在 lane F 是「消费面」、在 lane D/S 是「实现面」，同名不同义。记为 R9-2。"
+      },
+      {
+        "id": "A128",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "U-2（ACTION）：M1-04／M2-04／M3-04 三卡依 D-008 体例补齐的 scope_allow 落点（各自 handoff/<id>-design.md、evidence/<M>/<id>/**、evidence/<M>/summaries/<id>.md，M2-04 另含 web/tests/unit/cases/**）尚未同步进 state.json tasks[id].scope，而 gates／outputs 已要求这些落点 -> lane 依 state.json 自证越界时会误判。",
+        "ruling": "**采纳临时意见并执行**：按 A5 归一化约定（`X/**` 与尾斜杠 `X/` 语义等价，state.json 侧目录统一写尾斜杠、文件写全路径）把卡字面量并入 tasks[id].scope，**只追加不改写**（A19），并逐卡记 `scope_sync_A128`（沿用 M4-03 的 `scope_sync_A5` 体例）。顺带修正 M0-03 的两处**路径前缀缺失**：state.json 记为 `handoff/M0-03-design.md`／`handoff/M0-03-public-components.md`，而卡字面量与磁盘实路径均为 `orchestrator/handoff/...` -> 依 A5「卡字面量为准」补全前缀（原值移入 `scope_sync_A128.superseded` 留存，不删除）。",
+        "evidence": [
+          "卡字面量实测：M1-04.md:32 补 3 项（handoff/M1-04-design.md、evidence/M1/M1-04/**、evidence/M1/summaries/M1-04.md）；M2-04.md:33 补 4 项（另含 web/tests/unit/cases/**）；M3-04.md 补 3 项",
+          "同步前 state.json 实测：M1-04.scope 5 项、M2-04.scope 5 项、M3-04.scope 4 项，均不含上述落点；M0-03b.scope 5 项**已含**（A5 于 2026-11-13T08:42 同步过）、M4-03.scope 9 项**已含**（scope_sync_A5）-> 二者无需动作",
+          "M0-03.scope 实测第 7/8 项为 `handoff/M0-03-design.md`／`handoff/M0-03-public-components.md`，仓库内不存在 `handoff/` 顶层目录（实为 `orchestrator/handoff/`）",
+          "M2-04.md:77 card-local U-2 另提「单测目录只登记 web/tests/unit/rules/，十页里 cases 侧四页的单测落点需一并确认」-> 本次一并补 `web/tests/unit/cases/`，该问句随之收口"
+        ],
+        "action_taken": "tasks[M1-04].scope 5->8、tasks[M2-04].scope 5->9、tasks[M3-04].scope 4->7；tasks[M0-03].scope 第 7/8 项补 `orchestrator/` 前缀；四卡各记 `scope_sync_A128`。U-2 -> ADJUDICATED。"
+      },
+      {
+        "id": "A129",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "U-3（RULING）：A102 裁定文写「AC-024 primary 仍 M3-04」，与台账 acceptance.primary_owner.AC-024.primary=M3-02 冲突，更正哪一侧？",
+        "ruling": "**以台账为准**（采纳临时意见）。理由：primary_owner 47 条自洽、经守护校验、且是 AC 取证的唯一权威分母；A102 属裁定叙述文，其 AC 归属句为笔误。按「原文不改写」纪律（A19／D-011），**不修改 A102 原文**，改由本条 A129 承载更正注记并在 A102 侧**追加** `correction_note_A129` 指针。M3-04 卡采选项 (a)：保留 AC-024 的 cross_ref 呈现，但**不提供 UI-20 页面证据**（UI-20 归 M2-04，依 A102）。",
+        "evidence": [
+          "acceptance.primary_owner.AC-024 实测 = {primary: M3-02, cross_ref: [M3-04], confidence: ARCHITECT_DERIVED, evidence_column: 'API、试算页', basis: '主证据所指权威工件由 M3-02 产出；纯验证任务与页面呈现面一律记 cross_ref'}",
+          "primary_owner 分母实测 47 条（counts.acceptance_denominator=47、acceptance_resolvable=47），与 M3-04.acs 含 AC-024（cross_ref 语义）不冲突",
+          "A126 已裁 gate 面（页面呈现全量）与 acs（主责或强相关）口径分离 -> M3-04 重切后 acceptance_rows 11 条含 AC-024 属 gate 面，非 primary 主张"
+        ],
+        "action_taken": "A102 追加 correction_note_A129（原文不改写）；M3-04 采 (a)，其 AC-024 取证义务限定为「页面呈现 cross_ref」，UI-20 页面证据归 M2-04。U-3 -> ADJUDICATED。"
+      },
+      {
+        "id": "A130",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "U-5（RULING）：M3-04 的 scope_allow `web/src/pages/review/**` 与 scope_deny `web/src/pages/review/monthly/**`（M3-P02 写权）字面包含冲突，state.json 侧无 deny 登记，M3-P02 派单时可能双双主张写权。",
+        "ruling": "**deny 优先**（采纳临时意见，与卡内既有撰写一致）。并在 tasks[M3-04] 侧**显式登记** `scope_deny`，使排除项在台账可见、不依赖读卡文。口径固化为通用规则：**scope_allow 与 scope_deny 字面重叠时一律 deny 优先**，且台账侧 deny 必须显式登记（禁只写在卡内），否则视为未生效。",
+        "evidence": [
+          "M3-04.md:37 禁止段与 scope_deny 已按 deny 优先撰写；tasks[M3-04].scope 实测 4 项（含 `web/src/pages/review/`）无 deny 登记",
+          "M3-P02 写权面实测 = `web/src/pages/review/monthly/` 与 `web/src/features/monthly/`（waves[7].L4 note 与 M4-P01.md:25 scope_deny 互证）",
+          "同型先例：M4-03 的 `web/src/pages/report/` 与 M4-P01 的 `web/src/pages/report/monthly/` 完全同构 -> 由 A141 一并处置"
+        ],
+        "action_taken": "tasks[M3-04].scope_deny = [web/src/pages/review/monthly/, web/src/features/monthly/] + scope_deny_note_A130；新增通用口径规则 rule_scope_deny_precedence（见 gate_measurement_caliber）。U-5 -> ADJUDICATED。"
+      },
+      {
+        "id": "A131",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "U-6（RULING）：M1-04 的 UI-09／UI-10 是否要求页面提供 registerEvidence 登记入口（该 op 写权涉 M4-02）？",
+        "ruling": "**只读展示**（采纳临时意见，即卡内现状）。UI-09／UI-10 只消费后端值、不提供登记入口；registerEvidence 的写入口归 M4-02／M4-03。若日后确需在数据页提供入口，必须由 M4-02（或 M4-03）卡与 M1-04 卡**互相点名**并走 CR，**禁单方扩权**。此裁定与 A131 同时固化一条通用口径：lane F 页面卡的 operations 段是**消费面**（A127），消费 ≠ 有写入口；凡涉及写操作的 UI 入口，必须在写权归属卡的卡文里显式点名该页面。",
+        "evidence": [
+          "M1-04.md:51 档位表 S2 明写「全部**只渲染后端值、禁前端算比率**」，与只读展示一致",
+          "M1-04.md:33 scope_deny 含 `src/**`（后端全禁）-> 本卡结构上无写权，提供登记入口必然越权",
+          "registerEvidence 实测在 M4-03.slice.json 的 operations 段内（22 op 之一），且 M4-03.scope 含 `web/src/pages/evidence/` -> 写入口归属明确"
+        ],
+        "action_taken": "无台账结构变更；口径固化进本条，M1-04 派单文须显式引用 A131 以杜绝 lane 自行加入口。U-6 -> ADJUDICATED。"
+      },
+      {
+        "id": "A132",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "U-7（CALIBER）：M1-04／M2-04／M3-04 三卡「栏一（primary AC）」均为 0 条，是否确认『页面任务卡栏一可为空』并写入批次6 派单文？",
+        "ruling": "**确认为正确结果而非缺漏**（采纳临时意见）。依据 acceptance.primary_owner.basis 原文：「纯验证任务（M5-02／M5-P01／M5-03）与**页面呈现面一律记 cross_ref**」-> lane F 页面卡在 primary_owner 里天然不占 primary，栏一为空是口径的必然推论。批次6（M3-P02／M5-P01）及此后一切 lane F 派单文**必须明载此口径**，禁 lane 因「栏一空」而自行主张 primary 或停摆回报。",
+        "evidence": [
+          "acceptance.primary_owner.AC-024.basis 原文实测含「页面呈现面一律记 cross_ref」",
+          "primary_owner 47 条中 primary 归属实测无 lane F 任务（M1-04／M2-04／M3-04／M4-03／M3-P02 均只出现在 cross_ref）",
+          "三卡 acs 实测非空（M1-04 3 条、M2-04 4 条、M3-04 3 条）-> 「栏一空」指 primary 栏，非 acs 缺失，两者不可混淆"
+        ],
+        "action_taken": "口径写入 resume.dispatch_requirements（新增一条常驻派单要求）；批次6 派单文须逐字引用 A132。U-7 -> ADJUDICATED。"
+      },
+      {
+        "id": "A133",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "W-1（WORDING）：Round 8 派单文两处与实际不符 —— 档位表表头第二列写作「模型」应为「档位」；AC 原文路径写作他处，实为 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md。",
+        "ruling": "**自我更正成立**（采纳临时意见）。R8-3 已记该更正，本条只做**口径固化**：此后一切派单文模板①档位表表头第二列统一写「档位」（与手册 §15.5 四列硬约束一致：子任务／档位／预估 token／写权落点），②AC 原文唯一权威路径统一写 `spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md`（月报增量 AC 另指 `spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/ACCEPTANCE-MONTHLY.md`，须同时给出）。禁再出现「模型」表头与含糊的 AC 路径。",
+        "evidence": [
+          "resume.round8_self_corrections 实测已含 R8-3（ids = R8-1,R8-3,R8-2,R8-4..R8-9）",
+          "任务卡实测表头用「档位」：M1-04.md:51、M3-03.md:54 均写「预估值为规划口径…按**子任务级**程序化重算」并引 §15.5",
+          "counts.task_card_identity 实测 20+9==29 成立 -> 卡片模板一致，问题只在派单文侧"
+        ],
+        "action_taken": "写入 resume.dispatch_requirements 常驻条；R8-3 不改写，由本条承载固化。W-1 -> ADJUDICATED。"
+      },
+      {
+        "id": "A134",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-1（RULING）：AlertBanner／EmptyState 是否物理迁入 web/src/components/state/？迁入必改 web/src/pages/**（WorkspacePage.vue:9-10），而 pages/** 在 M0-03b 的 scope_deny。",
+        "ruling": "**采纳 Lagrange 的 F-1／F-2 裁定：不迁移、原址冻结、在 state/ 内组合复用**。理由：物理迁移会迫使 M0-03b 越界改 pages/**，属用 scope 违例换目录美观；组合复用同样满足「六态呈现契约唯一来源」的目标。若日后确需物理迁移，必须**同时放开 pages/** 写权并走独立 CR**，禁在冻结卡内夹带。",
+        "evidence": [
+          "M0-03b.md:20 scope_deny 实测含 `web/src/pages/**`、`web/src/features/**`、`web/src/composables/**`、`web/src/styles/**` -> 迁移路径结构上不可达",
+          "M0-03b.md:16 越界自证 gate = `git diff --name-only HEAD -- web/src | grep -v '^web/src/components/state/' | wc -l` 期望 0 -> 迁移必然触发红灯",
+          "M0-03b.scope 实测 5 项只含 web/src/components/state/ 与 web/tests/unit/state/ + 三个交付落点"
+        ],
+        "action_taken": "无台账结构变更；M0-03b 派单文（wave2）须逐字引用 A134 以杜绝 lane 自行迁移。F-U-1 -> ADJUDICATED。"
+      },
+      {
+        "id": "A135",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-2（BLOCKING）：六态截图（M0-03b/S4）需要 e2e harness，但 `web/tests/e2e/**` 不在 tasks[M0-03b].scope，且六态的真实宿主页面也不在本卡 scope。三选一：(a) 扩 scope 增 web/tests/e2e/state/**；(b) 另指定落点（vitest + @vitest/browser 或既有 playwright.config.ts）；(c) 把截图推迟到首个消费 ViewState 的页面任务（M1-04）。",
+        "ruling": "**采 (c)**（采纳临时意见，成本最低且与 A31「页面证据归属页面卡」一致）。M0-03b 的 S4 六态截图**不在本卡取证**，本卡以**冻结登记 + 单测**为完成面，记 **PASS_WITH_TODO**；六态截图证据随 **M1-04**（首个消费 ViewState 的页面卡）落地，落在 `evidence/M1/M1-04/screenshots/`（该落点已由 A128 同步进 tasks[M1-04].scope）。**不采 (a)**：为截图扩 e2e scope 会让冻结卡持有页面级 harness 写权，与 A134 的「不越界」同一原则；**不采 (b)**：另指定落点等于新增第三套证据口径，违反证据唯一落点纪律。",
+        "evidence": [
+          "M0-03b.md:19 scope_allow 实测 5 项，无任何 e2e 落点；:20 scope_deny 含 `web/*.config.*`、`web/package.json` -> (b) 所需的 playwright/vitest 配置与依赖改动同样越界（依赖与配置仅编排器可改）",
+          "A128 已把 `evidence/M1/M1-04/` 同步进 tasks[M1-04].scope，M1-04.md:35 outputs 实测已含 `evidence/M1/M1-04/screenshots/**` -> (c) 的落点无需再扩权",
+          "M1-04 deps 实测 = [M0-03, M1-01, M1-02, M1-03]，含 M0-03（六态冻结的上游）-> 时序上 (c) 可行，M0-03b 不构成 M1-04 的硬前置",
+          "tasks[M0-01].status 实测已是 PASS_WITH_TODO -> 该状态在本项目已有先例，非新造"
+        ],
+        "action_taken": "tasks[M0-03b] 记 `s4_screenshot_deferral_A135`（推迟说明 + 承接方 M1-04 + 完成面口径）；M0-03b 完成时判 PASS_WITH_TODO 而非 PASS；M1-04 派单文必须显式承接六态截图取证（连同 D-034 的 #2 DataTable 密集档／冻结首列、#4 AppShell 透传一并点名，依 A140）。F-U-2 -> ADJUDICATED，BLOCKING 解除。"
+      },
+      {
+        "id": "A136",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-3（RULING）：数字单位换算（ui/COMMON.md:36 后半句）是否纳入 M0-03b 本次冻结面？",
+        "ruling": "**不纳入**（采纳 Lagrange 的 F-E 裁定）。理由：单位换算的落点在 `web/src/features/shared`，属 M0-03b 的 scope_deny；且它会与 M1-04／M3-04 的呈现逻辑重复实现。留待**首个真正需要单位换算的页面任务**（按 AC 面判断为 M1-04 的 UI-09／UI-10 指标呈现）在其 features 落点内实现，届时若需公共化再走 CR 提升为公共件。",
+        "evidence": [
+          "M0-03b.md:20 scope_deny 实测含 `web/src/features/**` -> 结构上不可达",
+          "tasks[M1-04].scope 实测含 `web/src/features/scope/`、`web/src/features/import/`；A128 后仍不含 features/shared -> 若 M1-04 需要，须在其派单文按 A5 追加登记，禁默认扩权"
+        ],
+        "action_taken": "无台账结构变更；口径固化进本条，M1-04 派单文须显式声明单位换算是否落在本卡（若落，须先按 A5 补 scope 登记）。F-U-3 -> ADJUDICATED。"
+      },
+      {
+        "id": "A137",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-4（RULING）：partial-comparable／pending-fill 两态的服务器数据源未在活契约落地（StatusBand 属 UI-10／M2-04），冻结面如何处置？",
+        "ruling": "**确认 Lagrange 处置：本卡只冻结呈现契约，触发值由页面显式传入**（props 入参而非组件内取数）；两态的真实数据接线随 **M2-04（UI-10）** 落地。此裁定固化一条通用口径：**公共件（web/src/components/**）一律无数据获取副作用**，一切状态触发值由消费页面显式传入 —— 这既是可测性要求，也是 A131「消费面 ≠ 写入口」的同源推论。",
+        "evidence": [
+          "M0-03b 冻结面实测只含 web/src/components/state/（六态呈现组件），无任何 api 调用落点；scope_deny 含 `web/src/api/types.ts`（生成物）",
+          "tasks[M2-04].scope 实测含 `web/src/pages/rules/`、`web/src/pages/cases/`、`web/src/features/diff/`，A126 已裁其 gate 面 15 条含 UI-10 相关 AC -> 接线归属明确",
+          "活契约实测 80 operationId / 13 注册节点 / 443309 B / sha16 592571099d638251，两态数据源确未落地（Lagrange 上报口径，编排器未另行回读 443KB 契约以省 token，依 D-011／D-012）"
+        ],
+        "action_taken": "无台账结构变更；M2-04 派单文须显式承接 partial-comparable／pending-fill 的数据接线。F-U-4 -> ADJUDICATED。"
+      },
+      {
+        "id": "A138",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-5（ACTION）：tasks[M0-03b].scope 是否仍缺冻结登记文件与证据落点？",
+        "ruling": "**实测已满足，无需动作**（采纳临时意见）。tasks[M0-03b].scope 实测 5 项已含 `orchestrator/handoff/M0-03b-freeze.md`、`evidence/M0/M0-03b/`、`evidence/M0/summaries/M0-03b.md`（A5 于 2026-11-13T08:42 同步过），与卡面 scope_allow 逐项对齐。本项**关闭为 NO_ACTION**，仅在 M0-03b 派单文里指明「scope 已同步、勿再回报同型 U」。",
+        "evidence": [
+          "tasks[M0-03b].scope 实测 = [web/src/components/state/, web/tests/unit/state/, orchestrator/handoff/M0-03b-freeze.md, evidence/M0/M0-03b/, evidence/M0/summaries/M0-03b.md]",
+          "M0-03b.md:19 scope_allow 实测同为该 5 项 -> 卡面与台账零漂移",
+          "对照：M1-04／M2-04／M3-04 三卡确有漂移，已由 A128 收口；M0-03b 与 M4-03 无漂移"
+        ],
+        "action_taken": "无台账变更。F-U-5 -> ADJUDICATED（NO_ACTION）。"
+      },
+      {
+        "id": "A139",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-6（CALIBER）：越界自证 gate 用 `git diff --name-only HEAD` 对**未跟踪新文件不敏感**（新建文件不出现在 diff 里）-> 假绿。",
+        "ruling": "**采纳，并升级为常驻双检口径**：此后一切 lane（不限 F）的越界自证 gate 必须同时给两条命令，且**两条都必须为 0**：①`git diff --name-only HEAD -- <scope根> | grep -vE '<本卡允许前缀正则>' | wc -l`（管已跟踪文件的修改）；②`git status --porcelain <scope根> | grep -vE '<本卡允许前缀正则>' | wc -l`（管未跟踪新文件）。两条均须在**仓库根 /home/szf/dev/CampaignLab** 执行（D-024 教训：在子目录下跑相对通配会 rc=2 假绿），且 rc 语义按门禁四元组记账（cwd+命令+rc+关键输出）。编排器复验时对一切「rc=1／输出 0」型守卫**亲自重跑**，不采信 lane 自报。",
+        "evidence": [
+          "M0-03b.md:16 与 M1-04.md:30 的越界自证 gate 实测均只用 `git diff --name-only HEAD` -> 未跟踪新文件确实漏检",
+          "resume.dispatch_requirements 实测已含 D-024 的 cwd 与 rc 语义条目 -> 本条与其同源，合并为一条常驻要求即可",
+          "本轮 D-036 全表复验实测使用 `git status --porcelain spec/ contracts/` 判只读区（而非 diff）-> 双检口径已在编排器侧实践有效"
+        ],
+        "action_taken": "写入 resume.dispatch_requirements（新增常驻条）；M0-03b 卡尾 append-only 追注一条（不改写 :16 原文，依 A19）。F-U-6 -> ADJUDICATED。"
+      },
+      {
+        "id": "A140",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "F-U-7（RULING）：D-034（前端公共组件 4 处既有缺陷）的**严重度与 owner 最终确认**（owner 二选一：M0-03 收尾／独立 CR）；其中 #1 ConfirmDialog 聚焦与 #3 StatusTag 五 tone 同形关联 AC-032（primary owner = M5-01）。",
+        "ruling": "**severity 确认 MINOR、blocking=false；owner 裁定为「M0-03 收尾」**（不采独立 CR）。理由：4 项中 #1／#3 有 AC-032 硬时限（须 M5-01 取证前修毕），走独立 CR 会引入契约／变更登记链路的时间成本，而 `web/src/components/**` 的写权本就归 M0-03（其 scope_allow 含 `web/src/**`），由 M0-03 收尾子任务承接是**写权最短路径**；#2／#4 无 AC 时限，随首个消费方页面任务处理。D-034 的 `path_caliber` 仍为 PENDING_CONTENT_REVIEW -> **owner 落定不解除内容级复核义务**，13 件组件契约表逐条对代码仍须在 M0-03 收尾前完成（本轮已派 Q lane 执行），修单时禁凭记忆填文件路径与行号（D-012／D-014）。",
+        "evidence": [
+          "tasks[M0-03].scope 实测含 `web/src/**` -> 对 web/src/components/** 有写权，无需 CR 即可修",
+          "D-034.blocking_note 原文实测：「不阻塞 M0-03b 与页面任务派单；但 #1／#3 关联 AC-032（primary owner = M5-01），必须在 M5-01 取证前处理」",
+          "acceptance.primary_owner 分母 47 条中 AC-032 的 primary 实测归 M5-01（waves[8] serial：M4-P01 -> M5-01）-> 时限锚点明确",
+          "D-034.measured.path_caliber 原文实测仍标 PENDING_CONTENT_REVIEW -> 本条只裁 owner／severity，不裁内容级复核状态"
+        ],
+        "action_taken": "defects[D-034].owner 由「二选一待裁」改为「M0-03 收尾（A140 终裁；不采独立 CR）」，并追加 owner_adjudicated_A140（severity 确认 MINOR、blocking=false、AC-032 时限保留、内容级复核义务不解除）。F-U-7 -> ADJUDICATED。"
+      },
+      {
+        "id": "A141",
+        "round": 9,
+        "at": "2026-11-14T00:57:19+08:00",
+        "source": "编排器（Round 9：Round 8 遗留 U 项批量终裁）",
+        "question": "FU-24（D-036 遗留）：M4-P01 是 lane S 但 scope 含 `web/src/pages/report/monthly/` 与 `web/tests/e2e/monthly_report/`（**混合卡**）。其切片 operations = 8 个实现面 op，而其 4 个页面（UI-21／22／24／26）的 meta 引用 20 个 op。选项：(a) 维持 8 op 不动、月报页面消费面由 M4-03 承载；(b) 另出一份前端消费面切片 M4-P01-web.slice.json 并存；(c) 按 lane F 口径扩到 21 op。",
+        "ruling": "**采 (a)**，且经**机械验证成立**：M4-P01 的 20 个页面引用 op **全部**落在 M4-03 重切后的 22 个 operations 内（差集 = 0），且 M4-03 的 5 个页面（UI-21／22／23／24／26）**完整包含** M4-P01 的 4 个页面。故月报页面的 DTO 消费面由 M4-03（lane F）单一承载，M4-P01 只做后端实现面 + `web/src/pages/report/monthly/` 子目录页面，其切片 operations 段维持「本卡实现面」语义（A127），**不重切**。**不采 (c)**：与 A127 直接冲突（会诱导 M4-P01 实现不属于自己的 13 个 op）。**不采 (b)**：双切片并存会引入「哪份是权威」的新歧义，且 M4-03 已全覆盖，属无收益成本。附带处置 scope 重叠：M4-03 的 `web/src/pages/report/` 字面包含 M4-P01 的 `web/src/pages/report/monthly/` -> 依 A130 的 deny 优先规则，在 tasks[M4-03] 侧显式登记 scope_deny，使 wave7（M4-03）与 wave8（M4-P01）的写权无歧义。",
+        "evidence": [
+          "机械实抽（可复跑）：M4-P01.slice.json pages=4（UI-21/22/24/26）、union(meta.operation_ids)=20、operations=8；M4-03.slice.json pages=5（UI-21/22/23/24/26）、union=22、operations=22",
+          "差集实测 sorted(set(M4-P01 page ops) - set(M4-03.operations)) == []（0 项）；M4-P01 的 20 op 中仅 7 个在自己的 operations 段内 -> 印证其 operations 段确为实现面而非消费面",
+          "A127 已裁：lane D／S 卡的 operations 段语义 = 本卡实现面，pages 段只是上下文参考 -> M4-P01 现状**合规**，D-036 审计初版把它列为不自洽属过度泛化（R9-2 已回滚）",
+          "waves[7].L1 = [M4-02, M4-03]、waves[8] = [M4-P01, M5-01] serial -> M4-03 先于 M4-P01，无并发写冲突，但 scope 字面包含仍需 deny 登记以杜绝 M4-03 越界写 monthly/"
+        ],
+        "action_taken": "M4-P01 切片不动（sha16 73a9bcf1c483adbd 保持）；tasks[M4-03].scope_deny 追加 `web/src/pages/report/monthly/`（A130 规则）；M4-P01 派单文（wave8）须逐字引用 A141 说明「页面消费面 DTO 由 M4-03 切片承载、本卡禁扩 operations」。FU-24 -> ADJUDICATED。"
       }
     ],
     "round7_predispatch": {
@@ -9971,7 +10263,7 @@
     "round8_pending_rulings": {
       "at": "2026-11-13T13:13:55+08:00",
       "source": "Lane T（Ramanujan）批次5 回报的 7 项 U + 2 处派单文措辞",
-      "status": "PARTIALLY_ADJUDICATED（U-1 -> A125、U-4 -> A126 已于 Round 9 终裁；余 U-2/U-3/U-5/U-6/U-7/W-1 待终裁）",
+      "status": "ADJUDICATED（Round 9 全部终裁：A128、A129、A130、A131、A132、A133）",
       "items": [
         {
           "id": "U-1",
@@ -9988,13 +10280,21 @@
           "id": "U-2",
           "level": "ACTION",
           "q": "三卡 scope_allow 依 D-008 补的落点（各卡 handoff/<id>-design.md、evidence/<M>/<id>/**、evidence/<M>/summaries/<id>.md，M2-04 另含 web/tests/unit/cases/**）需同步进 state.json",
-          "provisional": "按 A5 归一化约定并入 tasks[id].scope（目录通配 X/** 与尾斜杠 X/ 等价），并记 scope_synced_from_card"
+          "provisional": "按 A5 归一化约定并入 tasks[id].scope（目录通配 X/** 与尾斜杠 X/ 等价），并记 scope_synced_from_card",
+          "status": "ADJUDICATED",
+          "ruling_id": "A128",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "U-3",
           "level": "RULING",
           "q": "A102 裁定文「AC-024 primary 仍 M3-04」与台账 acceptance.primary_owner.AC-024.primary=M3-02 冲突，更正哪一侧",
-          "provisional": "**以台账为准**（primary_owner 47 条自洽且经守护校验），A102 追加更正注记（原文不改写）；M3-04 卡采 (a)：保留 AC-024 的 cross_ref 但不提供 UI-20 页面证据（UI-20 归 M2-04，A102）"
+          "provisional": "**以台账为准**（primary_owner 47 条自洽且经守护校验），A102 追加更正注记（原文不改写）；M3-04 卡采 (a)：保留 AC-024 的 cross_ref 但不提供 UI-20 页面证据（UI-20 归 M2-04，A102）",
+          "status": "ADJUDICATED",
+          "ruling_id": "A129",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "U-4",
@@ -10011,25 +10311,41 @@
           "id": "U-5",
           "level": "RULING",
           "q": "M3-04 的 scope_allow web/src/pages/review/** 与 scope_deny web/src/pages/review/monthly/**（M3-P02 写权）字面包含冲突",
-          "provisional": "**deny 优先**（卡内已按此撰写）；并在 tasks[M3-04].scope 侧显式登记排除项，避免 M3-P02 派单时双双主张写权"
+          "provisional": "**deny 优先**（卡内已按此撰写）；并在 tasks[M3-04].scope 侧显式登记排除项，避免 M3-P02 派单时双双主张写权",
+          "status": "ADJUDICATED",
+          "ruling_id": "A130",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "U-6",
           "level": "RULING",
           "q": "M1-04 的 UI-09/UI-10 是否要求页面提供 registerEvidence 登记入口（涉 M4-02 写权）",
-          "provisional": "**只读展示**（卡内现状）：登记入口归 M4-02，页面侧只消费；如需入口须由 M4-02 卡与 M1-04 卡互相点名，禁单方扩权"
+          "provisional": "**只读展示**（卡内现状）：登记入口归 M4-02，页面侧只消费；如需入口须由 M4-02 卡与 M1-04 卡互相点名，禁单方扩权",
+          "status": "ADJUDICATED",
+          "ruling_id": "A131",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "U-7",
           "level": "CALIBER",
           "q": "三卡栏一均为 0 条 primary，是否确认「页面任务卡栏一可为空」并写入批次6 派单文",
-          "provisional": "**确认**：页面呈现面一律 cross_ref（acceptance.primary_owner.basis 原文），栏一为空是正确结果而非缺漏；批次6（M3-P02/M5-P01）派单文须明载此口径"
+          "provisional": "**确认**：页面呈现面一律 cross_ref（acceptance.primary_owner.basis 原文），栏一为空是正确结果而非缺漏；批次6（M3-P02/M5-P01）派单文须明载此口径",
+          "status": "ADJUDICATED",
+          "ruling_id": "A132",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "W-1",
           "level": "WORDING",
           "q": "派单文两处与实际不符：档位表表头第二列应为「档位」而非「模型」；AC 原文路径应为 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md",
-          "provisional": "自我更正 R8-3；后续派单文模板统一改用「档位」与 qa/ACCEPTANCE.md 路径"
+          "provisional": "自我更正 R8-3；后续派单文模板统一改用「档位」与 qa/ACCEPTANCE.md 路径",
+          "status": "ADJUDICATED",
+          "ruling_id": "A133",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         }
       ]
     },
@@ -10133,49 +10449,77 @@
     "round8_pending_rulings_F": {
       "at": "2026-11-13T13:19:23+08:00",
       "source": "Lane F（Lagrange）M0-03/S10 + M0-03b/S1 回报的 7 项 U",
-      "status": "PENDING（checkpoint 前未终裁，下次会话开工首件事）",
+      "status": "ADJUDICATED（Round 9 全部终裁：A134、A135、A136、A137、A138、A139、A140）",
       "items": [
         {
           "id": "F-U-1",
           "level": "RULING",
           "q": "AlertBanner/EmptyState 是否物理迁入 web/src/components/state/？迁入必改 web/src/pages/**（WorkspacePage.vue:9-10），而 pages/** 在 scope_deny",
-          "provisional": "**采纳 Lagrange 的 F-1/F-2 裁定**：不迁移、原址冻结、state/ 内组合复用。若日后要求物理迁移，须同时放开 pages/** 并走独立 CR"
+          "provisional": "**采纳 Lagrange 的 F-1/F-2 裁定**：不迁移、原址冻结、state/ 内组合复用。若日后要求物理迁移，须同时放开 pages/** 并走独立 CR",
+          "status": "ADJUDICATED",
+          "ruling_id": "A134",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-2",
           "level": "BLOCKING",
           "q": "web/tests/e2e/** 不在 scope_allow，但六态截图（S4）需要 harness，而页面不在本卡 scope",
-          "provisional": "三选一，下次会话首裁：(a) 扩 tasks[M0-03b].scope 增 web/tests/e2e/state/**；(b) 指定其他落点（如 evidence/M0/M0-03b/state/ 由 vitest + @vitest/browser 或既有 playwright.config.ts 承载）；(c) 把截图推迟到首个消费 ViewState 的页面任务（M1-04）。**(c) 成本最低且与 A31 页面证据归属一致，建议 (c) + 在 M0-03b 卡记 PASS_WITH_TODO**"
+          "provisional": "三选一，下次会话首裁：(a) 扩 tasks[M0-03b].scope 增 web/tests/e2e/state/**；(b) 指定其他落点（如 evidence/M0/M0-03b/state/ 由 vitest + @vitest/browser 或既有 playwright.config.ts 承载）；(c) 把截图推迟到首个消费 ViewState 的页面任务（M1-04）。**(c) 成本最低且与 A31 页面证据归属一致，建议 (c) + 在 M0-03b 卡记 PASS_WITH_TODO**",
+          "status": "ADJUDICATED",
+          "ruling_id": "A135",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-3",
           "level": "RULING",
           "q": "数字单位换算（COMMON.md:36 后半句）是否纳入本次冻结面",
-          "provisional": "**不纳入**（Lagrange 的 F-E 裁定）：features/shared 属 deny 且会与 M1-04/M3-04 重复；留待首个需要单位换算的页面任务"
+          "provisional": "**不纳入**（Lagrange 的 F-E 裁定）：features/shared 属 deny 且会与 M1-04/M3-04 重复；留待首个需要单位换算的页面任务",
+          "status": "ADJUDICATED",
+          "ruling_id": "A136",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-4",
           "level": "RULING",
           "q": "partial-comparable / pending-fill 的服务器数据源未在活契约落地（StatusBand 属 UI-10/M2-04）",
-          "provisional": "**确认 Lagrange 处置**：本卡只冻结呈现契约，触发值由页面显式传入；两态的真实数据接线随 M2-04（UI-10）落地"
+          "provisional": "**确认 Lagrange 处置**：本卡只冻结呈现契约，触发值由页面显式传入；两态的真实数据接线随 M2-04（UI-10）落地",
+          "status": "ADJUDICATED",
+          "ruling_id": "A137",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-5",
           "level": "ACTION",
           "q": "tasks[M0-03b].scope 仍缺冻结登记文件与证据落点",
-          "provisional": "实测 state.json 已含 orchestrator/handoff/M0-03b-freeze.md、evidence/M0/M0-03b/、evidence/M0/summaries/M0-03b.md（A5 于 04:25 同步过）-> **本项已满足，无需动作**，仅需在下次派单文里指明"
+          "provisional": "实测 state.json 已含 orchestrator/handoff/M0-03b-freeze.md、evidence/M0/M0-03b/、evidence/M0/summaries/M0-03b.md（A5 于 04:25 同步过）-> **本项已满足，无需动作**，仅需在下次派单文里指明",
+          "status": "ADJUDICATED",
+          "ruling_id": "A138",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-6",
           "level": "CALIBER",
           "q": "越界自证 gate 用 git diff --name-only HEAD 对未跟踪新文件不敏感",
-          "provisional": "**采纳**：把「git status --porcelain web/src | wc -l == 0」写进后续所有 F lane 卡的越界自证 gate（双检），并在 M0-03b 卡尾 append-only 加注"
+          "provisional": "**采纳**：把「git status --porcelain web/src | wc -l == 0」写进后续所有 F lane 卡的越界自证 gate（双检），并在 M0-03b 卡尾 append-only 加注",
+          "status": "ADJUDICATED",
+          "ruling_id": "A139",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         },
         {
           "id": "F-U-7",
           "level": "RULING",
           "q": "公共件既有 4 处缺陷（ConfirmDialog 打开未主动聚焦致 Esc 依赖焦点在框内；DataTable 缺 36px 密集档与宽表冻结首列；StatusTag 五 tone 形状相同；AppShell 未透传 drawer/entryActive 给 SideRail）在 M0-03b 期间不可修（越界）",
-          "provisional": "**立独立缺陷单**（下次会话开工第一件事：D-034，severity 建议 MINOR，status OPEN，owner M0-03 收尾或独立 CR），禁在 M0-03b 期间夹带修复；其中 ConfirmDialog 聚焦与 StatusTag「不靠颜色区分」两项**关联 AC-032**（归属 M5-01），须在 M5-01 取证前处理"
+          "provisional": "**立独立缺陷单**（下次会话开工第一件事：D-034，severity 建议 MINOR，status OPEN，owner M0-03 收尾或独立 CR），禁在 M0-03b 期间夹带修复；其中 ConfirmDialog 聚焦与 StatusTag「不靠颜色区分」两项**关联 AC-032**（归属 M5-01），须在 M5-01 取证前处理",
+          "status": "ADJUDICATED",
+          "ruling_id": "A140",
+          "adjudicated_at": "2026-11-14T00:57:19+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定：长程无人值守一律采文档默认/建议值）"
         }
       ]
     },
@@ -10573,6 +10917,42 @@
         "commits": [
           "2d7722e（U-1/A125/A126：M2-04 重切）",
           "本提交（D-036/A127/R9-2/FU-23/FU-24 + 守护）"
+        ]
+      },
+      {
+        "at": "2026-11-14T00:58:54+08:00",
+        "item": "Round 9 批次A：Round 8 遗留 13 项 U/W 全量终裁（A128-A140）+ FU-24 终裁（A141）+ 4 项 ACTION 落地",
+        "detail": [
+          "终裁 13 项：U-2(A128 ACTION 已执行)、U-3(A129)、U-5(A130)、U-6(A131)、U-7(A132)、W-1(A133)、F-U-1(A134)、F-U-2(A135 BLOCKING 解除)、F-U-3(A136)、F-U-4(A137)、F-U-5(A138 NO_ACTION)、F-U-6(A139)、F-U-7(A140)；另 FU-24(A141)",
+          "ACTION 落地：tasks[M1-04].scope 5->8、tasks[M2-04].scope 5->9、tasks[M3-04].scope 4->7（U-2/A128，按卡字面量 D-008 补齐项）；tasks[M0-03].scope[6][7] 补 orchestrator/ 前缀（A5 卡字面量为准，原值留 scope_sync_A128.superseded）",
+          "deny 登记：tasks[M3-04].scope_deny=[review/monthly/, features/monthly/]（A130）、tasks[M4-03].scope_deny=[report/monthly/]（A141）；新增通用规则 rule_scope_deny_precedence",
+          "常驻派单要求 +4 条（A139 双检越界自证 / A132+A131 栏一可空与消费面非写入口 / A133 档位与 AC 路径口径 / A137 公共件无取数副作用）",
+          "D-034 owner 终裁 -> M0-03 收尾（不采独立 CR），severity MINOR 与 blocking=false 确认，AC-032 时限与 PENDING_CONTENT_REVIEW 义务均不解除",
+          "tasks[M0-03b].s4_screenshot_deferral_A135：六态截图推迟至 M1-04，本卡完成面改判 PASS_WITH_TODO",
+          "A102 追加 correction_note_A129（原文不改写）：AC-024 primary 以台账 M3-02 为准",
+          "自我更正：首版把 FU-24 的裁定号写成 A142（实得 A141），5 处引用悬空 -> 提交前逐键语义 diff 阶段发现并全量改为 A141，A142 预留 FU-23"
+        ],
+        "accounting": "**不计入 budget.subtask_log**（依 accounting_rule_orch_self_served：编排器自办计入会污染 flash_share 分母）",
+        "verification": "逐键语义 diff（HEAD vs 工作树）：REMOVED_KEY=0、TYPE_CHANGE=0、ADDED_KEY=66、VALUE_CHANGE=12（全部为本次意图内改动）；6 份守护 37 passed 全绿（含 test_counts_freshness：无新增 py/md，分母 188 不变）",
+        "related": [
+          "A128",
+          "A129",
+          "A130",
+          "A131",
+          "A132",
+          "A133",
+          "A134",
+          "A135",
+          "A136",
+          "A137",
+          "A138",
+          "A139",
+          "A140",
+          "A141",
+          "D-034",
+          "D-036",
+          "FU-24",
+          "R9-3"
         ]
       }
     ],
