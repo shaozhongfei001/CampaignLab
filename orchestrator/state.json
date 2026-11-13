@@ -1,8 +1,8 @@
 {
   "schema": "1.0",
   "phase": "M0",
-  "wave": 1,
-  "updated_at": "2026-11-14T04:00:09+08:00",
+  "wave": 2,
+  "updated_at": "2026-11-14T04:20:04+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -906,7 +906,7 @@
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 0,
+    "dispatched_not_yet_returned": 3,
     "flash_share_dev_lanes": 0.3684,
     "flash_share_口径": {
       "all_lanes": "19/31=0.6129",
@@ -1827,13 +1827,14 @@
       "subtask_progress": {
         "S1": "DONE",
         "S2": "DONE",
-        "S2b": "TODO",
+        "S2b": "IN_PROGRESS(S2b-1 dispatched R11 / lane V Lorentz)",
         "S3": "DONE",
         "S4": "TODO",
         "S5": "TODO",
         "S6": "TODO",
         "S7": "TODO",
-        "S8": "TODO"
+        "S8": "TODO",
+        "S2c": "TODO"
       },
       "subtask_progress_evidence": {
         "S1": "0adf66e docs(M0-04/S1)：orchestrator/handoff/M0-04-design.md",
@@ -1845,7 +1846,20 @@
         "S7": "TODO：tests/unit/test_job_dto.py（A86）",
         "S8": "TODO：evidence/M0/M0-04/**（AC-029 负例 + AC-031 写入侧）"
       },
-      "s2b_note": "S2b = worker/integrity.py + worker/deps.py，依 A110（Volta U-1）顺延：两文件硬依赖 infra/artifacts.py（归 M0-04/S3），故须在 S3 之后落地，避免双主写与签名假定。档位 qwen3.8-max（涉完整性校验判据与依赖注入冻结面）。AC-031 判定仍归 M5-01（design §9-S8 不变）。本键于 Round 8 关机 checkpoint 追加（append-only，不改既有值）。 || R10-D 追记（append-only，不改上文）：S3 已入库，S2b 的硬依赖已满足，可派单。S2b 拆两个子步骤、各一次提交：**S2b-1**（前置，A157+A153）= 把 `_hash_file` 提升为公共 `hash_file` 并进 `__all__`（不保留私有别名、内部调用点 `artifacts.py:618` 改指公共名、`tests/unit/test_artifacts.py:273` 守护白名单放宽为「多出项允许 ARTIFACT_ID_PREFIX 与 hash_file（A157）」）＋新建 `tests/unit/test_layering_edges.py` 白名单守护（`infra → worker` 模块级导入集合恰等于 {(src/campaignlab/infra/artifacts.py, campaignlab.worker.errors)}）；**S2b-2**（主体，A110）= `worker/integrity.py`＋`worker/deps.py`，其中 `get_artifact_writer` 返回前必须调 `verify_same_filesystem()`（A156），制品接线口径按 A154 二选一、禁第三种。S2b **不做** FU-29 的下沉（涉公共冻结件 `domain/errors.py`，另派 lane，wave3 前闭合）。"
+      "s2b_note": "S2b = worker/integrity.py + worker/deps.py，依 A110（Volta U-1）顺延：两文件硬依赖 infra/artifacts.py（归 M0-04/S3），故须在 S3 之后落地，避免双主写与签名假定。档位 qwen3.8-max（涉完整性校验判据与依赖注入冻结面）。AC-031 判定仍归 M5-01（design §9-S8 不变）。本键于 Round 8 关机 checkpoint 追加（append-only，不改既有值）。 || R10-D 追记（append-only，不改上文）：S3 已入库，S2b 的硬依赖已满足，可派单。S2b 拆两个子步骤、各一次提交：**S2b-1**（前置，A157+A153）= 把 `_hash_file` 提升为公共 `hash_file` 并进 `__all__`（不保留私有别名、内部调用点 `artifacts.py:618` 改指公共名、`tests/unit/test_artifacts.py:273` 守护白名单放宽为「多出项允许 ARTIFACT_ID_PREFIX 与 hash_file（A157）」）＋新建 `tests/unit/test_layering_edges.py` 白名单守护（`infra → worker` 模块级导入集合恰等于 {(src/campaignlab/infra/artifacts.py, campaignlab.worker.errors)}）；**S2b-2**（主体，A110）= `worker/integrity.py`＋`worker/deps.py`，其中 `get_artifact_writer` 返回前必须调 `verify_same_filesystem()`（A156），制品接线口径按 A154 二选一、禁第三种。S2b **不做** FU-29 的下沉（涉公共冻结件 `domain/errors.py`，另派 lane，wave3 前闭合）。",
+      "s2c_note": "S2c（R11 新立，A169）= `src/campaignlab/worker/service.py:JobService(list_jobs,get_job,cancel_job,retry_job)` + `JobStore.list_jobs`（对 `store.py` **纯追加**，既有 12 方法签名/函数体/SQL 文本一字不改，numstat deleted 必须为 0，体例同 A82）。硬约束：① 复用 `infra.db.repositories.job_from_row` 做行→DTO（N5，禁复制第二份）；② 本包内**禁**出现任何 jobs 表 DML 文本（A81 SQL 写点唯一）；③ 游标复用 `api/common.py::encode_cursor/decode_cursor`，禁另发明；④ **只返回领域/DTO 层结果**（JobRecord 序列 + 游标），**不组装 HTTP 分页壳** —— `JobPage` 依 A91 仍归 S4，S2c 禁抢先添加（避免双主写，同 A84/A91）；⑤ `now` 一律由调用方从 `Clock` 传入，本包禁取系统当前时间（worker/__init__.py 红线 3）。档位 qwen3.8-max（store.py 属事务边界 + public_frozen 即将冻结面，跨模块一致性判定，手册 §6.3 强制 max）。次序：接在 S2b-2 之后、S4 之前（A168 串行链的第 4 棒）。",
+      "remaining_sequence_R11": [
+        "S2b-1（在飞，lane V）→ 编排器提交",
+        "FU-29（lane V 续接，max）→ 编排器提交；闭合 A153 反向边，test_layering_edges 白名单收紧为空集；**wave3 派单前必须已闭合**",
+        "S2b-2（lane V 续接，max）：worker/integrity.py{Discrepancy,ManifestRow,verify_artifact_index,manifest_rows} + worker/deps.py{get_job_store,get_job_service,get_artifact_writer,resolve_data_dir}；A156 硬要求 get_artifact_writer 返回前必调 verify_same_filesystem() 并落 st_dev 不符→ConfigError→CLI rc=2 的守护；A154 接线二选一禁第三种",
+        "S2c（lane V 续接，max，A169 新立）：worker/service.py + JobStore.list_jobs（纯追加）",
+        "S4（**flash** 可，A91/A84 口径已锁死）：api/jobs.py{router,list_jobs,get_job,cancel_job,retry_job,_job_page_response,_job_response} + api/common.py append-only 追加 JobPage + api/app.py 挂载 ≤3 行（A90① 的 A10 最小例外）；**承接 AC-034 跨工作区→404 的 gate 义务（A165 rule_deferred_to_must_become_a_gate）**",
+        "S5（flash，14k）：tests/integration/jobs/{conftest,test_state_machine(9 个 t1..t9),test_idempotency(3),test_jobs_api(7 含 test_cross_workspace_is_404)}.py —— 依赖 S4",
+        "S6（flash，12k）：tests/integration/jobs/{test_lease(6),test_artifact(6)}.py —— 依赖 S5 的 conftest，故 S5→S6 串行；全部用 FixedClock/advance_clock，禁 sleep、禁 time.monotonic 判定",
+        "S8（flash，9k）：evidence/M0/M0-04/**（commands.md V1–V9 四元组、ac.md、job-states.md、gates/*.log、http/*.json 11 件）+ evidence/M0/summaries/M0-04.md（≤30 行）；AC-031 **只写「写入侧前提已交付 + 判定归 M5-01」，禁写 PASS/FAIL**（design §7）",
+        "S7 已并行派出（lane U，本轮）"
+      ],
+      "subtask_progress_note_R11": "S2b 的值由 `TODO` 改为 `IN_PROGRESS(S2b-1 dispatched R11 / lane V Lorentz)` —— 这是**既有键的值更新**（str→str，非类型变更），符合 rule_ledger_write_structure_preserving；其余 8 键逐键断言与改前字节相同。S2c 为 A169 新立键（append-only 追加）。"
     },
     "M1-01": {
       "status": "TODO",
@@ -5448,7 +5462,127 @@
       "⑦ 每次回收后程序化重算 flash_share（units=subtask_count or 1；dev=task.startswith('M')），wave2 出口复核两护栏，禁为凑配比降档",
       "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d68b-c44a-7863-87e6-30bf0ae7bdec",
+        "nickname": "Lorentz",
+        "lane": "V",
+        "task": "M0-04",
+        "subtask": "S2b-1（A157+A153）：_hash_file 提升为公共 hash_file 并进 __all__（不留私有别名、调用点改指公共名）+ 新建 tests/unit/test_layering_edges.py 白名单守护（infra→worker 边集合恰为 1 条、走子模块路径、附正向对照）",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "budget": "12k",
+        "budget_basis": "R10-4 纠正措施②：按被改面估（artifacts.py 局部改名 + 1 个新守护测试文件 + 1 份取证），非按报告份数估",
+        "tier_basis": "手册 §6.3 max 强制清单：改动落在 public_frozen「即将冻结」面 infra/artifacts.py（签名/参数序/返回类型一字不得改），且新建的 layering 守护是 A153 分层裁定的唯一执行点 —— 判据错一处即让 FU-29 的收紧失去基线。R10-4 纠正措施①（输入含冻结面者一律 max）同样命中。**非为凑 token 配比升档**：反事实是 flash 在此类「冻结面 + 守护判据设计」上的先例（Mencius）为 76× 越限。",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T04:13:12+08:00",
+        "dispatched_at_caliber": "machine_derived（A167）：spawn 调用前一刻由 `date +%Y-%m-%dT%H:%M:%S%:z` 实测取值，非手填圆整值",
+        "spawn_returned_at": "2026-11-14T04:20:04+08:00",
+        "write_set": [
+          "src/campaignlab/infra/artifacts.py（仅 _hash_file→hash_file 提升与调用点改名）",
+          "tests/unit/test_artifacts.py（仅放宽 __all__ 守护白名单）",
+          "tests/unit/test_layering_edges.py（新建）",
+          "evidence/M0/M0-04/s2b1-hash-file.md（新建）",
+          "evidence/M0/M0-04/commands-s2b1.md（新建，lane 专属命令日志）"
+        ],
+        "hard_deny": [
+          "orchestrator/state.json（子智能体无台账写权）",
+          "一切 git 写操作（add/commit/push/checkout/reset/stash）",
+          "sudo",
+          "整读 contracts/openapi.json(443309B) / spec/** / docs/delivery/LONG-HORIZON-ORCHESTRATION.md / orchestrator/state.json",
+          "src/campaignlab/domain/**",
+          "src/campaignlab/worker/**（只读可，禁写）",
+          "src/campaignlab/api/**",
+          "src/campaignlab/infra/db/**",
+          "src/campaignlab/infra/__init__.py",
+          "tests/integration/**",
+          "tests/ 下除 write_set 两件外的一切",
+          "contracts/**",
+          "spec/**",
+          "scripts/**",
+          "web/**",
+          "orchestrator/**",
+          "migrations/**",
+          "evidence/M0/M0-04/commands.md（他 lane 写权）"
+        ],
+        "sequencing": "本 lane 为 M0-04 关键路径的**首棒**，后续 FU-29 → S2b-2 → S2c 由**同一 lane 复用**（send_input）承接，编排器在每步之间单独提交（one-task-one-commit 不破）。复用理由：四步共享 infra/artifacts.py 与 tests/unit/test_layering_edges.py 写权，并行必双主写。"
+      },
+      {
+        "agent_id": "01a1d68c-6013-75a1-a2b7-54d50add89aa",
+        "nickname": "Peirce",
+        "lane": "T",
+        "task": "ORCHESTRATOR-TOOLING",
+        "subtask": "为 9 个尚未切片的任务生成契约切片（M1-01 M1-02 M1-03 M2-01 M2-02 M2-03 M3-P02 M5-P01 M5-03）：目标一律从任务卡取、禁猜，rc=2 即修正目标重跑，产出后按 A18 口径程序化断言 missing 键不存在且 truncated_schemas==[]，并校验 sha16=592571099d638251 / spec_version=1.0.1",
+        "tier": "qwen3.8-flash",
+        "reasoning_effort": "medium",
+        "budget": "14k",
+        "budget_basis": "机械活：9 次脚本调用 + 9 次断言 + 1 份取证；无跨模块判断、无冻结面改动",
+        "tier_basis": "手册 §6.3：flash 适用面 = 单文件/机械铺开/无跨模块一致性判定。本 lane **禁改 scripts/contract_slice.py**、禁猜目标（不确定即上报 U 项），复杂度被派单文压到 flash 可胜任的下限。**这是真实的降档省本，不是凑配比**：反事实是交 max 做纯脚本调用属浪费。",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T04:13:12+08:00",
+        "dispatched_at_caliber": "machine_derived（A167）",
+        "spawn_returned_at": "2026-11-14T04:20:04+08:00",
+        "write_set": [
+          "orchestrator/handoff/{M1-01,M1-02,M1-03,M2-01,M2-02,M2-03,M3-P02,M5-P01,M5-03}.slice.json（9 个新文件）",
+          "evidence/M0/ORCHESTRATOR/r11-slices/{00-index.md,commands.md}"
+        ],
+        "hard_deny": [
+          "orchestrator/state.json（子智能体无台账写权）",
+          "一切 git 写操作（add/commit/push/checkout/reset/stash）",
+          "sudo",
+          "整读 contracts/openapi.json(443309B) / spec/** / docs/delivery/LONG-HORIZON-ORCHESTRATION.md / orchestrator/state.json",
+          "src/**",
+          "tests/**",
+          "web/**",
+          "contracts/**",
+          "spec/**",
+          "scripts/**（含 contract_slice.py，禁改一个字）",
+          "orchestrator/state.json",
+          "orchestrator/handoff/ 下任何既有文件",
+          "evidence/ 下除 r11-slices/ 外的一切"
+        ],
+        "unblocks": "wave3 全部（M1-01/M1-02/M1-03/M2-01/M2-02/M2-03）与 wave7 的 M3-P02、wave9 的 M5-P01、wave10 的 M5-03 —— 无切片则这些卡不得派单（手册 15.5：无拆解表/上下文包不得 spawn）"
+      },
+      {
+        "agent_id": "01a1d68d-4828-7d01-95f4-42a5b2a4a87c",
+        "nickname": "Franklin",
+        "lane": "U",
+        "task": "M0-04 + FU-32",
+        "subtask": "件一 M0-04/S7：新建 tests/unit/test_job_dto.py（design §9-S7 点名的 7 个函数，函数名逐字一致，双向断言 + retryable 全矩阵参数化）；件二 FU-32/A163：改写 web/vite.config.ts:32 注释消除 300[012] 字面量使 G5c 守卫回到 rc=1，并补必命中的正向对照（临时探针用完即删）",
+        "tier": "qwen3.8-flash",
+        "reasoning_effort": "medium",
+        "budget": "16k",
+        "budget_basis": "两件均为定点小活：S7 = 1 个新测试文件（判据全部有现成真值来源：切片 + states.py + domain/errors.py）；FU-32 = 1 行注释改写 + 2 条 grep 取证",
+        "tier_basis": "手册 §6.3：S7 属「逐字段样板填充 + 双向集合比对」，判据来源已被派单文逐条点名（禁整读活契约、缺项即上报 U 项），无跨模块一致性裁定；FU-32 属单文件注释改写。**降档依据是复杂度而非配比**：两件都不触碰 public_frozen 面、不做架构判断。S4（api/jobs.py 接线）与 S2b/S2c 仍留 max，未因配比而降档。",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T04:13:12+08:00",
+        "dispatched_at_caliber": "machine_derived（A167）",
+        "spawn_returned_at": "2026-11-14T04:20:04+08:00",
+        "write_set": [
+          "tests/unit/test_job_dto.py（新建）",
+          "evidence/M0/M0-04/s7-job-dto.md（新建）",
+          "evidence/M0/M0-04/commands-s7.md（新建，lane 专属）",
+          "web/vite.config.ts（**仅**改写第 32 行注释；本卡显式授权 1 处 deleted）",
+          "evidence/M0/ORCHESTRATOR/r11-fu32/{00-index.md,commands.md}"
+        ],
+        "hard_deny": [
+          "orchestrator/state.json（子智能体无台账写权）",
+          "一切 git 写操作（add/commit/push/checkout/reset/stash）",
+          "sudo",
+          "整读 contracts/openapi.json(443309B) / spec/** / docs/delivery/LONG-HORIZON-ORCHESTRATION.md / orchestrator/state.json",
+          "src/**",
+          "tests/ 下除 test_job_dto.py 外的一切",
+          "web/ 下除 vite.config.ts 外的一切（含 playwright.config.ts、package.json、tsconfig*、src/**、tests/**）",
+          "contracts/**",
+          "spec/**",
+          "scripts/**",
+          "orchestrator/**",
+          "conftest.py（禁新建任何 conftest，R8-4 教训）",
+          "evidence/M0/M0-04/commands.md（他 lane 写权）"
+        ],
+        "note": "两件写集完全不相交，故可同 lane 顺序做完；件二属 FU-32 的提前闭合（原 trigger 为 M1-04 派单前），因该文件属 F lane 写权而当前无 F lane 在飞，提前清掉以免 wave4 时与页面卡抢写权。"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -10943,6 +11077,54 @@
         ],
         "action_taken": "① 固化规则 `rule_ledger_timestamp_must_be_machine_derived`：state.json 内一切时间戳（updated_at / dispatched_at / retired_at / measured_at / at / found_at / closed_at）必须由脚本从系统钟取值写入，**禁手填、禁圆整到分**；写入脚本须在输出里回显所用时间戳以便审计；② 本轮 Q lane 的 `dispatched_at` 保留原值 `03:20:00`（append-only，不改写历史），另在其退役条目加 `dispatched_at_caliber: hand_written_skewed_forward_~39min（A167）` 与机器取值的 `retired_at`；③ 时序判定一律以**文件 mtime 与 git 提交序**为权威，台账时间戳仅作参考 —— 已写入规则。",
         "self_note": "手填时间戳在有人值守时无害（人会自己纠错），在无人值守长程里则是**静默的排序毒药**。本轮侥幸没出错，只因为 Q lane 选择了 mtime 而非台账时间做归因依据 —— 这是 lane 的judgment 好，不是流程可靠。已把「机器取值」定为硬规则，并显式规定时序权威为 mtime / git 序。"
+      },
+      {
+        "id": "A168",
+        "round": 11,
+        "at": "2026-11-14T04:20:04+08:00",
+        "source": "编排器（R11 派单前置实测：M0-04 余量盘点 + 写集相交分析）",
+        "question": "M0-04 余下 4 件事（S2b-1 / FU-29 / S2b-2 / 新立的 S2c）中，S2b-1 与 FU-29 **都要改 `src/campaignlab/infra/artifacts.py`**，且 FU-29 的落地动作是「把 `tests/unit/test_layering_edges.py` 的白名单从 1 条收紧为空集」——而该文件由 S2b-1 **新建**。若按台账字面把 FU-29「另派 lane」并与 S2b 并行，会出现 ① 同文件双主写 ② FU-29 无文件可收紧（收紧动作失去落点）。次序与 lane 归属如何裁定？",
+        "ruling": "**裁定：严格串行 S2b-1 → FU-29 → S2b-2 → S2c，且四步由同一条 max lane 复用承接（send_input），编排器在每步之间单独提交（one-task-one-commit 与 A157「S2b-1 禁与 S2b 主体混提交」双双不破）。** ① 次序依据：FU-29 的收紧对象是 S2b-1 新建的守护文件，故 S2b-1 必须先落（这也与 FU-29 台账原文「白名单从 1 条收紧为空集」自洽——该句本身就预设文件已存在）；S2b-2 的 `worker/integrity.py` 需要 S2b-1 提升出的公共 `hash_file`（A157 的立法理由即「同口径复核」），故 S2b-2 在 S2b-1 之后；S2c 的 `JobService.list_jobs` 与 S2b-2 的 `deps.get_job_service` 互为供需，故 S2c 紧随 S2b-2。② lane 复用而非并行的依据：手册并行判据（PRE-4/PRE-5）要求「写集不相交」**且**「无编译期/运行期单向依赖」**且**「被依赖符号已具备可用成员面」——本组四步三条全部不满足，属**必须串行**，并行即为 R5-3 同类错误的第四次重演。③ 复用同一 lane 而非新起 lane 的依据：四步共享同一批文件的上下文（artifacts.py 的 __all__、layering 守护的白名单常量、worker 包的分层红线），复用可免去重复读取，是**省 token 的正解**；档位置换（max→flash）一律禁止。④ FU-29 的 trigger「wave3 派单前必须闭合」因此得到保证：本串行链的第 2 步即闭合它，早于任何 wave3 派单。",
+        "evidence": [
+          "编排器实测（R11 派单前）：`ls src/campaignlab/worker/` = {__init__,capacity,errors,leases,runner,states,store}.py —— **integrity.py / deps.py / service.py 三者均不存在**；`grep -n '    def ' src/campaignlab/worker/store.py` 实测 12 个方法，**无 list_jobs**；`ls src/campaignlab/api/` = {__init__,app,common,deps,health,session,workspaces}.py —— **无 jobs.py**",
+          "写集相交实测：S2b-1 的 write_set 含 `src/campaignlab/infra/artifacts.py`，FU-29 的 item 原文含 `src/campaignlab/infra/artifacts.py:54 改指 campaignlab.domain.errors` → 同文件",
+          "A157 原文：「归属 **S2b-1**，单独一次提交，禁与 S2b 主体交付混提交」；A153 原文：「FU-29 限期把 ArtifactCommitFailed 下沉 domain/errors.py（wave3 派单前闭合）+ S2b-1 落白名单守护」"
+        ],
+        "action_taken": "本条入库；R11 首棒只派 S2b-1（lane V / Lorentz / max high / 12k / loop_cap 3），其余三步待其回报后由同一 lane 续接",
+        "related": [
+          "A153",
+          "A157",
+          "A110",
+          "A91",
+          "FU-29",
+          "PRE-4",
+          "PRE-5",
+          "R5-3"
+        ]
+      },
+      {
+        "id": "A169",
+        "round": 11,
+        "at": "2026-11-14T04:20:04+08:00",
+        "source": "编排器（R11 派单前置实测发现：design §9-S2 点名的 worker/service.py 与 JobStore.list_jobs 至今无主）",
+        "question": "design §9-S2 点名要落 `worker/service.py:JobService(list_jobs,get_job,cancel_job,retry_job)` 与 `worker/store.py::JobStore.list_jobs`，但 S2 lane 的「诚实偏差清单」明示这两项**未落地**，A91 又把 `list_jobs` 与其 HTTP 面 `JobPage` 一并判归「Round 8」，而 A110 新立的 S2b 只覆盖 `integrity.py + deps.py`。结果：S2b-2 的 `worker/deps.py::get_job_service` **没有 JobService 可返回**，S4 的 `api/jobs.py` 四个 handler **没有服务层可调** —— 这两个符号当前**无任何任务/子任务承接**。谁做？",
+        "ruling": "**新立子任务 M0-04/S2c，owner = lane V（qwen3.8-max，接在 S2b-2 之后），交付 `src/campaignlab/worker/service.py:JobService(list_jobs,get_job,cancel_job,retry_job)` + `JobStore.list_jobs`（对 store.py **纯追加**，既有 12 个方法的签名/函数体/SQL 文本一字不改，体例同 A82 对 `infra/db/repositories.py` 的处置：numstat 的 deleted 必须为 0）。** ① `JobPage` 的归属**不变**：仍按 A91 归 M0-04/**S4**，在 `api/common.py` append-only 追加（与 `WorkspacePage` 同构，字段序/校验口径/`__all__` 位置对齐，numstat 对该文件 0 删除行）；S2c **不得**抢先添加 `JobPage`（避免双主写，与 A84/A91 同理）。② S2c 的 `JobService.list_jobs` 只返回**领域/DTO 层**结果（`JobRecord` 序列 + 游标），**不组装 HTTP 分页壳**；`JobPage` 的组装归 S4 的 `_job_page_response`。这样 S2c 与 S4 的写集严格不相交，S4 因此可在 S2c 之后交 flash 档（逐字段样板填充，A91/A84 的口径已被裁定锁死）。③ `JobStore.list_jobs` 必须复用 `infra.db.repositories.job_from_row` 做行→DTO 映射（N5：**不复制**第二份），且**不得**在本包内出现任何 jobs 表的 DML 文本（A81 红线：SQL 写点唯一）；游标口径复用 `api/common.py::encode_cursor/decode_cursor` 的既有实现，禁另发明。④ 档位定 max 的依据：`store.py` 属事务边界与 public_frozen「即将冻结」面，追加方法必须与既有 `BEGIN IMMEDIATE` 短事务口径、审计同事务写入、领域错翻译三者一致，属跨模块一致性判定（手册 §6.3 强制 max）。",
+        "evidence": [
+          "编排器实测：`grep -n '    def ' src/campaignlab/worker/store.py` → 12 个方法（claimed/cancel_requested/total/__init__/get_job/pending_count/claim_next/renew/request_cancel/confirm_cancel/succeed/fail/reap_expired/enqueue/retry/fail_unhandled），**无 list_jobs**",
+          "`src/campaignlab/worker/__init__.py` 尾段原文：「未在本卡落地的 design §9 符号（`integrity.py`、`deps.py`、`store.list_jobs`）见 M0-04/S2 的回报：前者与 `deps.get_artifact_writer` 依赖 `infra/artifacts.py`（M0-04/S3，当前工作树内不存在），后者与其 HTTP 面 `JobPage` 一并由 A91 判归 Round 8。」→ 即 S2 自己已把 `list_jobs` 交回编排器，而 Round 8 并未承接，属**台账断层**，本条补齐",
+          "design §9-S2 原文点名：`worker/service.py:JobService`（方法：`list_jobs,get_job,cancel_job,retry_job`）· `worker/deps.py:get_job_store,get_job_service,get_artifact_writer,resolve_data_dir`",
+          "`ls src/campaignlab/api/` 实测无 `jobs.py` → S4 亦未落地，其对服务层的依赖成立"
+        ],
+        "action_taken": "本条入库；`tasks['M0-04'].subtask_progress` 追加键 `S2c`（append-only，既有 9 键一字未改）；追加 `tasks['M0-04'].s2c_note` 承载 S2c 的写权/硬约束/档位；M0-04 的余量次序固化为 S2b-1 → FU-29 → S2b-2 → S2c → S4 → S5 → S6 → S8（S7 已并行派出）",
+        "related": [
+          "A82",
+          "A84",
+          "A91",
+          "A110",
+          "A81",
+          "N5",
+          "FU-30"
+        ]
       }
     ],
     "round7_predispatch": {
@@ -12725,6 +12907,57 @@
         "R10-8",
         "R10-9"
       ]
+    },
+    "in_flight_agents_note_round11": "R11（2026-11-14T04:13:12+08:00 派单 / 2026-11-14T04:20:04+08:00 台账落地）：三条 lane 同时在飞 —— V(Lorentz,max)=M0-04/S2b-1【关键路径首棒】、T(Peirce,flash)=9 张契约切片、U(Franklin,flash)=M0-04/S7 + FU-32。开发配额 3/3 用满、QA 配额 1/1 **空置待用**（wave2 出口的 Q-VERIFY-WAVE2 需等 M0-04 全部子任务 DONE 后才有可复核面，提前派只会复核半成品）。三条 lane 的 dispatched_at 一律为 **spawn 调用前一刻的机器实测值**（A167 立规后首次全量执行，对照 R10-E 的 P-6：前任手填圆整值超前宿主钟约 39 分钟）；另加 spawn_returned_at 记录 spawn 返回时刻，两者之差即派单台账落地延迟，如实留痕。",
+    "wave2_entry_note": "R11 于 2026-11-14T04:20:04+08:00 把 resume 侧的 wave 由 1 推进到 2：wave1（M0-02 + M0-03）的出口条件已全部满足并入库（7db82a7：11 门实测 rc 回填、0 FAIL、A109③ 在 wave1 作用域归零、复合 AC 回填、两任务翻 DONE）。wave2 = {M0-04, M0-03b}（parallel）：M0-03b 现为 PASS_WITH_TODO（S1/S2/S3 DONE、S4 DEFERRED(A135)，其义务已由 FU-31 定址到 M1-04），M0-04 为 IN_PROGRESS（S1/S2/S3 DONE，余 S2b-1/S2b-2/S2c/S4/S5/S6/S7/S8）。phase 仍为 M0。**注意**：顶层 `s['wave']` 与 `s['phase']` 属既有键值更新，未新增/删除任何顶层键。",
+    "round11_dispatch": {
+      "at": "2026-11-14T04:20:04+08:00",
+      "round": 11,
+      "wave": 2,
+      "trigger": "R10-E 提交 7db82a7（第 86 次）后：wave1 出口已闭合（M0-02/M0-03 = DONE），在飞 lane 归零，开发配额 3/3 与 QA 配额 1/1 全空",
+      "dispatched": [
+        {
+          "lane": "V",
+          "nickname": "Lorentz",
+          "tier": "qwen3.8-max high",
+          "task": "M0-04/S2b-1",
+          "budget": "12k",
+          "agent_id": "01a1d68b-c44a-7863-87e6-30bf0ae7bdec",
+          "critical_path": true
+        },
+        {
+          "lane": "T",
+          "nickname": "Peirce",
+          "tier": "qwen3.8-flash medium",
+          "task": "9 张契约切片（wave3/7/9/10 派单前置）",
+          "budget": "14k",
+          "agent_id": "01a1d68c-6013-75a1-a2b7-54d50add89aa",
+          "critical_path": false
+        },
+        {
+          "lane": "U",
+          "nickname": "Franklin",
+          "tier": "qwen3.8-flash medium",
+          "task": "M0-04/S7 + FU-32",
+          "budget": "16k",
+          "agent_id": "01a1d68d-4828-7d01-95f4-42a5b2a4a87c",
+          "critical_path": false
+        }
+      ],
+      "parallel_safety": "三条 lane 写集两两不相交（编排器逐路径核对）：V={infra/artifacts.py, tests/unit/test_artifacts.py, tests/unit/test_layering_edges.py, evidence/M0/M0-04/s2b1-*, commands-s2b1}；T={orchestrator/handoff/*.slice.json 9 件新建, evidence/M0/ORCHESTRATOR/r11-slices/}；U={tests/unit/test_job_dto.py, web/vite.config.ts, evidence/M0/M0-04/s7-*, commands-s7, evidence/M0/ORCHESTRATOR/r11-fu32/}。**共享文件已被主动消除**：三条 lane 各自的命令日志分别命名 commands-s2b1 / commands-s7 / r11-slices，禁写公共的 evidence/M0/M0-04/commands.md（该文件留给 S8 汇总）。全表 pytest 会互见对方半成品 → 派单文已要求：落在自己 write_set 之外的失败一律记 IN_FLIGHT_CONTAMINATION 并额外跑作用域套件，禁修别人的文件（体例同 Newton 的 fulltable_restriction）。",
+      "m0_04_remaining_sequence": [
+        "S2b-1（在飞，lane V）→ 编排器提交",
+        "FU-29（lane V 续接，max）→ 编排器提交；闭合 A153 反向边，test_layering_edges 白名单收紧为空集；**wave3 派单前必须已闭合**",
+        "S2b-2（lane V 续接，max）：worker/integrity.py{Discrepancy,ManifestRow,verify_artifact_index,manifest_rows} + worker/deps.py{get_job_store,get_job_service,get_artifact_writer,resolve_data_dir}；A156 硬要求 get_artifact_writer 返回前必调 verify_same_filesystem() 并落 st_dev 不符→ConfigError→CLI rc=2 的守护；A154 接线二选一禁第三种",
+        "S2c（lane V 续接，max，A169 新立）：worker/service.py + JobStore.list_jobs（纯追加）",
+        "S4（**flash** 可，A91/A84 口径已锁死）：api/jobs.py{router,list_jobs,get_job,cancel_job,retry_job,_job_page_response,_job_response} + api/common.py append-only 追加 JobPage + api/app.py 挂载 ≤3 行（A90① 的 A10 最小例外）；**承接 AC-034 跨工作区→404 的 gate 义务（A165 rule_deferred_to_must_become_a_gate）**",
+        "S5（flash，14k）：tests/integration/jobs/{conftest,test_state_machine(9 个 t1..t9),test_idempotency(3),test_jobs_api(7 含 test_cross_workspace_is_404)}.py —— 依赖 S4",
+        "S6（flash，12k）：tests/integration/jobs/{test_lease(6),test_artifact(6)}.py —— 依赖 S5 的 conftest，故 S5→S6 串行；全部用 FixedClock/advance_clock，禁 sleep、禁 time.monotonic 判定",
+        "S8（flash，9k）：evidence/M0/M0-04/**（commands.md V1–V9 四元组、ac.md、job-states.md、gates/*.log、http/*.json 11 件）+ evidence/M0/summaries/M0-04.md（≤30 行）；AC-031 **只写「写入侧前提已交付 + 判定归 M5-01」，禁写 PASS/FAIL**（design §7）",
+        "S7 已并行派出（lane U，本轮）"
+      ],
+      "next_wave_gate": "wave2 出口 = M0-04 全部子任务 DONE + M0-03b 的 DEFERRED(A135) 项已由 FU-31 定址到 M1-04 → 派 Q lane 做 Q-VERIFY-WAVE2（A109 的唯一合法 DONE 路径），并**由编排器独占补跑全表 17 门**（R10-E 本轮未重跑全表的欠账在此清偿）。wave3（M1-01/M1-02/M1-03 ∥ M2-01/M2-02/M2-03）派单前置 = ① FU-29 已闭合 ② lane T 的 9 张切片已入库 ③ wave2 出口 Q 复核已入库。",
+      "tier_allocation_note": "本轮 3 条 lane = 1 max + 2 flash（units 口径：flash 2/3 = 0.667）。**降档依据一律是复杂度**：max 留给 public_frozen 面改动（artifacts.py 签名冻结）、分层守护判据设计（A153）、事务边界追加（store.py，S2c）；flash 承接机械脚本调用（切片）与判据来源已被逐条点名的样板测试（S7）与单行注释改写（FU-32）。后续 S4/S5/S6/S8 依 design §9 的卡内档位表本就标 flash，不改判。token 侧护栏在本环境**持续不可测**（子智能体无计量句柄，连续两条 max lane tokens=null），故实质管控仍是「派单预算 + loop_cap + 越限比事后追责」，禁以预算数冒充实测（R10-E 的 guardrail_status 口径）。"
     }
   },
   "acceptance": {
