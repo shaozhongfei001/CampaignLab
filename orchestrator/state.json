@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T23:24:04+08:00",
+  "updated_at": "2026-11-13T23:59:21+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1979,7 +1979,7 @@
       "branch": "m0-framework",
       "gates": [
         {
-          "id": "AC-002 至 AC-004、AC-012 至 AC-017 页面侧",
+          "id": "AC-002、AC-003、AC-004、AC-012、AC-013、AC-014、AC-015、AC-016、AC-017、AC-024、AC-028、AC-029、AC-030、AC-032、AC-034 页面侧（15 条，与切片 acceptance_rows 逐一对应；A126：gate 面按页面呈现全量列，acs 保持主责或强相关不扩）",
           "rc": null,
           "evidence": ""
         },
@@ -8894,6 +8894,38 @@
         "question": "门禁证据的落点：此前一律写 /tmp/fulltable*.json，实测 WSL VM 在命令间空闲即被自动终止（up 1 min、/proc/uptime 66s），/tmp 为 tmpfs 随之清空，导致 checkpoint 期的 /tmp/fulltable.json 与本轮首次的 /tmp/fulltable_r9_d035.json 双双丢失。证据应落在哪里？",
         "ruling": "**证据一律落仓库内 `evidence/**/<run>/fulltable.log` 并入库**（依 .gitignore 第 16-18 行 / D-003 的既有设计：`*.log` 被忽略但 `!evidence/**/*.log` 反排除，正是为了让 gates[].evidence 的指针指向仓库内真实存在的文件，使 Q lane 可复核、宿主重置不丢）。宿主机 `.orch_tmp/evidence/` 另存一份机读 JSON 副本（sha256 双向核对后仓库内只保留 .log，机读 .json 不入工作树以免留 untracked）。**禁把唯一证据只存 /tmp**；/tmp 仅可用作可重生成的中间产物（如 contract_slice 的负例输出 /tmp/neg_*.json）。",
         "action_taken": "本轮证据已落 evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log（4537 B，入库）；gates[*].evidence 与 fulltable_evidence.path 全部改指该仓库内路径；新增口径规则 rule_no_tmp_only_evidence；自我更正 R9-1"
+      },
+      {
+        "id": "A125",
+        "round": 9,
+        "at": "2026-11-13T23:59:21+08:00",
+        "source": "编排器（Round 9：T lane U-1 BLOCKING 终裁 + M2-04 切片重切）",
+        "question": "U-1（BLOCKING）：A102/A104 把 UI-14/UI-15/UI-20 判归 M2-04，但 M2-04.slice.json 是按批次5 计划的 --ui UI-02,03,04,05,12,13,16 生成，三页正文与其 op 不在切片内；活契约存在 listRuns/getRun/getRunCase/computeEstimate/createCandidate 等 op 未进该切片 26 op。如何重切？",
+        "ruling": "**采纳临时意见并按机械实抽执行重切**。严守 A108 的『禁凭建议清单写死』：先从 spec/CampaignLab-SDD-v1.0/ui/INDEX.md 取 10 页（原 7 页 + UI-14/UI-15/UI-20），逐页读正文用活契约 80 个 operationId 做词边界正则实抽求并集，再与活契约取交集 -> ops_union=35；AC 取 INDEX.md 验收列并集 -> 15 条；--ui 补三页、--depth 6（A108）。重切后校验 truncated_schemas==[] 与 source.openapi == 活契约现值，更新卡内陈旧计数、解挂 S7/S8。切片字节与 sha16 依卡内 L32 既有纪律（D-012/D-014：指纹与字节数不写进任务卡）**只记台账不写卡**，卡内改为指向 resume.u1_m204_reslice。",
+        "evidence": [
+          "机械实抽（可复跑 .orch_tmp/rederive_m204.py）：pages=10、ops_union=35、NEW=9（computeEstimate/createCandidate/createExport/downloadExport/getJob/getReview/getRun/getRunCase/listRuns）、**DROPPED=0**、ac_union=15",
+          "交叉验证：U-1 建议的 5 个 op 全部命中实抽结果（5/5 in_rederived=True 且 in_current_slice=False）；实抽另发现 4 个建议未列的 op（createExport/downloadExport/getJob/getReview），证明『禁凭建议写死』确有必要",
+          "重切后实测：bytes 227468->309681、sha16 ba5d30f35fe4b96c->bff9ae7990d164eb、operations 26->35、acceptance_rows 4->15、pages 7->10、truncated_schemas=[]、无 missing 键、spec_version=1.0.1、source.openapi=443309/592571099d638251 与磁盘活契约逐位相同",
+          "切片新鲜度 gate（卡内 L32 原文命令）复跑 rc=0 且断言 ('missing' not in d) and d['truncated_schemas']==[] 通过",
+          "只读纪律：git status --porcelain spec/ contracts/ = 空",
+          "证据入库：evidence/M2/ORCHESTRATOR/round9-u1-m204-reslice/fulltable.log（5190 B）"
+        ],
+        "action_taken": "重切 orchestrator/handoff/M2-04.slice.json；卡内 10 处锚点替换（L11/L12/L14/L39/L41/L51/L57/L58/L71）保持 head 48 行不变、tail 19->20、total 79->80（守护上限 60/40/200 全部达标）；U-1 条目 append-only 追加终裁行（不改原文）；tasks[M2-04].gates[0].id 按 A126 扩为 15 条枚举；acs 保持 4 条不扩；新增 resume.u1_m204_reslice 权威记录；U-1 -> ADJUDICATED",
+        "self_note": "checkpoint 交接稿写『更新 M2-04.md 卡内 slice 指纹引用（字节/sha16）』与卡内 L32 既有纪律（指纹与字节数不写进本卡，D-012/D-014）**相冲突**。裁定以卡内纪律为准：卡内只写可复跑的计数与台账指针，指纹/字节数仅入台账。交接稿措辞不追溯改写，以本条为准。"
+      },
+      {
+        "id": "A126",
+        "round": 9,
+        "at": "2026-11-13T23:59:21+08:00",
+        "source": "编排器（Round 9：T lane U-4 gate 面 vs acs 口径终裁）",
+        "question": "U-4（RULING）：三卡 gate 字面范围大于 acs（M1-04 含 AC-006..010、M2-04 含 AC-013..016、M3-04 含 AC-019..023）。是否把 gate 面上的号补进 tasks[id].acs？",
+        "ruling": "**采纳临时意见：允许 gate 面 > acs，两者口径不同且不得对齐**。gate 面按『页面呈现的全部 AC』列（栏二 cross_ref 语义），与切片 acceptance_rows 逐一对应；tasks[id].acs 保持『主责或强相关』语义不变。**禁为对齐而扩 acs** —— 扩了会污染 acceptance.primary_owner 的分母（47 条自洽且经守护校验）。U-1 重切后 M2-04 切片 acceptance_rows 由 4 条变 15 条，故其 gates[0].id 由范围式『AC-002 至 AC-004、AC-012 至 AC-017 页面侧』改为 15 条**枚举式**，与切片逐一对应（范围式『至』字面会隐含未呈现的号，正是 U-4 的成因）。",
+        "evidence": [
+          "M2-04 重切后 acceptance_rows 实测 15 条：AC-002/003/004/012/013/014/015/016/017/024/028/029/030/032/034",
+          "tasks[M2-04].acs 保持 4 条（AC-002/004/012/017）未扩；acceptance.primary_owner 分母 47 未变动",
+          "同型排查：M1-04 gate『AC-005 至 AC-011』vs 切片 acceptance_rows 3 条、M3-04 gate『AC-018 至 AC-024』vs 3 条 —— 两卡的范围式字面同样隐含未落切片的号，其处置随后续批量重切治理一并收口（本条只落 M2-04，因其切片已重切、gate 面须与 acceptance_rows 逐一对应）"
+        ],
+        "action_taken": "tasks[M2-04].gates[0].id 改为 15 条枚举式并标注 A126 口径；U-4 -> ADJUDICATED；M1-04/M3-04 的同型 gate 字面挂到后续批量重切治理一并处理"
       }
     ],
     "round7_predispatch": {
@@ -9564,13 +9596,18 @@
     "round8_pending_rulings": {
       "at": "2026-11-13T13:13:55+08:00",
       "source": "Lane T（Ramanujan）批次5 回报的 7 项 U + 2 处派单文措辞",
-      "status": "PENDING（checkpoint 前未终裁，下次会话开工首件事）",
+      "status": "PARTIALLY_ADJUDICATED（U-1 -> A125、U-4 -> A126 已于 Round 9 终裁；余 U-2/U-3/U-5/U-6/U-7/W-1 待终裁）",
       "items": [
         {
           "id": "U-1",
           "level": "BLOCKING",
           "q": "M2-04 切片缺 A102/A104 新判归的 UI-14/UI-15/UI-20 正文，且活契约的 listRuns/getRun/getRunCase/computeEstimate/createCandidate 等 op 未进该切片 26 op",
-          "provisional": "建议重切：--ops 取原 26 op ∪ 上述 5 op（须先按 round8_batch5_slice_plan.method 第④步从三页 spec 正文实抽 op 字面相交集，禁凭建议清单直接写死）、--ui 补 UI-14,UI-15,UI-20、--depth 6（A108）；重切后校验 truncated_schemas==[] 并更新 M2-04 卡的 slice 指纹引用与 S7/S8 解挂"
+          "provisional": "建议重切：--ops 取原 26 op ∪ 上述 5 op（须先按 round8_batch5_slice_plan.method 第④步从三页 spec 正文实抽 op 字面相交集，禁凭建议清单直接写死）、--ui 补 UI-14,UI-15,UI-20、--depth 6（A108）；重切后校验 truncated_schemas==[] 并更新 M2-04 卡的 slice 指纹引用与 S7/S8 解挂",
+          "status": "ADJUDICATED",
+          "ruling_id": "A125",
+          "adjudicated_at": "2026-11-13T23:59:21+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定）",
+          "resolution": "已重切：35 op / 15 AC 行 / 10 页 / truncated_schemas=[] / DROPPED=0；S7、S8 解挂；权威记录 resume.u1_m204_reslice"
         },
         {
           "id": "U-2",
@@ -9588,7 +9625,12 @@
           "id": "U-4",
           "level": "RULING",
           "q": "三卡 gate 字面范围大于 acs（M1-04 含 AC-006..010、M2-04 含 AC-013..016、M3-04 含 AC-019..023）",
-          "provisional": "**允许**：gate 面按「页面呈现的全部 AC」列（栏二 cross_ref），tasks[id].acs 保持「主责或强相关」语义不变；两者口径差异写进 A107 的解释，禁为对齐而扩 acs（会污染 primary_owner 分母）"
+          "provisional": "**允许**：gate 面按「页面呈现的全部 AC」列（栏二 cross_ref），tasks[id].acs 保持「主责或强相关」语义不变；两者口径差异写进 A107 的解释，禁为对齐而扩 acs（会污染 primary_owner 分母）",
+          "status": "ADJUDICATED",
+          "ruling_id": "A126",
+          "adjudicated_at": "2026-11-13T23:59:21+08:00",
+          "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定）",
+          "resolution": "允许 gate 面 > acs；M2-04 gates[0].id 改 15 条枚举式；acs 保持 4 条不扩；M1-04/M3-04 同型随后续批量重切治理收口"
         },
         {
           "id": "U-5",
@@ -10103,7 +10145,119 @@
         "gates_after": "全表 16 项全绿（mismatch=none）；mypy 72 source files；pytest 350 passed；ruff format 186 files"
       }
     ],
-    "accounting_rule_orch_self_served": "编排器自办的小修复**不入** budget.subtask_log（避免污染 flash_share 分母，该口径只统计子智能体派单），一律记入 resume.round<N>_orchestrator_self_served。"
+    "accounting_rule_orch_self_served": "编排器自办的小修复**不入** budget.subtask_log（避免污染 flash_share 分母，该口径只统计子智能体派单），一律记入 resume.round<N>_orchestrator_self_served。",
+    "u1_m204_reslice": {
+      "at": "2026-11-13T23:59:21+08:00",
+      "round": 9,
+      "task": "M2-04",
+      "adjudications": [
+        "A125",
+        "A126"
+      ],
+      "closes": "resume.round8_pending_rulings.items[U-1]（BLOCKING）",
+      "reason": "A102/A104 把 UI-14/UI-15/UI-20 判归 M2-04，但切片按批次5 计划 --ui UI-02,03,04,05,12,13,16 生成，三页正文与其 op 不在切片内；实现方禁回读活契约（D-011/D-012），缺 op 即硬阻塞",
+      "derivation": {
+        "method": "round8_batch5_slice_plan.method 第④步：从 spec/CampaignLab-SDD-v1.0/ui/INDEX.md 取 10 页 -> 逐页读正文 -> 用活契约 80 个 operationId 做词边界正则实抽 -> 求并集 -> 与活契约取交集；AC 取 INDEX.md 验收列并集。**禁凭 U-1 建议清单写死**",
+        "script_reproducible": ".orch_tmp/rederive_m204.py（宿主机 D:/ws/codex_rd/ss_campaignlab/.orch_tmp/，可复跑）",
+        "pages_selected": [
+          "UI-02",
+          "UI-03",
+          "UI-04",
+          "UI-05",
+          "UI-12",
+          "UI-13",
+          "UI-16",
+          "UI-14",
+          "UI-15",
+          "UI-20"
+        ],
+        "pages_added": [
+          "UI-14",
+          "UI-15",
+          "UI-20"
+        ],
+        "depth": 6,
+        "depth_basis": "A108",
+        "ops_union": 35,
+        "ops_new": [
+          "computeEstimate",
+          "createCandidate",
+          "createExport",
+          "downloadExport",
+          "getJob",
+          "getReview",
+          "getRun",
+          "getRunCase",
+          "listRuns"
+        ],
+        "ops_dropped": [],
+        "ac_union": [
+          "AC-002",
+          "AC-003",
+          "AC-004",
+          "AC-012",
+          "AC-013",
+          "AC-014",
+          "AC-015",
+          "AC-016",
+          "AC-017",
+          "AC-024",
+          "AC-028",
+          "AC-029",
+          "AC-030",
+          "AC-032",
+          "AC-034"
+        ],
+        "cross_validation": "U-1 建议的 5 个 op（listRuns/getRun/getRunCase/computeEstimate/createCandidate）5/5 命中实抽结果且均不在旧切片；实抽另发现建议未列的 4 个 op（createExport/downloadExport/getJob/getReview）"
+      },
+      "command": "python3 scripts/contract_slice.py --ops checkRule,compareRules,computeEstimate,confirmCase,confirmRule,createActivity,createCandidate,createCase,createExport,createPreflight,createRule,createRun,downloadExport,getActivity,getCase,getEvidence,getJob,getPreflight,getReceipt,getReview,getRule,getRun,getRunCase,listActivities,listCandidates,listCases,listPreflights,listRules,listRuns,recordReceipt,registerEvidence,reviewPreflight,updateActivity,updateCase,updateRule --ac AC-002,AC-003,AC-004,AC-012,AC-013,AC-014,AC-015,AC-016,AC-017,AC-024,AC-028,AC-029,AC-030,AC-032,AC-034 --ui UI-02,UI-03,UI-04,UI-05,UI-12,UI-13,UI-16,UI-14,UI-15,UI-20 --depth 6 --out orchestrator/handoff/M2-04.slice.json",
+      "old": {
+        "path": "orchestrator/handoff/M2-04.slice.json",
+        "bytes": 227468,
+        "sha16": "ba5d30f35fe4b96c",
+        "operations": 26,
+        "acceptance_rows": 4,
+        "pages": 7
+      },
+      "new": {
+        "path": "orchestrator/handoff/M2-04.slice.json",
+        "bytes": 309681,
+        "sha16": "bff9ae7990d164eb",
+        "operations": 35,
+        "acceptance_rows": 15,
+        "pages": 10,
+        "spec_version": "1.0.1",
+        "truncated_schemas": [],
+        "missing_key_present": false,
+        "source_openapi": {
+          "path": "contracts/openapi.json",
+          "bytes": 443309,
+          "sha16": "592571099d638251",
+          "info_version": "1.0.1",
+          "operation_id_total": 80
+        }
+      },
+      "post_checks": {
+        "slice_rc": 0,
+        "ops_count_35": true,
+        "ops_match_expected": true,
+        "ac_count_15": true,
+        "ac_match_expected": true,
+        "pages_count_10": true,
+        "pages_match_expected": true,
+        "truncated_schemas_empty": true,
+        "missing_absent": true,
+        "source_matches_live_contract": true
+      },
+      "evidence": "evidence/M2/ORCHESTRATOR/round9-u1-m204-reslice/fulltable.log",
+      "unblocked": [
+        "tasks[M2-04] 的 S7（UI-14/UI-15 运行中心与结果轨迹页样板，flash 5k）",
+        "tasks[M2-04] 的 S8（UI-16 预发对照 + UI-20 试算页样板，flash 4k）"
+      ],
+      "card_edit_caliber": "head 48 行不变（<=60）、tail 19->20（<=40）、total 79->80（<=200）；10 处锚点替换均断言命中次数后才写；U-1 条目 append-only 追加终裁行",
+      "readonly_check": "git status --porcelain spec/ contracts/ = 空",
+      "followup_systemic": "同型排查发现 7 个含页面切片中 6 个存在同类自相矛盾（切片自带 pages[*].meta 引用的 op/AC 不在切片正文内，而卡片禁回读活契约 D-011/D-012 -> 实现方硬阻塞）；受影响：M1-04/M3-04（仅缺 AC 行）、M1-P01/M3-P01/M4-02/M4-03/M4-P01（缺 op，BLOCKING 级）-> 批量重切治理，缺陷编号于下一提交分配后回填此处（禁悬空指针）"
+    }
   },
   "acceptance": {
     "baseline_total": 35,

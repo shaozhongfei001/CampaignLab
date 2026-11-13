@@ -1,0 +1,87 @@
+# Round 9 / U-1 (A125) -- M2-04 slice re-cut evidence
+generated_at: 2026-11-13T23:51:03+08:00
+repo: /home/szf/dev/CampaignLab   branch: m0-framework
+task: M2-04   ruling: U-1 -> A125 ; gate-face caliber: U-4 -> A126
+
+== 1. mechanical re-derivation (spec/ui/INDEX.md literal intersection, NOT the suggested list) ==
+live operationId = 80
+INDEX rows parsed = 26
+UI-02  UI-02-activity-list.md       nav=活动与规则    bytes=  1693 ops= 3  AC-002、AC-032
+UI-03  UI-03-activity-detail.md     nav=活动与规则    bytes=  2177 ops= 8  AC-002、AC-003、AC-017
+UI-04  UI-04-rule-version.md        nav=活动与规则    bytes=  2150 ops= 6  AC-003、AC-004、AC-034
+UI-05  UI-05-rule-check.md          nav=活动与规则    bytes=  1905 ops= 3  AC-004、AC-012
+UI-12  UI-12-case-list.md           nav=仿真与验收    bytes=  1715 ops= 3  AC-012、AC-034
+UI-13  UI-13-case-detail.md         nav=仿真与验收    bytes=  2093 ops= 6  AC-012、AC-013、AC-015
+UI-16  UI-16-preflight.md           nav=仿真与验收    bytes=  1941 ops= 6  AC-016、AC-017
+UI-14  UI-14-run-list.md            nav=仿真与验收    bytes=  1825 ops= 6  AC-013、AC-029
+UI-15  UI-15-run-result.md          nav=仿真与验收    bytes=  2148 ops= 8  AC-014、AC-015、AC-016、AC-030
+UI-20  UI-20-estimate.md            nav=仿真与验收    bytes=  1711 ops= 3  AC-024、AC-028
+
+=== current slice: 35 ops / 10 pages / 15 ac rows ===
+current pages: ['UI-02', 'UI-03', 'UI-04', 'UI-05', 'UI-12', 'UI-13', 'UI-14', 'UI-15', 'UI-16', 'UI-20']
+=== mechanically re-derived (10 pages) ===
+ops_union count = 35
+NEW ops (not in current slice) = []
+DROPPED ops (in current but not re-derived) = []
+ac_union (INDEX 验收列并集) = ['AC-002', 'AC-003', 'AC-004', 'AC-012', 'AC-013', 'AC-014', 'AC-015', 'AC-016', 'AC-017', 'AC-024', 'AC-028', 'AC-029', 'AC-030', 'AC-032', 'AC-034'] count = 15
+current ac rows = ['AC-002', 'AC-003', 'AC-004', 'AC-012', 'AC-013', 'AC-014', 'AC-015', 'AC-016', 'AC-017', 'AC-024', 'AC-028', 'AC-029', 'AC-030', 'AC-032', 'AC-034']
+
+=== per-page ops ===
+  UI-02  ['createActivity', 'getActivity', 'listActivities']
+  UI-03  ['createRule', 'getActivity', 'getEvidence', 'getReceipt', 'listPreflights', 'listRules', 'recordReceipt', 'updateActivity']
+  UI-04  ['checkRule', 'compareRules', 'confirmRule', 'getRule', 'registerEvidence', 'updateRule']
+  UI-05  ['checkRule', 'createCase', 'getRule']
+  UI-12  ['createCase', 'getCase', 'listCases']
+  UI-13  ['confirmCase', 'createCase', 'createRun', 'getCase', 'registerEvidence', 'updateCase']
+  UI-16  ['createPreflight', 'getPreflight', 'listCandidates', 'listPreflights', 'registerEvidence', 'reviewPreflight']
+  UI-14  ['createRun', 'getJob', 'getRun', 'listCases', 'listRules', 'listRuns']
+  UI-15  ['createCandidate', 'createExport', 'downloadExport', 'getEvidence', 'getJob', 'getRun', 'getRunCase', 'listCandidates']
+  UI-20  ['computeEstimate', 'getEvidence', 'getReview']
+
+=== U-1 建议清单核对（禁凭建议写死，仅作交叉验证）===
+  listRuns           in_live_contract=True  in_rederived=True  in_current_slice=True
+  getRun             in_live_contract=True  in_rederived=True  in_current_slice=True
+  getRunCase         in_live_contract=True  in_rederived=True  in_current_slice=True
+  computeEstimate    in_live_contract=True  in_rederived=True  in_current_slice=True
+  createCandidate    in_live_contract=True  in_rederived=True  in_current_slice=True
+
+=== slice_cmd (mechanically derived) ===
+python3 scripts/contract_slice.py --ops checkRule,compareRules,computeEstimate,confirmCase,confirmRule,createActivity,createCandidate,createCase,createExport,createPreflight,createRule,createRun,downloadExport,getActivity,getCase,getEvidence,getJob,getPreflight,getReceipt,getReview,getRule,getRun,getRunCase,listActivities,listCandidates,listCases,listPreflights,listRules,listRuns,recordReceipt,registerEvidence,reviewPreflight,updateActivity,updateCase,updateRule --ac AC-002,AC-003,AC-004,AC-012,AC-013,AC-014,AC-015,AC-016,AC-017,AC-024,AC-028,AC-029,AC-030,AC-032,AC-034 --ui UI-02,UI-03,UI-04,UI-05,UI-12,UI-13,UI-16,UI-14,UI-15,UI-20 --depth 6 --out orchestrator/handoff/M2-04.slice.json
+cmd_len = 695
+staged -> /tmp/_m204_rederive.json (NOTE: /tmp is volatile; will re-derive in-repo before use)
+
+== 2. post-reslice verification ==
+{
+ "slice_rc": 0,
+ "ops_count": 35,
+ "acceptance_rows_count": 15,
+ "pages_count": 10,
+ "truncated_schemas": [],
+ "missing_key_present": false,
+ "spec_version": "1.0.1",
+ "source_openapi": {
+  "path": "contracts/openapi.json",
+  "bytes": 443309,
+  "sha16": "592571099d638251"
+ },
+ "live_openapi_on_disk": {
+  "bytes": 443309,
+  "sha16": "592571099d638251"
+ },
+ "source_matches_live_contract": true,
+ "new_slice": {
+  "bytes": 309681,
+  "sha16": "bff9ae7990d164eb"
+ },
+ "old_slice": {
+  "bytes": 227468,
+  "sha16": "ba5d30f35fe4b96c"
+ }
+}
+
+== 3. readonly discipline ==
+git status --porcelain spec/ contracts/ -> rc=0 output=''
+
+== 4. reproduce command ==
+python3 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/rederive_m204.py   # re-derive ops/AC/pages
+python3 scripts/contract_slice.py --ops <35> --ac <15> --ui <10> --depth 6 --out orchestrator/handoff/M2-04.slice.json

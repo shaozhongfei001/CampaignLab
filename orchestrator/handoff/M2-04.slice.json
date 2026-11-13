@@ -589,6 +589,187 @@
     }
    }
   },
+  "computeEstimate": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/estimates",
+   "operation": {
+    "operationId": "computeEstimate",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Estimate"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "EstimateCreate"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Estimate": {
+     "type": "object",
+     "properties": {
+      "review_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "executed": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "assumed_contact_conversion": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "fixed_valid_conversion": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "estimate_exact": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      },
+      "estimate_count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "observed_base": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "delta_count": {
+       "type": "integer",
+       "minimum": -9000000000000,
+       "maximum": 9000000000000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "review_id",
+      "executed",
+      "assumed_contact_conversion",
+      "fixed_valid_conversion",
+      "estimate_exact",
+      "estimate_count",
+      "observed_base",
+      "delta_count",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "EstimateCreate": {
+     "type": "object",
+     "properties": {
+      "review_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "contact_conversion": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 42,
+       "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+      }
+     },
+     "required": [
+      "review_id",
+      "contact_conversion"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
   "confirmCase": {
    "method": "POST",
    "path": "/workspaces/{workspace_id}/cases/{case_id}/confirm",
@@ -1924,6 +2105,323 @@
     }
    }
   },
+  "createCandidate": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/runs/{run_id}/candidates",
+   "operation": {
+    "operationId": "createCandidate",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Candidate"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "CandidateCreate"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Candidate": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "run_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "case_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "activity_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "rule_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "rule_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "case_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "expected": {
+       "$schema": "Outcome"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "READY",
+        "STALE"
+       ]
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "run_id",
+      "case_id",
+      "activity_id",
+      "rule_id",
+      "rule_digest",
+      "case_digest",
+      "expected",
+      "state",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Outcome": {
+     "type": "object",
+     "properties": {
+      "winner_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 20
+      },
+      "used": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "budget_used_fen": {
+       "anyOf": [
+        {
+         "type": "integer",
+         "minimum": 0,
+         "maximum": 9000000000000
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "coupons": {
+       "type": "array",
+       "items": {
+        "$schema": "CouponRecord"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "manual_review": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "winner_ids",
+      "used",
+      "budget_used_fen",
+      "coupons",
+      "manual_review"
+     ],
+     "additionalProperties": false
+    },
+    "CouponRecord": {
+     "type": "object",
+     "properties": {
+      "order_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "net_paid_fen": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "coupon_state": {
+       "type": "string",
+       "enum": [
+        "NONE",
+        "ISSUED",
+        "REDEEMED",
+        "REVOKED",
+        "MANUAL_REVIEW"
+       ]
+      }
+     },
+     "required": [
+      "order_id",
+      "net_paid_fen",
+      "coupon_state"
+     ],
+     "additionalProperties": false
+    },
+    "CandidateCreate": {
+     "type": "object",
+     "properties": {
+      "case_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "expectation": {
+       "$schema": "Outcome"
+      },
+      "note": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      }
+     },
+     "required": [
+      "case_id",
+      "expectation",
+      "note"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
   "createCase": {
    "method": "POST",
    "path": "/workspaces/{workspace_id}/cases",
@@ -2561,6 +3059,398 @@
       "name",
       "mode",
       "input"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "createExport": {
+   "method": "POST",
+   "path": "/workspaces/{workspace_id}/exports",
+   "operation": {
+    "operationId": "createExport",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "Idempotency-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 8,
+       "maxLength": 128
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "Location": {
+        "description": "返回作业的状态 URL",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 500
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$schema": "ExportCreate"
+       }
+      }
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    },
+    "ExportCreate": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "EVIDENCE_ZIP",
+        "REPORT_MD",
+        "MISSING_CSV",
+        "REVIEW_CSV"
+       ]
+      },
+      "subject": {
+       "$schema": "ObjectRef"
+      },
+      "reason": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      }
+     },
+     "required": [
+      "kind",
+      "subject",
+      "reason"
      ],
      "additionalProperties": false
     }
@@ -3923,6 +4813,100 @@
     }
    }
   },
+  "downloadExport": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/exports/{export_id}/file",
+   "operation": {
+    "operationId": "downloadExport",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "export_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "Content-Disposition": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 350
+        }
+       }
+      },
+      "content": {
+       "application/octet-stream": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   }
+  },
   "getActivity": {
    "method": "GET",
    "path": "/workspaces/{workspace_id}/activities/{activity_id}",
@@ -4892,6 +5876,353 @@
     }
    }
   },
+  "getJob": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/jobs/{job_id}",
+   "operation": {
+    "operationId": "getJob",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Job"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Job": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "VALIDATE_IMPORT",
+        "PUBLISH_IMPORT",
+        "CORRECT_SNAPSHOT",
+        "COMPARE",
+        "REVIEW",
+        "DIAGNOSE",
+        "QUESTION",
+        "SIMULATE",
+        "REPORT",
+        "EXPORT"
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED"
+       ]
+      },
+      "attempt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "progress": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "stage": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 120
+      },
+      "input_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "retry_of": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "result_ref": {
+       "anyOf": [
+        {
+         "$schema": "ObjectRef"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "problem": {
+       "anyOf": [
+        {
+         "$schema": "Problem"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "retryable": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "kind",
+      "state",
+      "attempt",
+      "progress",
+      "stage",
+      "input_digest",
+      "retry_of",
+      "result_ref",
+      "problem",
+      "retryable"
+     ],
+     "additionalProperties": false
+    },
+    "ObjectRef": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "workspace",
+        "activity",
+        "rule",
+        "import",
+        "snapshot",
+        "definition",
+        "case",
+        "run",
+        "candidate",
+        "preflight",
+        "receipt",
+        "comparison",
+        "review",
+        "diagnosis",
+        "question",
+        "report",
+        "action",
+        "job",
+        "export",
+        "evidence"
+       ]
+      },
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     "required": [
+      "kind",
+      "id"
+     ],
+     "additionalProperties": false
+    },
+    "Problem": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 250
+      },
+      "title": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "status": {
+       "type": "integer",
+       "minimum": 400,
+       "maximum": 599
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "request_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "detail",
+      "request_id",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
   "getPreflight": {
    "method": "GET",
    "path": "/workspaces/{workspace_id}/preflights/{preflight_id}",
@@ -5435,6 +6766,1206 @@
     }
    }
   },
+  "getReview": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/reviews/{review_id}",
+   "operation": {
+    "operationId": "getReview",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "review_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Review"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Review": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "scope": {
+       "$schema": "Scope"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "reasons": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "included_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "MetricComparison"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "participation_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "detail_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "detail_count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "origin_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "topic_rows": {
+       "type": "array",
+       "items": {
+        "$schema": "AnalysisRow"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "worst_layer_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "missing_requirements": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "monthly_review": {
+       "$schema": "MonthlyReview"
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "scope",
+      "state",
+      "reasons",
+      "included_channels",
+      "metrics",
+      "participation_rows",
+      "detail_rows",
+      "detail_count",
+      "origin_rows",
+      "topic_rows",
+      "worst_layer_id",
+      "missing_requirements",
+      "evidence_ids",
+      "digest"
+     ],
+     "additionalProperties": false
+    },
+    "Scope": {
+     "type": "object",
+     "properties": {
+      "snapshot_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "periods": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+       },
+       "minItems": 0,
+       "maxItems": 12
+      },
+      "cutoff": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "group": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "subbranch": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "channel_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6
+      },
+      "origin": {
+       "type": "string",
+       "enum": [
+        "ALL",
+        "hq",
+        "branch"
+       ]
+      },
+      "strategy_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 50
+      },
+      "segment": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 80
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "segment_basis": {
+       "type": "string",
+       "enum": [
+        "DEPLOYMENT",
+        "MONTH_END"
+       ]
+      },
+      "activity_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "$schema": "Baseline"
+      }
+     },
+     "required": [
+      "snapshot_id",
+      "period",
+      "baseline"
+     ],
+     "additionalProperties": false
+    },
+    "Baseline": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "previous",
+        "yoy",
+        "peer",
+        "bank",
+        "hq",
+        "target",
+        "custom",
+        "branch"
+       ]
+      },
+      "period": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "branch_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "kind"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    },
+    "MetricComparison": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "current": {
+       "$schema": "Measure"
+      },
+      "comparable_current": {
+       "anyOf": [
+        {
+         "$schema": "Measure"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline": {
+       "anyOf": [
+        {
+         "$schema": "Measure"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "delta": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "relative_delta": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "metric_id",
+      "current",
+      "comparable_current",
+      "baseline",
+      "delta",
+      "relative_delta"
+     ],
+     "additionalProperties": false
+    },
+    "Measure": {
+     "type": "object",
+     "properties": {
+      "metric_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "unit": {
+       "type": "string",
+       "enum": [
+        "PERSON",
+        "CUSTOMER_MONTH",
+        "BRANCH",
+        "STRATEGY",
+        "EVENT",
+        "SEAT",
+        "CNY_FEN",
+        "RATIO"
+       ]
+      },
+      "value": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "AVAILABLE",
+        "MISSING",
+        "NOT_COMPARABLE",
+        "ZERO_DENOMINATOR"
+       ]
+      },
+      "numerator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "denominator": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 42,
+         "pattern": "^-?(0|[1-9]\\d*)(\\.\\d{1,18})?$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "definition_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "metric_id",
+      "unit",
+      "value",
+      "state",
+      "numerator",
+      "denominator",
+      "definition_ids",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "AnalysisRow": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 160
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "MetricComparison"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "key",
+      "label",
+      "metrics"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyReview": {
+     "type": "object",
+     "properties": {
+      "profile": {
+       "const": "BANK_MONTHLY_V1"
+      },
+      "calculation_version": {
+       "const": "1.0.1"
+      },
+      "focus_period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "periods": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+       },
+       "minItems": 3,
+       "maxItems": 3,
+       "uniqueItems": true
+      },
+      "state": {
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "common_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6,
+       "uniqueItems": true
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "trend": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyTrend"
+       },
+       "minItems": 0,
+       "maxItems": 21
+      },
+      "comparisons": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyComparison"
+       },
+       "minItems": 0,
+       "maxItems": 14
+      },
+      "participation": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyParticipation"
+       },
+       "minItems": 0,
+       "maxItems": 12006
+      },
+      "capacity": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyCapacity"
+       },
+       "minItems": 0,
+       "maxItems": 18
+      },
+      "production": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyProduction"
+       },
+       "minItems": 0,
+       "maxItems": 36
+      },
+      "origin_overlap": {
+       "type": "array",
+       "items": {
+        "$schema": "MonthlyOriginOverlap"
+       },
+       "minItems": 0,
+       "maxItems": 15
+      }
+     },
+     "required": [
+      "profile",
+      "calculation_version",
+      "focus_period",
+      "periods",
+      "state",
+      "common_channels",
+      "issues",
+      "trend",
+      "comparisons",
+      "participation",
+      "capacity",
+      "production",
+      "origin_overlap"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyTrend": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "channel_id": {
+       "type": "string",
+       "enum": [
+        "all",
+        "remote",
+        "manager",
+        "ai",
+        "wechat",
+        "sms",
+        "push"
+       ]
+      },
+      "coverage_state": {
+       "type": "string",
+       "enum": [
+        "AVAILABLE",
+        "RESTORED",
+        "NOT_COLLECTED",
+        "MISSING",
+        "PARTIAL"
+       ]
+      },
+      "observed_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6,
+       "uniqueItems": true
+      },
+      "comparable_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6,
+       "uniqueItems": true
+      },
+      "observed": {
+       "$schema": "Measure"
+      },
+      "comparable": {
+       "$schema": "Measure"
+      }
+     },
+     "required": [
+      "period",
+      "channel_id",
+      "coverage_state",
+      "observed_channels",
+      "comparable_channels",
+      "observed",
+      "comparable"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyComparison": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "baseline_period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "channel_id": {
+       "type": "string",
+       "enum": [
+        "all",
+        "remote",
+        "manager",
+        "ai",
+        "wechat",
+        "sms",
+        "push"
+       ]
+      },
+      "state": {
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "common_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6,
+       "uniqueItems": true
+      },
+      "observed_current": {
+       "$schema": "Measure"
+      },
+      "observed_baseline": {
+       "$schema": "Measure"
+      },
+      "observed_delta": {
+       "$schema": "Measure"
+      },
+      "comparable_current": {
+       "$schema": "Measure"
+      },
+      "comparable_baseline": {
+       "$schema": "Measure"
+      },
+      "comparable_delta": {
+       "$schema": "Measure"
+      },
+      "relative_delta": {
+       "$schema": "Measure"
+      },
+      "coverage_gap_delta": {
+       "$schema": "Measure"
+      }
+     },
+     "required": [
+      "period",
+      "baseline_period",
+      "channel_id",
+      "state",
+      "common_channels",
+      "observed_current",
+      "observed_baseline",
+      "observed_delta",
+      "comparable_current",
+      "comparable_baseline",
+      "comparable_delta",
+      "relative_delta",
+      "coverage_gap_delta"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyParticipation": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "level": {
+       "type": "string",
+       "enum": [
+        "BANK",
+        "GROUP",
+        "BRANCH"
+       ]
+      },
+      "key": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 180
+      },
+      "origin": {
+       "type": "string",
+       "enum": [
+        "ALL",
+        "branch"
+       ]
+      },
+      "covered_channels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "remote",
+         "manager",
+         "ai",
+         "wechat",
+         "sms",
+         "push"
+        ]
+       },
+       "minItems": 0,
+       "maxItems": 6,
+       "uniqueItems": true
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "Measure"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      }
+     },
+     "required": [
+      "period",
+      "level",
+      "key",
+      "label",
+      "origin",
+      "covered_channels",
+      "metrics"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyCapacity": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "channel_id": {
+       "type": "string",
+       "enum": [
+        "remote",
+        "manager",
+        "ai",
+        "wechat",
+        "sms",
+        "push"
+       ]
+      },
+      "capacity_unit": {
+       "anyOf": [
+        {
+         "type": "string",
+         "enum": [
+          "CALL_ATTEMPT",
+          "MESSAGE_SENT",
+          "TASK_SLOT"
+         ]
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "comparable_to_previous": {
+       "type": "boolean"
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "Measure"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      }
+     },
+     "required": [
+      "period",
+      "channel_id",
+      "capacity_unit",
+      "comparable_to_previous",
+      "metrics"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyProduction": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "COHORT",
+        "SEGMENT",
+        "LIFECYCLE"
+       ]
+      },
+      "key": {
+       "type": "string",
+       "enum": [
+        "STRATEGY",
+        "SELF_MANAGED",
+        "ORGANIC",
+        "OTHER",
+        "MASS",
+        "AFFLUENT",
+        "VIP",
+        "PRIVATE",
+        "NEW_YTD",
+        "EXISTING",
+        "UNKNOWN"
+       ]
+      },
+      "state": {
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "Measure"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      }
+     },
+     "required": [
+      "period",
+      "dimension",
+      "key",
+      "state",
+      "metrics"
+     ],
+     "additionalProperties": false
+    },
+    "MonthlyOriginOverlap": {
+     "type": "object",
+     "properties": {
+      "period": {
+       "type": "string",
+       "pattern": "^20\\d{2}-(0[1-9]|1[0-2])$"
+      },
+      "bucket": {
+       "type": "string",
+       "enum": [
+        "HQ_ONLY",
+        "BRANCH_ONLY",
+        "BOTH",
+        "UNION",
+        "BRANCH_WITH_OVERLAP"
+       ]
+      },
+      "state": {
+       "enum": [
+        "FULL",
+        "PARTIAL",
+        "MISSING"
+       ]
+      },
+      "metrics": {
+       "type": "array",
+       "items": {
+        "$schema": "Measure"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      }
+     },
+     "required": [
+      "period",
+      "bucket",
+      "state",
+      "metrics"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
   "getRule": {
    "method": "GET",
    "path": "/workspaces/{workspace_id}/rules/{rule_id}",
@@ -5822,6 +8353,748 @@
       "decision",
       "status",
       "evidence_id"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "getRun": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/runs/{run_id}",
+   "operation": {
+    "operationId": "getRun",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       },
+       "ETag": {
+        "description": "当前对象修订号",
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 32
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "Run"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "Run": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "request": {
+       "$schema": "RunCreate"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "COMPLETED",
+        "COMPLETED_WITH_ISSUES"
+       ]
+      },
+      "baseline_rule_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "candidate_rule_digest": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 64,
+         "maxLength": 64,
+         "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "case_count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "rows": {
+       "type": "array",
+       "items": {
+        "$schema": "RunCaseSummary"
+       },
+       "minItems": 1,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "request",
+      "state",
+      "baseline_rule_digest",
+      "candidate_rule_digest",
+      "case_count",
+      "digest",
+      "evidence_ids",
+      "rows"
+     ],
+     "additionalProperties": false
+    },
+    "RunCreate": {
+     "type": "object",
+     "properties": {
+      "activity_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "case_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 1,
+       "maxItems": 1000
+      },
+      "baseline_rule_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "candidate_rule_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "snapshot_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "activity_id",
+      "case_ids",
+      "baseline_rule_id"
+     ],
+     "additionalProperties": false
+    },
+    "RunCaseSummary": {
+     "type": "object",
+     "properties": {
+      "case_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "case_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "original_status": {
+       "type": "string",
+       "enum": [
+        "MATCH",
+        "DIFF",
+        "MISSING",
+        "NOT_REQUIRED"
+       ]
+      },
+      "first_divergence_event_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "acceptance_eligible": {
+       "type": "boolean"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "case_id",
+      "case_digest",
+      "original_status",
+      "first_divergence_event_id",
+      "acceptance_eligible",
+      "issues"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "getRunCase": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/runs/{run_id}/cases/{case_id}",
+   "operation": {
+    "operationId": "getRunCase",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "RunCase"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "RunCase": {
+     "type": "object",
+     "properties": {
+      "case_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "case_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "original_status": {
+       "type": "string",
+       "enum": [
+        "MATCH",
+        "DIFF",
+        "MISSING",
+        "NOT_REQUIRED"
+       ]
+      },
+      "baseline": {
+       "anyOf": [
+        {
+         "$schema": "Outcome"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "candidate": {
+       "anyOf": [
+        {
+         "$schema": "Outcome"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "baseline_trace": {
+       "type": "array",
+       "items": {
+        "$schema": "TraceStep"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "candidate_trace": {
+       "type": "array",
+       "items": {
+        "$schema": "TraceStep"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "first_divergence_event_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "acceptance_eligible": {
+       "type": "boolean"
+      },
+      "issues": {
+       "type": "array",
+       "items": {
+        "$schema": "Issue"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "case_id",
+      "case_digest",
+      "original_status",
+      "baseline",
+      "candidate",
+      "baseline_trace",
+      "candidate_trace",
+      "first_divergence_event_id",
+      "acceptance_eligible",
+      "issues",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "Outcome": {
+     "type": "object",
+     "properties": {
+      "winner_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 20
+      },
+      "used": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "budget_used_fen": {
+       "anyOf": [
+        {
+         "type": "integer",
+         "minimum": 0,
+         "maximum": 9000000000000
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "coupons": {
+       "type": "array",
+       "items": {
+        "$schema": "CouponRecord"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      },
+      "manual_review": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "winner_ids",
+      "used",
+      "budget_used_fen",
+      "coupons",
+      "manual_review"
+     ],
+     "additionalProperties": false
+    },
+    "CouponRecord": {
+     "type": "object",
+     "properties": {
+      "order_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "net_paid_fen": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "coupon_state": {
+       "type": "string",
+       "enum": [
+        "NONE",
+        "ISSUED",
+        "REDEEMED",
+        "REVOKED",
+        "MANUAL_REVIEW"
+       ]
+      }
+     },
+     "required": [
+      "order_id",
+      "net_paid_fen",
+      "coupon_state"
+     ],
+     "additionalProperties": false
+    },
+    "TraceStep": {
+     "type": "object",
+     "properties": {
+      "event_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "position": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "effect": {
+       "type": "string",
+       "enum": [
+        "APPLIED",
+        "SKIPPED",
+        "MANUAL",
+        "DUPLICATE"
+       ]
+      },
+      "used_delta": {
+       "type": "integer",
+       "minimum": -9000000000000,
+       "maximum": 9000000000000
+      },
+      "budget_delta_fen": {
+       "anyOf": [
+        {
+         "type": "integer",
+         "minimum": -9000000000000,
+         "maximum": 9000000000000
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      }
+     },
+     "required": [
+      "event_id",
+      "position",
+      "at",
+      "code",
+      "effect",
+      "used_delta",
+      "budget_delta_fen",
+      "detail"
+     ],
+     "additionalProperties": false
+    },
+    "Issue": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "location": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "message": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+       ]
+      }
+     },
+     "required": [
+      "code",
+      "location",
+      "message",
+      "severity"
      ],
      "additionalProperties": false
     }
@@ -7936,6 +11209,298 @@
       "decision",
       "status",
       "evidence_id"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  "listRuns": {
+   "method": "GET",
+   "path": "/workspaces/{workspace_id}/runs",
+   "operation": {
+    "operationId": "listRuns",
+    "parameters": [
+     {
+      "name": "workspace_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      }
+     },
+     {
+      "name": "cursor",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 300
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100,
+       "default": 25
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 100
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 60
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "业务结果或受理状态",
+      "headers": {
+       "X-Request-Id": {
+        "schema": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        }
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$schema": "RunSummaryPage"
+        }
+       }
+      }
+     },
+     "400": {
+      "$ref": "#/components/responses/Problem400"
+     },
+     "401": {
+      "$ref": "#/components/responses/Problem401"
+     },
+     "403": {
+      "$ref": "#/components/responses/Problem403"
+     },
+     "404": {
+      "$ref": "#/components/responses/Problem404"
+     },
+     "409": {
+      "$ref": "#/components/responses/Problem409"
+     },
+     "412": {
+      "$ref": "#/components/responses/Problem412"
+     },
+     "413": {
+      "$ref": "#/components/responses/Problem413"
+     },
+     "422": {
+      "$ref": "#/components/responses/Problem422"
+     },
+     "428": {
+      "$ref": "#/components/responses/Problem428"
+     },
+     "429": {
+      "$ref": "#/components/responses/Problem429"
+     },
+     "500": {
+      "$ref": "#/components/responses/Problem500"
+     }
+    }
+   },
+   "schemas": {
+    "RunSummaryPage": {
+     "type": "object",
+     "properties": {
+      "items": {
+       "type": "array",
+       "items": {
+        "$schema": "RunSummary"
+       },
+       "minItems": 0,
+       "maxItems": 100
+      },
+      "next_cursor": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 300
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "items",
+      "next_cursor"
+     ],
+     "additionalProperties": false
+    },
+    "RunSummary": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "revision": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 9007199254740991
+      },
+      "created_at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "request": {
+       "$schema": "RunCreate"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "COMPLETED",
+        "COMPLETED_WITH_ISSUES"
+       ]
+      },
+      "baseline_rule_digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "candidate_rule_digest": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 64,
+         "maxLength": 64,
+         "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "case_count": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 9000000000000
+      },
+      "digest": {
+       "type": "string",
+       "minLength": 64,
+       "maxLength": 64,
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "evidence_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 0,
+       "maxItems": 1000
+      }
+     },
+     "required": [
+      "id",
+      "revision",
+      "created_at",
+      "request",
+      "state",
+      "baseline_rule_digest",
+      "candidate_rule_digest",
+      "case_count",
+      "digest",
+      "evidence_ids"
+     ],
+     "additionalProperties": false
+    },
+    "RunCreate": {
+     "type": "object",
+     "properties": {
+      "activity_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "case_ids": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+       },
+       "minItems": 1,
+       "maxItems": 1000
+      },
+      "baseline_rule_id": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 96,
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+      },
+      "candidate_rule_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "snapshot_id": {
+       "anyOf": [
+        {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 96,
+         "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      }
+     },
+     "required": [
+      "activity_id",
+      "case_ids",
+      "baseline_rule_id"
      ],
      "additionalProperties": false
     }
@@ -10239,6 +13804,12 @@
    "关联复盘显示预约任务，AC-202 显示缺绑定。同银行外部活动号重复明确定位",
    "API 和页面"
   ],
+  "AC-003": [
+   "AC-003",
+   "保存规则草稿，比较两个版本，确认并试编辑",
+   "显示差异字段、条款来源和摘要。确认版不可变，变更通过草稿。旧 ETag 拒绝",
+   "API、审计"
+  ],
   "AC-004": [
    "AC-004",
    "规则门槛、预算、叠加、日期和退款口径分别检查",
@@ -10251,11 +13822,71 @@
    "合成可录入预期，历史有原实测、原规则、初始状态和来源。确认版保持原摘要",
    "API、案例页"
   ],
+  "AC-013": [
+   "AC-013",
+   "跑 15 条黄金案例及确认样本重复运行",
+   "给定同输入同两规则业务摘要一致。批次中非法输入隔离，其他有效行保留。按 case 获取完整轨迹",
+   "运行结果及失败样本"
+  ],
+  "AC-014": [
+   "AC-014",
+   "CP-07、CP-08、SIM-017 并排对比",
+   "CP-07 A 保留、B 撤回，净支付 9500 分。CP-08 B 待人工并保持预算。SIM-017 原赢家 S-201，候选 S-101",
+   "轨迹及账本"
+  ],
+  "AC-015": [
+   "AC-015",
+   "跑 SIM-018、SIM-019 以及缺证据的历史输入",
+   "SIM-018 DIFF 无法保存候选，SIM-019 频控耗尽、赢家空列表。缺证据给补数入口",
+   "状态与动作"
+  ],
+  "AC-016": [
+   "AC-016",
+   "用五个预发向量导入冻结案例",
+   "MATCH、DIFF、MISSING、VERSION_MISMATCH、STALE 逐项正确。人工审阅说明不改变自动判定",
+   "预发与差异"
+  ],
   "AC-017": [
    "AC-017",
    "通过审阅后登记 PRE-101 对应的 REL-101",
    "正式来源、版本、时间和预发同一活动。差异、未审、过期或跨活动不可登记",
    "回执和审计"
+  ],
+  "AC-024": [
+   "AC-024",
+   "默认主样例将假设转化设 45%，再试非法输入",
+   "8640×0.45×0.5＝1944，差 +216。0–1 外报字段错误，缺分母给缺项",
+   "API、试算页"
+  ],
+  "AC-028": [
+   "AC-028",
+   "使用同范围 11 月对 10 月观测，另试缺证据",
+   "1,944 人、+216。保存实际观察，缺证据保留待核。净增量结论需要实验类证据",
+   "复核记录"
+  ],
+  "AC-029": [
+   "AC-029",
+   "重复提交、两个执行者争用、运行中断、取消和重试",
+   "同键同请求同对象，异请求 409。失效租约不能提交。中断后可重试。取消/完成只有一个终态",
+   "作业与 DB"
+  ],
+  "AC-030": [
+   "AC-030",
+   "导出报告、取数、复盘 CSV 和证据 ZIP",
+   "版本、范围、摘要和权限齐全，CSV 字符串公式转义。另一工作区不可访问。旧签认版本可导出",
+   "下载制品及校验"
+  ],
+  "AC-032": [
+   "AC-032",
+   "1440×900 与 1024×768 操作键盘、空页和错误分支",
+   "状态可读，焦点回收，表头和表格滚动正常。数字和缺项不靠颜色区分",
+   "截图、键盘轨迹"
+  ],
+  "AC-034": [
+   "AC-034",
+   "测试过期会话、错误 Host/Origin、跨工作区 ID 和上传失败",
+   "按 401/403/404/413 或 422 返回。隔离、路径、日志和 ETag 证据可查",
+   "HTTP 负例"
   ]
  },
  "pages": {
@@ -10393,6 +14024,56 @@
    "markdown_lines": 43,
    "markdown": "# UI-13 案例输入、实测与预期\n\n路由 `/w/:workspace_id/cases/:case_id`。导航为「仿真与验收」。适用角色为业务审核者、验收人员。需求编号 FR-13。\n\n保留可复跑的事件、初始状态、来源、实测与人工预期。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 左 8 列 | 客户范围、初始状态、事件序列 |\n| 右 4 列 | 期望和原实际、来源、摘要与确认 |\n| 底部 | 提交确认、复制为新修订、加入运行 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 事件 | 序号、类型、时刻、订单或策略、金额/预约 | CaseInput |\n| 结果 | 赢家、占用次数、预算、订单券状态 | Outcome |\n| 关联 | 原规则版本、动作和证据 | Case |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 保存输入及观察 | getCase, updateCase, registerEvidence | 显示字段错误、来源和当前修订 |\n| 确认或复制 | confirmCase, createCase | 确认版本需要摘要。复制使用 parent_case_id |\n| 进入运行 | createRun | 选择当前活动确认的规则和当前案例，带至运行结果 |\n\n## 页面状态与边界\n\n- 历史模式需要实测、原规则和来源。确认为不可变。缺逐笔历史输入时显示取数清单并链接情景估算。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-012、AC-013、AC-015，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-12 场景案例库](UI-12-case-list.md)、[UI-14 运行中心与批量复跑](UI-14-run-list.md)、[UI-15 运行结果、轨迹与验收案例](UI-15-run-result.md)、[UI-20 接触转化情景试算](UI-20-estimate.md)、[UI-24 改进执行与下期复核](UI-24-action-detail.md)。\n"
   },
+  "UI-14": {
+   "meta": {
+    "id": "UI-14",
+    "requirement": "FR-14",
+    "title": "运行中心与批量复跑",
+    "route": "/w/:workspace_id/runs",
+    "path": "ui/UI-14-run-list.md",
+    "operation_ids": [
+     "listRules",
+     "listCases",
+     "createRun",
+     "getJob",
+     "listRuns",
+     "getRun"
+    ],
+    "acceptance": [
+     "AC-013",
+     "AC-029"
+    ]
+   },
+   "markdown_lines": 40,
+   "markdown": "# UI-14 运行中心与批量复跑\n\n路由 `/w/:workspace_id/runs`。导航为「仿真与验收」。适用角色为验收人员。需求编号 FR-14。\n\n选择同活动的确认案例和版本，启动单例或批量仿真并回查结果。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 上方 | 活动、原规则、候选规则与快照 |\n| 全宽 | 案例多选与运行列表，底部主按钮运行 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 运行输入 | 已确认案例 1 至 1000、原版本、候选版本、可选快照 | RunCreate |\n| 历史 | 运行编号、两版、案例数、状态、摘要 | Run |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 选择输入并运行 | listRules, listCases, createRun, getJob | 选择一条即单例，多个为批次。核对摘要后提交 |\n| 查看历史结果 | listRuns, getRun | 默认最近运行在前，点行打开结果 |\n\n## 页面状态与边界\n\n- 混用模板、跨活动和草稿阻止提交。作业中断后从作业中心按原输入重试。切换规则先复查影响案例。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-013、AC-029，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-04 规则版本编辑与对比](UI-04-rule-version.md)、[UI-13 案例输入、实测与预期](UI-13-case-detail.md)、[UI-15 运行结果、轨迹与验收案例](UI-15-run-result.md)、[UI-25 作业状态与恢复](UI-25-jobs.md)。\n"
+  },
+  "UI-15": {
+   "meta": {
+    "id": "UI-15",
+    "requirement": "FR-15",
+    "title": "运行结果、轨迹与验收案例",
+    "route": "/w/:workspace_id/runs/:run_id",
+    "path": "ui/UI-15-run-result.md",
+    "operation_ids": [
+     "getRun",
+     "getRunCase",
+     "getEvidence",
+     "createCandidate",
+     "listCandidates",
+     "createExport",
+     "getJob",
+     "downloadExport"
+    ],
+    "acceptance": [
+     "AC-014",
+     "AC-015",
+     "AC-016",
+     "AC-030"
+    ]
+   },
+   "markdown_lines": 43,
+   "markdown": "# UI-15 运行结果、轨迹与验收案例\n\n路由 `/w/:workspace_id/runs/:run_id`。导航为「仿真与验收」。适用角色为活动策划、验收人员。需求编号 FR-15。\n\n理解哪个事件导致规则结果分歧，保存可移交的候选预期。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 摘要 | 快照、输入、原规则、候选规则及摘要 |\n| 主区 | 左 4 列案例列表，右 8 列双栏结果和轨迹 |\n| 底部 | 验收预期确认、移交及导出 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 单例 | 原规则实测一致性、首个差异事件、两侧赢家或券账本 | RunCase |\n| 逐事件 | 序号、时刻、规则原因、次数和预算增减 | TraceStep |\n| 保存 | 选择 case_id、结果期望、人工说明 | CandidateCreate |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 查看并切案例 | getRun, getRunCase, getEvidence | 获取摘要列表后按案例请求轨迹。对齐同 event_id 并标首个差异，用执行位置展示优先顺序 |\n| 保存验收案例 | createCandidate, listCandidates | 用户核对预期和输入摘要，保存后可在预发页选择 |\n| 导出本次证据 | createExport, getJob, downloadExport | 待制品完成后下载 |\n\n## 页面状态与边界\n\n- 历史原规则 DIFF 或 MISSING、输入错误、待人工处理或候选已失效时显示原因并禁止保存。SIM-017 可移交，SIM-018 原实测不符。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-014、AC-015、AC-016、AC-030，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-13 案例输入、实测与预期](UI-13-case-detail.md)、[UI-16 行内预发结果对照](UI-16-preflight.md)、[UI-26 证据、审计与导出](UI-26-evidence-export.md)。\n"
+  },
   "UI-16": {
    "meta": {
     "id": "UI-16",
@@ -10415,6 +14096,26 @@
    },
    "markdown_lines": 41,
    "markdown": "# UI-16 行内预发结果对照\n\n路由 `/w/:workspace_id/preflight`。导航为「仿真与验收」。适用角色为验收人员、业务审核者。需求编号 FR-16。\n\n把行内预发的实际结果逐例对照冻结的预期并记录审阅。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 上方 | 活动、候选集合、预发来源和选择批次 |\n| 全宽结果 | 候选、原与候选摘要、预期、实际、差异、状态 |\n| 右侧抽屉 | 差异路径和来源证据 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 导入 | 选择案例集、批次、观察时刻、实际结果和原证据 | PreflightCreate |\n| 判定 | 一致、差异、缺项、版本不符、待复测 | Preflight.rows |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 创建预发记录 | listCandidates, registerEvidence, createPreflight | 粘贴结构化 JSON 或从文件读取到表单，服务器重新核验 |\n| 审阅结果 | listPreflights, getPreflight, reviewPreflight | 提交当前摘要和说明。通过后前往活动详情登记回执 |\n\n## 页面状态与边界\n\n- 缺观察为 MISSING，摘要不同为 VERSION_MISMATCH，候选过期为 STALE。人工说明只补证据，结果由服务端重新判定。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-016、AC-017，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-03 活动详情与版本回执](UI-03-activity-detail.md)、[UI-15 运行结果、轨迹与验收案例](UI-15-run-result.md)、[UI-24 改进执行与下期复核](UI-24-action-detail.md)。\n"
+  },
+  "UI-20": {
+   "meta": {
+    "id": "UI-20",
+    "requirement": "FR-20",
+    "title": "接触转化情景试算",
+    "route": "/w/:workspace_id/estimate",
+    "path": "ui/UI-20-estimate.md",
+    "operation_ids": [
+     "getReview",
+     "computeEstimate",
+     "getEvidence"
+    ],
+    "acceptance": [
+     "AC-024",
+     "AC-028"
+    ]
+   },
+   "markdown_lines": 40,
+   "markdown": "# UI-20 接触转化情景试算\n\n路由 `/w/:workspace_id/estimate`。导航为「仿真与验收」。适用角色为渠道运营。需求编号 FR-20。\n\n用汇总数据估算假设转化率对应人数和差值。\n\n## 页面结构\n\n| 区域 | 布局与内容 |\n|---|---|\n| 上方 | 固定复盘、快照、期间和渠道 |\n| 两列 | 左 5 列公式及转化假设，右 7 列原值、试算、差值 |\n\n使用 [公共页面规范](COMMON.md) 的 12 列、状态、键盘与证据抽屉。下表以服务端模型为数据来源。\n\n## 字段和绑定\n\n| 区域 | 字段 | 接口模型 |\n|---|---|---|\n| 输入 | 复盘结果、接触层间率 0 到 100% | EstimateCreate，传输转 0 到 1 |\n| 结果 | 已执行、固定末层率、原有效、试算精确值和取整人数 | Estimate |\n\n## 操作、接口与反馈\n\n| 动作 | operationId | 提交和反馈 |\n|---|---|---|\n| 运行估算 | getReview, computeEstimate | 输入 45% 得 1,944，比 1,728 多 216，标明条件试算 |\n| 核对来源 | getEvidence | 展开分母与范围，可转案例库进行逐笔验证 |\n\n## 页面状态与边界\n\n- 固定层率或已执行缺失时展示所需数据。观察与试算来自不同证据类型。\n- 首载、空结果、失败、版本变化和权限状态采用公共页面规范。详情和制品以当前工作区校验结果为准。\n\n## 验收与衔接\n\n按 [验收计划](../qa/ACCEPTANCE.md) 核对 AC-024、AC-028，记录页面实际状态、接口结果、证据引用和失败分支。\n\n衔接页面为 [UI-13 案例输入、实测与预期](UI-13-case-detail.md)、[UI-17 策略复盘工作台](UI-17-strategy-review.md)、[UI-24 改进执行与下期复核](UI-24-action-detail.md)。\n"
   }
  },
  "truncated_schemas": []
