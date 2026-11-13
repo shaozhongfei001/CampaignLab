@@ -271,7 +271,7 @@ def test_artifact_public_surface_matches_frozen_design() -> None:
 
 
 def test_artifact_exported_symbols_cover_the_frozen_list() -> None:
-    """design §9 给 S3 点名的符号必须全部导出（外加一个 id 前缀常量）。"""
+    """design §9 给 S3 点名的符号必须全部导出；多出项白名单见下（A157 追加 hash_file）。"""
     expected = {
         "ARTIFACT_KIND_JOB_RESULT",
         "TMP_STALE_SECONDS",
@@ -286,7 +286,9 @@ def test_artifact_exported_symbols_cover_the_frozen_list() -> None:
     }
     exported = set(artifacts_module_all())
     assert expected <= exported, f"冻结符号缺失：{sorted(expected - exported)}"
-    assert exported - expected == {"ARTIFACT_ID_PREFIX"}
+    #: A157：``_hash_file`` 提升为公共 ``hash_file`` 并进 ``__all__``，故多出项白名单追加
+    #: 一个符号。这是**追加式**放宽：上面的 ``expected`` 冻结集合与下面各条判据一字未改。
+    assert exported - expected == {"ARTIFACT_ID_PREFIX", "hash_file"}
     for name in ("begin", "commit", "verify_same_filesystem"):
         assert callable(getattr(ArtifactWriter, name))
     for symbol in (AttemptStage, ArtifactWriter, CommittedArtifact, SweepReport):

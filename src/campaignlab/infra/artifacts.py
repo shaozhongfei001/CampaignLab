@@ -61,6 +61,7 @@ __all__ = [
     "AttemptStage",
     "CommittedArtifact",
     "SweepReport",
+    "hash_file",
     "relative_path_for",
     "results_root",
     "stage_root",
@@ -155,12 +156,17 @@ def relative_path_for(*, kind: str, workspace_id: str, sha256: str) -> str:
     return "/".join((_RESULTS_DIRNAME, token, workspace_id, digest[:_SHA256_PREFIX_LENGTH], digest))
 
 
-def _hash_file(path: Path, *, chunk_size: int = _HASH_CHUNK_BYTES) -> tuple[str, int]:
+def hash_file(path: Path, *, chunk_size: int = _HASH_CHUNK_BYTES) -> tuple[str, int]:
     """流式算一个已落盘文件的 ``(sha256, byte_size)``。
 
-    刻意不做成公开符号：design §9 给 S3 划定的符号面里没有它。M0-04/S2b 的
-    ``worker/integrity.py::verify_artifact_index`` 需要同一能力，是否把它提升为公共件
-    已作为裁定项上交编排器（禁自行扩冻结面）。
+    **A157：本符号是公共件**（原名 ``_hash_file``；签名、参数序与返回类型一字未改，
+    且**不保留**私有别名 —— 禁两份入口）。提升理由是口径唯一性：M0-04/S2b 的
+    ``worker/integrity.py::verify_artifact_index`` 的语义即「与写入侧**同口径**复核」，
+    复核方若自己另写一遍分块读 + ``sha256`` 累加，摘要就有了两个实现，二者必然在
+    chunk 边界与空文件处置上漂移；而漂移的表现形式恰好是「校验静默失配」这种最难查
+    的形态。**口径分叉等于校验失效**，故写入侧与复核侧必须调用同一个函数。提升方向
+    是 ``worker → infra``（正确方向），不新增反向边；依 A151，design §9 的符号清单是
+    **下限而非上限**，故本次提升不越冻结面。
     """
     hasher = hashlib.sha256()
     total = 0
@@ -615,7 +621,7 @@ class ArtifactWriter:
     ) -> bool:
         """把暂存件搬到内容寻址的终态路径。返回 ``True`` 表示复用了既有终态文件。"""
         if final_path.exists():
-            actual_digest, actual_size = _hash_file(final_path)
+            actual_digest, actual_size = hash_file(final_path)
             if actual_size != byte_size or actual_digest != digest:
                 raise ArtifactCommitFailed(
                     "终态路径上已有不同内容的文件，拒绝覆盖（内容寻址冲突或受控目录被污染）："
