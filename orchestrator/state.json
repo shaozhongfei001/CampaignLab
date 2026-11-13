@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T09:41:17+08:00",
+  "updated_at": "2026-11-13T09:47:18+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -3645,9 +3645,25 @@
         "status": "IN_FLIGHT",
         "dispatched_at": null,
         "dispatched_at_note": "前序会话派出，未写回 state.json 即中断；无计量留痕，按纪律记 null（禁估算）。在飞事实由接管后 wait_agent(timeout=20s)→timed_out=true 实测证明。",
-        "verified_in_flight_at": "2026-11-13T09:41:17+08:00",
+        "verified_in_flight_at": "2026-11-13T09:47:18+08:00",
         "write_scope": "src/campaignlab/**（含 api/deps.py、api/app.py、cli.py，A40 扩围；禁改已冻结签名）、tests/unit/<新增>、evidence/M0/M0-02/**",
         "exit_condition": "doctor rc=0 且 WARN worker 项消失；api/deps.py 内 NotImplementedError 计数=0；lease_until 赋值只在 application/worker.py；jobs 表 INSERT/UPDATE 只在 repositories.py；既有 166 用例一个不少"
+      },
+      {
+        "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
+        "nickname": "Planck",
+        "lane": "T",
+        "task": "D-016-batch4",
+        "subtask": "补 3 张任务卡 M4-P01/M5-01/M5-02 + KNOWN_MISSING 9->6（numstat 必须 0\\t3）",
+        "tier": "qwen3.8-flash",
+        "est_tokens_planned": 40000,
+        "loop_cap": 2,
+        "dispatched_at": "2026-11-13T09:47:18+08:00",
+        "instance": "NEW",
+        "entry_doc": "orchestrator/handoff/D-016-batch4-rules.md",
+        "status_at_this_commit": "IN_FLIGHT",
+        "exit_condition": "head<=60/tail<=40/total<=200/表头逐字四列/REQUIRED_SECTIONS 四节齐备；自算切片指纹与 rules 第8节全等；纯 python3 复现三守护断言且 23+6==29；numstat==0\\t3；工具链调用 0 次；未做 git 写；U 项照实上交不自裁",
+        "hard_forbids": "禁 git 写、禁 sudo、禁 pytest/mypy/ruff/uv/npm/node/vite/vitest/playwright、禁整读 openapi.json 与 state.json 与任何 slice 全文、禁碰 S lane 在飞的 src/campaignlab/** 未跟踪文件"
       }
     ],
     "dispatch_requirements": [
@@ -4490,8 +4506,8 @@
           "deferred_to": "S3d 回收提交 + 批次4 回收提交（两次独立复验，编排器亲自实跑全表）",
           "measured_at": "2026-11-13T09:41:17+08:00"
         },
-        "predispatch_commit": "PENDING(本条)",
-        "predispatch_commit_note": "本提交（批次4 素材 7 文件 + state.json）落库后，由下一条 dispatch 记录提交回填真实短哈希"
+        "predispatch_commit": "76cf311",
+        "predispatch_commit_note": "已回填：76cf311（chore(orchestrator): Round 6 predispatch 治理提交），已推送 origin/m0-framework，push 后 behind/ahead=0/0；8 路径 = 批次4 素材 7 文件 + state.json（git show --stat 实测 6350 insertions / 24 deletions）。原占位文字见 resume.commit_backfill_round6 的 backfill_due 说明。"
       }
     },
     "d004_d005_commit": "1f5912e",
@@ -4979,21 +4995,25 @@
             "dispatched_at_note": "前序会话派出，无计量留痕，记 null（禁估算）",
             "instance": "NEW（Round5 的 Hilbert 已关闭不得续用）",
             "status_at_this_commit": "IN_FLIGHT（wait_agent timed_out 实测）"
-          }
-        ],
-        "pending_dispatch_this_round": [
+          },
           {
+            "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
+            "nickname": "Planck",
             "lane": "T",
             "task": "D-016-batch4",
-            "nickname": "待 spawn 后回填",
-            "subtask": "补 3 张任务卡 M4-P01/M5-01/M5-02 + KNOWN_MISSING 9->6",
+            "subtask": "补 3 张任务卡 M4-P01/M5-01/M5-02 + KNOWN_MISSING 9->6（numstat 必须 0\\t3）",
             "tier": "qwen3.8-flash",
             "est_tokens_planned": 40000,
             "loop_cap": 2,
+            "dispatched_at": "2026-11-13T09:47:18+08:00",
+            "instance": "NEW",
             "entry_doc": "orchestrator/handoff/D-016-batch4-rules.md",
-            "note": "本 predispatch 提交推送后立即 spawn；agent_id 与 dispatch 记录随下一条提交回填（沿用 Round 5 的 predispatch_commit/dispatch_commit 两段式）"
+            "status_at_this_commit": "IN_FLIGHT",
+            "exit_condition": "head<=60/tail<=40/total<=200/表头逐字四列/REQUIRED_SECTIONS 四节齐备；自算切片指纹与 rules 第8节全等；纯 python3 复现三守护断言且 23+6==29；numstat==0\\t3；工具链调用 0 次；未做 git 写；U 项照实上交不自裁",
+            "hard_forbids": "禁 git 写、禁 sudo、禁 pytest/mypy/ruff/uv/npm/node/vite/vitest/playwright、禁整读 openapi.json 与 state.json 与任何 slice 全文、禁碰 S lane 在飞的 src/campaignlab/** 未跟踪文件"
           }
         ],
+        "pending_dispatch_this_round": [],
         "write_scope_disjoint": true,
         "disjoint_proof": "S lane(Godel) 只写 src/campaignlab/**（含 api/deps.py、api/app.py、cli.py、application/worker.py、infra/repositories.py）、tests/unit/<自己的新文件>、evidence/M0/M0-02/**；T lane(批次4) 只写 orchestrator/tasks/{M4-P01,M5-01,M5-02}.md（新建）与 tests/unit/test_task_cards.py（仅删 KNOWN_MISSING 3 行）。唯一潜在交叠 tests/unit/** 已按 Round 5 同一手法显式切分：T 只准改 test_task_cards.py 一个既有文件、S 只准新增自己的测试文件不得改既有测试。orchestrator/state.json、orchestrator/handoff/*.slice.json 与 git 写权限由编排器独占。",
         "toolchain_isolation": "S lane 独占 .venv（uv/pytest/mypy/ruff），禁跑任何 npm/node/vite/vitest；T lane 禁跑全部构建/测试工具链，自检一律用系统 python3 标准库（NOTE-10 假红规避）。编排器在两 lane 任一在飞期间禁跑工具链，全表复跑推迟到双双回收后。",
@@ -5047,9 +5067,14 @@
           "D-016 批次5": "M1-04/M2-04/M3-04 预抽，须待批次4 回收入库（避免同时改 test_task_cards.py）→ Round 7 候选",
           "wave5 L1": "D-022 仍 pending_owner（最迟 wave5 派单前裁定）"
         },
-        "predispatch_commit": "PENDING(本条)",
+        "predispatch_commit": "76cf311",
         "batch4_predispatch_ref": "resume.dispatch_preconditions.round6.batch4_predispatch",
-        "gates_ref": "resume.dispatch_preconditions.round6.gates_run_at_predispatch"
+        "gates_ref": "resume.dispatch_preconditions.round6.gates_run_at_predispatch",
+        "pending_dispatch_fulfilled_at": "2026-11-13T09:47:18+08:00",
+        "dispatch_commit": "PENDING(本条)",
+        "dispatch_commit_note": "本条 = Round 6 dispatch 记录提交；predispatch_commit 已回填为 76cf311",
+        "at_dispatch": "2026-11-13T09:47:18+08:00",
+        "mode_actual": "parallel-2-lanes 已成型：S/M0-02-S3d(Godel, qwen3.8-max, high, 40k, loop<=2) ∥ T/D-016批次4(Planck, qwen3.8-flash, 40k, loop<=2)"
       }
     ],
     "q_verify": {
@@ -6384,7 +6409,7 @@
       ],
       "conclusion": "Round 5 三槽全部释放，Round 6 可用槽 >=2（手册 §15.11 满足）"
     },
-    "in_flight_agents_note_round6": "接管更正：state.json 原 in_flight_agents=[] 与事实不符——S lane(Godel/S3d) 实际在飞。本条据 wait_agent 实测补录（原 note 保留不改写）。Round 6 采 2 lane 并行：S/S3d(max，已在飞) ∥ T/D-016批次4(flash，本提交后派)。"
+    "in_flight_agents_note_round6": "接管更正：state.json 原 in_flight_agents=[] 与事实不符——S lane(Godel/S3d) 实际在飞，已于 predispatch 提交 76cf311 补录。本条（dispatch 记录提交）追加 T lane(Planck/D-016批次4)，Round 6 双 lane 并行成型。两 lane 写集不相交（S 只写 src/campaignlab/**+tests/unit/<新增>+evidence/M0/M0-02/**；T 只写 orchestrator/tasks/{M4-P01,M5-01,M5-02}.md + tests/unit/test_task_cards.py 的 3 行删除），工具链不争用（S 独占 .venv，T 纯 python3）。编排器在两 lane 任一在飞期间禁跑工具链（NOTE-10）。"
   },
   "acceptance": {
     "baseline_total": 35,
