@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-14T07:06:37+08:00",
+  "updated_at": "2026-11-14T07:31:25+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1082,7 +1082,7 @@
         "nickname": "Huygens",
         "agent_id": "01a1d70a-1cb5-78b3-9db6-6209ea068490",
         "round": 12,
-        "commit": "PENDING(本提交)"
+        "commit": "51af733"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -5761,7 +5761,41 @@
       "⑦ 每次回收后程序化重算 flash_share（units=subtask_count or 1；dev=task.startswith('M')），wave2 出口复核两护栏，禁为凑配比降档",
       "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "lane": "X",
+        "nickname": "Mill",
+        "agent_id": "01a1d70a-d4d8-75b3-8fc3-dd67c14405c4",
+        "task": "GOVERNANCE",
+        "subtask": "FU-33 / D-041 / D-042①",
+        "tier": "qwen3.8-max",
+        "reasoning": "high",
+        "status": "in_flight",
+        "dispatched_round": 12
+      },
+      {
+        "lane": "Y",
+        "nickname": "Mendel",
+        "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
+        "task": "M0-04",
+        "subtask": "S2b-2",
+        "tier": "qwen3.8-max",
+        "reasoning": "high",
+        "status": "in_flight",
+        "dispatched_round": 13
+      },
+      {
+        "lane": "Z",
+        "nickname": "PENDING(派单后回填)",
+        "agent_id": "PENDING(派单后回填)",
+        "task": "M2-01",
+        "subtask": "S1",
+        "tier": "qwen3.8-max",
+        "reasoning": "high",
+        "status": "pending_spawn",
+        "dispatched_round": 13
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -6274,7 +6308,7 @@
       "counts": {
         "pytest_passed": 490,
         "mypy_source_files": 80,
-        "ruff_formatted_files": 230,
+        "ruff_formatted_files": 234,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -6283,17 +6317,17 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 230,
+          "total": 234,
           "in_scope_py": 82,
-          "in_scope_md": 148,
+          "in_scope_md": 152,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-14T07:06:37+08:00",
+          "measured_after": "2026-11-14T07:31:25+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。 || R12 追加（append-only，不改上文）：待提交树 tracked 229（py 82 + md 147），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 229 于冻结索引树上成立；本次新增 scripts/orch_harness.py（编排器提交工装，1 py）+ 两份 R12 派单文 + D-042（3 md）。 || R12-W 追加（append-only，不改上文）：待提交树 tracked 230（py 82 + md 148），恒等式 tracked(py+md) + untracked(lane X 在飞件，不计入分母) == ruff format --check 报数 230 于**冻结索引树**上成立（R11-3）。本次新增 evidence/M0/FU-29/commands.md（1 md）；同目录的 positive-control.log / symbols.txt / diff-stat.txt 三个非 py/md 后缀**不入分母**；4 个 .py 均为**修改**既有文件，故 py 分母 82 不变、mypy 80 不变、pytest 490 不变（test_layering_edges.py 用例数 8→8）。",
+          "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。 || R12 追加（append-only，不改上文）：待提交树 tracked 229（py 82 + md 147），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 229 于冻结索引树上成立；本次新增 scripts/orch_harness.py（编排器提交工装，1 py）+ 两份 R12 派单文 + D-042（3 md）。 || R12-W 追加（append-only，不改上文）：待提交树 tracked 230（py 82 + md 148），恒等式 tracked(py+md) + untracked(lane X 在飞件，不计入分母) == ruff format --check 报数 230 于**冻结索引树**上成立（R11-3）。本次新增 evidence/M0/FU-29/commands.md（1 md）；同目录的 positive-control.log / symbols.txt / diff-stat.txt 三个非 py/md 后缀**不入分母**；4 个 .py 均为**修改**既有文件，故 py 分母 82 不变、mypy 80 不变、pytest 490 不变（test_layering_edges.py 用例数 8→8）。 || R13 追加（append-only，不改上文）：待提交树 tracked 234（py 82 + md 152），恒等式 tracked(py+md) + untracked(lane X/Y/Z 在飞件，不计入分母) == ruff format --check 报数 234 于**冻结索引树**上成立（R11-3）。本次新增 4 件 .md（1 份公共纪律段 + 2 份派单文 + 1 份原始回执归档），零 .py，故 mypy 80 / pytest 490 不变。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "本提交入库 1 件新 in-scope .py（tests/unit/test_layering_edges.py）、2 件新 in-scope .md（evidence/M0/M0-04/{s2b1-hash-file,commands-s2b1}.md），并修改 2 件既有 in-scope .py（src/campaignlab/infra/artifacts.py、tests/unit/test_artifacts.py，不改变分母）",
@@ -6510,8 +6544,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T07:06:37+08:00",
-        "counts_refresh_reason": "R12-W：lane W（Huygens）交付 FU-29，编排器逐项独立复验全绿后入库。新增 1 个 in-scope .md （evidence/M0/FU-29/commands.md）-> ruff 分母 229->230（py 82 不变、md 147->148）；mypy 80 不变（**零新增 .py**，4 个 .py 均为修改既有文件；lane 用 `mypy --exclude tests/unit/test_task_cards_complete.py` 反证为 80，编排器在冻结索引树上复证实测 80）；pytest 490 不变（冻结树 469 passed + GIT_ENV_IGNORES 静态收集 21）。counts 与新增文件同一次提交刷新（A101 / rule_counts_same_commit）。**卡片三键仍刻意不动**（20/9，D-042）：依 D-042 §6① 必须与 lane X 的三张新卡同批校正为 29/0/29。",
+        "counts_refreshed_at": "2026-11-14T07:31:25+08:00",
+        "counts_refresh_reason": "R13 派单前提交：新增 4 件 in-scope .md（LANE-COMMON.md、R13-lane-Y-M0-04-S2b-2.md、R13-lane-Z-M2-01-S1.md、round12-lane-W-return-raw.md），ruff 分母 230→234（md 148→152）；本批零 .py，故 mypy 80 与 pytest 490 实测不变。冻结索引树实测值，非静态推算。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -6650,6 +6684,15 @@
           "pytest_passed": 490,
           "mypy_source_files": 80,
           "counts_refreshed_at": "2026-11-14T06:29:57+08:00"
+        },
+        "previous_values_last": {
+          "ruff_formatted_files": 230
+        },
+        "previous_values_R13": {
+          "ruff_formatted_files": 230,
+          "in_scope_md": 148,
+          "in_scope_py": 82,
+          "total": 230
         }
       },
       "denominator_history": [
@@ -10002,7 +10045,7 @@
         ],
         "closed_at": "2026-11-14T07:06:37+08:00",
         "closed_by": "lane W（Huygens，qwen3.8-max/high）· 编排器逐项独立复验全绿后入库",
-        "closed_commit": "PENDING(本提交)",
+        "closed_commit": "51af733",
         "resolution": "ArtifactCommitFailed 的定义下沉 src/campaignlab/domain/errors.py（numstat 26/0，纯追加、零删除行）；worker/errors.py 改 import 后 re-export，__all__ 7 项逐字且顺序不变（mypy strict 的 no_implicit_reexport 下靠 __all__ 才算显式再导出，故这是功能件）；infra/artifacts.py 的 import 改指 domain.errors 并按 ruff I001 重排（最小 diff 1/1，5 个 raise 点与 L13 docstring 与 HEAD byte-equal）；tests/unit/test_layering_edges.py 的 ALLOWED_INFRA_TO_WORKER_EDGES 收紧为 frozenset()（仍为模块顶层恰好一次 AnnAssign），两条前提失效的用例按 A182 重写为「零反向边」语义并以 _probe_repo(tmp_path) 保留正向对照，其余 6 条用例 AST 逐字未动，用例数 8→8。编排器实测：全仓 infra→worker 反向边 = 0，A153 的分层倒置已消除。",
         "verified_by_orchestrator": "不采信 lane 自报（rule_no_trust_handoff_summary_assertions）：numstat 四文件逐字相符；6 个 hard_deny 文件 `git diff --quiet HEAD` 全 rc=0；inspect 实取 domain.__all__=18 / worker.__all__=7 逐字同 HEAD / same_obj=True / default_code=INTERNAL_ERROR / PROBLEM_CODES=20 / ArtifactCommitFailed.__module__=campaignlab.domain.errors / LeaseLost.__module__ 仍 campaignlab.worker.errors / DomainError.__subclasses__=15；positive-control.log 实测含 2 failed 的 RED 与 8 passed 的复原，且 RED 点名精确边 (54, 'campaignlab.worker.errors', 0)；8 个产出文件编码三性全 OK；工作树每一处改动都能归属到 lane W 或 lane X，无第三来源。"
       },
@@ -14131,7 +14174,9 @@
             "scripts/"
           ],
           "tier_basis": "手册 §6.3 硬规则命中两条：① 改动落在 public_frozen 面（domain/errors.py 的 __all__ 与 worker/errors.py 的公开符号集，均要求逐字不变）；② 要改的是**分层守护的判据本身**（test_layering_edges.py 的白名单收紧 + 两条用例重写），判据错一处即让 A153 的裁定失去执行点。R10-4 纠正措施①（输入含冻结面者一律 max）同样命中。",
-          "agent_id": "PENDING(派单后回填)"
+          "agent_id": "01a1d70a-1cb5-78b3-9db6-6209ea068490",
+          "nickname": "Huygens",
+          "dispatched": true
         },
         {
           "lane": "X",
@@ -14164,12 +14209,16 @@
             "docs/"
           ],
           "tier_basis": "手册 §6.3：产出物是**新守护的判据设计**（双向集合相等 + 台账三键对账 + tmp_path 正向对照），且三张卡要为 wave7/9/10 的关键路径任务（M5-P01、M5-03 均 critical=true）定义拆解表 —— §15.5「无拆解表不得 spawn」使卡的质量直接决定后续能否派单。C3（不确定性）= 3：需在 D-041、state.json 台账、两份 spec 与 26 张既有卡之间推断体例。故 max。",
-          "agent_id": "PENDING(派单后回填)"
+          "agent_id": "01a1d70a-d4d8-75b3-8fc3-dd67c14405c4",
+          "nickname": "Mill",
+          "dispatched": true
         }
       ],
       "concurrency_note": "两 lane 写集经编排器逐件比对**完全不相交**（W 全在 src/tests 的 errors+layering 面，X 全在 orchestrator/tasks + task_cards 守护面），故可并行（手册 §5：同 wave 内开发 lane <= 3）。两者共享同一工作树，故双方派单文均载「在飞污染警告 + 一律路径限定自验」（A161：复验方对在飞面禁写）。",
       "counts_note": "本提交新增 1 个 .py（scripts/orch_harness.py）+ 3 个 .md（两份派单文 + D-042）：ruff 分母 225->229（py 81->82、md 144->147）、mypy 79->80、pytest 490 不变（无新增用例）。卡片三键（task_cards_on_disk/known_missing_cards）**本提交不动**，依 D-042 §6① 必须与 lane X 的三张新卡同批校正，否则会重演「错开半个提交」的腐化。",
-      "commit": "PENDING(本提交)"
+      "commit": "ce08975",
+      "commit_backfilled_at": "2026-11-14T07:31:25+08:00",
+      "commit_backfill_note": "R13 回填：本条立账时写的是 PENDING(本提交)，实际入库 sha = ce08975；同批回填 lanes 内 W/X 的 agent_id（立账时写的是 PENDING(派单后回填)）。"
     },
     "round12_self_corrections": [
       {
@@ -14262,6 +14311,103 @@
       "in_flight_contamination_reported": [
         "tests/unit/test_task_cards_complete.py（lane X 未入库 .py）—— 正是 lane W 全表 mypy 报 81 而非 80、ruff format 报 230 而非 229 的唯一原因；lane 用 --exclude 反证自身零新增 .py，判定正确，未去修（A161）",
         "orchestrator/tasks/M5-03.md（lane X 正在写）"
+      ],
+      "commit": "51af733"
+    },
+    "in_flight_agents_note_round13": "R13 派发面：X（FU-33 治理卡面，R12 遗留，仍在飞）+ Y（M0-04/S2b-2）+ Z（M2-01/S1 设计）。lane W（Huygens / FU-29）已 PASS 并于 51af733 入库，其原始回执已归档 orchestrator/handoff/round12-lane-W-return-raw.md，槽位已 close_agent 释放 —— R12 末实测：未关闭已完成 lane 会撞 spawn 线程上限，导致 lane Z 派不出去。三条 lane 写集逐件比对不相交（见 round13_predispatch.concurrency_note）。",
+    "round13_predispatch": {
+      "at": "2026-11-14T07:31:25+08:00",
+      "round": 13,
+      "wave": 2,
+      "mode": "parallel-3-lanes",
+      "as_of_head": "51af733",
+      "branch": "m0-framework",
+      "worktree_at_dispatch": "非干净：lane X（FU-33：3 张卡 + test_task_cards_complete.py + test_task_cards.py 修改 + evidence/M0/FU-33/）与 lane Y（M0-04/S2b-2）在飞。故本批只显式 git add 4 件派单文 + state.json，门禁一律跑冻结索引树（R11-3），A144(c) 用 owner_map 逐件归属在飞件。",
+      "baseline_reproduced_by_new_instance": {
+        "measured_at": "2026-11-14T07:31:25+08:00",
+        "method": "第 5 次接管的新实例从磁盘实测（rule_no_trust_handoff_summary_assertions）：不采信交接摘要里的计数，一律用 scripts/orch_harness.py 现跑。",
+        "head_before_this_commit": "51af733",
+        "commits_total": 93,
+        "tracked_in_scope_before": "py 82 + md 148 = 230",
+        "ruff_format_check_before": "rc=0 / 230 files already formatted",
+        "mypy_before": "rc=0 / 80 source files",
+        "pytest_before": "490（冻结树口径 = 469 frozen + 21 GIT_ENV_IGNORES 静态收集）",
+        "predispatch_files_ruff": "rc=0 / 4 files already formatted（4 件派单文入库前单独实测）",
+        "live_contract": "contracts/openapi.json sha16=592571099d638251 / bytes=443309 / info.version=1.0.1 / registered_nodes=13（与 M2-01.slice.json、M0-04.slice.json 的 source.openapi 逐字相同，即两份切片均为 CR-002 之后的新鲜切片）"
+      },
+      "slot_management": {
+        "problem": "R12 末 lane Z 首次 spawn 失败：agent thread limit reached。根因 = 已完成的 lane W （Huygens）从未 close_agent，占着并发槽。",
+        "action": "R13 开工第一步：先归档 lane W 原始回执（round12-lane-W-return-raw.md，本提交入库），再 close_agent(01a1d70a-1cb5-78b3-9db6-6209ea068490) 释放槽位，然后才 spawn lane Z。",
+        "rule": "每条 lane 一旦回执归档 + 交付入库 + 独立复验通过，必须立即 close_agent；禁把已完成 lane 挂着当「上下文」用（要复用走 resume_agent）。",
+        "closed_at": "2026-11-14T07:31:25+08:00"
+      },
+      "lanes": [
+        {
+          "lane": "X",
+          "task": "GOVERNANCE",
+          "subtask": "FU-33 / D-041（补 3 张卡 + 完整性守护）+ D-042 §6①（卡片三键校正）",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R12-lane-X-FU-33.md",
+          "critical": true,
+          "loop_cap": 2,
+          "agent_id": "01a1d70a-d4d8-75b3-8fc3-dd67c14405c4",
+          "nickname": "Mill",
+          "status": "in_flight(R12 派发，R13 未重派)",
+          "carry_obligation": "D-042 §6① 的卡片三键校正（task_cards_on_disk 20→29、known_missing_cards 9→0、task_card_identity 改写）必须与 3 张新卡在**同一次提交**内完成，由编排器在落地 lane X 的那次 run_commit 里 mutate；lane X 自身无 orchestrator/state.json 写权。"
+        },
+        {
+          "lane": "Y",
+          "task": "M0-04",
+          "subtask": "S2b-2",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R13-lane-Y-M0-04-S2b-2.md",
+          "critical": true,
+          "loop_cap": 2,
+          "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
+          "nickname": "Mendel",
+          "status": "in_flight",
+          "write_set": [
+            "src/campaignlab/worker/integrity.py",
+            "src/campaignlab/worker/deps.py",
+            "tests/unit/test_worker_integrity.py",
+            "tests/integration/jobs/test_worker_deps.py",
+            "evidence/M0/M0-04/"
+          ],
+          "next_serial": "S2c（qwen3.8-max）→ S4/S5/S6/S8（qwen3.8-flash）",
+          "known_brief_inconsistency": "该派单文 §0 把 lane Z 的写集写成 domain/activity/ + api/{activities,rules}.py，而 R13 实际把 lane Z 收窄为**只产设计文档**（M2-01/S1）。不构成判红：Y 的自验一律路径限定（LANE-COMMON §4），且两 lane 写集仍不相交。已在 Z 的派单消息里显式给出真实写集，Y 回执后编排器复验时按真实写集比对。"
+        },
+        {
+          "lane": "Z",
+          "task": "M2-01",
+          "subtask": "S1（设计冻结件，禁写实现码）",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R13-lane-Z-M2-01-S1.md",
+          "critical": false,
+          "slack": 4,
+          "loop_cap": 3,
+          "agent_id": "PENDING(派单后回填)",
+          "nickname": "PENDING(派单后回填)",
+          "status": "pending_spawn",
+          "write_set": [
+            "orchestrator/handoff/M2-01-design.md"
+          ],
+          "hard_bans": [
+            "禁发明 status 查询参数（CR-002 选项 B / ADR-006 §4.7；切片实测 listActivities 只有 cursor/limit）",
+            "禁改 contracts/** 与 spec/**；PROBLEM_CODES 钉死 20 码、api/common.py.__all__ 钉死 51 项，确需变更一律报 U 项走 §7",
+            "每条字段/取值断言必须可复跑地指向 M2-01.slice.json 的 operations.<opId>.schemas.* 路径，禁写「按惯例应该是」"
+          ],
+          "next_serial": "S2（qwen3.8-max）→ S3–S7（qwen3.8-flash，依任务卡第 42 行起的档位表）"
+        }
+      ],
+      "concurrency_note": "3 条 lane 写集逐件比对**完全不相交**：X = orchestrator/tasks/{M3-P02,M5-P01,M5-03}.md + tests/unit/test_task_cards{,_complete}.py + evidence/M0/FU-33/；Y = src/campaignlab/worker/{integrity,deps}.py + tests/unit/test_worker_integrity.py + tests/integration/jobs/test_worker_deps.py + evidence/M0/M0-04/；Z = orchestrator/handoff/M2-01-design.md 一件。三者与本轮编排器自办的 4 件派单文亦不相交。并发上限 3 条开发 lane（手册 §5.4），本轮正好占满。共享同一工作树 ⇒ 各 lane 自验一律路径限定，全表门禁只由编排器在冻结索引树上跑（LANE-COMMON §4）。",
+      "counts_note": "本提交新增 4 件 in-scope .md、零 .py：ruff_formatted_files 230→234（in_scope_md 148→152、in_scope_py 82 不变），mypy_source_files 80 不变，pytest_passed 490 不变。均由 run_commit 在冻结索引树上实测后与预测值逐条对账通过才允许提交。",
+      "pending_backfill": [
+        "resume.round13_predispatch.commit → 本提交 sha（下一次落地提交时回填）",
+        "resume.round13_predispatch.lanes[lane=Z].agent_id / nickname → spawn 后回填",
+        "resume.in_flight_agents[lane=Z].agent_id / nickname → 同上"
       ],
       "commit": "PENDING(本提交)"
     }
