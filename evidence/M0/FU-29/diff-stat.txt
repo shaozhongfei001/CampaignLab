@@ -1,0 +1,41 @@
+=== FU-29 diff-stat.txt : git diff vs HEAD ce08975, scoped to lane W write_set ===
+date_utc=2026-11-13T22:51:42Z
+
+--- git diff --numstat -- <write_set> ---
+26	0	src/campaignlab/domain/errors.py
+1	1	src/campaignlab/infra/artifacts.py
+10	12	src/campaignlab/worker/errors.py
+60	55	tests/unit/test_layering_edges.py
+
+--- git diff --stat -- <write_set> ---
+ src/campaignlab/domain/errors.py   |  26 +++++++++
+ src/campaignlab/infra/artifacts.py |   2 +-
+ src/campaignlab/worker/errors.py   |  22 ++++---
+ tests/unit/test_layering_edges.py  | 115 +++++++++++++++++++------------------
+ 4 files changed, 97 insertions(+), 68 deletions(-)
+
+--- git status --porcelain=v1 (whole tree; lane X contamination is visible here) ---
+ M src/campaignlab/domain/errors.py
+ M src/campaignlab/infra/artifacts.py
+ M src/campaignlab/worker/errors.py
+ M tests/unit/test_layering_edges.py
+?? evidence/M0/FU-29/
+?? tests/unit/test_task_cards_complete.py
+
+--- raise points in artifacts.py (must be unchanged: 5 hits, same line numbers as HEAD) ---
+626:                raise ArtifactCommitFailed(
+637:                raise ArtifactCommitFailed(
+642:            raise ArtifactCommitFailed(
+648:            raise ArtifactCommitFailed(
+703:            raise ArtifactCommitFailed(
+
+--- artifacts.py docstring mention (line 13, must be unchanged) ---
+   抛 ``EXDEV``：本文件把它**判红**（``ArtifactCommitFailed``）而不是退化成 copy —— copy
+
+--- HEAD version of the same two probes, for byte comparison ---
+626:                raise ArtifactCommitFailed(
+637:                raise ArtifactCommitFailed(
+642:            raise ArtifactCommitFailed(
+648:            raise ArtifactCommitFailed(
+703:            raise ArtifactCommitFailed(
+   抛 ``EXDEV``：本文件把它**判红**（``ArtifactCommitFailed``）而不是退化成 copy —— copy

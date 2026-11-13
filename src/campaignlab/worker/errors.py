@@ -9,6 +9,15 @@
    落在 ``Problem.issues[0].code``（``Issue.code`` 是自由串 1-96，非冻结面），外层
    ``Problem.code`` 取 ``INTERNAL_ERROR``、``status`` 取 500。把它提升为 ``Problem.code``
    会污染 ADR-005 冻结的注册表，故此处显式禁止。
+
+``ArtifactCommitFailed`` 的**定义**已下沉到 ``domain/errors.py``（FU-29，消除全仓唯一一条
+``infra → worker`` 反向分层边：``infra`` 是 HTTP 与 worker 共用的底座，不该为一个异常类型
+去执行 ``worker`` 包）。本文件只 import 后 re-export，公开符号集逐字不变 ——
+``worker/__init__.py`` 与 ``tests/integration/jobs/test_artifact_write.py`` 都仍从这里导入。
+mypy strict 开着 ``no_implicit_reexport``：**只有列进 ``__all__`` 才算显式再导出**，故
+``__all__`` 里的 ``"ArtifactCommitFailed"`` 是功能件而非装饰，禁删。
+``LeaseLost`` 相反，它**留在** worker 不下沉：它是 worker 侧的正常信号（design §4「静默
+放弃本次尝试」），不属 domain 通用错。
 """
 
 from __future__ import annotations
@@ -16,7 +25,7 @@ from __future__ import annotations
 from typing import ClassVar, Final
 
 from campaignlab.api.common import Issue, Problem
-from campaignlab.domain.errors import PROBLEM_CODES, DomainError
+from campaignlab.domain.errors import PROBLEM_CODES, ArtifactCommitFailed, DomainError
 from campaignlab.domain.ids import new_request_id
 
 __all__ = [
@@ -46,17 +55,6 @@ class LeaseLost(DomainError):
     """
 
     default_code: ClassVar[str] = "STATE_CONFLICT"
-
-
-class ArtifactCommitFailed(DomainError):
-    """制品提交失败（跨设备 ``os.replace``、摘要不符、登记冲突等）。
-
-    取 ``INTERNAL_ERROR``：这是服务端基础设施故障，不该让客户端以为是自己输入的问题。
-    本卡不实现制品写入（``infra/artifacts.py`` 归 M0-04/S3），此处只提供 design §9
-    点名的异常类型，供 S3 落地后直接复用。
-    """
-
-    default_code: ClassVar[str] = "INTERNAL_ERROR"
 
 
 def _build(code: str, *, request_id: str, detail: str, issues: tuple[Issue, ...] = ()) -> Problem:

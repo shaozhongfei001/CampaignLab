@@ -49,9 +49,9 @@ from sqlalchemy import Connection, text
 
 from campaignlab.clock import ensure_utc
 from campaignlab.config import ConfigError
+from campaignlab.domain.errors import ArtifactCommitFailed
 from campaignlab.domain.ids import is_resource_id, new_request_id, new_resource_id
 from campaignlab.infra.db.repositories import ArtifactRecord, ArtifactRepository
-from campaignlab.worker.errors import ArtifactCommitFailed
 
 __all__ = [
     "ARTIFACT_ID_PREFIX",

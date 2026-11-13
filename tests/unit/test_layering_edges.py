@@ -1,28 +1,30 @@
-"""M0-04/S2b-1：``infra/** → campaignlab.worker`` 导入边的白名单守护（A153 现状追认）。
+"""M0-04/S2b-1 → FU-29：``infra/** → campaignlab.worker`` 导入边守护（白名单已收紧为空集）。
 
 ``infra`` 是 HTTP 进程与 worker 进程共用的底座，``worker`` 是只有 worker 进程才该拉起的
-执行层。当前全仓**唯一**一条 ``infra → worker`` 反向边是
-``src/campaignlab/infra/artifacts.py`` 里的
-``from campaignlab.worker.errors import ArtifactCommitFailed``（A153 追认的现状）。
+执行层，故 ``infra → worker`` 是**分层倒置**。A153 曾追认过全仓唯一一条这样的边
+（``src/campaignlab/infra/artifacts.py`` 里的
+``from campaignlab.worker.errors import ArtifactCommitFailed``）：**FU-29 已把该异常类下沉
+到 ``domain/errors.py``、把消费端改指 ``campaignlab.domain.errors``，那条边随之消失**，
+白名单 ``ALLOWED_INFRA_TO_WORKER_EDGES`` 因此收紧为 ``frozenset()``。从现在起**任何**
+``infra → worker`` 边都判红，不再有豁免项。
 
-它之所以无环、之所以没把 ``worker/__init__.py`` 拖进 HTTP 进程，**唯一原因**是它走
-**子模块路径**（``campaignlab.worker.errors``）而非**父包属性式**（``from
-campaignlab.worker import ArtifactCommitFailed``）：后者会传递执行整个
-``worker/__init__.py``，把状态机、租约、事务边界与执行编排一并拉进 HTTP 进程
-（A153 硬约束）。故本守护把边目标记为**被执行的那个模块** —— ``from X import Y`` 记
-``X``，因为无论 ``Y`` 是不是子模块，``X`` 都已被执行。这样一来，谁把那条边「整理」成
-父包属性式导入，边目标就从 ``campaignlab.worker.errors`` 变成 ``campaignlab.worker``，
-白名单不再覆盖 → 判红。
+边目标记为**被执行的那个模块** —— ``from X import Y`` 记 ``X``，因为无论 ``Y`` 是不是
+子模块，``X`` 都已被执行。这个口径在 FU-29 之后依然重要：它区分「子模块路径」
+（``from campaignlab.worker.errors import ...``，只执行 ``worker/errors.py``）与**父包
+属性式**（``from campaignlab.worker import ...``，会传递执行整个 ``worker/__init__.py``，
+把状态机、租约、事务边界与执行编排一并拖进 HTTP 进程 —— A153 硬约束）。两者现在都判红，
+但报错文本里的边目标不同，能直接指出是哪一种回退。
 
-**白名单是模块级常量** ``ALLOWED_INFRA_TO_WORKER_EDGES``：**FU-29**（把
-``ArtifactCommitFailed`` 下沉到 ``domain/errors.py``）落地后它必须收紧为
-``frozenset()``；写成常量是为了让那次收紧只改一行。本文件的用例一律**不写死**白名单
-内容，故收紧后无需同步改用例。
+**白名单是模块级常量**，且本文件的用例一律**不写死**其内容：这正是 FU-29 只改一行即可
+收紧的原因，也让将来万一要再开豁免时同样只改一行（并被迫面对
+``test_the_whitelist_never_legalises_a_parent_package_edge``：父包边永不豁免）。
 
 扫描用 ``ast``（禁正则扫源码文本）：正则读不出 ``ImportFrom.level``（相对导入的点数），
-也分不清真导入与注释／字符串里的伪导入。四条正向对照用 ``tmp_path`` 探针（**不落工作
-树**）分别证明：父包式判红、非白名单文件判红、相对导入不能规避、注释与字符串不算边；
-最后一条与前三条合起来破掉「恒返回全集」与「恒返回空集」两种假绿。
+也分不清真导入与注释／字符串里的伪导入。四条 ``tmp_path`` 探针（**不落工作树**）分别
+证明：父包式判红、非白名单文件判红、相对导入不能规避、注释与字符串不算边；最后一条与
+前三条合起来破掉「恒返回全集」与「恒返回空集」两种假绿。收紧为空集后又多一条对照：
+``test_infra_to_worker_edges_are_exactly_the_allowed_whitelist`` 会用探针证明扫描器**仍能**
+扫出 FU-29 之前那条边，故「实测空集」是真没边，不是扫描器坏了。
 """
 
 from __future__ import annotations
@@ -41,13 +43,13 @@ WHITELIST_SYMBOL: Final = "ALLOWED_INFRA_TO_WORKER_EDGES"
 #: 探针树里那个「非白名单文件」的仓库相对键（探针布局与工作树同形，故键也同形）。
 PROBE_KEY: Final = "src/campaignlab/infra/probe.py"
 
-#: A153 追认的现状：``infra → worker`` 只此一条边，且它走的是子模块路径。
-#: **FU-29**（``ArtifactCommitFailed`` 下沉 ``domain/errors.py``）落地后，本常量收紧为
-#: ``frozenset()``；届时 ``test_the_whitelist_is_a_module_level_constant_ready_for_fu29``
-#: 与其余用例均无需改动（它们不写死这里的内容）。
-ALLOWED_INFRA_TO_WORKER_EDGES: Final[frozenset[tuple[str, str]]] = frozenset(
-    {("src/campaignlab/infra/artifacts.py", "campaignlab.worker.errors")}
-)
+#: **FU-29 已闭合**：``ArtifactCommitFailed`` 下沉到 ``domain/errors.py``，
+#: ``infra/artifacts.py`` 改指 ``campaignlab.domain.errors``，全仓 ``infra → worker``
+#: 反向边归零。故本白名单是**空集**，任何一条 ``infra → worker`` 边（子模块路径或父包
+#: 属性式，一律）都判红。收紧只改了这一行 —— 这正是把它做成模块级常量的目的。
+#: 形态也受守护：必须保持「模块顶层恰好一次 ``AnnAssign``」，因为
+#: ``test_the_whitelist_is_a_module_level_constant_ready_for_fu29`` 用 AST 数声明次数 == 1。
+ALLOWED_INFRA_TO_WORKER_EDGES: Final[frozenset[tuple[str, str]]] = frozenset()
 
 
 def _module_dotted_name(path: Path, repo_root: Path) -> str:
@@ -164,48 +166,51 @@ def _probe_repo(tmp_path: Path, source: str) -> Path:
     return tmp_path
 
 
-def test_infra_to_worker_edges_are_exactly_the_allowed_whitelist() -> None:
-    """A153 现状：``infra/** → worker`` 的边集合恰等于白名单（既不多也不少）。"""
+def test_infra_to_worker_edges_are_exactly_the_allowed_whitelist(tmp_path: Path) -> None:
+    """FU-29 后：``infra/** → worker`` 的边集合恰等于白名单（现为空集，既不多也不少）。
+
+    「实测为空」必须能与「扫描器坏了」区分开，否则守护会退化成恒绿。故断言空集之后再用
+    ``_probe_repo`` 造一棵含 FU-29 之前那条边（``from campaignlab.worker.errors import
+    ArtifactCommitFailed``）的探针树，证明**同一个扫描器仍能扫出它** —— 工作树为空是真没边。
+    """
     measured = collect_worker_import_edges(INFRA_ROOT, repo_root=REPO_ROOT)
     located = scan_worker_import_edges(INFRA_ROOT, repo_root=REPO_ROOT)
     extra = measured - ALLOWED_INFRA_TO_WORKER_EDGES
     gone = ALLOWED_INFRA_TO_WORKER_EDGES - measured
     assert not extra, (
-        "出现未授权的 infra → worker 反向边（FU-29 之前只允许子模块路径那一条）："
+        "出现未授权的 infra → worker 反向边（FU-29 已把白名单收紧为空集，任何一条都判红）："
         + str(sorted(extra))
     )
-    assert not gone, (
-        "白名单里的边已不在工作树中："
-        + str(sorted(gone))
-        + "；若这是 FU-29 把 ArtifactCommitFailed 下沉 domain/errors.py 的结果，"
-        "请把 ALLOWED_INFRA_TO_WORKER_EDGES 收紧为 frozenset()"
-    )
-    assert located, "扫描器一条边都没扫到：守护不做静默通过（应至少命中 artifacts.py）"
+    assert not gone, "白名单里的边已不在工作树中：" + str(sorted(gone))
+    assert not located, f"FU-29 后 infra → worker 应为零边，实测 {located}"
+    # 正向对照（反假绿，禁删）：同一个扫描器仍能扫出 FU-29 之前的那条边。
+    probe_source = "from campaignlab.worker.errors import ArtifactCommitFailed\n"
+    probe_root = _probe_repo(tmp_path, probe_source)
+    assert scan_worker_import_edges(probe_root, repo_root=probe_root) == [
+        (PROBE_KEY, 1, "campaignlab.worker.errors")
+    ], "扫描器扫不出 FU-29 之前那条边：空集不可信，守护已失去反假绿能力"
 
 
-def test_artifacts_worker_import_is_absolute_and_submodule_scoped() -> None:
-    """A153 逐节点核对：那条边必须 ``level == 0``、模块级、且恰为 ``worker.errors``。"""
+def test_artifacts_has_zero_worker_import_nodes_of_either_kind() -> None:
+    """FU-29 逐节点核对：``artifacts.py`` 里 worker 导入节点数 == **0**（两种节点都覆盖）。
+
+    原用例的前提是「恰有 1 条边」且它必须走子模块路径 ``campaignlab.worker.errors``；
+    FU-29 把 ``ArtifactCommitFailed`` 下沉 ``domain/errors.py`` 后该前提消失，故改为零反向边
+    语义。``ImportFrom`` 与 ``Import`` **分别**核对：``from campaignlab.worker... import X``
+    与 ``import campaignlab.worker...`` 都必须不存在 —— 只覆盖一种就是给另一种留绕过口子。
+    """
     artifacts = INFRA_ROOT / "artifacts.py"
     package = _package_of(_module_dotted_name(artifacts, REPO_ROOT), artifacts)
     tree = ast.parse(artifacts.read_text(encoding="utf-8-sig"), filename=str(artifacts))
-    nodes = [
+    from_nodes = [
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.ImportFrom) and _is_worker(_import_from_target(node, package))
     ]
-    assert len(nodes) == 1, f"A153 只追认了一条 infra → worker 边，实测 {len(nodes)} 条"
-    node = nodes[0]
-    assert node.col_offset == 0, f"artifacts.py:{node.lineno} 的 worker 导入不在模块顶层"
-    assert node.level == 0, (
-        f"artifacts.py:{node.lineno} 改用了相对导入（level={node.level}）："
-        "相对写法在源码里看不出跨层，禁用它规避本守护"
+    assert from_nodes == [], (
+        "artifacts.py 仍有 from … worker 的反向边（FU-29 后必须是 0 条）："
+        + str([(node.lineno, node.module, node.level) for node in from_nodes])
     )
-    assert node.module == "campaignlab.worker.errors", (
-        f"artifacts.py:{node.lineno} 的边目标是 {node.module!r}，必须是子模块路径 "
-        "'campaignlab.worker.errors'；写成父包 'campaignlab.worker' 会传递执行 "
-        "worker/__init__.py，把整个状态机与事务层拖进 HTTP 进程（A153 硬约束）"
-    )
-    assert [alias.name for alias in node.names] == ["ArtifactCommitFailed"]
     plain = [
         alias.name
         for item in ast.walk(tree)

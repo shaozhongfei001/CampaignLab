@@ -1,0 +1,45 @@
+=== FU-29 symbols.txt : inspect actual values (no hardcoded / inferred numbers) ===
+date_utc=2026-11-13T22:51:41Z  HEAD=ce08975
+
+--- [A] handoff S4 verbatim command, run as-is ---
+cmd: uv run --no-sync python -c "import inspect,campaignlab.domain.errors as d,campaignlab.worker.errors as w;print(...)"
+domain.__all__ 18
+worker.__all__ 7 ['JOB_INTERRUPTED', 'NO_HANDLER', 'ArtifactCommitFailed', 'LeaseLost', 'interrupted_problem', 'no_handler_problem', 'problem_of']
+same_obj True
+default_code INTERNAL_ERROR
+registry 20
+rc=0
+
+--- [B] handoff S4 expectation check ---
+expected: same_obj True / default_code INTERNAL_ERROR / registry 20 / worker.__all__ 7 items verbatim
+
+--- [C] supplement ---
+--- supplement (inspect / runtime, R8-1/A115: no hardcoded values) ---
+ArtifactCommitFailed.__module__        = campaignlab.domain.errors
+definition source file                 = /home/szf/dev/CampaignLab/src/campaignlab/domain/errors.py
+definition source line                 = 275
+same object via worker/__init__        = True
+issubclass(DomainError)                = True
+mro                                    = ['ArtifactCommitFailed', 'DomainError', 'Exception', 'BaseException', 'object']
+instance .code/.status/.type/.title    = INTERNAL_ERROR 500 urn:campaignlab:problem:internal_error 服务内部错误
+in domain.__all__ / in worker.__all__  = True / True
+domain.__all__ len / unique            = 18 / 18
+domain.__all__ (full, as listed)       = ['PROBLEM_CODES', 'AccessDenied', 'ArtifactCommitFailed', 'DomainError', 'IdempotencyConflict', 'InputTooLarge', 'InternalFailure', 'InvalidScope', 'JobCapacity', 'OriginDenied', 'PreconditionRequired', 'ResourceNotFound', 'RevisionConflict', 'SessionInvalid', 'StateConflict', 'ValidationFailure', 'problem_type', 'status_to_code']
+new entry index                        = 2 -> neighbours: AccessDenied | DomainError
+  NOTE on ordering convention (pre-existing, NOT pure ASCII sort):
+  this __all__ lists the module-level CONSTANT first, then CamelCase classes in
+  ascending ASCII order, then snake_case functions in ascending ASCII order.
+  ArtifactCommitFailed was inserted into the CamelCase run at its ASCII position.
+  camel run ascending?                 = True ['AccessDenied', 'ArtifactCommitFailed', 'DomainError', 'IdempotencyConflict', 'InputTooLarge', 'InternalFailure', 'InvalidScope', 'JobCapacity', 'OriginDenied', 'PreconditionRequired', 'ResourceNotFound', 'RevisionConflict', 'SessionInvalid', 'StateConflict', 'ValidationFailure']
+  lower run ascending?                 = True ['problem_type', 'status_to_code']
+DomainError subclasses DEFINED IN domain/errors.py = 14
+  (this substantiates the docstring line: 13 at R5-1 -> 14 after FU-29)
+  names = ['AccessDenied', 'ArtifactCommitFailed', 'IdempotencyConflict', 'InputTooLarge', 'InternalFailure', 'InvalidScope', 'JobCapacity', 'OriginDenied', 'PreconditionRequired', 'ResourceNotFound', 'RevisionConflict', 'SessionInvalid', 'StateConflict', 'ValidationFailure']
+DomainError subclasses process-wide    = 15
+  extra beyond domain/errors.py        = ['campaignlab.worker.errors.LeaseLost']
+PROBLEM_CODES len                      = 20 (registry NOT extended)
+INTERNAL_ERROR entry                   = (500, 'urn:campaignlab:problem:internal_error', '服务内部错误')
+worker/errors.py file                  = /home/szf/dev/CampaignLab/src/campaignlab/worker/errors.py
+LeaseLost still defined in             = campaignlab.worker.errors (NOT sunk into domain, per handoff S2)
+worker.__all__ (verbatim order)        = ['JOB_INTERRUPTED', 'NO_HANDLER', 'ArtifactCommitFailed', 'LeaseLost', 'interrupted_problem', 'no_handler_problem', 'problem_of']
+rc=0

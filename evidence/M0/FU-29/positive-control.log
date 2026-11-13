@@ -1,0 +1,163 @@
+=== FU-29 POSITIVE CONTROL (handoff S3 / manual 15.4) ===
+date_utc=2026-11-13T22:49:02Z
+HEAD=ce08975  branch=m0-framework
+purpose: prove tests/unit/test_layering_edges.py can really go RED now that FU-29 has
+         tightened ALLOWED_INFRA_TO_WORKER_EDGES to frozenset(). Green-only evidence
+         cannot distinguish 'the guard works' from 'the guard is trivially green'.
+method : temporarily revert src/campaignlab/infra/artifacts.py:54 to the pre-FU-29 form
+         (from campaignlab.worker.errors import ArtifactCommitFailed), run the guard,
+         capture the RED, then restore byte-exact (sha256 verified both ways).
+
+--- step 0: sha256 of the CORRECT post-FU-29 artifacts.py ---
+14515bc840dadb9d77f7f03dee86051abadd0b3a8f72e6aa5f04eee0d6eb7e2f  src/campaignlab/infra/artifacts.py
+
+--- step 1: import block in its correct post-FU-29 form (lines 50-55) ---
+from campaignlab.clock import ensure_utc
+from campaignlab.config import ConfigError
+from campaignlab.domain.errors import ArtifactCommitFailed
+from campaignlab.domain.ids import is_resource_id, new_request_id, new_resource_id
+from campaignlab.infra.db.repositories import ArtifactRecord, ArtifactRepository
+
+
+--- step 2: MUTATE (revert to pre-FU-29 form) ---
+snapshot_sha256=14515bc840dadb9d77f7f03dee86051abadd0b3a8f72e6aa5f04eee0d6eb7e2f
+mutated_sha256=15cfd4e36f5ed8f137db33ffb593c9028e37ce237d6dc9e67a934634ee5fc24a
+MUTATE-OK: artifacts.py import reverted to the pre-FU-29 (worker.errors) form
+mutate_rc=0
+
+--- step 3: import block after mutation (lines 50-55) ---
+from campaignlab.clock import ensure_utc
+from campaignlab.config import ConfigError
+from campaignlab.domain.ids import is_resource_id, new_request_id, new_resource_id
+from campaignlab.infra.db.repositories import ArtifactRecord, ArtifactRepository
+from campaignlab.worker.errors import ArtifactCommitFailed
+
+
+--- step 4: git diff --numstat vs HEAD for artifacts.py ---
+(empty is EXPECTED and is itself the point: the mutation reproduces HEAD's pre-FU-29
+ form exactly, so this RED is literally 'the guard rejects the state of the repo at HEAD')
+[end numstat]
+
+--- step 5: RUN THE GUARD -> EXPECT RED ---
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0 -- /home/szf/dev/CampaignLab/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 8 items
+
+tests/unit/test_layering_edges.py::test_infra_to_worker_edges_are_exactly_the_allowed_whitelist FAILED [ 12%]
+tests/unit/test_layering_edges.py::test_artifacts_has_zero_worker_import_nodes_of_either_kind FAILED [ 25%]
+tests/unit/test_layering_edges.py::test_parent_package_style_import_would_be_flagged PASSED [ 37%]
+tests/unit/test_layering_edges.py::test_worker_import_from_a_non_whitelisted_file_would_be_flagged PASSED [ 50%]
+tests/unit/test_layering_edges.py::test_relative_import_cannot_be_used_to_evade_the_whitelist PASSED [ 62%]
+tests/unit/test_layering_edges.py::test_scanner_reads_the_ast_not_the_source_text PASSED [ 75%]
+tests/unit/test_layering_edges.py::test_the_whitelist_is_a_module_level_constant_ready_for_fu29 PASSED [ 87%]
+tests/unit/test_layering_edges.py::test_the_whitelist_never_legalises_a_parent_package_edge PASSED [100%]
+
+=================================== FAILURES ===================================
+_________ test_infra_to_worker_edges_are_exactly_the_allowed_whitelist _________
+
+tmp_path = PosixPath('/tmp/pytest-of-szf/pytest-55/test_infra_to_worker_edges_are0')
+
+    def test_infra_to_worker_edges_are_exactly_the_allowed_whitelist(tmp_path: Path) -> None:
+        """FU-29 后：``infra/** → worker`` 的边集合恰等于白名单（现为空集，既不多也不少）。
+    
+        「实测为空」必须能与「扫描器坏了」区分开，否则守护会退化成恒绿。故断言空集之后再用
+        ``_probe_repo`` 造一棵含 FU-29 之前那条边（``from campaignlab.worker.errors import
+        ArtifactCommitFailed``）的探针树，证明**同一个扫描器仍能扫出它** —— 工作树为空是真没边。
+        """
+        measured = collect_worker_import_edges(INFRA_ROOT, repo_root=REPO_ROOT)
+        located = scan_worker_import_edges(INFRA_ROOT, repo_root=REPO_ROOT)
+        extra = measured - ALLOWED_INFRA_TO_WORKER_EDGES
+        gone = ALLOWED_INFRA_TO_WORKER_EDGES - measured
+>       assert not extra, (
+            "出现未授权的 infra → worker 反向边（FU-29 已把白名单收紧为空集，任何一条都判红）："
+            + str(sorted(extra))
+        )
+E       AssertionError: 出现未授权的 infra → worker 反向边（FU-29 已把白名单收紧为空集，任何一条都判红）：[('src/campaignlab/infra/artifacts.py', 'campaignlab.worker.errors')]
+E       assert not {('src/campaignlab/infra/artifacts.py', 'campaignlab.worker.errors')}
+
+tests/unit/test_layering_edges.py:180: AssertionError
+__________ test_artifacts_has_zero_worker_import_nodes_of_either_kind __________
+
+    def test_artifacts_has_zero_worker_import_nodes_of_either_kind() -> None:
+        """FU-29 逐节点核对：``artifacts.py`` 里 worker 导入节点数 == **0**（两种节点都覆盖）。
+    
+        原用例的前提是「恰有 1 条边」且它必须走子模块路径 ``campaignlab.worker.errors``；
+        FU-29 把 ``ArtifactCommitFailed`` 下沉 ``domain/errors.py`` 后该前提消失，故改为零反向边
+        语义。``ImportFrom`` 与 ``Import`` **分别**核对：``from campaignlab.worker... import X``
+        与 ``import campaignlab.worker...`` 都必须不存在 —— 只覆盖一种就是给另一种留绕过口子。
+        """
+        artifacts = INFRA_ROOT / "artifacts.py"
+        package = _package_of(_module_dotted_name(artifacts, REPO_ROOT), artifacts)
+        tree = ast.parse(artifacts.read_text(encoding="utf-8-sig"), filename=str(artifacts))
+        from_nodes = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and _is_worker(_import_from_target(node, package))
+        ]
+>       assert from_nodes == [], (
+            "artifacts.py 仍有 from … worker 的反向边（FU-29 后必须是 0 条）："
+            + str([(node.lineno, node.module, node.level) for node in from_nodes])
+        )
+E       AssertionError: artifacts.py 仍有 from … worker 的反向边（FU-29 后必须是 0 条）：[(54, 'campaignlab.worker.errors', 0)]
+E       assert [ImportFrom(m...e)], level=0)] == []
+E         
+E         Left contains one more item: ImportFrom(module='campaignlab.worker.errors', names=[alias(name='ArtifactCommitFailed', asname=None)], level=0)
+E         
+E         Full diff: (-: missing in left side, +: extra in left side)
+E         - []
+E         + [
+E         +     ImportFrom(module='campaignlab.worker.errors', names=[alias(name='ArtifactCommitFailed', asname=None)], level=0),
+E         + ]
+
+tests/unit/test_layering_edges.py:210: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_layering_edges.py::test_infra_to_worker_edges_are_exactly_the_allowed_whitelist
+FAILED tests/unit/test_layering_edges.py::test_artifacts_has_zero_worker_import_nodes_of_either_kind
+========================= 2 failed, 6 passed in 0.18s ==========================
+pytest_rc_during_mutation=1   (non-zero => the guard really goes red)
+
+--- step 6: RESTORE byte-exact ---
+restored_sha256=14515bc840dadb9d77f7f03dee86051abadd0b3a8f72e6aa5f04eee0d6eb7e2f
+snapshot_sha256=14515bc840dadb9d77f7f03dee86051abadd0b3a8f72e6aa5f04eee0d6eb7e2f
+RESTORE-OK: byte-exact
+restore_rc=0
+
+--- step 7: sha256 after restore (must equal step 0) ---
+14515bc840dadb9d77f7f03dee86051abadd0b3a8f72e6aa5f04eee0d6eb7e2f  src/campaignlab/infra/artifacts.py
+
+--- step 8: import block after restore (lines 50-55) ---
+from campaignlab.clock import ensure_utc
+from campaignlab.config import ConfigError
+from campaignlab.domain.errors import ArtifactCommitFailed
+from campaignlab.domain.ids import is_resource_id, new_request_id, new_resource_id
+from campaignlab.infra.db.repositories import ArtifactRecord, ArtifactRepository
+
+
+--- step 9: git diff --numstat vs HEAD for artifacts.py (must show the FU-29 change again) ---
+1	1	src/campaignlab/infra/artifacts.py
+[end numstat]
+
+--- step 10: RE-RUN THE GUARD -> EXPECT GREEN ---
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0 -- /home/szf/dev/CampaignLab/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 8 items
+
+tests/unit/test_layering_edges.py::test_infra_to_worker_edges_are_exactly_the_allowed_whitelist PASSED [ 12%]
+tests/unit/test_layering_edges.py::test_artifacts_has_zero_worker_import_nodes_of_either_kind PASSED [ 25%]
+tests/unit/test_layering_edges.py::test_parent_package_style_import_would_be_flagged PASSED [ 37%]
+tests/unit/test_layering_edges.py::test_worker_import_from_a_non_whitelisted_file_would_be_flagged PASSED [ 50%]
+tests/unit/test_layering_edges.py::test_relative_import_cannot_be_used_to_evade_the_whitelist PASSED [ 62%]
+tests/unit/test_layering_edges.py::test_scanner_reads_the_ast_not_the_source_text PASSED [ 75%]
+tests/unit/test_layering_edges.py::test_the_whitelist_is_a_module_level_constant_ready_for_fu29 PASSED [ 87%]
+tests/unit/test_layering_edges.py::test_the_whitelist_never_legalises_a_parent_package_edge PASSED [100%]
+
+============================== 8 passed in 0.13s ===============================
+pytest_rc_after_restore=0

@@ -6,6 +6,13 @@ R5-1 硬规则：本文件的内容是把 S3a **暂存**于 ``api/common.py`` �
 公开符号集与搬移前逐字相同。依 ADR-005 §2.1，code 注册表的单一来源就是本文件，
 **严禁两处各存一份**。
 
+FU-29 增补：``ArtifactCommitFailed`` 追加在本文件末尾，是 R5-1 那次整块搬移之后**唯一**
+新增的 ``DomainError`` 子类（原住 ``worker/errors.py``）。下沉理由不是分类学，而是消除
+全仓唯一一条 ``infra → worker`` 反向分层边（A153 → FU-29）：``infra`` 是 HTTP 进程与
+worker 进程共用的底座，不该为一个异常类型去执行 ``worker`` 包。它复用既有的
+``INTERNAL_ERROR``，**未扩** ``PROBLEM_CODES``（仍 20 码）。故下文「13 个子类」说的是
+R5-1 搬移当时的口径，本文件的子类数现为 14。
+
 取值集合的唯一权威枚举是 ``spec/CampaignLab-SDD-v1.0/architecture/API.md``
 第 20–29 行「错误分类」表的第 2 列（以「、」分隔，D-019 实测 **20 个**）：
 本文件是该表的**代码化副本**——不得新增表外 code、不得改名、不得删除。
@@ -31,6 +38,7 @@ if TYPE_CHECKING:
 __all__ = [
     "PROBLEM_CODES",
     "AccessDenied",
+    "ArtifactCommitFailed",
     "DomainError",
     "IdempotencyConflict",
     "InputTooLarge",
@@ -260,5 +268,23 @@ class JobCapacity(DomainError):
 
 class InternalFailure(DomainError):
     """500：detail 只含 request_id，不回显堆栈／SQL／用户源字段。"""
+
+    default_code: ClassVar[str] = "INTERNAL_ERROR"
+
+
+class ArtifactCommitFailed(DomainError):
+    """制品提交失败（跨设备 ``os.replace``、摘要不符、登记冲突等）。
+
+    取 ``INTERNAL_ERROR``：这是服务端基础设施故障，不该让客户端以为是自己输入的问题。
+    该 code 是 ``PROBLEM_CODES`` 20 码注册表内的既有项，本类**未扩表**。
+
+    FU-29：本类原住 ``worker/errors.py``（M0-04/S2 当时的语境是「本卡不实现制品写入，
+    先给出 design §9 点名的异常类型供 S3 复用」）。S3 已落地，``infra/artifacts.py`` 的
+    5 个 ``raise`` 点是它的唯一消费者；而 ``infra`` 是 HTTP 进程与 worker 进程共用的
+    底座，让它为一个异常类型去 import ``campaignlab.worker.errors`` 就是 ``infra →
+    worker`` 的分层倒置（A153）。故把定义下沉到 ``domain``：``domain`` 不依赖任何上层，
+    HTTP 侧与 worker 侧都能合法引用。``worker/errors.py`` 仍 import 后 re-export，
+    公开符号集逐字不变。
+    """
 
     default_code: ClassVar[str] = "INTERNAL_ERROR"
