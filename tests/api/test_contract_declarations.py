@@ -17,7 +17,6 @@ import re
 from typing import Any, Final
 
 import pytest
-from conftest import LIVE_CONTRACT, REPO, SLICE, Harness, route_for
 from fastapi.routing import APIRoute
 
 from campaignlab.api import health as health_api
@@ -26,6 +25,7 @@ from campaignlab.api import workspaces as workspaces_api
 from campaignlab.api.common import X_REQUEST_ID_HEADER, Health, Issue, Problem
 from campaignlab.config import API_PREFIX
 from campaignlab.domain.errors import PROBLEM_CODES
+from tests.api.conftest import LIVE_CONTRACT, REPO, SLICE, Harness, route_for
 
 #: 装饰器带 ``declared_responses()`` 的 4 个 op。
 #: A95 的 action_taken 记录 responses= 计数：session 2 / workspaces 2 / health 0。

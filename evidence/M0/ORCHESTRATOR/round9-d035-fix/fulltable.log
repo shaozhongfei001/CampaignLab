@@ -1,0 +1,79 @@
+# Round 9 首件 · D-035 修复后全表门禁复验（编排器独占）
+# started_at: 2026-11-13T23:17:48+08:00
+# repo: /home/szf/dev/CampaignLab  branch: m0-framework  HEAD(before commit): 15feb1a
+# 证据落点：仓库内本文件（.log 依 .gitignore 的 !evidence/**/*.log 入库，供 Q lane 复核）+ 宿主机读副本
+
+### G1_baseline_v1.0                 rc=0 expected=0 OK (0.0s)
+    cmd: ( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )
+### G2_baseline_v1.0.1_patch         rc=0 expected=0 OK (0.0s)
+    cmd: ( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )
+### G3_frontend_baseline             rc=0 expected=0 OK (0.1s)
+    cmd: python3 scripts/check_frontend_baseline.py
+    out: baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+    out: FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+### G4_slice_unknown_op_negative     rc=2 expected=2 OK (0.1s)
+    cmd: python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r9.json
+    out: spec_version=1.0.1 slice_bytes=622 slice_lines=17 sections=['spec_version', 'source', 'operations', 'truncated_schemas'] missing=['operations:noSuchOp'] depth=5 truncated_schemas=[]
+    out: FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']
+### G4b_slice_unknown_ac_negative    rc=2 expected=2 OK (0.1s)
+    cmd: python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac_r9.json
+    out: spec_version=1.0.1 slice_bytes=599 slice_lines=15 sections=['spec_version', 'source', 'acceptance_rows', 'truncated_schemas'] missing=['acceptance_rows:AC-MR-99'] depth=5 truncated_schemas=[]
+    out: FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']
+### G5_contract_gate                 rc=0 expected=0 OK (0.1s)
+    cmd: python3 scripts/check_contracts.py check
+    out: CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped
+### G6_contract_meta_validate        rc=0 expected=0 OK (1.7s)
+    cmd: uv run --no-sync python scripts/check_contracts.py check --validate
+    out: CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6
+### G7_ruff_check                    rc=0 expected=0 OK (0.0s)
+    cmd: uv run --no-sync ruff check .
+    out: All checks passed!
+### G8_ruff_format                   rc=0 expected=0 OK (0.0s)
+    cmd: uv run --no-sync ruff format --check .
+    out: 186 files already formatted
+### G9_mypy                          rc=0 expected=0 OK (0.6s)
+    cmd: uv run --no-sync mypy
+    out: Success: no issues found in 72 source files
+### G10_pytest                       rc=0 expected=0 OK (72.4s)
+    cmd: uv run --no-sync pytest -q
+    out: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    out: 350 passed, 6 warnings in 72.09s (0:01:12)
+### G12_package_verify               rc=0 expected=0 OK (0.1s)
+    cmd: python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+    out: PASS 四版规则、15 个案例双版本、五种预发状态
+    out: PACKAGE PASS 6/6
+### G13_npm_ci_and_build             rc=0 expected=0 OK (8.6s)
+    cmd: npm --prefix web ci && npm --prefix web run build
+    out: dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB
+    out: ✓ built in 708ms
+### G14_doctor                       rc=0 expected=0 OK (1.7s)
+    cmd: bash scripts/doctor.sh
+    out:   PASS=15  WARN=1  FAIL=0
+    out:   RESULT: HEALTHY
+### G14b_cli_doctor                  rc=0 expected=None OK (0.3s)
+    cmd: uv run --no-sync python -m campaignlab doctor
+    out: PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s
+    out:   PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED
+### G11_prototype_verify             rc=0 expected=0 OK (0.6s)
+    cmd: bash scripts/verify.sh
+    out: ==> 4/4 字节级复现
+    out: PASS: 字节级复现
+
+=== spec/contracts dirty === rc=0 result='' (empty=clean)
+=== worktree ===
+M tests/api/test_contract_declarations.py
+ M tests/api/test_contract_http.py
+?? tests/__init__.py
+?? tests/api/__init__.py
+?? tests/integration/__init__.py
+?? tests/integration/bootstrap/__init__.py
+?? tests/unit/__init__.py
+=== identity ===
+  tracked in-scope py+md = 181 (py 69 + md 112)
+  untracked in-scope = 5 (py 5 + md 0)
+  ruff format --check . = 186 files already formatted
+  IDENTITY_OK = True
+
+# finished_at: 2026-11-13T23:19:14+08:00
+# RESULT: gates_run=16 mismatch=none all_green=True
+# readonly: spec/contracts dirty=0 ; identity_ok=True

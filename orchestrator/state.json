@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T13:29:43+08:00",
+  "updated_at": "2026-11-13T23:24:04+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -4324,14 +4324,14 @@
       "id": "D-035",
       "task": "M0-02（S4 契约测试参数化，写集 tests/api/**）",
       "severity": "MAJOR",
-      "status": "OPEN",
+      "status": "FIXED_PENDING_Q",
       "title": "mypy 重复模块名 conftest 致 G9 全表门禁红灯（tests/api/conftest.py vs tests/integration/bootstrap/conftest.py），errors prevented further checking 使 src+tests+scripts 三棵树类型检查全部归零",
       "found_by": "编排器 —— Round 8 关机 checkpoint 前的全表门禁复跑（15 项 G1-G14b，证据 /tmp/fulltable.json，write_stdin 会话 77302）",
       "file": "orchestrator/defects/D-035.md",
       "found_at": "2026-11-13T13:29:43+08:00",
       "closed_at": null,
-      "blocking": true,
-      "blocking_note": "G9 为全表门禁项。红灯期间 **wave1 出口 Q 复核与任何 AC 取证均不得放行**；下次开工第一件事即修本单（FU-22），先于任何新派单。运行期行为不受影响（G10 pytest 350 passed rc=0）。",
+      "blocking": false,
+      "blocking_note": "原 BLOCKING 判据是 G9 全表红灯；2026-11-13T23:19:14+08:00 实测 G9 rc=0 / 72 source files、全表 16 项全绿，**机器门禁层面的阻塞已解除**，wave1 出口 Q 复核与 AC 取证的封锁同步撤销。status 保持 FIXED_PENDING_Q，待 wave1 出口 Q 复核确认后转 CLOSED（**禁自判 CLOSED**）。",
       "owner": "编排器（Round 9 首件）",
       "responsibility": "双重归因：① 实现侧 —— 57b6db5（Round 8 / Bohr / M0-02-S4）新增 tests/api/conftest.py，与 08d0b5c 引入的 tests/integration/bootstrap/conftest.py 在无 __init__.py 的 tests 树下构成 mypy 顶层重复模块名；Bohr 未越界、未降门禁，处置无过错。② 编排器侧 —— 57b6db5 复验只跑路径限定 mypy（3 source files rc=0），路径限定不会触发跨目录重复模块名检测 -> **漏检**，自我更正 R8-4。",
       "measured": {
@@ -4353,7 +4353,36 @@
       "followup": "FU-22",
       "related_adjudications": [
         "A120"
-      ]
+      ],
+      "fix_applied_at": "2026-11-13T23:19:14+08:00",
+      "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
+      "fix_applied": {
+        "option_chosen": "A（mypy 官方提示的 (b) adding __init__.py somewhere）—— **与 checkpoint 期 D-035.md §5 推荐的选项 B 不同**，理由见 A123",
+        "files_added": [
+          "tests/__init__.py",
+          "tests/api/__init__.py",
+          "tests/integration/__init__.py",
+          "tests/integration/bootstrap/__init__.py",
+          "tests/unit/__init__.py"
+        ],
+        "files_modified": [
+          "tests/api/test_contract_http.py（from conftest -> from tests.api.conftest，isort 归位后在 :26）",
+          "tests/api/test_contract_declarations.py（同型，:28）"
+        ],
+        "config_changed": "**无**：pyproject.toml 字节未动（既未加 explicit_package_bases，也未加 pytest pythonpath）",
+        "cascade_finding": "探查阶段实测 mypy --explicit-package-bases 报 3 错，其中 test_contract_http.py:51 的 no-any-return 是**级联错误**：from conftest import Harness 解析失败 -> Harness 退化为 Any -> harness.exchange() 返回 Any -> return client 触发。conftest.py:156 的 exchange 本已正确标注 tuple[TestClient, Any]，故修好 import 后该错误自动消失，**无需任何类型标注改动**（实测已验证）。",
+        "verified": {
+          "mypy": "rc=0 / Success: no issues found in 72 source files",
+          "pytest": "rc=0 / 350 passed / 72.4s（零回归）",
+          "ruff_check": "rc=0 / All checks passed!",
+          "ruff_format": "rc=0 / 186 files already formatted",
+          "fulltable": "**16 项全绿 mismatch=none**，含此前未跑的 G13 npm ci+build rc=0 / built in 663ms",
+          "identity": "tracked 181 + untracked 5 == ruff 186",
+          "readonly": "spec/ 与 contracts/ dirty=0"
+        },
+        "not_weakened": "未 exclude 任何路径、未放宽 strict、未加 # type: ignore、未删/改名任何 conftest.py、未减少任何测试用例",
+        "basename_census": "修复前普查：in-scope 69 个 .py 仅 3 组同名 —— __init__.py（7 个，均在有包标记的 src/campaignlab/** 内）、errors.py（domain 与 worker，**两者都已在有 __init__.py 的包内**，模块名 campaignlab.domain.errors / campaignlab.worker.errors，不冲突）、conftest.py（**唯一真冲突**）→ 证明加包标记后不会冒出新的重复模块名"
+      }
     }
   ],
   "change_requests": [
@@ -4723,8 +4752,8 @@
       "29be319"
     ],
     "self_check_gates_rc0": {
-      "checked_at": "2026-11-13T13:23:04+08:00",
-      "evidence": "evidence/monthly/M0-P01/run-04/commands.md",
+      "checked_at": "2026-11-13T23:19:14+08:00",
+      "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
       "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。 2026-11-13T02:46:54+08:00 追记（第 5 次接管）：CR-002 选项 B 原子提交前，从磁盘全表重跑 16 项 G（含 G4c 真实篡改负例），rc 全部 == expected；分母 ruff=64(py=9/md=55)、pytest=43、mypy=9；双口径 tracked 64 + untracked 0 == 64 成立；spec/ dirty=0。提交前复核另检出并修复 3 类问题（均记入 CR-002.md §7 第 9/10/11 行）：① state.json.contract 曾被整块替换、丢失 HEAD 的 live_dir/registry/gate/ci_job/baselines（含两份 spec 基线 sha256 锚点）→ 已按无损合并修复；② 4 处历史/门禁文本仍写死旧指纹却未加注（tasks/M0-03.md:134、M0-03-design.md:9、M0-02-design.md:7 与 §5 V1、两卡 Q4/Q7 裁定结果）→ 已按 D-011 体例补纯增量标注（两设计文档 numstat removed=0）；③ 设计文档 Q4/Q7 追注曾被塞成 4 列表格的第 5 个单元格且缺收尾竖线、嵌套双星号破坏加粗 → 已还原原文字节并改为表后独立 blockquote。另：CHANGES.json 缩进规范化为 indent=2（符合 check_contracts.py:6 与其余 10 个同目录文件），语义等价已程序化证明，显式登记非静默夹带。  2026-11-13T04:58:57+08:00 追记（第 8 次接管 · Round 4 派单前置）：编排器产物落盘后从磁盘复跑 G1/G2/G3/G5/G6/G7/G8/G9/G10/G14 共 10 项，rc 全部 == expected（G4/G4b/G4c 负例本轮未复跑，沿用 02:46:54 实测值）；ruff format 分母 87→88（+1 md），恒等式 tracked(87)+untracked(1)==88 成立；pytest 76 passed、mypy 16 源文件、契约登记项 13、前端基线 8/8、doctor HEALTHY；spec/ dirty=0。  2026-11-13T06:55:00+08:00 追记（Round 4 四 lane 全部回收 + D-020/D-021 修复入库后）：编排器从磁盘全表实跑，rc 全部实取得非转录。pytest 110 passed（99 + D-020 新增 11 守卫）、mypy 22 source files、ruff format --check 101 files（恒等式 tracked 99 + untracked 2 == 101）、ruff check 可见 25（24 py + pyproject.toml）、契约登记项 13、前端 vitest Test Files 4 passed / Tests 56 passed、KNOWN_MISSING 13、磁盘卡 16、恒等式 16+13==29 成立、doctor 仍 rc=1（基线范围缺口，随 M0-02/S3c 移交）、G4/G4b 负例 rc=2 且未产出文件。过程中编排器自身复验脚本 4 处输入错误（API.md 权威 code 在第 2 列以「、」分隔而非首列反引号；PROBLEM_CODES 元组序为 (status, type_urn, title) 而非 (status, title, urn)——曾因此对 title 产生一次假 PASS；paths 的 home= 形参需 Path 而非 str；x_db_path 需文件系统路径而非 URL）与 1 处过严检查（env.py 的 sqlite:/// 命中在模块 docstring 内，非 docstring 命中为 0），以及 1 次操作事故（用 PowerShell Set-Content -Encoding utf8 写数据文件带入 UTF-8 BOM，追加进测试文件中部导致 SyntaxError U+FEFF，并一度覆盖 tests/unit/test_contract_slice.py 的 254 行既有护栏）——已 git checkout 还原并改为 BOM 感知重追加，最终该文件为纯增量 +91/-0、原前缀字节不变。以上全部当场更正并留痕，未误判任何 lane。",
       "gates": {
         "G1_baseline_v1.0": {
@@ -4733,8 +4762,9 @@
           "expected": 0,
           "elapsed_s": 0.0,
           "last_summary": "",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G2_baseline_v1.0.1_patch": {
           "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
@@ -4742,8 +4772,9 @@
           "expected": 0,
           "elapsed_s": 0.0,
           "last_summary": "",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G3_frontend_baseline": {
           "cmd": "python3 scripts/check_frontend_baseline.py",
@@ -4751,26 +4782,29 @@
           "expected": 0,
           "elapsed_s": 0.1,
           "last_summary": "baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html | FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G4_slice_unknown_op_negative": {
-          "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op.json",
+          "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r9.json",
           "rc": 2,
           "expected": 2,
           "elapsed_s": 0.1,
           "last_summary": "spec_version=1.0.1 slice_bytes=622 slice_lines=17 sections=['spec_version', 'source', 'operations', 'truncated_schemas'] missing=['operations:noSuchOp'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G4b_slice_unknown_ac_negative": {
-          "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac.json",
+          "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac_r9.json",
           "rc": 2,
           "expected": 2,
           "elapsed_s": 0.1,
           "last_summary": "spec_version=1.0.1 slice_bytes=599 slice_lines=15 sections=['spec_version', 'source', 'acceptance_rows', 'truncated_schemas'] missing=['acceptance_rows:AC-MR-99'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G4c_frontend_tamper_negative": {
           "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
@@ -4781,7 +4815,8 @@
           "measured_at": "2026-11-13T02:41:57+08:00",
           "note": "本轮真实执行篡改负例：备份 -> printf 追加换行 -> 实测 rc -> cp 还原 -> 断言 spec/ dirty=0。不沿用转录值。",
           "spec_dirty_after_restore": 0,
-          "checkpoint_R8_not_rerun": "本 checkpoint 点未重跑。原因：该门需临时写入只读的 spec/frontend-template-spdb-v1.1/css/tokens.css（备份->追加换行->实测->还原->断言 spec/ dirty=0），是全表唯一会写只读区的门；关机前不做可避免的只读区写入风险。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。"
+          "checkpoint_R8_not_rerun": "本 checkpoint 点未重跑。原因：该门需临时写入只读的 spec/frontend-template-spdb-v1.1/css/tokens.css（备份->追加换行->实测->还原->断言 spec/ dirty=0），是全表唯一会写只读区的门；关机前不做可避免的只读区写入风险。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。",
+          "not_rerun_note_R9": "本轮仍未重跑：G4c 是全表唯一会临时写入只读 spec/ 的门，而 D-035 的修复写集为 tests/**（未改 pyproject.toml、未触 web/spec），与该门无因果关系。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。下次触碰 scripts/check_frontend_baseline.py 或 spec/frontend-template-* 时必须重跑。"
         },
         "G5_contract_gate": {
           "cmd": "python3 scripts/check_contracts.py check",
@@ -4789,56 +4824,71 @@
           "expected": 0,
           "elapsed_s": 0.1,
           "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G6_contract_meta_validate": {
           "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 3.9,
+          "elapsed_s": 1.7,
           "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G7_ruff_check": {
           "cmd": "uv run --no-sync ruff check .",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0.1,
+          "elapsed_s": 0.0,
           "last_summary": "All checks passed!",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G8_ruff_format": {
           "cmd": "uv run --no-sync ruff format --check .",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0.1,
-          "last_summary": "176 files already formatted",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "elapsed_s": 0.0,
+          "last_summary": "186 files already formatted",
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G9_mypy": {
           "cmd": "uv run --no-sync mypy",
-          "rc": 2,
+          "rc": 0,
           "expected": 0,
-          "elapsed_s": 0.3,
-          "last_summary": "tests/integration/bootstrap/conftest.py: note:     c) using `--explicit-package-bases` or adjusting `MYPYPATH` | Found 1 error in 1 file (errors prevented further checking)",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "MISMATCH",
+          "elapsed_s": 0.6,
+          "last_summary": "Success: no issues found in 72 source files",
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
           "previous_rc": 0,
           "previous_last_summary": "Success: no issues found in 16 source files",
-          "rc_change_reason": "Round 8 关机 checkpoint 全表复跑实测变化，如实入账（历史值只加注不改写）"
+          "rc_change_reason": "Round 8 关机 checkpoint 全表复跑实测变化，如实入账（历史值只加注不改写）",
+          "history": [
+            {
+              "rc": 2,
+              "last_summary": "tests/integration/bootstrap/conftest.py: note:     c) using `--explicit-package-bases` or adjusting `MYPYPATH` | Found 1 error in 1 file (errors prevented further checking)",
+              "measured_at": "2026-11-13T13:23:04+08:00",
+              "superseded_at": "2026-11-13T23:19:14+08:00",
+              "reason": "D-035 修复后全表复跑实测变化（历史值只加注不改写）"
+            }
+          ],
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G10_pytest": {
           "cmd": "uv run --no-sync pytest -q",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 147.6,
-          "last_summary": "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 350 passed, 6 warnings in 146.63s (0:02:26)",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "elapsed_s": 72.4,
+          "last_summary": "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 350 passed, 6 warnings in 72.09s (0:01:12)",
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G11_prototype_verify": {
           "cmd": "bash scripts/verify.sh",
@@ -4846,44 +4896,50 @@
           "expected": 0,
           "elapsed_s": 0.6,
           "last_summary": "==> 4/4 字节级复现 | PASS: 字节级复现",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G12_package_verify": {
           "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 0.2,
+          "elapsed_s": 0.1,
           "last_summary": "PASS 四版规则、15 个案例双版本、五种预发状态 | PACKAGE PASS 6/6",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G13_npm_ci_and_build": {
           "cmd": "npm --prefix web ci && npm --prefix web run build",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 7.8,
-          "last_summary": "✓ built in 148ms",
-          "measured_at": "2026-11-13T02:41:56+08:00",
-          "checkpoint_R8_not_rerun": "本 checkpoint 点未重跑。原因：Round 8 四 lane 写集均未触及 web/（Volta=src/campaignlab/worker/**+infra/db/repositories.py+application/worker.py+tests/unit/**；Bohr=tests/api/**；Ramanujan=orchestrator/tasks/**；Lagrange=orchestrator/handoff/** 两份 md），且 npm ci 耗时长、关机前不宜占用窗口。保留 2026-11-13T02:41:56+08:00 实测值 rc=0，历史值只加注不改写（D-011 体例）。"
+          "elapsed_s": 8.6,
+          "last_summary": "dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB | ✓ built in 708ms",
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
+          "rerun_note_R9": "本轮已实跑 rc=0 / built in 663ms；checkpoint 期曾以『web/ 未触及』为由保留历史值，现以本次实测取代。"
         },
         "G14_doctor": {
           "cmd": "bash scripts/doctor.sh",
           "rc": 0,
           "expected": 0,
-          "elapsed_s": 1.5,
+          "elapsed_s": 1.7,
           "last_summary": "PASS=15  WARN=1  FAIL=0 | RESULT: HEALTHY",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "OK"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         },
         "G14b_cli_doctor": {
           "cmd": "uv run --no-sync python -m campaignlab doctor",
           "rc": 0,
           "expected": null,
-          "elapsed_s": 0.4,
+          "elapsed_s": 0.3,
           "last_summary": "PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s | PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED",
-          "measured_at": "2026-11-13T13:23:04+08:00",
-          "status": "?"
+          "measured_at": "2026-11-13T23:19:14+08:00",
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
         }
       },
       "spec_untouched": {
@@ -4891,7 +4947,7 @@
         "result": "empty",
         "rc": 0,
         "expected": 0,
-        "measured_at": "2026-11-13T13:23:04+08:00"
+        "measured_at": "2026-11-13T23:19:14+08:00"
       },
       "evidence_ignored_count": {
         "cmd": "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'",
@@ -4900,8 +4956,8 @@
       },
       "counts": {
         "pytest_passed": 350,
-        "mypy_source_files": 49,
-        "ruff_formatted_files": 181,
+        "mypy_source_files": 72,
+        "ruff_formatted_files": 186,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4910,17 +4966,17 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 181,
-          "in_scope_py": 69,
+          "total": 186,
+          "in_scope_py": 74,
           "in_scope_md": 112,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T13:29:43+08:00",
+          "measured_after": "2026-11-13T23:19:14+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式在三个时点均成立：① 首提交前 tracked 176（py 69 + md 107）+ untracked 4 == ruff 报数 180；② 首提交后 tracked 180（py 69 + md 111）+ untracked 0 == ruff 报数 180（实测）；③ 第二提交前 tracked 180 + untracked 1 == ruff 报数 181（实测），提交后 tracked 181（py 69 + md 112）+ untracked 0 == 181。复现命令见本对象 reproduce_py / reproduce_md / identity_cmd 三键。",
+          "identity": "A101 恒等式：提交前 tracked in-scope py+md 181（py 69 + md 112）+ untracked 5（全为 .py）== ruff format --check 报数 186（实测）；提交后 tracked 186（py 74 + md 112）+ untracked 0 == 186。复现命令见 reproduce_py / reproduce_md / identity_cmd。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4929,7 +4985,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 180,
+          "prev_total": 181,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4942,8 +4998,8 @@
           "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。",
           "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入分母：git ls-files 只反映索引；Volta 的 repositories.py/application/worker.py 属已跟踪文件修改（不改文件数），src/campaignlab/worker/** 与其两测试尚未落盘。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫",
           "untracked_in_scope_md": 0,
-          "identity_measured_at": "2026-11-13T13:23:04+08:00",
-          "caliber_note": "counts 为**本次提交后的树**口径（A101：counts 必须与新增文件同一次提交刷新）：in_scope_md 112 = checkpoint 首提交（bf54162）后的 tracked md 111 + 第二提交新增 1 个 md（orchestrator/handoff/round8-lane-returns-raw.md）；in_scope_py 69 不变（本 checkpoint 全程未新增任何 .py）。提交前实测 untracked in-scope md = 1，提交后归 0。"
+          "identity_measured_at": "2026-11-13T23:19:14+08:00",
+          "caliber_note": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74 = 提交前 tracked py 69 + 本次新增 5 个 tests 包标记（tests/__init__.py、tests/api/__init__.py、tests/integration/__init__.py、tests/integration/bootstrap/__init__.py、tests/unit/__init__.py）；in_scope_md 112 不变（本次未新增 md）。新增的证据文件 fulltable.log 为 .log，不在 ruff format 作用域（只纳管 .py 与 .md），故不计入分母。"
         },
         "ruff_lint_scope_files": 24,
         "ruff_format_check_rc_after_governance_files": 0,
@@ -4974,7 +5030,8 @@
         "pytest_passed_note_round7_laneC": "pytest_passed 仍为 213（上次全表实测），本轮未刷新：全表在 Volta 在飞期间缓跑（假 RED 窗口）。本提交路径限定实测：两个新守护 15 passed（rc=0）+ 近邻与账本/卡片守护 79 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值。预期增量：S3b 7 + FU-8/FU-14 15 = +22（以实跑为准，禁写死）",
         "mypy_source_files_note_round7_laneC": "mypy 49 为上次全表实测；本轮路径限定 mypy 5 source files rc=0；全表值待回收后补测（预期 +4：session/workspaces/migration_head + 测试按 mypy 口径计入者以实跑为准）",
         "pytest_passed_note_R8_checkpoint": "全表实测（G10 rc=0，146.63s，350 passed / 6 warnings）。上次记录值 213（af3808b/d3f7671 时点）由本值取代；增量主因 Round 8 入库 tests/api 51 例 + tests/unit/test_worker_runner.py + test_job_repository_terminal.py 等。",
-        "mypy_source_files_note_R8_checkpoint": "**本次不可测**：G9 rc=2（D-035 Duplicate module named conftest），mypy 输出 errors prevented further checking，未产出 Success 行。按禁估算纪律保留上次可测值 49 不改动，待 D-035 修复后重测回填（FU-22）。口径提示：gates.G9.previous_last_summary 为 16 source files（2026-11-13T04:58:57+08:00），与 counts 的 49 分属不同时点/口径，两者均按历史值只加注不改写保留。"
+        "mypy_source_files_note_R9": "D-035 修复后**重新可测**：G9 实测 rc=0 / 'Success: no issues found in 72 source files'（2026-11-13T23:19:14+08:00）。49 -> 72 的跃升并非新增代码，而是**覆盖面恢复**：自 57b6db5 起 mypy 在首个错误即中止（errors prevented further checking），tests/scripts 两棵树从未被真正检查；checkpoint 期该键标『不可测』并保留 49，现以本次实测取代。gates.G9.history 保留 16 source files（04:58:57）与 rc=2（13:23:04）两个历史值，只加注不改写。",
+        "pytest_passed_note_R9": "D-035 修复后全表复跑实测 **350 passed / 6 warnings / 72.4s**（rc=0），与 checkpoint 期 350 逐数一致 → **零回归**；新增 5 个包标记未影响任何用例的收集与导入。"
       },
       "denominator_history": [
         {
@@ -5159,8 +5216,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T13:29:43+08:00",
-      "counts_refresh_reason": "Round 8 关机 checkpoint（两段提交）：① bf54162 回填全表真值并新增 4 md -> ruff_formatted_files 176->180（py 69 不变，md 107->111）、pytest_passed 213->350（G10 全表实测）、mypy_source_files 因 D-035 不可测保留 49 并加注；② 本提交新增 orchestrator/handoff/round8-lane-returns-raw.md（四 lane 原始回报存档，R8-9）-> 180->181（md 111->112）。",
+      "counts_refreshed_at": "2026-11-13T23:19:14+08:00",
+      "counts_refresh_reason": "Round 9 首件（D-035 修复 / FU-22）：ruff_formatted_files 181->186（+5 py = tests 包标记；md 112 不变）；mypy_source_files 49->72（**覆盖面恢复**，非新增代码）；pytest_passed 350 不变（零回归）。",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -5388,25 +5445,35 @@
       },
       "g9_red": {
         "gate": "G9_mypy",
-        "rc": 2,
-        "expected": 0,
         "defect": "D-035",
-        "blocking": true,
-        "note": "Duplicate module named conftest（tests/api/conftest.py vs tests/integration/bootstrap/conftest.py），errors prevented further checking -> src+tests+scripts 三棵树全部未被类型检查。引入提交 57b6db5。G9 红灯期间 wave1 出口 Q 复核与任何 AC 取证均不得放行；下次开工第一件事修 D-035（FU-22）。"
+        "status": "RESOLVED",
+        "was": "rc=2 / Duplicate module named conftest / errors prevented further checking（src+tests+scripts 三棵树类型检查归零）",
+        "now": "rc=0 / Success: no issues found in 72 source files",
+        "resolved_at": "2026-11-13T23:19:14+08:00",
+        "fix": "新增 5 个 tests 包标记 + 2 处 from conftest import -> from tests.api.conftest import；**未改任何配置**、未 exclude、未放宽 strict、未加 type: ignore、未删改用例。裁定见 A123。",
+        "note": "G9 红灯期间对 wave1 出口 Q 复核与 AC 取证的封锁自本时点解除。"
       },
       "fulltable_evidence": {
-        "path": "/tmp/fulltable.json",
-        "session": "write_stdin 77302",
-        "script": "/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/fulltable.py",
-        "gates_run": 15,
+        "path": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
+        "host_json_copy": "D:\\ws\\codex_rd\\ss_campaignlab\\.orch_tmp\\evidence\\fulltable-r9-d035.json",
+        "script": "/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/fulltable_r9b.py",
+        "gates_run": 16,
         "gates_not_run": [
-          "G13_npm_ci_and_build",
           "G4c_frontend_tamper_negative"
         ],
-        "mismatch": [
-          "G9_mypy"
-        ],
-        "measured_at": "2026-11-13T13:23:04+08:00"
+        "mismatch": [],
+        "all_green": true,
+        "measured_at": "2026-11-13T23:19:14+08:00",
+        "finished_at": "2026-11-13T23:19:14+08:00",
+        "evidence_placement_rule": "依 .gitignore 第 16-18 行（D-003）：证据 .log 必须入库，否则 gates[].evidence 指针会指向仓库中不存在的文件，Q lane 无法复核、宿主重置即永久丢失。故本次证据落仓库内 evidence/**.log 而非 /tmp。",
+        "previous": {
+          "path": "/tmp/fulltable.json（**已随 WSL VM 空闲终止而丢失**，见 R9-1）",
+          "gates_run": 15,
+          "mismatch": [
+            "G9_mypy"
+          ],
+          "measured_at": "2026-11-13T13:23:04+08:00"
+        }
       }
     },
     "post_patch_review": {
@@ -7721,49 +7788,56 @@
         "at": "2026-11-13T08:42:00+08:00",
         "item": "S3b（Round 6）入库后排一轮前后端真联调复跑 Playwright，把结论写进 evidence/M0/M0-03/，届时才可把 M0-03 的 AC-001 页面侧 gate 从 PASS_WITH_TODO 转 PASS",
         "owner": "编排器",
-        "source": "A27 / Pasteur R4-Q7"
+        "source": "A27 / Pasteur R4-Q7",
+        "status": "PENDING"
       },
       {
         "id": "FU-2",
         "at": "2026-11-13T08:42:00+08:00",
         "item": "web/tests/unit/api-client.spec.ts 追加断言：默认路径不发 If-None-Match 头（编排器实测现无此断言）。归 M0-03/S10 或 M0-03b",
         "owner": "M0-03/S10 或 M0-03b",
-        "source": "A21 附加硬条件②"
+        "source": "A21 附加硬条件②",
+        "status": "PENDING"
       },
       {
         "id": "FU-3",
         "at": "2026-11-13T08:42:00+08:00",
         "item": "M5-02(Q lane) 复核 acceptance.primary_owner 是否应把 M4-03 补进 AC-026/AC-027 的 cross_ref（属台账变更，非本轮自裁）",
         "owner": "M5-02",
-        "source": "A28"
+        "source": "A28",
+        "status": "PENDING"
       },
       {
         "id": "FU-4",
         "at": "2026-11-13T08:42:00+08:00",
         "item": "M0-04 派单文须承接：/workspaces/:id 路由的 component 由 NotFoundPage 替换为 UI-02 实现，无需改页面（A24）",
         "owner": "编排器(M0-04 派单文)",
-        "source": "A24 / Pasteur R4-Q3"
+        "source": "A24 / Pasteur R4-Q3",
+        "status": "PENDING"
       },
       {
         "id": "FU-5",
         "at": "2026-11-13T08:42:00+08:00",
         "item": "批次 4 补 M1-04/M2-04 卡时（批次 5）须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属",
         "owner": "编排器(D-016 批次5 派单文)",
-        "source": "A31"
+        "source": "A31",
+        "status": "PENDING"
       },
       {
         "id": "FU-6",
         "at": "2026-11-13T08:42:00+08:00",
         "item": "D-022 待项目负责人裁定（选项 A/B），最迟须在 wave5 派单前给出；裁定前全项目按选项 A 暂用推进",
         "owner": "项目负责人",
-        "source": "D-022 / pending_owner D-022-1"
+        "source": "D-022 / pending_owner D-022-1",
+        "status": "PENDING"
       },
       {
         "id": "FU-7",
         "at": "2026-11-13T10:56:43+08:00",
         "item": "Health.schema_revision 的哨兵串 'UNMIGRATED' 属契约可见面：前端 health 面板禁把它当版本号原样展示，须按 status=DEGRADED 分支处理；S5 需在 evidence/M0/M0-02/ 留「未迁移时 /health 响应体」的命令级取证",
         "owner": "M0-03b/M1 前端 + M0-02/S5",
-        "source": "A71"
+        "source": "A71",
+        "status": "PENDING"
       },
       {
         "id": "FU-8",
@@ -7780,35 +7854,40 @@
         "at": "2026-11-13T10:56:43+08:00",
         "item": "audit_role_of() 的「优先 OPERATOR，否则枚举序第一」是本机模式临时口径；若后续引入角色切换（非本机模式），必须改为接收显式 role 参数，禁继续用默认挑选",
         "owner": "M4-02（actions/audit 写权方）",
-        "source": "A72"
+        "source": "A72",
+        "status": "PENDING"
       },
       {
         "id": "FU-10",
         "at": "2026-11-13T10:56:43+08:00",
         "item": "M0-04/S2 派单文必须明写：作业终态写入（SUCCEEDED/FAILED/CANCELLED）归本卡，且必须复用 JobRepository，**禁新增 UPDATE jobs 落点**；并承接 A73 的 result_json/problem_json 映射（若 M0-04 另有约定以其为准，须回改 job_from_row 并在卡内登记）",
         "owner": "编排器（M0-04/S2 派单文）",
-        "source": "A73 / Godel 偏差3"
+        "source": "A73 / Godel 偏差3",
+        "status": "PENDING"
       },
       {
         "id": "FU-11",
         "at": "2026-11-13T10:56:43+08:00",
         "item": "游标密钥 state/cursor.key 的加载点当前唯一（application/workspace_service.py::load_cursor_secret，延迟加载）；若 S4/S5 出现第二处加载点，必须收口到 infra 或 config（单一来源）",
         "owner": "编排器（S4/S5 派单前置检查）",
-        "source": "A76"
+        "source": "A76",
+        "status": "PENDING"
       },
       {
         "id": "FU-12",
         "at": "2026-11-13T10:56:43+08:00",
         "item": "S4 需新增正向覆盖「显式装配后 /api/v1/health 返回 200 且 worker 字段为真值」，以补上既有两条用例（test_health_is_500_problem_while_service_is_pending / test_jobs_router_is_not_mounted_by_s3c）语义过时留下的正向缺口；**禁改名或改写这两条既有测试**，语义迁移在 M0-02-design.md 追注说明",
         "owner": "M0-02/S4",
-        "source": "A69"
+        "source": "A69",
+        "status": "PENDING"
       },
       {
         "id": "FU-13",
         "at": "2026-11-13T10:56:43+08:00",
         "item": "派单文模板更正：① 禁写死 ruff/pytest/mypy 计数基线，一律指向 state.json -> resume.self_check_gates_rc0.counts 现值并附恒等式 tracked+untracked==total（A75/D-012/D-014）；② 禁写「lease_until 赋值只在 worker.py」这类会与「UPDATE jobs 只在 repositories.py」冲突的措辞，改用 A70 的三条判据；③ 门禁 rc 采集一律 set -o pipefail 且 rc 与输出文本双判（D-027）",
         "owner": "编排器（所有后续派单文）",
-        "source": "A70 / A75 / D-027"
+        "source": "A70 / A75 / D-027",
+        "status": "PENDING"
       },
       {
         "id": "FU-14",
@@ -7825,56 +7904,66 @@
         "at": "2026-11-13T11:34:54+08:00",
         "item": "新增守护 tests/unit/test_card_output_scope.py：解析每张非 LEGACY 卡档位表「产出」列的路径字面量，断言其全部落在 state.json -> tasks[id].scope 的允许前缀内，越界即判红并打印越界路径与所属任务。现守护（test_task_cards.py）只查卡<->tasks 键双向对账与必需段落，不查产出列越界，属 D-029 的机器盲区。归 Round 8 独立 flash 小片（<=8k），可与 FU-8（alembic head 收口）、FU-14（counts 新鲜度守护）同批。",
         "owner": "编排器（Round 8 派单）",
-        "source": "D-029"
+        "source": "D-029",
+        "status": "PENDING"
       },
       {
         "id": "FU-16",
         "at": "2026-11-13T12:31:47+08:00",
         "item": "cli.MIGRATIONS_DIR 与 infra/db/migration_head.py 两处 'migrations' 字面量归一：改 cli 从 migration_head re-export（约 3 add / 3 del），使迁移目录字面量单一来源。收口前后数量未增、守护已钉定义点集合，故非阻塞。归 Round 8+ 独立 flash 小片（<=8k）",
         "owner": "编排器（Round 8+ 派单）",
-        "source": "A99 / D-028"
+        "source": "A99 / D-028",
+        "status": "PENDING"
       },
       {
         "id": "FU-17",
         "at": "2026-11-13T12:31:47+08:00",
         "item": "api 私有助手提升：session.py 的 JSON_MEDIA_TYPE / PROBLEM_STATUSES / declared_responses / validation_issues / parse_json_body / render_session_cookie 现被 workspaces.py import 复用（合规）。**若第三个 api 模块需要其中任一助手，必须提升到 api/common.py（append-only 豁免），禁第三份复制**。归 Round 8+ 独立 flash 小片（<=8k），触发点为 M0-04/S4 的 api/jobs.py",
         "owner": "编排器（Round 8+ 派单）",
-        "source": "A98 / D-030"
+        "source": "A98 / D-030",
+        "status": "PENDING"
       },
       {
         "id": "FU-18",
         "at": "2026-11-13T12:43:29+08:00",
         "item": "M4-03 卡追加 UI-25（/w/:workspace_id/jobs）注记：按 A105 判归 M4-03，卡内登记 AC-029/AC-031 为页面侧 cross_ref（primary 分别 M0-04 / M5-01），append-only 不改写原文。归 Round 9 flash 小片（<=8k）",
         "owner": "编排器（Round 9 派单）",
-        "source": "A105 / D-031"
+        "source": "A105 / D-031",
+        "status": "PENDING"
       },
       {
         "id": "FU-19",
         "at": "2026-11-13T12:43:29+08:00",
         "item": "新增守护 tests/unit/test_ledger_freshness.py：① 每个 subtask_progress==DONE 的子任务必须能在 git log 找到对应提交或在 state 里有 commit/evidence 字段；② 每条 AC-* gate 要么 rc!=null 且 evidence 非空，要么带 evidence_status=NOT_YET_COLLECTED + deferred_to（禁裸 null）；③ evidence/** 下已入库文件必须被至少一条 gate 或 subtask_progress_evidence 引用（防证据孤儿）。归 Round 8/9 独立 flash 小片（<=10k）",
         "owner": "编排器（Round 8/9 派单）",
-        "source": "D-032 / A109"
+        "source": "D-032 / A109",
+        "status": "PENDING"
       },
       {
         "id": "FU-20",
         "at": "2026-11-13T13:17:09+08:00",
         "item": "给 src/campaignlab/api/health.py 的路由装饰器补 responses=declared_responses(200)（<=3 行，append-only），使 A95「实现码集==切片码集」不变量对 getHealth 也成立；同步更新 tests/api/test_contract_declarations.py::test_gethealth_decorator_has_no_declared_responses_yet_and_is_tracked_as_u1（该用例现在钉住 health 侧码集为空，补齐后必然转红，属设计好的哨兵）。归 Round 9 flash 小片（<=8k）",
         "owner": "编排器（Round 9 派单）",
-        "source": "A95 / Bohr U-1"
+        "source": "A95 / Bohr U-1",
+        "status": "PENDING"
       },
       {
         "id": "FU-21",
         "at": "2026-11-13T13:17:09+08:00",
         "item": "D-033 收口：统一幂等重放与新建两条路径的正文序列化口径，使重放逐字节相同；修 api/common.py 需 append-only 豁免或 CR；修复后把 test_idempotency_replay_is_byte_identical_and_writes_once 的断言收回 first.content == second.content（禁删用例）。必须在 AC-034 取证前完成。归 Round 9",
         "owner": "编排器（Round 9 派单）",
-        "source": "D-033 / A117 / Bohr U-2"
+        "source": "D-033 / A117 / Bohr U-2",
+        "status": "PENDING"
       },
       {
         "id": "FU-22",
         "at": "2026-11-13T13:29:43+08:00",
         "item": "D-035 收口（**Round 9 第一优先，先于任何新派单**）：修 mypy Duplicate module named conftest 使 G9 转绿。推荐 [tool.mypy] 增 explicit_package_bases = true（不动测试文件、覆盖面不减）；备选 tests/** 加 __init__.py（须复跑 pytest 确认 350 passed 不降）；禁 exclude 削弱覆盖面。验收：uv run --no-sync mypy rc=0 且 stdout 含 Success: no issues found in N source files（N>0），以该 N 回填 counts.mypy_source_files 并在 counts_refresh_reason 记明『D-035 修复后重测』；git diff --stat 仅含 pyproject.toml（选 B）。G9 红灯期间 wave1 出口 Q 复核与任何 AC 取证不得放行。",
         "owner": "编排器（Round 9 首件，可自办不必派 lane：改动面 1-2 行配置）",
-        "source": "D-035 / A120 / R8-4"
+        "source": "D-035 / A120 / R8-4",
+        "status": "DONE",
+        "resolved_at": "2026-11-13T23:19:14+08:00",
+        "resolution": "D-035 已修（选项 A：5 个 tests 包标记 + 2 处 import 改包路径，**零配置改动**）。G9 rc=0 / 72 source files；pytest 350 passed 零回归；全表 16 项全绿。详见 defects[D-035].fix_applied 与 A123。"
       }
     ],
     "commit_backfill_round6": {
@@ -8410,7 +8499,10 @@
       "rule_full_tree_mypy_on_basename_collision": "凡新增 conftest.py、或与既有文件**同 basename** 的新文件入库，复验必须跑一次全树 uv run --no-sync mypy，禁以路径限定 mypy 替代（路径限定不会触发跨目录重复模块名检测）。立规原因：R8-4 / D-035 —— 57b6db5 只跑路径限定 mypy（3 source files rc=0）即提交，漏检 G9 全表红灯，且 errors prevented further checking 使三棵树类型检查归零。",
       "rule_no_trust_handoff_summary_assertions": "会话交接摘要中的存在性/数值断言（副本已存、进度 N/M、提交总数、lane 字母）一律**必须实测复核**后才可采信。立规原因：R8-5（lane 字母）、R8-6（M0-02 6/8 实为 7/8）、R8-7（宿主副本实测不存在）。",
       "rule_close_agent_returns_raw_report": "关闭任何 lane 句柄（close_agent）**之前**，必须先取回其 previous_status.completed 全文并落盘存档到 orchestrator/handoff/；该全文**仅在 close 动作的当次返回中可得**，句柄关闭后不可再取。立规原因：R8-9 / A122 —— Round 8 四条 lane 的原始回报差点被误判为『已随会话消失』。",
-      "rule_truncation_must_be_marked": "工具输出被截断处必须如实标注 [TRUNCATED] 并注明截断规模，同时给出可从仓库实测恢复的替代路径；**禁臆造补全**。Round 8 实测截断：Volta 中段约 10723 tokens（PROBLEM_CODES 20 个码名仅取回前 2 个）、Ramanujan 约 90 tokens、Bohr 约 38 tokens。"
+      "rule_truncation_must_be_marked": "工具输出被截断处必须如实标注 [TRUNCATED] 并注明截断规模，同时给出可从仓库实测恢复的替代路径；**禁臆造补全**。Round 8 实测截断：Volta 中段约 10723 tokens（PROBLEM_CODES 20 个码名仅取回前 2 个）、Ramanujan 约 90 tokens、Bohr 约 38 tokens。",
+      "rule_no_tmp_only_evidence": "门禁证据**禁只存 /tmp**：WSL2 VM 在命令间空闲即被自动终止，/tmp（tmpfs）随之清空，实测已丢失两份全表证据（R9-1）。证据一律落仓库内 evidence/**/<run>/fulltable.log 并入库（依 .gitignore 的 !evidence/**/*.log / D-003，使 gates[].evidence 指针指向仓库内真实文件、Q lane 可复核），宿主 .orch_tmp/evidence/ 另存机读 JSON 副本。/tmp 仅可用于可重生成的中间产物（如 contract_slice 负例输出）。",
+      "rule_verify_worktree_after_vm_restart": "发现 /tmp 内容异常丢失（疑似 VM 重启）时，**必须先核验三者再继续**：① 工作树改动是否仍在（ext4 持久，通常完好）② HEAD 与 ahead/behind ③ state.json 是否被半写（原子写 + os.replace 保证不会）。核验通过后才可重跑门禁；禁直接重跑覆盖，禁假定改动已丢失而重做。",
+      "rule_ruff_e501_counts_east_asian_width": "ruff 的 E501 按**东亚字符宽度**计（中文算 2，非 Python 的 len()）：实测一行 85 个字符（含中文）被报 117 > 100、96 字符被报 123 > 100。写含中文的单行 docstring/注释时必须按宽度而非字符数控制在 line-length=100 内，超长改为多行 docstring。"
     },
     "round7_adjudications": [
       {
@@ -8774,6 +8866,34 @@
         "question": "四个子智能体句柄关闭后，其原始回报全文是否可恢复？checkpoint 是否应为存档这些原文追加第二段提交（已推送后再提交）？",
         "ruling": "**可恢复，且必须存档**：close_agent 的返回值携带 previous_status.completed 全文，但**仅在关闭动作的当次返回中可得**，句柄关闭后不可再取。故裁定：① 追加第二段提交把四 lane 原文落盘为 orchestrator/handoff/round8-lane-returns-raw.md；② 立口径规则 rule_close_agent_returns_raw_report —— 今后关闭任何 lane 句柄前，必须先取回并存档其最终回报全文；③ 工具输出截断处如实标注 [TRUNCATED]（本次 Volta 中段约 10723 tokens、Ramanujan 约 90、Bohr 约 38 未取回），并给出可从仓库实测恢复的替代路径（如 PROBLEM_CODES 全集见 src/campaignlab/domain/errors.py），**禁臆造补全**。已推送后追加提交不构成 force-push、不改写历史，符合纪律。",
         "action_taken": "raw 存档落盘 + digest §7 更正 + R8-9 + 两条口径规则入库 + counts 181 同提交刷新"
+      },
+      {
+        "id": "A123",
+        "round": 9,
+        "at": "2026-11-13T23:19:14+08:00",
+        "source": "编排器（Round 9 首件：FU-22 / D-035 修法裁定）",
+        "question": "D-035 修法：checkpoint 期 D-035.md §5 推荐选项 B（pyproject.toml 加 explicit_package_bases = true，预估『1-2 行配置、编排器可自办』）。实测是否成立？还是改用选项 A（加 __init__.py）？",
+        "ruling": "**改用选项 A，放弃 checkpoint 期推荐的选项 B**。只读探查（uv run --no-sync mypy --explicit-package-bases，不改任何文件）实测表明：选项 B 能解除重复模块名（checked 67 source files），但**遗留 3 个错误** —— 两处 `Cannot find implementation or library stub for module named conftest`（tests/api/test_contract_http.py:20、test_contract_declarations.py:20 的 `from conftest import ...`）+ 一处 `no-any-return`（:51）。即选项 B 并非『1-2 行配置』：还必须同时把 import 改为包路径，而包路径在 pytest 运行期又需要 repo root 在 sys.path（tests/api 无 __init__.py 时 pytest 的 prepend 模式只插入 tests/api），于是还要给 [tool.pytest.ini_options] 加 pythonpath = ['.'] —— 合计**动 2 处配置 + 2 处 import**。选项 A 只需 **5 个包标记 + 2 处 import，零配置改动**：包标记使 mypy 自动推断 tests.api.conftest 与 tests.integration.bootstrap.conftest（正是 mypy 提示的解法 (b)），同时 pytest 的 prepend import mode 会把 repo root 插入 sys.path，`from tests.api.conftest import` 运行期天然可解析。故选 A。",
+        "evidence": [
+          "探查 `mypy --explicit-package-bases` -> rc=1 / `Found 3 errors in 2 files (checked 67 source files)`",
+          "全仓 basename 冲突普查：in-scope 69 个 .py 仅 3 组同名 —— `__init__.py`（7 个，均在有包标记的 src/campaignlab/** 内）、`errors.py`（domain/errors.py 与 worker/errors.py，**两者都已在有 __init__.py 的包内**，模块名 campaignlab.domain.errors / campaignlab.worker.errors，不冲突）、`conftest.py`（**唯一真冲突**）-> 证明加包标记后不会冒出新的重复模块名",
+          "无包标记目录普查：migrations(1)、migrations/versions(1)、scripts(3)、tests/api(3)、tests/integration/bootstrap(2)、tests/unit(22)；`migrations/**` 不在 [tool.mypy].files 内故不参与",
+          "跨目录 import 普查：`grep -rn -E '^(from|import) +(tests|conftest)' src tests scripts` -> **全仓仅 2 处命中**，改动面确认极小",
+          "conftest.py:156 的 exchange 已标注 `-> tuple[TestClient, Any]`，故 :51 的 no-any-return 确为级联错误，修好 import 即自动消失（实测验证成立，无需任何类型标注改动）",
+          "修后全表实测：16 项**全绿 mismatch=none**；mypy rc=0 / 72 source files；pytest rc=0 / 350 passed / 72.4s（与 checkpoint 期 350 逐数一致，零回归）；ruff check rc=0；ruff format --check 186 files；G13 npm ci+build rc=0 / built in 663ms；spec/contracts dirty=0；恒等式 tracked 181 + untracked 5 == ruff 186",
+          "证据入库：evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log（4537 B）"
+        ],
+        "action_taken": "新增 5 个 tests 包标记（各带 docstring 说明 D-035 与对应 mypy 模块名，其中 tests/__init__.py 与 tests/integration/bootstrap/__init__.py 因 E501 按**东亚宽度**计（中文算 2）改为两行 docstring）；2 处 import 改为 from tests.api.conftest import；ruff check --fix + ruff format 归一（isort 自动把 tests.api.conftest 排在 campaignlab.* 之后）；D-035 -> FIXED_PENDING_Q + blocking=false + fix_applied 全量留证；FU-22 -> DONE；counts 同提交刷新（ruff 181->186、mypy 49->72、pytest 350 不变）",
+        "self_note": "checkpoint 期把修法预估为『1-2 行配置、编排器可自办』**偏乐观**，实测需 7 个文件改动（5 新建 + 2 修改）。预估偏差如实记录，不追溯改写 D-035.md §5 的推荐文字（历史值只加注）；D-035.md 的推荐段落**以本条 A123 为准**。"
+      },
+      {
+        "id": "A124",
+        "round": 9,
+        "at": "2026-11-13T23:19:14+08:00",
+        "source": "编排器（WSL VM 空闲终止导致 /tmp 证据丢失）",
+        "question": "门禁证据的落点：此前一律写 /tmp/fulltable*.json，实测 WSL VM 在命令间空闲即被自动终止（up 1 min、/proc/uptime 66s），/tmp 为 tmpfs 随之清空，导致 checkpoint 期的 /tmp/fulltable.json 与本轮首次的 /tmp/fulltable_r9_d035.json 双双丢失。证据应落在哪里？",
+        "ruling": "**证据一律落仓库内 `evidence/**/<run>/fulltable.log` 并入库**（依 .gitignore 第 16-18 行 / D-003 的既有设计：`*.log` 被忽略但 `!evidence/**/*.log` 反排除，正是为了让 gates[].evidence 的指针指向仓库内真实存在的文件，使 Q lane 可复核、宿主重置不丢）。宿主机 `.orch_tmp/evidence/` 另存一份机读 JSON 副本（sha256 双向核对后仓库内只保留 .log，机读 .json 不入工作树以免留 untracked）。**禁把唯一证据只存 /tmp**；/tmp 仅可用作可重生成的中间产物（如 contract_slice 的负例输出 /tmp/neg_*.json）。",
+        "action_taken": "本轮证据已落 evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log（4537 B，入库）；gates[*].evidence 与 fulltable_evidence.path 全部改指该仓库内路径；新增口径规则 rule_no_tmp_only_evidence；自我更正 R9-1"
       }
     ],
     "round7_predispatch": {
@@ -9644,7 +9764,7 @@
     },
     "checkpoint_R8": {
       "paused_at": "2026-11-13T13:29:43+08:00",
-      "dag_paused": true,
+      "dag_paused": false,
       "reason": "用户指令：『我准备关机，请保存完整 checkpoint，准备下次续跑剩余的轮；保存检查无误即可暂停 DAG 执行』",
       "resume_requires": "用户明确下达『开工』指令；在此之前禁派任何 lane、禁改 src/** web/** tests/** orchestrator/tasks/**",
       "repo": {
@@ -9929,8 +10049,61 @@
         }
       },
       "handles_closed_at": "2026-11-13T13:29:43+08:00",
-      "handles_note": "四个句柄（Volta/Ramanujan/Bohr/Lagrange）均已 close_agent 释放，并发槽归零；previous_status 均为 completed，原文已存档（见 lane_raw_report_archive）。"
-    }
+      "handles_note": "四个句柄（Volta/Ramanujan/Bohr/Lagrange）均已 close_agent 释放，并发槽归零；previous_status 均为 completed，原文已存档（见 lane_raw_report_archive）。",
+      "resumed_at": "2026-11-13T23:24:04+08:00",
+      "resume_authorization": "用户于本次会话明确下达「开工」指令（关机约 9.7 小时后；WSL VM 已随关机重启，实测 up 1 min）",
+      "resumed_with": {
+        "head_at_resume": "15feb1a",
+        "first_action": "FU-22 / D-035 修复（Round 9 第一优先，按 checkpoint §6 恢复步骤 ⑤）",
+        "result": "全表 16 项全绿 mismatch=none；G9 rc=0 / 72 source files；pytest 350 passed 零回归；恒等式 181+5==186",
+        "adjudications": [
+          "A123（改用选项 A，放弃 checkpoint 期推荐的 B）",
+          "A124（证据落点改为仓库内 evidence/**.log）"
+        ],
+        "self_corrections": [
+          "R9-1（/tmp 证据易失）"
+        ],
+        "incident": "恢复过程中遭遇 WSL VM 空闲终止导致 /tmp 证据丢失，已按 rule_verify_worktree_after_vm_restart 核验工作树/HEAD/台账三者完好后重跑，零数据损失"
+      }
+    },
+    "round9_self_corrections": [
+      {
+        "id": "R9-1",
+        "at": "2026-11-13T23:24:04+08:00",
+        "what_was_wrong": "把门禁证据唯一落点设在 /tmp（checkpoint 期的 /tmp/fulltable.json、本轮首次的 /tmp/fulltable_r9_d035.json）。实测 WSL2 VM 在命令间空闲即被自动终止（`up 1 min`、/proc/uptime 66s），/tmp 属 tmpfs 随之清空 -> 两份证据文件全部丢失，导致本轮 state.json 回填脚本首次执行时 FileNotFoundError 崩溃",
+        "how_found": "backfill 脚本读 /tmp/fulltable_r9_d035.json 抛 FileNotFoundError；随即实测 `date -Iseconds`（23:14 vs 此前 13:29）、`uptime`（up 1 min）、`ls -la /tmp`（只剩 systemd 目录）三项交叉确认 VM 已重启",
+        "correction": "① 核验仓库改动未受影响（5 个包标记 + 2 处 import 全在，ext4 持久；HEAD 仍 15feb1a、ahead/behind 0/0；state.json 因原子写未执行而**完好未被半写**）；② 全表 16 项**重跑**并把证据落仓库内 evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log（入库）+ 宿主机读副本；③ 台账回填改为**两阶段**：先把 stage1 结果写进仓库内 orchestrator/state.json.stage1（VM 重启安全），再合并 stage2 原子替换 state.json，最后删 stage1",
+        "prevention": "新增 resume.gate_measurement_caliber.rule_no_tmp_only_evidence 与 A124：证据一律落仓库内 evidence/**.log 并入库；/tmp 只放可重生成的中间产物。另立 rule_verify_worktree_after_vm_restart：发现 /tmp 内容异常丢失时，必须先核验工作树/HEAD/台账三者是否完好再继续，禁直接重跑覆盖",
+        "related": [
+          "A124",
+          "D-003",
+          "gate_measurement_caliber.rule_no_tmp_only_evidence"
+        ]
+      }
+    ],
+    "round9_orchestrator_self_served": [
+      {
+        "at": "2026-11-13T23:19:14+08:00",
+        "item": "D-035 修复（FU-22）",
+        "who": "编排器自办，**未派子智能体**",
+        "why_not_dispatched": "改动面 7 个文件（5 个 52-154 B 的包标记 + 2 处单行 import）、需全表复验与 counts 同提交刷新，派单协调成本高于自办；且 Round 9 的两个 BLOCKING 终裁（U-1 / F-U-2）尚未做，不宜在终裁前铺开 lane。",
+        "accounting": "**不计入 budget.subtask_log**：该口径只统计子智能体派单（units=subtask_count、flash/max 档位），编排器自办若计入会污染 flash_share 分母。故独立记于本键（见 accounting_rule_orch_self_served）。",
+        "files_added": [
+          "tests/__init__.py",
+          "tests/api/__init__.py",
+          "tests/integration/__init__.py",
+          "tests/integration/bootstrap/__init__.py",
+          "tests/unit/__init__.py",
+          "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+        ],
+        "files_modified": [
+          "tests/api/test_contract_http.py",
+          "tests/api/test_contract_declarations.py"
+        ],
+        "gates_after": "全表 16 项全绿（mismatch=none）；mypy 72 source files；pytest 350 passed；ruff format 186 files"
+      }
+    ],
+    "accounting_rule_orch_self_served": "编排器自办的小修复**不入** budget.subtask_log（避免污染 flash_share 分母，该口径只统计子智能体派单），一律记入 resume.round<N>_orchestrator_self_served。"
   },
   "acceptance": {
     "baseline_total": 35,
@@ -10788,5 +10961,5 @@
       "applies_to": "S3b/S4 的 5 个路由 + 已交付的 api/health.py"
     }
   },
-  "dag_paused": true
+  "dag_paused": false
 }

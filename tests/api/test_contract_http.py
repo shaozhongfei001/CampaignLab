@@ -17,13 +17,13 @@ from datetime import timedelta
 from typing import Any, Final
 
 import pytest
-from conftest import EVIL_HOST, EVIL_ORIGIN, T0, Harness
 from fastapi.testclient import TestClient
 
 from campaignlab.api.common import X_REQUEST_ID_HEADER, Problem
 from campaignlab.application.session_service import SESSION_COOKIE_NAME, SESSION_INVALID_DETAIL
 from campaignlab.config import API_PREFIX
 from campaignlab.domain.errors import PROBLEM_CODES
+from tests.api.conftest import EVIL_HOST, EVIL_ORIGIN, T0, Harness
 
 EXCHANGE_URL: Final = f"{API_PREFIX}/session/exchange"
 SESSION_URL: Final = f"{API_PREFIX}/session"
