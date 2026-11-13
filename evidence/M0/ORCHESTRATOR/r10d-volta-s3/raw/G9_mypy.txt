@@ -1,0 +1,7 @@
+$ uv run --no-sync mypy
+--- rc=0 expected=0 secs=0.6 ---
+--- stdout ---
+Success: no issues found in 77 source files
+
+--- stderr ---
+

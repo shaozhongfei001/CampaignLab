@@ -1,0 +1,6 @@
+$ ( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )
+--- rc=0 expected=0 secs=0.0 ---
+--- stdout ---
+
+--- stderr ---
+

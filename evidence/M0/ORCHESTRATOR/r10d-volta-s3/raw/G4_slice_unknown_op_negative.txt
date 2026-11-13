@@ -1,0 +1,8 @@
+$ python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r10d.json
+--- rc=2 expected=2 secs=0.1 ---
+--- stdout ---
+
+--- stderr ---
+spec_version=1.0.1 slice_bytes=622 slice_lines=17 sections=['spec_version', 'source', 'operations', 'truncated_schemas'] missing=['operations:noSuchOp'] depth=5 truncated_schemas=[]
+FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']
+

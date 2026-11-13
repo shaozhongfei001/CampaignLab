@@ -112,3 +112,59 @@
 > **⑥ A88③ 的形状约束（`JOB_INTERRUPTED`）**：T7 写入 `jobs.problem_json` 的 Problem 必须是 `code='INTERNAL_ERROR'` + `status=500` + `issues[0].code='JOB_INTERRUPTED'`；`JOB_INTERRUPTED` **禁**提升为 `Problem.code`（会污染 ADR-005 冻结的 20 码注册表）。已由 `tests/unit/test_worker_runner.py::test_t7_expired_running_is_marked_job_interrupted` 钉住。`artifacts.kind` 取常量 `"JOB_RESULT"`（A89，本裁定即其权威来源），`result_ref` 断言口径 `ObjectRef(kind="job", id=<job_id>)`。
 >
 > **全文**：`state.json -> resume.round7_adjudications` 的 A81／A82／A83／A86／A87／A88／A89／A90／A91。S2 未在本卡落地的 §9 符号（`worker/integrity.py`、`worker/deps.py`、`worker/service.py`、`JobStore.list_jobs`）及其理由见 S2 的回报「诚实偏差清单」与 U 项。
+
+## 11. Round 10-D 裁定追记（A152–A157；append-only，§1–§10 一字未改）
+
+> 本节由编排器在回收 lane S（Jason/Volta，M0-04/S3）后追加，把 §5 的两处口径差与 §9 的符号面定案，
+> 使后续 lane（S2b/S4/S5/S6/S8 与 wave3）不必再按字面重开此议。体例依 A151：**原文逐字保留、只追加注解**。
+> 追加方式为纯 EOF 追加，`git diff --numstat` 对本文件只报新增行、删除行为 0。
+> 裁定全文（question / ruling / evidence / action_taken / self_note）见 `orchestrator/state.json -> resume.round7_adjudications` 的 A152–A157。
+
+- **A152 — 对 §5:48 的 `INSERT … ON CONFLICT(workspace_id,kind,sha256) DO NOTHING` 字面要求：不按字面实现。**
+  该句是对**可观测语义**（幂等登记、冲突时既有行 id 胜出、回读值权威）的示意写法，不构成「另设第二个 SQL 写点」的授权；
+  就 SQL 写点收敛这一主题，在册裁定 **A81**（`infra/db/repositories.py` 为 5 张表唯一 SQL 落点）更具体、更权威，冲突时以 A81 为准。
+  合规实现形态 =「SELECT → 必要时 `ArtifactRepository.insert` → 再 SELECT 回读权威 id」，整体运行在调用方的 `BEGIN IMMEDIATE` 内，
+  写者已被 SQLite 写锁串行化，「未命中 → 插入」之间不存在第二个写者；`UNIQUE(workspace_id,kind,sha256)` 是兜底，
+  若触发即整体回滚判红，不会静默产生重复行。**禁**为逐字实现而给 `infra/db/**` 开 `upsert_ignore` 口子
+  （那等于扩 A82 的纯追加方法集并动唯一 SQL 写点，代价与风险高于收益、可观测语义零增量）。
+- **A155 — 对 §5:48「`result_ref.id` 必须取回读值」与 §10 注⑥/A89 `ObjectRef(kind="job", id=<job_id>)` 之冲突：两者不是同一对象的口径。**
+  冻结文档内部矛盾**第五例**（前四例见 A145–A151）。定案三条：
+  ① **M0-04 的 `result_ref` 断言面一律按 A89** —— §5:51 与 §9-N8 本就把 `result_ref` 的组装与 kind 业务映射外推给 handler / M1-M2
+     （N8 原文「本卡不发明」），而 A89/§10 注⑥ 是在后的、专门针对 M0-04 断言面的裁定；
+  ② §5:48 的「回读值权威、**禁用刚生成的 id**」**保留但重新定域**：它约束的是 `artifacts` 行自身的 id，
+     即 `commit()` 暴露的 `artifact_id` 必须是回读值（`infra/artifacts.py::_select_artifact_id`，:706-718），不得是本地生成值。
+     其真实意图由配对的失败模式给出（§7:67 AC-029 已知失败模式：「`ON CONFLICT DO NOTHING` 后不回读 id → `result_ref.id` 指向不存在行」）
+     —— 要防的是**引用不存在的行**；在 A89 口径下 `result_ref.id = job_id`，该失败模式对 M0-04 不适用，但约束本身仍有价值；
+  ③ **前向效力（条件式，对 M1/M2）**：当且仅当某个 kind 的业务映射把 `result_ref.id` 指向制品行时（如 `EXPORT`/`REPORT`），
+     该 id **必须**取回读值、禁取刚生成的 id。见 FU-30，相关卡派单文须引用本条。
+- **A153 — 对 §5:47「启动即 `verify_same_filesystem()`」所依赖的 `infra → worker` 复用边：追认 + 限期修正（FU-29）。**
+  `infra/artifacts.py:54` 的 `from campaignlab.worker.errors import ArtifactCommitFailed` 是**本文 §9 与 `worker/errors.py:55-56`
+  （「此处只提供 design §9 点名的异常类型，供 S3 落地后直接复用」）明示指定**的复用路径，lane 未越界，追认；
+  编排器独立实测全仓 `infra → worker` 的模块级导入**恰此 1 条**、`worker → infra` 4 条、无环。但它构成反向分层边，
+  且导入 `infra.artifacts` 会**传递执行**整个 `campaignlab/worker/__init__.py`（90 行：capacity/errors/leases/runner/states/store），
+  即 HTTP 侧任何制品写入消费者都会把整个 worker 状态机与事务层拖进进程，与 ARCHITECTURE.md 分层口径及
+  PYTHON.md「HTTP 进程只运行有界计算」相悖 → **FU-29 排期在 wave3（M1-01/M2-01）派单前**把 `ArtifactCommitFailed`
+  下沉 `domain/errors.py`（20 码注册表不扩，只加异常类；`default_code="INTERNAL_ERROR"` 已在注册表内），
+  `worker/errors.py` 改为 import 后 re-export（公开符号集逐字不变，与 R5-1 对 `api/common.py` 的处置同体例），走冻结面变更。
+  **S2b 硬约束（禁违反）**：该边当前无环的**唯一原因**是它走**子模块路径** `campaignlab.worker.errors` 而非父包属性；
+  S2b 禁把它「整理」成 `from campaignlab.worker import ArtifactCommitFailed`，也禁在 `worker/__init__.py` 里把 `deps` 的
+  re-export 排在 `errors` 之前 —— 两者任一都会即刻成环。
+- **A154 — 对 §5:51 与 `JobStore.succeed(artifacts=…)` 的接线口径：`CommittedArtifact` 刻意不含 `ArtifactRecord`，追认。**
+  编排器实测 `worker/store.py:417` `succeed(..., artifacts: Sequence[ArtifactRecord] = ())` 默认即空元组、:446-447 逐条
+  `self._artifacts.insert(...)`；若把已登记行的 record 再交回 `succeed`，必撞 `UNIQUE(workspace_id,kind,sha256)`。
+  handler 侧接线**二选一，禁第三种**：(a) `store.succeed(..., artifacts=())`（制品行已由 `commit()` 在同一 `BEGIN IMMEDIATE` 内登记）；
+  (b) 同一事务内先 `commit()` 再直接发终态谓词 UPDATE（不经 `succeed(artifacts=…)`）。
+  **禁**「先 `commit()` 再把 record 传给 `succeed(artifacts=…)`」。S2b 须落守护用例：同一 `(workspace_id,kind,sha256)`
+  走完整 handler 路径后 `artifacts` 表**恰 1 行**。
+- **A157 — 对 §9-S3 符号面：`_hash_file`（`artifacts.py:158-175`）提升为公共符号 `hash_file` 并进 `__all__`。**
+  供 S2b 的 `worker/integrity.py::verify_artifact_index` 复用。理由：integrity 的语义就是「与写入侧**同口径**复核」，
+  两份摘要实现必然在 chunk 边界／空文件处置上漂移，**口径分叉即等于校验失效**；且提升方向是 `worker → infra`（正确方向），
+  不新增反向边。依 A151 确立的通用处置，§9 的符号清单是**下限而非上限**。**不保留** `_hash_file` 私有别名（禁两份入口），
+  内部调用点（`artifacts.py:618`）改指公共名；`tests/unit/test_artifacts.py` 的 `__all__` 守护白名单同步放宽为
+  「多出项允许 `ARTIFACT_ID_PREFIX` 与 `hash_file`（A157）」。归属 **S2b-1**，单独一次提交，禁与 S2b 主体交付混提交。
+- **A156 — 对 §5:47 的调用点：`verify_same_filesystem()` 做成显式方法追认**（启动路径不在 S3 写权内，lane 未自行越界是对的）。
+  **点名 S2b**：`worker/deps.get_artifact_writer` 必须在返回 writer 前调用一次 `verify_same_filesystem()`，
+  并落守护用例证明「`st_dev` 不符 → `config.ConfigError` → CLI 面 rc=2」；否则 §5:47 的启动闸永不生效。
+  编排器追加（归 FU-30，非 S2b）：`scripts/doctor.sh` 与 `python -m campaignlab doctor` 应把「`tmp/jobs` 与 `results` 同盘」列为检查项，
+  使该闸在**部署期**即可见，而非只在作业提交期炸；本轮实测 G14=`RESULT: HEALTHY`、G14b=`PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED`
+  均未覆盖此项。M0-04 的 S7 实测为 `tests/unit/test_job_dto.py`（卡内档位表），不含 doctor 面，故不得挂在 S7 上。

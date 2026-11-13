@@ -1,0 +1,20 @@
+$ npm --prefix web run build
+--- rc=0 expected=0 secs=1.1 ---
+--- stdout ---
+
+> campaignlab-web@0.0.0 build
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 83 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.39 kB │ gzip:  0.27 kB
+dist/assets/index-BL_mlG_f.css  377.54 kB │ gzip: 51.33 kB
+dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB
+
+✓ built in 499ms
+
+--- stderr ---
+

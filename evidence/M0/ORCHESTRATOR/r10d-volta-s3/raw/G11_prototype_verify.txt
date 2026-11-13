@@ -1,0 +1,14 @@
+$ bash scripts/verify.sh
+--- rc=0 expected=0 secs=0.8 ---
+--- stdout ---
+env: node=v24.22.3 python=Python 3.12.3
+==> 1/4 交付件完整性
+SHA256SUMS OK
+==> 2/4 计算与问法断言
+79/79 PASS
+==> 3/4 确定性数据生成
+==> 4/4 字节级复现
+PASS: 字节级复现
+
+--- stderr ---
+

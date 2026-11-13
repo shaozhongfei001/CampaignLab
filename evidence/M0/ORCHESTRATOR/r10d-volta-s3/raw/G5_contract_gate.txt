@@ -1,0 +1,7 @@
+$ python3 scripts/check_contracts.py check
+--- rc=0 expected=0 secs=0.1 ---
+--- stdout ---
+CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped
+
+--- stderr ---
+

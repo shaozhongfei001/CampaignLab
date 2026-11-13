@@ -1,0 +1,236 @@
+# Round 10-D -- FULL TABLE 17 gates (Volta/M0-04-S3 pre-commit re-verification)
+generated_at: 2026-11-14T02:43:28+0800
+repo: /home/szf/dev/CampaignLab   branch: m0-framework   HEAD: 1675d46
+trigger: M0-04/S3 atomic artifact write landed in worktree (4 py + 2 md, untracked) -> pre-commit full table
+runner: orchestrator self-served (full-table re-verification is orchestrator-exclusive)
+pre-run readonly spec/contracts dirty = ''
+
+[G1_baseline_v1.0] rc=0 expected=0 -> PASS (0.0s)
+    cmd: ( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )
+    summary: 
+[G2_baseline_v1.0.1_patch] rc=0 expected=0 -> PASS (0.0s)
+    cmd: ( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )
+    summary: 
+[G3_frontend_baseline] rc=0 expected=0 -> PASS (0.1s)
+    cmd: python3 scripts/check_frontend_baseline.py
+    summary: FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）
+[G4_slice_unknown_op_negative] rc=2 expected=2 -> PASS (0.1s)
+    cmd: python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r10d.json
+    summary: FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']
+[G4b_slice_unknown_ac_negative] rc=2 expected=2 -> PASS (0.1s)
+    cmd: python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac_r10d.json
+    summary: FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']
+[G4c_frontend_tamper_negative] rc=1 expected=1 restore_rc=0 spec_contracts_dirty='' -> PASS (0.0s)
+    summary: baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html
+[G5_contract_gate] rc=0 expected=0 -> PASS (0.1s)
+    cmd: python3 scripts/check_contracts.py check
+    summary: CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped
+[G6_contract_meta_validate] rc=0 expected=0 -> PASS (2.1s)
+    cmd: uv run --no-sync python scripts/check_contracts.py check --validate
+    summary: CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6
+[G7_ruff_check] rc=0 expected=0 -> PASS (-1.4s)
+    cmd: uv run --no-sync ruff check .
+    summary: All checks passed!
+[G8_ruff_format] rc=0 expected=0 -> PASS (0.0s)
+    cmd: uv run --no-sync ruff format --check .
+    summary: 207 files already formatted
+[G9_mypy] rc=0 expected=0 -> PASS (0.6s)
+    cmd: uv run --no-sync mypy
+    summary: Success: no issues found in 77 source files
+[G10_pytest] rc=0 expected=0 -> PASS (87.0s)
+    cmd: uv run --no-sync pytest -q
+    summary: 416 passed, 6 warnings in 88.82s (0:01:28)
+[G11_prototype_verify] rc=0 expected=0 -> PASS (0.8s)
+    cmd: bash scripts/verify.sh
+    summary: PASS: 字节级复现
+[G12_package_verify] rc=0 expected=0 -> PASS (0.1s)
+    cmd: python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+    summary: PACKAGE PASS 6/6
+[G13a_npm_ci] rc=0 expected=0 -> PASS (6.7s)
+    cmd: npm --prefix web ci
+    summary: Run `npm audit` for details.
+[G13b_npm_build] rc=0 expected=0 -> PASS (1.1s)
+    cmd: npm --prefix web run build
+    summary: ✓ built in 499ms
+[G14_doctor] rc=0 expected=0 -> PASS (1.9s)
+    cmd: bash scripts/doctor.sh
+    summary: RESULT: HEALTHY
+[G14b_cli_doctor] rc=0 expected=0 -> PASS (0.4s)
+    cmd: uv run --no-sync python -m campaignlab doctor
+    summary: PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED
+
+=== mismatch: none ===
+readonly spec/contracts dirty = '' (rc=0)
+A101 identity: tracked=201 (py 75 + md 126) + untracked=6 = 207 ; ruff reported=207 -> OK
+HEAD tree denominator (pre-commit): py=75 md=126 total=201
+projected post-commit counts: py=75 md=126 total=201
+double-judge: pytest_passed=416 no_failed_token=True ; mypy_source_files=77 ; ruff_formatted=207
+
+=== gate results (machine readable) ===
+{
+ "G1_baseline_v1.0": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )",
+  "secs": 0.0,
+  "summary": ""
+ },
+ "G2_baseline_v1.0.1_patch": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
+  "secs": 0.0,
+  "summary": ""
+ },
+ "G3_frontend_baseline": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "python3 scripts/check_frontend_baseline.py",
+  "secs": 0.1,
+  "summary": "FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）"
+ },
+ "G4_slice_unknown_op_negative": {
+  "rc": 2,
+  "expected_rc": 2,
+  "ok": true,
+  "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r10d.json",
+  "secs": 0.1,
+  "summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']"
+ },
+ "G4b_slice_unknown_ac_negative": {
+  "rc": 2,
+  "expected_rc": 2,
+  "ok": true,
+  "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac_r10d.json",
+  "secs": 0.1,
+  "summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']"
+ },
+ "G4c_frontend_tamper_negative": {
+  "rc": 1,
+  "expected_rc": 1,
+  "ok": true,
+  "restore_rc": 0,
+  "spec_contracts_dirty": "",
+  "secs": 0.0,
+  "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py  (then byte-exact restore)",
+  "summary": "baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html"
+ },
+ "G5_contract_gate": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "python3 scripts/check_contracts.py check",
+  "secs": 0.1,
+  "summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped"
+ },
+ "G6_contract_meta_validate": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
+  "secs": 2.1,
+  "summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6"
+ },
+ "G7_ruff_check": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync ruff check .",
+  "secs": -1.4,
+  "summary": "All checks passed!"
+ },
+ "G8_ruff_format": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync ruff format --check .",
+  "secs": 0.0,
+  "summary": "207 files already formatted"
+ },
+ "G9_mypy": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync mypy",
+  "secs": 0.6,
+  "summary": "Success: no issues found in 77 source files"
+ },
+ "G10_pytest": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync pytest -q",
+  "secs": 87.0,
+  "summary": "416 passed, 6 warnings in 88.82s (0:01:28)"
+ },
+ "G11_prototype_verify": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "bash scripts/verify.sh",
+  "secs": 0.8,
+  "summary": "PASS: 字节级复现"
+ },
+ "G12_package_verify": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
+  "secs": 0.1,
+  "summary": "PACKAGE PASS 6/6"
+ },
+ "G13a_npm_ci": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "npm --prefix web ci",
+  "secs": 6.7,
+  "summary": "Run `npm audit` for details."
+ },
+ "G13b_npm_build": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "npm --prefix web run build",
+  "secs": 1.1,
+  "summary": "✓ built in 499ms"
+ },
+ "G14_doctor": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "bash scripts/doctor.sh",
+  "secs": 1.9,
+  "summary": "RESULT: HEALTHY"
+ },
+ "G14b_cli_doctor": {
+  "rc": 0,
+  "expected_rc": 0,
+  "ok": true,
+  "cmd": "uv run --no-sync python -m campaignlab doctor",
+  "secs": 0.4,
+  "summary": "PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED"
+ }
+}
+
+=== A101 identity + counts (machine readable) ===
+{
+ "tracked_py": 75,
+ "tracked_md": 126,
+ "tracked_total": 201,
+ "untracked_py_md": 6,
+ "ruff_reported": 207,
+ "identity_ok": true,
+ "head_py": 75,
+ "head_md": 126,
+ "head_total": 201,
+ "pytest_passed": 416,
+ "pytest_no_failed_token": true,
+ "mypy_source_files": 77,
+ "spec_contracts_dirty": ""
+}
+
+FULLTABLE_DONE allpass=True gates=18

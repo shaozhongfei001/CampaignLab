@@ -1,0 +1,14 @@
+$ uv run --no-sync python -m campaignlab doctor
+--- rc=0 expected=0 secs=0.4 ---
+--- stdout ---
+[doctor] host=127.0.0.1 port=8000 data_dir=/home/szf/.local/share/campaignlab
+[doctor] db=sqlite:////home/szf/.local/share/campaignlab/state/campaignlab.db level=DEFAULT_DATA_DIR source=默认 .local/share/campaignlab/state/campaignlab.db
+PASS  version   app=0.0.0 contract=1.0.1 source=/home/szf/dev/CampaignLab/contracts/openapi.json
+PASS  binding   127.0.0.1:8000 回环且空闲，可 serve
+WARN  data_dir  /home/szf/.local/share/campaignlab 可写，但缺 OPERATIONS.md 子目录：raw,snapshots,results,exports,tmp,logs
+WARN  database  /home/szf/.local/share/campaignlab/state/campaignlab.db 完整但无 alembic_version（尚未迁移）；level=DEFAULT_DATA_DIR
+PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s
+  PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED
+
+--- stderr ---
+

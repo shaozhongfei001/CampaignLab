@@ -1,0 +1,6 @@
+$ ( cd spec/CampaignLab-SDD-v1.0 && sha256sum -c SHA256SUMS --quiet )
+--- rc=0 expected=0 secs=0.0 ---
+--- stdout ---
+
+--- stderr ---
+

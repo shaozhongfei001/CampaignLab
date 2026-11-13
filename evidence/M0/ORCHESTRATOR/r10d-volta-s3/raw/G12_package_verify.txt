@@ -1,0 +1,13 @@
+$ python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py
+--- rc=0 expected=0 secs=0.1 ---
+--- stdout ---
+PASS 清单与逐文件 SHA-256 共 89 项
+PASS 接口和本地 Schema 引用共 80 个操作
+PASS 26 个页面、35 个验收用例、55 个材料点位、47 个手册操作点及文档链接
+PASS SQLite DDL 可执行，共 28 表，含完整性与外键负例
+PASS 甲乙各 510 切片、元分与六行 CSV/JSON、分母、量率、估算、补数及 60 个问法条目
+PASS 四版规则、15 个案例双版本、五种预发状态
+PACKAGE PASS 6/6
+
+--- stderr ---
+
