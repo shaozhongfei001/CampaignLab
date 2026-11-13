@@ -13,17 +13,16 @@
   所有 lane 措辞一致（可测、可截图比对）；``detail`` 才允许携带上下文；
 - 500 的 ``detail`` 只含 ``request_id``，禁止回显堆栈／SQL／用户源字段（OPERATIONS.md）。
 
-> **⚠ 临时归属声明（S3a 回报 Q1，务必读完再改本文件）**
-> ADR-005 §2.1 增补指定 code 注册表的单一来源是 ``src/campaignlab/domain/errors.py``，
-> design §6 把 ``domain/errors.py``（code+title+异常类）与 ``domain/ids.py``（ID 正则、
-> ``new_request_id``）划给 S3。但 R4-1 修订档位表 v2 给 S3a 的写权限清单里**没有**
-> ``src/campaignlab/domain/**``，且该目录尚不存在。为使 ``api/common.py`` 可用（S3b 的
-> 路由与 ``install_error_handlers`` 都依赖它），下列符号**暂存于本文件**：
-> ``PROBLEM_CODES`` / ``_TITLE_BY_CODE`` / ``_STATUS_BY_CODE`` / ``DomainError`` 及其 13 个子类
-> / ``_new_request_id`` / ``RESOURCE_ID_PATTERN``。
-> 后续轮次建 ``domain/errors.py`` 与 ``domain/ids.py`` 时必须**整块搬移（不是复制）**，
-> 并让本文件改为 ``from campaignlab.domain.errors import ...`` 后再导出；
-> **严禁两处各存一份**——那会直接违反 ADR-005 §2.1 的单一来源约束。
+> **归属变更留痕（M0-02 · S3c，R5-1 硬规则已执行）**
+>
+> 上文原「⚠ 临时归属声明」所述暂存于本文件的符号——``PROBLEM_CODES`` / ``_TITLE_BY_CODE`` /
+> ``_STATUS_BY_CODE`` / ``DomainError`` 及其 13 个子类 / ``_new_request_id`` /
+> ``RESOURCE_ID_PATTERN``——已**整块搬移（不是复制）**至 ``campaignlab/domain/errors.py``
+> 与 ``campaignlab/domain/ids.py``（ADR-005 §2.1 单一来源）。
+> 本文件只保留 ``import`` 与 re-export：``__all__`` 未增未减、公开符号集与搬移前逐字相同；
+> 私有名（``_STATUS_BY_CODE`` / ``_TITLE_BY_CODE`` / ``_STATUS_TO_CODE`` / ``_build_registry``
+> / ``_invert_status`` / ``_new_request_id``）同样 re-export，使 ``dir(common)`` 也与搬移前一致。
+> **严禁在本文件重新定义上述任何符号**——那会直接复刻 R5-1 要防止的「两处各存一份」。
 """
 
 from __future__ import annotations
@@ -34,16 +33,45 @@ import hashlib
 import hmac
 import json
 import unicodedata
-import uuid
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Annotated, Any, ClassVar, Final, Literal
+from typing import Annotated, Any, Final, Literal
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
+# R5-1：下列符号的**定义**已整块搬移至 ``domain/errors.py`` 与 ``domain/ids.py``
+# （ADR-005 §2.1 单一来源）；此处只 import 并 re-export，本文件不得再出现它们的定义。
+# 私有名一并 re-export（带 ``noqa: F401``）以保持 ``dir(common)`` 与搬移前逐字一致。
+from campaignlab.domain.errors import (
+    _STATUS_BY_CODE,  # noqa: F401
+    _STATUS_TO_CODE,  # noqa: F401
+    _TITLE_BY_CODE,  # noqa: F401
+    PROBLEM_CODES,
+    AccessDenied,
+    DomainError,
+    IdempotencyConflict,
+    InputTooLarge,
+    InternalFailure,
+    InvalidScope,
+    JobCapacity,
+    OriginDenied,
+    PreconditionRequired,
+    ResourceNotFound,
+    RevisionConflict,
+    SessionInvalid,
+    StateConflict,
+    ValidationFailure,
+    _build_registry,  # noqa: F401
+    _invert_status,  # noqa: F401
+    problem_type,
+    status_to_code,
+)
+from campaignlab.domain.ids import RESOURCE_ID_PATTERN
+from campaignlab.domain.ids import new_request_id as _new_request_id
 
 __all__ = [
     "CURSOR_MAX_LENGTH",
@@ -99,10 +127,8 @@ __all__ = [
     "validate_idempotency_key",
 ]
 
-# --------------------------------------------------------------------- 常量与 code 注册表
+# --------------------------------------------------------------------- HTTP 常量
 
-#: 活契约里 ID 型字段（``Problem.code`` / ``request_id`` / ``Workspace.id`` …）共用的正则。
-RESOURCE_ID_PATTERN: Final = r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,95}$"
 X_REQUEST_ID_HEADER: Final = "X-Request-Id"
 PROBLEM_MEDIA_TYPE: Final = "application/problem+json"
 
@@ -118,228 +144,12 @@ CURSOR_MAX_LENGTH: Final = 300
 #: design §4：unsafe 方法同时校验 Host 与 Origin，GET 只校验 Host。
 UNSAFE_METHODS: Final[frozenset[str]] = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
-#: HTTP 状态 -> code。唯一权威来源是 API.md 第 20–29 行的「错误分类」表，逐行照抄，禁发明。
-_STATUS_BY_CODE: Final[dict[str, int]] = {
-    "BAD_REQUEST": 400,
-    "BAD_CURSOR": 400,
-    "SESSION_EXPIRED": 401,
-    "ORIGIN_DENIED": 403,
-    "ACCESS_DENIED": 403,
-    "RESOURCE_NOT_FOUND": 404,
-    "IDEMPOTENCY_CONFLICT": 409,
-    "STATE_CONFLICT": 409,
-    "VERSION_MISMATCH": 409,
-    "STALE_CANDIDATE": 409,
-    "SNAPSHOT_CONFLICT": 409,
-    "ACTION_REVIEW_REQUIRED": 409,
-    "REVISION_CONFLICT": 412,
-    "PRECONDITION_REQUIRED": 428,
-    "INPUT_TOO_LARGE": 413,
-    "VALIDATION_ERROR": 422,
-    "INVALID_SCOPE": 422,
-    "EVIDENCE_REQUIRED": 422,
-    "JOB_CAPACITY": 429,
-    "INTERNAL_ERROR": 500,
-}
-
-#: ADR-005 §2.2：固定中文短句表。同一 code 在所有 lane 必须逐字相同，不得在调用点现编。
-_TITLE_BY_CODE: Final[dict[str, str]] = {
-    "BAD_REQUEST": "请求格式不正确",
-    "BAD_CURSOR": "翻页游标无效",
-    "SESSION_EXPIRED": "会话已失效",
-    "ORIGIN_DENIED": "来源不受信任",
-    "ACCESS_DENIED": "权限不足",
-    "RESOURCE_NOT_FOUND": "对象不存在或不可见",
-    "IDEMPOTENCY_CONFLICT": "幂等键冲突",
-    "STATE_CONFLICT": "当前状态不允许该操作",
-    "VERSION_MISMATCH": "版本不一致",
-    "STALE_CANDIDATE": "候选已过期",
-    "SNAPSHOT_CONFLICT": "快照冲突",
-    "ACTION_REVIEW_REQUIRED": "动作需先完成复核",
-    "REVISION_CONFLICT": "修订号不匹配",
-    "PRECONDITION_REQUIRED": "缺少 If-Match 前置条件",
-    "INPUT_TOO_LARGE": "输入体积超过上限",
-    "VALIDATION_ERROR": "字段校验未通过",
-    "INVALID_SCOPE": "筛选范围不合法",
-    "EVIDENCE_REQUIRED": "证据不齐备",
-    "JOB_CAPACITY": "作业队列已满",
-    "INTERNAL_ERROR": "服务内部错误",
-}
-
-
-def problem_type(code: str) -> str:
-    """ADR-005 §2.1：``type = "urn:campaignlab:problem:" + code.lower()``。"""
-    return "urn:campaignlab:problem:" + code.lower()
-
-
-def _build_registry() -> dict[str, tuple[int, str, str]]:
-    """由状态表与标题表合成 ``code -> (status, type, title)``。
-
-    两张表键集合必须完全一致，否则注册表会缺项——这里直接断言，让缺口在 import 期就炸，
-    而不是等到某个错误分支返回了空 title。
-    """
-    missing_titles = set(_STATUS_BY_CODE) - set(_TITLE_BY_CODE)
-    unknown_titles = set(_TITLE_BY_CODE) - set(_STATUS_BY_CODE)
-    if missing_titles or unknown_titles:
-        raise RuntimeError(
-            f"code 注册表不自洽：缺 title={sorted(missing_titles)} 多余={sorted(unknown_titles)}"
-        )
-    return {
-        code: (status, problem_type(code), _TITLE_BY_CODE[code])
-        for code, status in _STATUS_BY_CODE.items()
-    }
-
-
-#: ``code -> (status, type, title)``（design §2 的既定形状）。
-PROBLEM_CODES: Final[dict[str, tuple[int, str, str]]] = _build_registry()
-
-
-def _invert_status() -> dict[int, str]:
-    inverted: dict[int, str] = {}
-    for code, entry in PROBLEM_CODES.items():
-        inverted.setdefault(entry[0], code)
-    return inverted
-
-
-_STATUS_TO_CODE: Final[dict[int, str]] = _invert_status()
-
-
-def status_to_code(status: int) -> str:
-    """HTTP 状态 -> 默认 code（用于把框架产生的异常翻译成 Problem 形）。
-
-    表外状态（例如 FastAPI 的 405）不允许发明新 code，只能落到同族既有 code：
-    4xx -> ``BAD_REQUEST``、5xx -> ``INTERNAL_ERROR``。
-    """
-    mapped = _STATUS_TO_CODE.get(status)
-    if mapped is not None:
-        return mapped
-    return "INTERNAL_ERROR" if status >= 500 else "BAD_REQUEST"
-
-
-def _new_request_id() -> str:
-    """design 开头：``X-Request-Id`` 取 ``uuid4().hex``（43→32 hex，落在 1–96 且匹配 ID 正则）。
-
-    临时私有实现，见文件头「临时归属声明」：Round 5 建 ``domain/ids.py::new_request_id`` 后改引用。
-    """
-    return uuid.uuid4().hex
-
-
-# ------------------------------------------------------------------------- 领域异常与 code
-
-
-class DomainError(Exception):
-    """所有可翻译成 Problem 的领域异常基类。
-
-    子类用 ``code`` 类属性固定 code；未列入 design §6 的 code（``BAD_REQUEST``、
-    ``BAD_CURSOR``、``VERSION_MISMATCH``、``STALE_CANDIDATE``、``SNAPSHOT_CONFLICT``、
-    ``ACTION_REVIEW_REQUIRED``、``EVIDENCE_REQUIRED``）用 ``DomainError(code=...)`` 直接抛，
-    不额外造类，避免与 Round 5 的 ``domain/errors.py`` 命名打架。
-    """
-
-    default_code: ClassVar[str] = "INTERNAL_ERROR"
-
-    def __init__(
-        self,
-        detail: str | None = None,
-        *,
-        code: str | None = None,
-        issues: Sequence[Issue] = (),
-        retry_after: int | None = None,
-    ) -> None:
-        resolved = code if code is not None else self.default_code
-        if resolved not in PROBLEM_CODES:
-            # 注册表外的 code 一律拒绝：ADR-005 §2.1「任何新增 code 必须先进注册表再使用」。
-            raise KeyError(f"未注册的 Problem code：{resolved!r}（权威枚举见 API.md 第 20-29 行）")
-        status, type_, title = PROBLEM_CODES[resolved]
-        self.code: Final = resolved
-        self.status: Final = status
-        self.type: Final = type_
-        self.title: Final = title
-        self.detail = title if detail is None else detail
-        self.issues: tuple[Issue, ...] = tuple(issues)
-        self.retry_after = retry_after
-        super().__init__(self.detail)
-
-
-class SessionInvalid(DomainError):
-    """401：令牌未知／已消费／超时／会话过期／进程重启后。
-
-    上述各态**同码同 detail**，杜绝枚举 oracle（design §4）。
-    """
-
-    default_code: ClassVar[str] = "SESSION_EXPIRED"
-
-
-class OriginDenied(DomainError):
-    """403：Origin 或 Host 非实际绑定的回环源。"""
-
-    default_code: ClassVar[str] = "ORIGIN_DENIED"
-
-
-class AccessDenied(DomainError):
-    """403：身份合法但角色/范围不足。"""
-
-    default_code: ClassVar[str] = "ACCESS_DENIED"
-
-
-class ResourceNotFound(DomainError):
-    """404：归属校验失败与「不存在」必须返回**逐字相同**的响应，不回显 ID、不区分原因。"""
-
-    default_code: ClassVar[str] = "RESOURCE_NOT_FOUND"
-
-
-class IdempotencyConflict(DomainError):
-    """409：同一 Idempotency-Key 命中不同请求摘要。"""
-
-    default_code: ClassVar[str] = "IDEMPOTENCY_CONFLICT"
-
-
-class StateConflict(DomainError):
-    """409：对象状态不允许该操作。"""
-
-    default_code: ClassVar[str] = "STATE_CONFLICT"
-
-
-class RevisionConflict(DomainError):
-    """412：If-Match 与当前 revision 不匹配。"""
-
-    default_code: ClassVar[str] = "REVISION_CONFLICT"
-
-
-class PreconditionRequired(DomainError):
-    """428：需要 If-Match 却没给。"""
-
-    default_code: ClassVar[str] = "PRECONDITION_REQUIRED"
-
-
-class InputTooLarge(DomainError):
-    """413：JSON 正文超过上限（与文件上传的 8 MiB / 64 MiB 口径不得混用，ADR-005 §2.3）。"""
-
-    default_code: ClassVar[str] = "INPUT_TOO_LARGE"
-
-
-class ValidationFailure(DomainError):
-    """422：字段级校验未通过，``issues[].location`` 必须是 JSON Pointer。"""
-
-    default_code: ClassVar[str] = "VALIDATION_ERROR"
-
-
-class InvalidScope(DomainError):
-    """422：筛选/范围不合法。"""
-
-    default_code: ClassVar[str] = "INVALID_SCOPE"
-
-
-class JobCapacity(DomainError):
-    """429：作业队列已满，**必须**附 ``Retry-After``（1–3600）。"""
-
-    default_code: ClassVar[str] = "JOB_CAPACITY"
-
-
-class InternalFailure(DomainError):
-    """500：detail 只含 request_id，不回显堆栈／SQL／用户源字段。"""
-
-    default_code: ClassVar[str] = "INTERNAL_ERROR"
+# --------------------------------------------------- 领域件（已搬移至 domain/，此处不再定义）
+
+# R5-1：``PROBLEM_CODES`` / ``_TITLE_BY_CODE`` / ``_STATUS_BY_CODE`` / ``DomainError`` 及其
+# 13 个子类 / ``_new_request_id`` / ``RESOURCE_ID_PATTERN`` 的定义已**整块搬移**至
+# ``campaignlab/domain/errors.py`` 与 ``campaignlab/domain/ids.py``；本文件只在顶部 import 后
+# re-export（ADR-005 §2.1 单一来源，严禁在此重新定义任何一份）。
 
 
 # ------------------------------------------------------------------------------ DTO（活契约）

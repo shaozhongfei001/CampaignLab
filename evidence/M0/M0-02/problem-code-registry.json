@@ -1,0 +1,138 @@
+{
+  "schema": "campaignlab.problem-code-registry/v1",
+  "generated_by": "M0-02/S3c",
+  "kind": "read-only-snapshot",
+  "single_source_of_truth": "src/campaignlab/domain/errors.py :: PROBLEM_CODES",
+  "authority": "spec/CampaignLab-SDD-v1.0/architecture/API.md 第 22-29 行第 2 列（以、分隔）",
+  "ruling": "ADR-005 §2.1 (type 方案) / §2.2 (title 固定中文短句表) / D-019 (共 20 个)",
+  "frontend_policy": "M0-03 卡 Q4 / RULING_NO_FRONTEND_MIRROR：前端 S8 参数化读本快照，禁镜像 code 白名单",
+  "type_scheme": "urn:campaignlab:problem:<code.lower()>",
+  "count": 20,
+  "codes": [
+    {
+      "code": "BAD_REQUEST",
+      "status": 400,
+      "type": "urn:campaignlab:problem:bad_request",
+      "title": "请求格式不正确"
+    },
+    {
+      "code": "BAD_CURSOR",
+      "status": 400,
+      "type": "urn:campaignlab:problem:bad_cursor",
+      "title": "翻页游标无效"
+    },
+    {
+      "code": "SESSION_EXPIRED",
+      "status": 401,
+      "type": "urn:campaignlab:problem:session_expired",
+      "title": "会话已失效"
+    },
+    {
+      "code": "ORIGIN_DENIED",
+      "status": 403,
+      "type": "urn:campaignlab:problem:origin_denied",
+      "title": "来源不受信任"
+    },
+    {
+      "code": "ACCESS_DENIED",
+      "status": 403,
+      "type": "urn:campaignlab:problem:access_denied",
+      "title": "权限不足"
+    },
+    {
+      "code": "RESOURCE_NOT_FOUND",
+      "status": 404,
+      "type": "urn:campaignlab:problem:resource_not_found",
+      "title": "对象不存在或不可见"
+    },
+    {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "status": 409,
+      "type": "urn:campaignlab:problem:idempotency_conflict",
+      "title": "幂等键冲突"
+    },
+    {
+      "code": "STATE_CONFLICT",
+      "status": 409,
+      "type": "urn:campaignlab:problem:state_conflict",
+      "title": "当前状态不允许该操作"
+    },
+    {
+      "code": "VERSION_MISMATCH",
+      "status": 409,
+      "type": "urn:campaignlab:problem:version_mismatch",
+      "title": "版本不一致"
+    },
+    {
+      "code": "STALE_CANDIDATE",
+      "status": 409,
+      "type": "urn:campaignlab:problem:stale_candidate",
+      "title": "候选已过期"
+    },
+    {
+      "code": "SNAPSHOT_CONFLICT",
+      "status": 409,
+      "type": "urn:campaignlab:problem:snapshot_conflict",
+      "title": "快照冲突"
+    },
+    {
+      "code": "ACTION_REVIEW_REQUIRED",
+      "status": 409,
+      "type": "urn:campaignlab:problem:action_review_required",
+      "title": "动作需先完成复核"
+    },
+    {
+      "code": "REVISION_CONFLICT",
+      "status": 412,
+      "type": "urn:campaignlab:problem:revision_conflict",
+      "title": "修订号不匹配"
+    },
+    {
+      "code": "PRECONDITION_REQUIRED",
+      "status": 428,
+      "type": "urn:campaignlab:problem:precondition_required",
+      "title": "缺少 If-Match 前置条件"
+    },
+    {
+      "code": "INPUT_TOO_LARGE",
+      "status": 413,
+      "type": "urn:campaignlab:problem:input_too_large",
+      "title": "输入体积超过上限"
+    },
+    {
+      "code": "VALIDATION_ERROR",
+      "status": 422,
+      "type": "urn:campaignlab:problem:validation_error",
+      "title": "字段校验未通过"
+    },
+    {
+      "code": "INVALID_SCOPE",
+      "status": 422,
+      "type": "urn:campaignlab:problem:invalid_scope",
+      "title": "筛选范围不合法"
+    },
+    {
+      "code": "EVIDENCE_REQUIRED",
+      "status": 422,
+      "type": "urn:campaignlab:problem:evidence_required",
+      "title": "证据不齐备"
+    },
+    {
+      "code": "JOB_CAPACITY",
+      "status": 429,
+      "type": "urn:campaignlab:problem:job_capacity",
+      "title": "作业队列已满"
+    },
+    {
+      "code": "INTERNAL_ERROR",
+      "status": 500,
+      "type": "urn:campaignlab:problem:internal_error",
+      "title": "服务内部错误"
+    }
+  ],
+  "excluded": {
+    "MONTHLY_INVALID_SCOPE": "D-022 OPEN：不在活契约也不在注册表，禁实现/禁扩表",
+    "MONTHLY_REPORT_KIND_REQUIRED": "D-022 OPEN：同上",
+    "JOB_INTERRUPTED": "A12：不是 Problem.code"
+  }
+}

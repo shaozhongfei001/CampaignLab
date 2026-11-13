@@ -206,3 +206,135 @@ DTO 一律 `model_config = ConfigDict(extra="forbid")`；Pydantic 必须拒绝�
 > **⑤ 本文件自检 §8 的 C1（`wc -l` = 117）与 C2（48 files）继续失效**：本文件因历次追注
 > 已增长，ruff 分母亦随并行 lane 漂移。两者一律以 `state.json →
 > resume.self_check_gates_rc0.counts` 为权威，禁写死（依 D-006 / D-012 / D-014）。
+
+## 9. Round 5 编排器追注（S3c 回收裁定 · 纯增量；§1–§8 各历史行一字未改）
+
+**依据**：S lane（Hilbert / `qwen3.8-max`）S3c 交付回报的 Q1–Q9，编排器独立复验后逐条裁定。
+本节与 `orchestrator/defects/D-025.md`、`state.json → resume.round5_adjudications`（A39–A48）同一次提交（手册 §15.9）。
+
+### 9.1 Q1 · §5 V1 行的期望指纹已失效 → 立 D-025，判据改指 state.json
+
+§5 V1 行（第 94 行）写死期望 `01bd28f0772f506e 443552`。编排器实测活契约
+`contracts/openapi.json` = **`592571099d638251` / 443309 B**，与 `M0-02.slice.json → source.openapi`、
+`state.json → counts.live_openapi_*` **三方一致**；写死值是 CR-002 重切前的旧指纹。
+§7 追注（140–154 行）已声明「文档内禁写死」，但 V1 行未同步更正 → 记 **D-025**。
+
+**裁定**：V1 的判据自本节起为 `state.json → resume.self_check_gates_rc0.counts.live_openapi_sha16 / .live_openapi_bytes`；
+第 94 行原文字节保留不改写。S5 采集 V1 时按此判据，**禁**引用行内写死值。
+
+### 9.2 Q2 · `api/deps.py` 四个提供器的装配位 → 归 S3d，写集扩围
+
+实测 `deps.py`：`get_session_service` / `get_health_service` / `get_workspace_service` / `require_session`
+四个函数体一律 `raise NotImplementedError`（文件内 `NotImplementedError` 出现 5 次 = 4 处真 raise + 1 处 docstring 提及）；
+三个 Protocol 中 `HealthService.snapshot() -> Health` 已声明，`SessionService` / `WorkspaceService` 为**空端口**。
+S3c 未 stub 假实现、未编造数据，处置正确。
+
+**裁定**：
+1. `src/campaignlab/api/deps.py` **纳入 S3d 写集**（R4-1 / R5-1 原未列，本节扩围）。S3d 负责
+   ① 用真实装配替换四个 `NotImplementedError` 函数体；② 按 `application/*` 实现类的真实公开方法面
+   补全三个 Protocol 成员（结构化子类型）。
+2. **禁改 `deps.py` 任何已冻结的公开签名与 Protocol 类名**：`get_config` / `get_clock` /
+   `require_session(request: Request) -> Session` / `HealthService.snapshot()` 逐字保持。
+3. `HealthService.snapshot() -> Health` **追认为冻结接口**。
+4. S3b 只读消费补全后的端口（见 §9.3 的串行裁定）。
+
+### 9.3 R5-3 · 「S3d ∥ S3b 并行」裁定作废 → 改为 S3d → S3b 串行（编排器自我更正）
+
+R5-2（`s3_split_ruling_v3.serial_ordering_correction`）判定 Round 6 可「S3d ∥ S3b 并行」，
+理由是「写集不相交且两者对 S3c 均为只读依赖」。**该判定再次不成立**，本节更正（原文字节保留）：
+
+- 依 §9.2，S3d 的写集**含 `api/deps.py`**；S3b 的 `api/session.py` / `api/workspaces.py` 必须
+  `from campaignlab.api.deps import ...` 并调用 `svc.<method>()`。
+- 当前 `SessionService` / `WorkspaceService` 是**空端口** → S3b 若与 S3d 并行：
+  ① mypy 对 `svc.exchange(...)` 一类调用**必然报错**（Protocol 无该成员）；
+  ② 运行期 `Depends(get_session_service)` 抛 `NotImplementedError` → S3b 的用例**不可能转绿**。
+- 即 S3b 对 S3d 存在**编译期 + 运行期单向依赖**，命中 PRE-4 判据「写集不相交 **且** 无编译期/运行期
+  单向依赖，二者缺一即串行」的**串行侧**。R5-2 只核了「写集」与「被依赖模块是否存在」，
+  漏核「被依赖符号是否已具备**可用成员面**」。
+
+**裁定**：`S3c(R5，已交付) → S3d(R6) → S3b(R7) → S4(R8) → S5(R8/R9)`。
+Round 6 的第二条 lane 改为 **D-016 批次 4 补卡（`qwen3.8-flash`，3 张：M4-P01 / M5-01 / M5-02）**，
+与 S3d 写集完全不相交（`orchestrator/tasks/*.md` vs `src/campaignlab/**`）且无任何依赖。
+M0-04/S2 的前置仍是「S3c 与 S3d 均已交付并入库」，达成时点为 R6 末。
+
+**新增判据 PRE-5**：并行派单前必须**实测**被依赖模块的成员面可用性 —— Protocol/ABC 是否为空、
+目标函数体是否 `NotImplementedError` / `pass` / `raise NotImplemented`；凡空端口或 NotImplemented 一律判**串行**。
+（同类错误第三次：R5-1 漏核 import 依赖 → R5-2 更正；R5-2 漏核空端口 → 本节更正。）
+
+### 9.4 Q3 · `AppIdentity` 归属 → 追认落 `config.py`
+
+§6（114 行）把 `AppIdentity` 列在 `application/session_service.py`，§2（58 行）又说它由
+`config.py::resolve_local_identity()` 产出，两处冲突。S3c 定义在 `config.py`
+（实测 `hasattr(config, 'AppIdentity') = True`、`hasattr(api.common, 'AppIdentity') = False`）。
+
+**裁定：追认 `config.py` 为 `AppIdentity` 的唯一定义处**（它是 `resolve_local_identity` 的返回类型）。
+S3d **必须** `from campaignlab.config import AppIdentity`，**禁**在 `application/session_service.py` 另建同名类。
+§6 第 114 行原文保留不改写，以本节为准。
+
+### 9.5 Q4 · `Role` 不下沉 → 维持 `api/common.py` 权威 + `TYPE_CHECKING` 引用
+
+`config.py` 用 `if TYPE_CHECKING: from campaignlab.api.common import Role`，运行期不产生 `config → api` 导入边。
+**裁定：维持现状，不把 `Role` 下沉到 `domain/values.py`** —— 下沉会改动 §6 对 `values.py` 的冻结符号清单
+并要求 `api/common.py` 增 re-export，属扩大冻结面变更；收益（消一条 TYPE_CHECKING 边）不抵成本。
+
+### 9.6 Q5 · 「公开符号集相同」口径 → 认可「差集只含失效导入绑定即通过」
+
+实测（编排器亲算）：`common.__all__` 51 → 51 **逐字同序相同**、`set_diff = []`；`dir()` 私有名 17 → 17 差集空；
+`dir()` 公开名 91 → 89，差集 = `{ClassVar, uuid}`（stdlib/typing 的**导入绑定**，搬移后不再被引用、
+由 ruff F401 移除，且不在 `__all__` 内）。另以 `git show HEAD:` 取旧版做**文本级**比对：
+顶层声明 77 → 53，`decls_only_in_CUR = []`（无任何新增声明），`decls_only_in_HEAD` 24 项全部是被搬走的
+`DomainError` 系与注册表构件；`common.py` 内定义形态正则命中 **0**；`errors.__all__` 17 项
+`common.X is errors.X` 全 True；`ids.__all__` 5 项中 `RESOURCE_ID_PATTERN` identity=True，
+其余 4 项（`RESOURCE_ID_RE` / `is_resource_id` / `new_request_id` / `new_resource_id`）是 `ids.py`
+**新增的便捷封装**、HEAD 版 `common.py` 从未有过（故 `decls_only_in_CUR = []` 不受影响）。
+
+**裁定：搬移不是复制，成立**；**禁**用 `# noqa: F401` 把失效导入留成死导入来凑 `dir()` 字面相等。
+
+### 9.7 Q6 · 两条归属不明的改动 → 编排器认领（非 lane 越界）
+
+`orchestrator/defects/D-022.md` 与 `orchestrator/handoff/D-016-batch3-context.md` 的改动是
+**编排器自身的治理编辑**（D-022 §5 并入 `SNAPSHOT_SUPERSEDED`；批次3 context §10 两处自我更正），
+不属任何 lane 写集。已随**提交 A（`71f9644`）**入库，未误归 S3c。
+
+### 9.8 Q7 · doctor 的 WARN/FAIL 语义 → 追认
+
+**裁定：追认 S3c 的口径** —— FAIL 只给「真的坏了」（契约读不到、非回环绑定、数据目录不可写、
+`integrity_check` / `foreign_key_check` 不过、已迁移但 revision ≠ head）→ rc=1；
+库未迁移 / worker 未装配 / 端口被占 → WARN，不改 rc。
+理由：若把「未迁移」判 FAIL，则任何全新检出上 `python -m campaignlab doctor` 恒 rc=1，
+本片出口条件（gate7 由 rc=1 → rc=0）在结构上不可达。
+编排器实测：`uv run --no-sync python -m campaignlab doctor` → **rc=0**，`PASS=2 WARN=3 FAIL=0 RESULT=DEGRADED`
+（三条 WARN = `data_dir` / `database` 未迁移 / `worker` 未装配，后两条属 S3d）。
+
+### 9.9 Q8 · `ruff B008` → 统一走 `# noqa: B008`，**不**改 `pyproject.toml`
+
+§1 冻结签名 `svc: HealthService = Depends(get_health_service)` 与 B008（禁在参数默认值调用函数）直接冲突。
+**裁定：S3b / S4 的 5 个路由统一在该行加 `# noqa: B008` + 一行说明**；
+**不**在 `pyproject.toml` 加 `extend-per-file-ignores` —— 后者会全局放宽该目录 lint 面，影响半径大于收益。
+`api/health.py` 现有 1 处 noqa 追认合规。
+
+### 9.10 Q9 · `serve` 的入口令牌 WARN → 由 S3d 落地时移除
+
+`cmd_serve` 现打印 `WARN 会话服务未装配（属 M0-02/S3d）：/session/exchange 暂不可用`，未伪造令牌，处置正确。
+**裁定：该 WARN 由 S3d 装配 `SessionTokenStore` 后移除**，S3c 侧不 stub；已列入 S3d 派单文出口条件。
+
+### 9.11 编排器独立复验结论（本次亲自实测，**非采信 lane 自报**）
+
+| # | 命令（cwd = 仓库根 `/home/szf/dev/CampaignLab`） | 实测 rc | 实测输出 |
+|---|---|---|---|
+| 1 | `uv run --no-sync python -m campaignlab doctor` | **0** | `PASS=2 WARN=3 FAIL=0 RESULT=DEGRADED`（出口条件 1→0 达成） |
+| 2 | `uv run --no-sync pytest -q` | **0** | `166 passed, 1 warning`（既有 110 一个不少 + 新增 56） |
+| 3 | `uv run --no-sync pytest -q tests/unit/test_task_cards.py tests/unit/test_task_card_narrative.py tests/unit/test_state_ledger.py` | **0** | `18 passed` |
+| 4 | `uv run --no-sync mypy` | **0** | `Success: no issues found in 39 source files`（22 → 39） |
+| 5 | `uv run --no-sync ruff check .` | **0** | `All checks passed!` |
+| 6 | `uv run --no-sync ruff format --check .` | **0** | `127 files already formatted`（恒等式 tracked 110 + untracked 17 == 127 成立） |
+| 7 | `python3 scripts/check_contracts.py check` | **0** | `CONTRACT CHECK PASS 登记项=13 实测差异=13` |
+| 8 | `git status --porcelain spec/ \| wc -l` | **0** | `0`（spec 一字节未动） |
+| 9 | `cd web && npm run test` | **0** | `Test Files 7 passed (7)`、`Tests 104 passed (104)` |
+| 10 | registry ↔ `API.md` 第 22–29 行第 2 列（以 `、` 分隔） | **0** | 20 码三方逐字同序 `API.md == PROBLEM_CODES == registry.codes`，双向差集空 |
+| 11 | `grep -rnE '^[[:space:]]*(port\|target)[[:space:]]*:.*300[012]' web/*.config.*`（D-024 的 G6a） | **1** | 无匹配（期望） |
+
+**行数口径**：一律 `wc -l`；`len(split("\n"))` = `wc -l` + 1（文件均以换行结尾），差 1 属正常（手册 §15.10）。
+S3c 交付 19 个文件的 `wc -l` 逐个复核与 lane 自报**全等**（含 `cli.py` = 337，早前交接摘要误记 332，以本表为准）。
+
+_追注时间：2026-11-13T08:58:09+08:00（编排器 O lane）_
