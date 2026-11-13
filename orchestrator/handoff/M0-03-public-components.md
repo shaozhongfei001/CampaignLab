@@ -199,7 +199,7 @@
 | 导出 | 定义行 | 内容 |
 |---|---|---|
 | `StatusTone` | `:1` | `"NEUTRAL" \| "OK" \| "WARN" \| "DANGER" \| "INFO"` |
-| `TableColumn` | `:2-7` | `key: string`、`label: string`、`sortable?: boolean`、`mono?: boolean`（全 `readonly`） |
+| `TableColumn` | `:2-7` | `key: string`、`label: string`、`sortable?: boolean \| undefined`、`mono?: boolean \| undefined`（全 `readonly`；**D-037 更正**：原写作 `sortable?: boolean`／`mono?: boolean`，与代码 `componentTypes.ts:5-6` 及本表 §2.1 前置约定「所有可选 props 都用 `?: T \| undefined` 声明」均不符，在 `web/tsconfig.json:10` `exactOptionalPropertyTypes: true` 下语义不等价） |
 | `TableRow` | `:8` | `Record<string, string \| number \| null>` |
 
 约束：新增字面量（例如给 `StatusTone` 加值）＝改公共冻结件签名，**必须走 CR**（手册 §3.1 / §7）。

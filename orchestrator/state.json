@@ -2,12 +2,12 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T01:06:20+08:00",
+  "updated_at": "2026-11-14T01:29:30+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.6129,
-    "flash_share_tokens": 0.441,
+    "flash_share_tasks": 0.625,
+    "flash_share_tokens": 0.4658,
     "phase_quotas": {
       "M0": 100,
       "M1": 150,
@@ -667,6 +667,48 @@
           "orchestrator/handoff/M0-03-public-components.md(303行/26803B)",
           "orchestrator/handoff/M0-03b-freeze.md(331行/33974B)"
         ]
+      },
+      {
+        "task": "Q-VERIFY-M0-03",
+        "subtask": "PENDING_CONTENT_REVIEW：13 件组件契约表逐条对码 + D-034 四项权威定址 + 六态冻结文档复核",
+        "lane": "Q",
+        "agent_id": "01a1d5da-16b1-7bb3-9a6a-72aebd047ee0",
+        "nickname": "Epicurus",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "reasoning_effort": "high",
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": 33000,
+        "tokens_note": "子智能体自报「唯一内容口径」约 33k；超其 20k 软上限 1.65x，自报原因为 13 件全文对码 + 5 份报告正文一次性落盘",
+        "est_tokens_planned": 20000,
+        "overrun_ratio": 1.65,
+        "overrun_drivers": [
+          "13 件公共组件全文对码（398 行）而非抽样",
+          "5 份报告正文一次性落盘（合计约 46.5 KB）",
+          "自报 6 次 PowerShell 引号/正则踩坑并自纠（未误判件缺失）"
+        ],
+        "cost_lesson": "复核类子任务的软上限应按「被复核面行数」而非「报告份数」估：13 件 398 行对码本身就接近 20k；下次同类派单软上限给 35k，或把 13 件拆两批。",
+        "returned_at": "2026-11-14T01:27:21+08:00",
+        "outputs": [
+          "evidence/M0/ORCHESTRATOR/r9-content-review/00-index.md（21 行）",
+          "evidence/M0/ORCHESTRATOR/r9-content-review/01-component-contract-table-review.md（47 行）",
+          "evidence/M0/ORCHESTRATOR/r9-content-review/02-d034-four-defects-locations.md（106 行）",
+          "evidence/M0/ORCHESTRATOR/r9-content-review/03-freeze-doc-review.md（54 行）",
+          "evidence/M0/ORCHESTRATOR/r9-content-review/commands.md（61 行 / 27 条命令四元组）"
+        ],
+        "verdict": "PASS_WITH_DIFF（一致 12 件 / 差异 1 件 / NOT_FOUND 0 件；D-034 四项全 CONFIRMED）",
+        "scope_violation": "NONE（git diff --name-only HEAD 为空 = 未改任何既有文件；全仓 untracked 仅其自身目录）",
+        "orchestrator_spot_check": "独立抽验全部关键 file:line（ConfirmDialog/EvidenceDrawer/DataTable/tokens.css/StatusTag/AppShell/SideRail/componentTypes.ts/tsconfig.json/契约表:202）与 13 件=390+8=398 行计数，逐条吻合。",
+        "orchestrator_correction": "抽验中编排器自身 `grep -rn --cl-row-h-dense web/src` 因模式以 `-` 开头被当选项 -> rc=2（命令自身错误），一度像「零引用」的假证据；按 D-024 判红、改 `grep -rn -- <pat>` 重跑，实测两 dense 令牌各仅 1 处命中=自身定义行、0 处消费者 -> 子智能体结论成立。记 R9-4。",
+        "related": [
+          "A143",
+          "D-034",
+          "D-037",
+          "PENDING_CONTENT_REVIEW",
+          "checkpoint_R8"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -750,7 +792,8 @@
         "tasks_target_met": false,
         "tokens_target_met": false
       },
-      "round8_update": "【2026-11-13T13:29:43+08:00 Round 8 关机 checkpoint 重算】flash_share_tasks 0.5455->0.6129（19/31 units）=> 护栏① **转为达标**（目标 >=0.60）；flash_share_tokens 0.441->0.441（314000/712000，仅 7 条有计量值、15 条 null）=> 护栏② **仍不达标**（目标 <=0.35）；dev lane flash 占比 0.1818->0.2667（4/15）。如实上报不粉饰：护栏①达标系 Round 8 四条 lane 中两条为 flash（Bohr M0-02/S4、Ramanujan D-016 批次5）拉动，units 22->31、flash units 12->19；护栏②不达标主因仍是两条历史 flash 越限（181k=3.02x、83k=1.38x），剔除越限部分后 flash token 占比约 19.5%，即护栏②失效的直接原因是**单批任务过大**而非档位选错。回补：wave3 起量产型子任务（参数化枚举、样板铺开、证据采集、卡片补齐）严格按手册 6.3 强制 flash 清单派 flash，并把单批规模压到 flash 上限内；护栏检查点仍为 wave2 出口，未达标则按手册 6.6 升级项目负责人。"
+      "round8_update": "【2026-11-13T13:29:43+08:00 Round 8 关机 checkpoint 重算】flash_share_tasks 0.5455->0.6129（19/31 units）=> 护栏① **转为达标**（目标 >=0.60）；flash_share_tokens 0.441->0.441（314000/712000，仅 7 条有计量值、15 条 null）=> 护栏② **仍不达标**（目标 <=0.35）；dev lane flash 占比 0.1818->0.2667（4/15）。如实上报不粉饰：护栏①达标系 Round 8 四条 lane 中两条为 flash（Bohr M0-02/S4、Ramanujan D-016 批次5）拉动，units 22->31、flash units 12->19；护栏②不达标主因仍是两条历史 flash 越限（181k=3.02x、83k=1.38x），剔除越限部分后 flash token 占比约 19.5%，即护栏②失效的直接原因是**单批任务过大**而非档位选错。回补：wave3 起量产型子任务（参数化枚举、样板铺开、证据采集、卡片补齐）严格按手册 6.3 强制 flash 清单派 flash，并把单批规模压到 flash 上限内；护栏检查点仍为 wave2 出口，未达标则按手册 6.6 升级项目负责人。",
+      "round9_q_update": "【2026-11-14T01:27:21+08:00 Round 9 Q lane 回收后重算】subtask_log 22->23 条（+Epicurus/Q flash 33k）。flash_share_tasks 0.6129->0.6250（20/32 units，护栏① 目标 >=0.60 **达标**）；flash_share_tokens 0.4410->0.4658（347000/745000，护栏② 目标 <=0.35 **仍不达标**）；dev lane 0.2667 不变（Q lane 非 dev，task 不以 M 开头）。如实上报不粉饰：护栏②恶化系本次 flash 子任务自报 33k（超软上限 1.65x）进入 token 分母，叠加两条历史越限（181k=3.02x、83k=1.38x）；剔除三处越限部分后 flash token 占比仍约 19.5%，即护栏②失效的直接原因是**单批规模过大**而非档位选错。回补：Round 9 三条开发 lane 中 2 条为 flash（Bohr M0-02/S5 12k、Mencius M0-03b/S2+S3 5k），仅 Volta M0-04/S3 为 max（手册 §6.3 事务边界与原子性强制 max，**禁为凑配比降档**）；并把复核类子任务的 token 软上限改为按被复核面行数估（见本条 cost_lesson）。护栏检查点仍为 wave2 出口，未达标按手册 §6.6 升级项目负责人。"
     }
   },
   "tasks": {
@@ -4406,6 +4449,42 @@
           "AC-032",
           "M5-01"
         ]
+      },
+      "path_caliber_resolved_A143": {
+        "at": "2026-11-14T01:27:21+08:00",
+        "resolved_by": "Q lane Epicurus（PENDING_CONTENT_REVIEW）+ 编排器独立抽验",
+        "note": "原 measured.path_caliber 明写「具体文件路径与行号以 13 件组件契约表为准；该表内容级复核仍为 PENDING_CONTENT_REVIEW，故本单暂不写死文件路径与行号」。该复核**已于本轮完成**，权威 file:line 如下（原文按 A19 不改写，只追加本键）：",
+        "authoritative_locations": {
+          "1_ConfirmDialog_focus": {
+            "component": "web/src/components/ConfirmDialog.vue（全文 34 行）",
+            "defect": ":13 `@keydown.esc` 挂在 mask 上、:14 有 `tabindex=\"-1\"` 但**无 `ref`**；focus(/autofocus/watch(/onMounted/nextTick/ref= 五族 grep **均 0 命中** -> Esc 关闭依赖焦点恰好已在框内",
+            "positive_control": "web/src/components/EvidenceDrawer.vue:10（onUpdated）、:13（panel.value?.focus()）、:17（trigger.value?.focus() 关闭归还）、:35（同时具备 ref=\"panel\" 与 tabindex=\"-1\"）-> 证明是缺口而非架构限制",
+            "caller": "web/src/pages/workspace/WorkspacePage.vue:215（import 于 :12，</AppShell> 收尾 :222）",
+            "ac_link": "AC-032（primary owner M5-01），须 M5-01 取证前修毕"
+          },
+          "2_DataTable_dense_and_sticky": {
+            "component": "web/src/components/DataTable.vue（全文 49 行）",
+            "defect": ":46 单一 `var(--cl-row-h)`；:3-9 props 块**无行高档位 prop**；`sticky` 在 web/src + web/tests 全域 **0 命中**（rc=1 真无匹配）-> 无 36px 密集档、无宽表冻结首列",
+            "orphan_tokens": "web/src/styles/tokens.css:78 `--cl-row-h-dense: 36px`、:92 `--cl-fs-table-dense: 12.5px` 各自**仅 1 处命中=自身定义行、0 处消费者**（编排器以 `grep -rn -- <pat>` 独立复验，见 R9-4）",
+            "baseline": "tokens.css:77 `--cl-row-h: 40px` 为现用唯一行高"
+          },
+          "3_StatusTag_shape": {
+            "component": "web/src/components/StatusTag.vue（全文 34 行）",
+            "defect": ":7 单一 `<span>` 结构；:29-33 五 tone（is-ok/is-warn/is-danger/is-info/is-neutral）**仅改 color 与 border-color**；:22-28 `.cl-tag::before` 圆点 `background: currentColor` 且形状尺寸对五 tone 完全相同 -> 非颜色载体只有 label 文本",
+            "enum_source": "web/src/components/componentTypes.ts:1 `StatusTone = \"NEUTRAL\" | \"OK\" | \"WARN\" | \"DANGER\" | \"INFO\"`（五值，禁删）",
+            "caller_evidence": "WorkspacePage.vue:140 未传 tone、:141 传 tone 但同时改 label 文本 -> 现存调用方已在依赖文本兜底",
+            "ac_link": "AC-032（primary owner M5-01），须 M5-01 取证前修毕"
+          },
+          "4_AppShell_passthrough": {
+            "component": "web/src/components/AppShell.vue（全文 39 行）",
+            "defect": ":6 props 块只有 health/session/recentWorkspace，**无 drawer / entryActive**；:11 为裸 `<SideRail />`（零绑定）",
+            "consumer_side": "web/src/components/SideRail.vue:4 **已声明** `drawer?: boolean | undefined` 与 `entryActive?: boolean | undefined`，并消费于 :7（`is-drawer` class）与 :8（`v-if=\"props.entryActive !== false\"`）",
+            "only_caller": "web/src/pages/workspace/WorkspacePage.vue:137 绑定 health/session/recent-workspace/@evidence，**未含** drawer/entryActive；SideRail 在 pages 层无直接引用（grep 0 命中）",
+            "fix_shape": "AppShell.vue:6 props 块 append 两个可选项（全可选 => :137 现存调用不破）；:11 改为透传绑定；SideRail.vue:7 的 `=== true` 与 :8 的 `!== false` 判定语义不变 -> 不改既有 props 语义"
+          }
+        },
+        "thirteen_components_caliber": "13 件 = 12 个 .vue（AlertBanner 43 / AppBar 27 / AppShell 39 / CardPanel 24 / ConfirmDialog 34 / DataTable 49 / EmptyState 19 / EvidenceDrawer 53 / PageBar 16 / PageGrid 18 / SideRail 34 / StatusTag 34 = 390 行）+ componentTypes.ts（8 行）= **398 行**；编排器独立复算一致。",
+        "content_review_status": "PENDING_CONTENT_REVIEW -> **DONE**（见 resume.content_review_R9）"
       }
     },
     {
@@ -4661,6 +4740,46 @@
       "evidence": [
         "orchestrator/defects/D-036.md",
         "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log"
+      ]
+    },
+    {
+      "id": "D-037",
+      "task": "M0-03（orchestrator/handoff/M0-03-public-components.md 在其 scope 内）",
+      "severity": "MINOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "13 件组件契约表 §2.13 把 TableColumn 的 sortable?/mono? 写作 `?: boolean`，代码实为 `?: boolean | undefined`；web/tsconfig.json:10 开启 exactOptionalPropertyTypes -> 契约表比代码更严格，语义不等价",
+      "found_by": "Q lane 子智能体 Epicurus（qwen3.8-flash high）执行台账挂账的 PENDING_CONTENT_REVIEW（13 件组件契约表逐条对代码）时主动上报；编排器独立抽验 file:line 逐条吻合后立单",
+      "file": "orchestrator/defects/D-037.md",
+      "found_at": "2026-11-14T01:27:21+08:00",
+      "closed_at": null,
+      "blocking": false,
+      "blocking_note": "无运行期影响（P3）：DataTable.vue:2 是唯一以 TableColumn[] 接收的组件，唯一消费点 web/src/pages/workspace/WorkspacePage.vue:162-166 实测未显式传 sortable: undefined。风险面是**未来**：后续 lane F 页面卡若照契约表 §2.13 生成列定义并显式传 undefined，会在 vue-tsc 下报错且报错点远离根因。",
+      "owner": "编排器（Round 9 自办；单行文档更正、代码零改动，不宜派单）",
+      "responsibility": "编排器侧：M0-03/S10 产出 13 件契约表时，§2.1-§2.12 共 17 处可选属性均逐字写了 `| undefined`，唯 §2.13 漏写 —— 属表格誊写遗漏，且当时只做了机械复验（编码/ruff/外部注册/色值/越界/行号抽样），**内容级复核被挂账为 PENDING_CONTENT_REVIEW**，故未拦住。Q lane 侧无过错。",
+      "root_cause": "文档是**对代码的描述**，二者无机械同步手段；本轮之前内容级复核一直挂账（checkpoint_R8 第 ⑦ 项），描述漂移无守护。",
+      "fix_detail": "M0-03-public-components.md:202 单行更正：`sortable?: boolean` -> `sortable?: boolean \\| undefined`、`mono?: boolean` -> `mono?: boolean \\| undefined`，并在同行括注 D-037 更正理由。行数不变（303 行前后一致，行内替换）；**代码零改动**（componentTypes.ts 是对的）；**不走 CR**（orchestrator/handoff/** 非只读区，且本修正是让描述符合已冻结实现、不改任何公共件签名，不触发手册 §3.1/§7 的 CR 条件）。",
+      "fix_scope": [
+        "orchestrator/handoff/M0-03-public-components.md（单行）"
+      ],
+      "measured": {
+        "code_side": "web/src/components/componentTypes.ts:5-6 = `readonly sortable?: boolean | undefined;` / `readonly mono?: boolean | undefined;`（8 行文件，未改动）",
+        "doc_side": "M0-03-public-components.md:202（§2.13 导出表）原写作 `sortable?: boolean`、`mono?: boolean`",
+        "tsconfig": "web/tsconfig.json:10 = `\"exactOptionalPropertyTypes\": true`",
+        "self_inconsistency": "同文档 :28 前置约定原文「所有可选 props 都用 `?: T | undefined` 声明」；全表含 `| undefined` 的行实测 17 处（:41/:69/:70/:71/:87/:101/:102/:117/:118/:134/:135/:160/:169 等）-> §2.13 是唯一例外",
+        "impact": "P3：DataTable.vue:2 唯一接收方；WorkspacePage.vue:162-166 唯一消费点未显式传 undefined"
+      },
+      "followup": null,
+      "related_adjudications": [
+        "A143"
+      ],
+      "related": [
+        "D-034",
+        "PENDING_CONTENT_REVIEW",
+        "checkpoint_R8"
+      ],
+      "evidence": [
+        "orchestrator/defects/D-037.md",
+        "evidence/M0/ORCHESTRATOR/r9-content-review/01-component-contract-table-review.md"
       ]
     }
   ],
@@ -4920,21 +5039,69 @@
     ],
     "in_flight_agents": [
       {
-        "agent_id": "01a1d33a-d519-7293-80a3-ebd4715c439d",
-        "nickname": "Ramanujan",
-        "lane": "T",
-        "task": "D-016-batch5",
-        "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+        "agent_id": "01a1d5e4-61a6-7700-ab0e-15ab58c5c948",
+        "nickname": "Bohr",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S5 AC-001/034/035 证据采集与回执（含 FU-7 的 UNMIGRATED /health 取证）",
         "tier": "qwen3.8-flash",
-        "budget": "40k",
-        "loop_cap": 2,
-        "dispatched_at": "2026-11-13T12:49:32+08:00",
+        "budget": "12k",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T01:27:21+08:00",
         "write_set": [
-          "orchestrator/tasks/M1-04.md",
-          "orchestrator/tasks/M2-04.md",
-          "orchestrator/tasks/M3-04.md",
-          "tests/unit/test_task_cards.py(仅 KNOWN_MISSING 字面量)"
+          "evidence/M0/M0-02/**",
+          "evidence/M0/summaries/M0-02.md"
         ]
+      },
+      {
+        "agent_id": "01a1d5e5-34c6-7a50-ab0c-669c281ed935",
+        "nickname": "Jason(Volta-R9)",
+        "lane": "S",
+        "task": "M0-04",
+        "subtask": "S3 原子制品写入（独立尝试目录 -> 同盘原子重命名 -> 同事务登记；未引用回收）",
+        "tier": "qwen3.8-max",
+        "budget": "28k",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T01:27:21+08:00",
+        "write_set": [
+          "src/campaignlab/infra/artifacts.py",
+          "tests/integration/jobs/**",
+          "tests/unit/test_artifacts.py",
+          "evidence/M0/M0-04/**"
+        ],
+        "hard_deny": [
+          "src/campaignlab/infra/__init__.py（M0-02 scope）",
+          "api/common.py",
+          "domain/errors.py",
+          "src/campaignlab/worker/**（S2 已交付）",
+          "migrations/**",
+          "src/campaignlab/api/jobs.py（S4）"
+        ]
+      },
+      {
+        "agent_id": "01a1d5e5-ed0e-7b51-a7fc-15d54bca2bbf",
+        "nickname": "Mencius(Lagrange-R9)",
+        "lane": "F",
+        "task": "M0-03b",
+        "subtask": "S2 六态参数化 vitest + S3 件内样板收敛（S4 截图依 A135 推迟至 M1-04）",
+        "tier": "qwen3.8-flash",
+        "budget": "5k",
+        "loop_cap": 3,
+        "dispatched_at": "2026-11-14T01:27:21+08:00",
+        "write_set": [
+          "web/src/components/state/**",
+          "web/tests/unit/state/**"
+        ],
+        "hard_deny": [
+          "web/src/pages/**",
+          "web/src/features/**",
+          "web/src/components/**（state/ 以外，含 D-034 四件禁夹带修）",
+          "web/*.config.*",
+          "web/package.json",
+          "web/src/api/types.ts",
+          "M0-03b-freeze.md（S1 已冻结）"
+        ],
+        "note": "派单后补发情报：state/ 目录实测不存在、ViewState 全域 0 命中 -> S3 是**按冻结登记新建**而非补齐既有文件（与 freeze.md:115/:117/:331 一致）"
       }
     ],
     "dispatch_requirements": [
@@ -5035,7 +5202,7 @@
       "29be319"
     ],
     "self_check_gates_rc0": {
-      "checked_at": "2026-11-14T00:34:27+08:00",
+      "checked_at": "2026-11-14T01:20:00+08:00",
       "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
       "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。 2026-11-13T02:46:54+08:00 追记（第 5 次接管）：CR-002 选项 B 原子提交前，从磁盘全表重跑 16 项 G（含 G4c 真实篡改负例），rc 全部 == expected；分母 ruff=64(py=9/md=55)、pytest=43、mypy=9；双口径 tracked 64 + untracked 0 == 64 成立；spec/ dirty=0。提交前复核另检出并修复 3 类问题（均记入 CR-002.md §7 第 9/10/11 行）：① state.json.contract 曾被整块替换、丢失 HEAD 的 live_dir/registry/gate/ci_job/baselines（含两份 spec 基线 sha256 锚点）→ 已按无损合并修复；② 4 处历史/门禁文本仍写死旧指纹却未加注（tasks/M0-03.md:134、M0-03-design.md:9、M0-02-design.md:7 与 §5 V1、两卡 Q4/Q7 裁定结果）→ 已按 D-011 体例补纯增量标注（两设计文档 numstat removed=0）；③ 设计文档 Q4/Q7 追注曾被塞成 4 列表格的第 5 个单元格且缺收尾竖线、嵌套双星号破坏加粗 → 已还原原文字节并改为表后独立 blockquote。另：CHANGES.json 缩进规范化为 indent=2（符合 check_contracts.py:6 与其余 10 个同目录文件），语义等价已程序化证明，显式登记非静默夹带。  2026-11-13T04:58:57+08:00 追记（第 8 次接管 · Round 4 派单前置）：编排器产物落盘后从磁盘复跑 G1/G2/G3/G5/G6/G7/G8/G9/G10/G14 共 10 项，rc 全部 == expected（G4/G4b/G4c 负例本轮未复跑，沿用 02:46:54 实测值）；ruff format 分母 87→88（+1 md），恒等式 tracked(87)+untracked(1)==88 成立；pytest 76 passed、mypy 16 源文件、契约登记项 13、前端基线 8/8、doctor HEALTHY；spec/ dirty=0。  2026-11-13T06:55:00+08:00 追记（Round 4 四 lane 全部回收 + D-020/D-021 修复入库后）：编排器从磁盘全表实跑，rc 全部实取得非转录。pytest 110 passed（99 + D-020 新增 11 守卫）、mypy 22 source files、ruff format --check 101 files（恒等式 tracked 99 + untracked 2 == 101）、ruff check 可见 25（24 py + pyproject.toml）、契约登记项 13、前端 vitest Test Files 4 passed / Tests 56 passed、KNOWN_MISSING 13、磁盘卡 16、恒等式 16+13==29 成立、doctor 仍 rc=1（基线范围缺口，随 M0-02/S3c 移交）、G4/G4b 负例 rc=2 且未产出文件。过程中编排器自身复验脚本 4 处输入错误（API.md 权威 code 在第 2 列以「、」分隔而非首列反引号；PROBLEM_CODES 元组序为 (status, type_urn, title) 而非 (status, title, urn)——曾因此对 title 产生一次假 PASS；paths 的 home= 形参需 Path 而非 str；x_db_path 需文件系统路径而非 URL）与 1 处过严检查（env.py 的 sqlite:/// 命中在模块 docstring 内，非 docstring 命中为 0），以及 1 次操作事故（用 PowerShell Set-Content -Encoding utf8 写数据文件带入 UTF-8 BOM，追加进测试文件中部导致 SyntaxError U+FEFF，并一度覆盖 tests/unit/test_contract_slice.py 的 254 行既有护栏）——已 git checkout 还原并改为 BOM 感知重追加，最终该文件为纯增量 +91/-0、原前缀字节不变。以上全部当场更正并留痕，未误判任何 lane。",
       "gates": {
@@ -5361,7 +5528,7 @@
       "counts": {
         "pytest_passed": 356,
         "mypy_source_files": 73,
-        "ruff_formatted_files": 188,
+        "ruff_formatted_files": 194,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -5370,30 +5537,30 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 188,
+          "total": 194,
           "in_scope_py": 75,
-          "in_scope_md": 113,
+          "in_scope_md": 119,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-14T00:34:27+08:00",
+          "measured_after": "2026-11-14T01:20:00+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式：提交前 tracked in-scope py+md 186（py 74 + md 112）+ untracked 2（py 1 + md 1）== ruff format --check 报数 188（实测）；提交后 tracked 188（py 75 + md 113）+ untracked 0 == 188。复现命令见 reproduce_py / reproduce_md / identity_cmd。",
+          "identity": "A101 恒等式：提交前 tracked in-scope py+md 188（py 75 + md 113）+ untracked 6（全为 .md：r9-content-review 5 份 + D-037.md）== ruff format --check 报数 194（实测）；提交后 tracked 194（py 75 + md 119）+ untracked 0 == 194。复现命令见 reproduce_py / reproduce_md / identity_cmd。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
-            "+1 py（tests/unit/test_slice_self_consistency.py，D-036 防复发守护）",
-            "+1 md（orchestrator/defects/D-036.md，缺陷单）"
+            "+5 md（evidence/M0/ORCHESTRATOR/r9-content-review/{00-index,01-component-contract-table-review,02-d034-four-defects-locations,03-freeze-doc-review,commands}.md，Q lane Epicurus / PENDING_CONTENT_REVIEW）",
+            "+1 md（orchestrator/defects/D-037.md，缺陷单）"
           ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "在飞中间态，非提交后终态；提交后两者均转 tracked，untracked 归 0。",
+          "untracked_component_note": "在飞中间态，非提交后终态；提交后六者均转 tracked，untracked 归 0。**三条开发 lane 的在飞产物不计入本分母**（Bohr: evidence/M0/M0-02/_runtime|http；Mencius: web/src/components/state/，且 web/ 本就被 extend-exclude；Volta: 尚未落盘）。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 181,
+          "prev_total": 188,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
-          "previous_values": "91（2026-11-13T05:33:25+08:00，在飞中间态）；88（04:58:57）；64（02:46:54）；63（02:07:05）；56（01:37:27）；53（00:42:29）；46（23:30:05）；37（D-006 前）。按「历史值只加注不改写」保留于本字段。 || 127（提交B后、D-025 落盘前）；125（Round 5 回收前）；101（Round 4 快照）",
+          "previous_values": "91（2026-11-13T05:33:25+08:00，在飞中间态）；88（04:58:57）；64（02:46:54）；63（02:07:05）；56（01:37:27）；53（00:42:29）；46（23:30:05）；37（D-006 前）。按「历史值只加注不改写」保留于本字段。 || 127（提交B后、D-025 落盘前）；125（Round 5 回收前）；101（Round 4 快照） || 188（D-036 提交后 0e5c093 的 total）；186（Round 9 首件 D-035 提交后）；181（Round 8 checkpoint）",
           "tracked_py_md": 110,
           "untracked_py_md": 18,
           "round6_progression": "128（提交C 时）-> 144（S3d 在飞时实测，含未跟踪）-> 146（批次4 入库 + 守护 + D-026.md）-> 147（D-027.md 入库）；本提交后 untracked 归 0、tracked 147",
@@ -5402,14 +5569,16 @@
           "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。",
           "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入分母：git ls-files 只反映索引；Volta 的 repositories.py/application/worker.py 属已跟踪文件修改（不改文件数），src/campaignlab/worker/** 与其两测试尚未落盘。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫",
           "untracked_in_scope_md": 0,
-          "identity_measured_at": "2026-11-14T00:34:27+08:00",
+          "identity_measured_at": "2026-11-14T01:20:00+08:00",
           "caliber_note": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74 = 提交前 tracked py 69 + 本次新增 5 个 tests 包标记（tests/__init__.py、tests/api/__init__.py、tests/integration/__init__.py、tests/integration/bootstrap/__init__.py、tests/unit/__init__.py）；in_scope_md 112 不变（本次未新增 md）。新增的证据文件 fulltable.log 为 .log，不在 ruff format 作用域（只纳管 .py 与 .md），故不计入分母。",
-          "caliber_note_R9_d036": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74->75 = 新增 tests/unit/test_slice_self_consistency.py；in_scope_md 112->113 = 新增 orchestrator/defects/D-036.md；total 186->188。本轮改动的三份 orchestrator/handoff/*.slice.json 属 .json、evidence/**/fulltable.log 属 .log，**均不在 ruff format 作用域**（只纳管 .py 与 .md），故不计入分母。上一轮的 caliber_note（D-035：+5 个 tests 包标记）按「原值保留不改写」体例留存，不以本条覆盖。"
+          "caliber_note_R9_d036": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74->75 = 新增 tests/unit/test_slice_self_consistency.py；in_scope_md 112->113 = 新增 orchestrator/defects/D-036.md；total 186->188。本轮改动的三份 orchestrator/handoff/*.slice.json 属 .json、evidence/**/fulltable.log 属 .log，**均不在 ruff format 作用域**（只纳管 .py 与 .md），故不计入分母。上一轮的 caliber_note（D-035：+5 个 tests 包标记）按「原值保留不改写」体例留存，不以本条覆盖。",
+          "caliber_note_R9_content_review": "counts 为**本次提交后的树**口径（A101）。in_scope_md 113->119 = 新增 6 份 .md（5 份复核报告 + D-037.md）；in_scope_py 75 不变（无新增 .py）。M0-03-public-components.md 属**已跟踪文件的行内更正**，不改文件数。本键只记本轮推导，上一轮 caliber_note_R9_d036 与更早的 caliber_note 按「原值保留不改写」体例留存。",
+          "prev_total_note": "prev_total 为**滚动指针**（= 上一轮的 total），本轮由 181 更正为 188；181 属 Round 8 值、在 D-036 轮未随 total 更新。历史序列一律以 previous_values 为权威归档（只加注不改写）。"
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T00:34:27+08:00",
-        "counts_refresh_reason": "Round 9 / D-036 批量重切与守护落地后全表复跑重采样（17 项全绿 mismatch=none，证据 evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log）：ruff_formatted_files 186->188（+2 = tests/unit/test_slice_self_consistency.py 与 orchestrator/defects/D-036.md；py 74->75、md 112->113）；pytest_passed 350->356（+6 = 新守护 6 例）；mypy_source_files 72->73（+1 = 新守护文件）；ruff_lint_scope_files 24->75（**再锚定**，见 ruff_lint_scope_files_note_R9_d036）。三份切片 .json、evidence/**.log 均不在 ruff format 作用域，不计入分母。",
+        "counts_refreshed_at": "2026-11-14T01:20:00+08:00",
+        "counts_refresh_reason": "Round 9 / PENDING_CONTENT_REVIEW 完成 + D-037 立单与更正后重采样（门禁四项 rc=0：ruff check / ruff format --check / mypy / pytest）：ruff_formatted_files 188->194（+6 md = evidence/M0/ORCHESTRATOR/r9-content-review/ 下 5 份复核报告 + orchestrator/defects/D-037.md；py 75 不变、md 113->119）；mypy_source_files 73 不变（无新增 .py）；pytest_passed 356 不变（无新增用例，零回归）；ruff_lint_scope_files 75 不变（纯 Python 稳定分母）。M0-03-public-components.md 为**行内单行更正**（303 行前后一致），不改分母。A101 恒等式：提交前 tracked in-scope py+md 188（py 75 + md 113）+ untracked 6（全为 .md，即本提交新增）== ruff format --check 报数 194；提交后 tracked 194 + untracked 0 == 194。**分母只从索引/已提交树取**，三条开发 lane（Bohr/Volta/Mencius）在飞的未入库产物（evidence/M0/M0-02/_runtime|http、web/src/components/state/、src/campaignlab/infra/artifacts.py 等）一律不计入（依 test_counts_freshness 的 in-flight 排除口径）。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -5425,10 +5594,11 @@
         "previous_values_backend": "{\"pytest_passed\": 110, \"mypy_source_files\": 22, \"ruff_formatted_files\": 101, \"ruff_lint_scope_files\": 18, \"ruff_check_visible_files\": 25}",
         "pytest_passed_self_correction": "编排器自我更正（2026-11-13T09:06:04+08:00）：本键先前被写为 165，因取值自「D-025.md 已落盘、其 state.json 台账条目尚未写入」的中间态运行（当时 test_state_ledger.py::test_every_md_on_disk_has_ledger_entry 如实判红 -> 1 failed, 165 passed）。台账补齐后重跑实测为 166 passed / 0 failed，以本值为准。教训：counts 采样必须在同一提交的台账写入**之后**进行，否则会把手册 §15.9 守护测试的中间态红点固化进 counts。",
         "gate_measurement": {
-          "caliber_ref": "resume.gate_measurement_caliber（D-027/R6-2）",
-          "gates_run": 17,
           "all_green": true,
-          "measured_at": "2026-11-14T00:34:27+08:00"
+          "caliber_ref": "resume.gate_measurement_caliber（D-027/R6-2）",
+          "gates_run": 4,
+          "measured_at": "2026-11-14T01:20:00+08:00",
+          "note": "本轮只跑与改动面相关的 4 项（G7 ruff check / G8 ruff format --check / G9 mypy / G10 pytest），均 rc=0；未跑全表 17 项（无契约/切片/前端基线改动），全表复验仍为编排器独占、留待 wave 出口。"
         },
         "pytest_passed_note_round7_laneA": "counts.pytest_passed 仍为 213（af3808b/d3f7671 全表实测值），本轮**未刷新**：全表 pytest 在 Volta 在飞期间会对其半成品判假 RED，故缓跑。本提交只做路径限定实测：tests/unit/test_s3b_routes.py 7 passed（rc=0）+ 近邻与守护 82 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值（禁估算）。",
         "mypy_source_files_note_round7_laneA": "同上：mypy 49 为上次全表实测值；本轮路径限定 mypy 4 source files rc=0，全表值待回收后补测",
@@ -5644,8 +5814,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-14T00:34:27+08:00",
-      "counts_refresh_reason": "Round 9 / D-036 批量重切与守护落地后全表复跑重采样（17 项全绿 mismatch=none，证据 evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log）：ruff_formatted_files 186->188（+2 = tests/unit/test_slice_self_consistency.py 与 orchestrator/defects/D-036.md；py 74->75、md 112->113）；pytest_passed 350->356（+6 = 新守护 6 例）；mypy_source_files 72->73（+1 = 新守护文件）；ruff_lint_scope_files 24->75（**再锚定**，见 ruff_lint_scope_files_note_R9_d036）。三份切片 .json、evidence/**.log 均不在 ruff format 作用域，不计入分母。",
+      "counts_refreshed_at": "2026-11-14T01:20:00+08:00",
+      "counts_refresh_reason": "Round 9 / PENDING_CONTENT_REVIEW 完成 + D-037 立单与更正后重采样（门禁四项 rc=0：ruff check / ruff format --check / mypy / pytest）：ruff_formatted_files 188->194（+6 md = evidence/M0/ORCHESTRATOR/r9-content-review/ 下 5 份复核报告 + orchestrator/defects/D-037.md；py 75 不变、md 113->119）；mypy_source_files 73 不变（无新增 .py）；pytest_passed 356 不变（无新增用例，零回归）；ruff_lint_scope_files 75 不变（纯 Python 稳定分母）。M0-03-public-components.md 为**行内单行更正**（303 行前后一致），不改分母。A101 恒等式：提交前 tracked in-scope py+md 188（py 75 + md 113）+ untracked 6（全为 .md，即本提交新增）== ruff format --check 报数 194；提交后 tracked 194 + untracked 0 == 194。**分母只从索引/已提交树取**，三条开发 lane（Bohr/Volta/Mencius）在飞的未入库产物（evidence/M0/M0-02/_runtime|http、web/src/components/state/、src/campaignlab/infra/artifacts.py 等）一律不计入（依 test_counts_freshness 的 in-flight 排除口径）。",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -7443,6 +7613,25 @@
         "returned_at": "2026-11-13T13:13:55+08:00",
         "commit": "本提交",
         "close_agent": "checkpoint 时统一释放"
+      },
+      {
+        "agent_id": "01a1d33a-d519-7293-80a3-ebd4715c439d",
+        "nickname": "Ramanujan",
+        "lane": "T",
+        "task": "D-016-batch5",
+        "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+        "tier": "qwen3.8-flash",
+        "budget": "40k",
+        "loop_cap": 2,
+        "dispatched_at": "2026-11-13T12:49:32+08:00",
+        "write_set": [
+          "orchestrator/tasks/M1-04.md",
+          "orchestrator/tasks/M2-04.md",
+          "orchestrator/tasks/M3-04.md",
+          "tests/unit/test_task_cards.py(仅 KNOWN_MISSING 字面量)"
+        ],
+        "status": "RELEASED_AT_ROUND9_DISPATCH（句柄失效：Round 8 关机 checkpoint 已释放，Round 9 重新派单时移入 previous）",
+        "moved_to_previous_at": "2026-11-14T01:29:30+08:00"
       }
     ],
     "round3_returns": {
@@ -8957,8 +9146,9 @@
       "rule_verify_worktree_after_vm_restart": "发现 /tmp 内容异常丢失（疑似 VM 重启）时，**必须先核验三者再继续**：① 工作树改动是否仍在（ext4 持久，通常完好）② HEAD 与 ahead/behind ③ state.json 是否被半写（原子写 + os.replace 保证不会）。核验通过后才可重跑门禁；禁直接重跑覆盖，禁假定改动已丢失而重做。",
       "rule_ruff_e501_counts_east_asian_width": "ruff 的 E501 按**东亚字符宽度**计（中文算 2，非 Python 的 len()）：实测一行 85 个字符（含中文）被报 117 > 100、96 字符被报 123 > 100。写含中文的单行 docstring/注释时必须按宽度而非字符数控制在 line-length=100 内，超长改为多行 docstring。",
       "rule_semantic_homomorphism_before_invariant": "把某一口径推广为不变量或守护测试之前，必须先核对该口径在各类对象上的**语义是否同构**；同名不同义即不得统一钉死。范例（R9-2 / A127）：切片 `operations` 段在 lane F（纯前端卡）是「本卡**消费面**」——页面要调的 op 必须全在切片内，否则违反 D-011/D-012 的禁回读活契约而硬阻塞；在 lane D/S（后端卡）是「本卡**实现面**」——只含本卡要实现的 op，切片里的 pages 段仅作上下文参考，页面引用的他人 op 不必也不应进入。故「切片自洽性」不变量只对 lane F 成立。配套要求：批量改动落地后、提交前必须做一次角色/lane 归属复核，不得只凭机械校验通过就提交。",
-      "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。",
-      "rule_scope_deny_precedence": "scope_allow 与 scope_deny 字面重叠时**一律 deny 优先**；且 deny 必须在 state.json tasks[id].scope_deny **显式登记**（只写在卡内视为未生效，因编排器复验与 lane 越界自证都以台账为机械口径）。已应用：M3-04（A130，排除 review/monthly/ 与 features/monthly/ 归 M3-P02）、M4-03（A141，排除 report/monthly/ 归 M4-P01）。新增同型重叠时按此规则登记，禁逐案另裁。"
+      "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。 **扩展（R9-5）**：列表型历史键（键名含 previous / history / log / returns / adjudications / corrections 者）**禁整体覆盖，一律 append-only**；写入脚本必须先用 HEAD 版本断言 `len(new) >= len(old)` 且 old 的每一项在 new 中逐条字节级保留（`json.dumps(..., sort_keys=True)` 比对），否则视为缺陷。实证：R9-5 曾用赋值覆盖 in_flight_agents_previous，丢弃 6 条历史 lane 记录并丢 status 键，被提交前语义 diff 的 REMOVED_KEY 计数拦下。",
+      "rule_scope_deny_precedence": "scope_allow 与 scope_deny 字面重叠时**一律 deny 优先**；且 deny 必须在 state.json tasks[id].scope_deny **显式登记**（只写在卡内视为未生效，因编排器复验与 lane 越界自证都以台账为机械口径）。已应用：M3-04（A130，排除 review/monthly/ 与 features/monthly/ 归 M3-P02）、M4-03（A141，排除 report/monthly/ 归 M4-P01）。新增同型重叠时按此规则登记，禁逐案另裁。",
+      "rule_grep_dash_pattern_needs_separator": "以 `-` 开头的 grep/rg 模式**必须**加 `--` 分隔选项与模式（如 `grep -rn -- --cl-row-h-dense web/src`），否则模式被当选项 -> rc=2、hits=0，与「真无匹配」（rc=1）表象相同而形成假绿。配套纪律：一切「hits=0 / 输出 0」型结论必须同时记 rc，**rc=2 一律判红并修命令重跑，禁记为 1、禁当无匹配**（D-024 的 rc 语义 + R9-4 实证）。"
     },
     "round7_adjudications": [
       {
@@ -9616,6 +9806,24 @@
           "卡文行数守护：三卡 head 行内替换（行数不变），tail 各 +1 行追注；实测 total 79／79／82 行，均在 test_task_card_narrative 的 head 60／tail 40／total 200 上限内"
         ],
         "action_taken": "tasks[M1-04/M3-04/M4-03].gates[0].id 改为 11／11／8 条枚举式；三卡各加 `gate_literal_note_A142`（M4-03 另含与 A28 的关系说明）；三卡 head 逐字引用同步行内替换（行数不变）；三卡 tail 各 append-only 追注 1 条收口说明，一并收口 M1-04 U-3＋U-4（引 A131）、M3-04 U-3（引 A129 采 (a)）＋U-4、M4-03 U-4。FU-23 -> DONE。"
+      },
+      {
+        "id": "A143",
+        "round": 9,
+        "at": "2026-11-14T01:27:21+08:00",
+        "source": "编排器（Round 9：PENDING_CONTENT_REVIEW 完成 + Q lane 回报验收 + D-037 立单裁定）",
+        "question": "checkpoint_R8 第 ⑦ 项挂账的 PENDING_CONTENT_REVIEW（Lagrange 两份文档：M0-03-public-components.md 的 13 件组件契约表、M0-03b-freeze.md 的六态冻结登记）如何做内容级复核？Q lane 回报 PASS_WITH_DIFF（一致 12/差异 1/NOT_FOUND 0，D-034 四项全 CONFIRMED）是否验收？差异项如何处置？",
+        "ruling": "**① 复核已完成并验收**：派 Q lane 子智能体（Epicurus，qwen3.8-flash high）做逐条对码，编排器**不采信自报**、独立抽验全部关键 file:line 与 13 件/398 行计数，逐条吻合 -> 验收通过，`PENDING_CONTENT_REVIEW` 转 **DONE**。② **差异项立 D-037（MINOR / FIXED_PENDING_Q / blocking=false）**，定性为**文档错、代码对**：契约表 §2.13 与代码 `componentTypes.ts:5-6` 不符，且与同文档 `:28` 自身约定及全表 17 处兄弟行写法均不符；在 `exactOptionalPropertyTypes: true` 下契约表比代码更严格。修法为**单行文档更正、代码零改动、不走 CR**（`orchestrator/handoff/**` 非只读区，且不改任何公共冻结件签名，不触发手册 §3.1/§7 的 CR 条件）。③ **D-034 的 path_caliber 随之落定**：原单明写「不写死文件路径与行号、待内容级复核」，现按 A19 原文不改写、追加 `path_caliber_resolved_A143` 承载四项权威 file:line；owner 仍依 A140 归 M0-03 收尾，AC-032 时限（M5-01 取证前）不变。④ **六态件「文档已冻结、代码零落地」判为 NOT_FOUND 而非违约**：与 `M0-03b-freeze.md:115/:117/:331` 自身声明一致（S1 只登记、S3 才落地），且 S2+S3 已于本轮派给 F lane（Mencius）在建，无需另催。",
+        "evidence": [
+          "Q lane 交付 5 份报告共 289 行（00-index 21 / 01 47 / 02 106 / 03 54 / commands 61，含 27 条命令四元组），均无 BOM、无 CR、有尾换行",
+          "编排器独立抽验（可复跑）：ConfirmDialog.vue:13/14 + focus(/autofocus/watch(/onMounted/nextTick/ref= 五族 grep 均 0 命中；EvidenceDrawer.vue:10/13/17 正例；DataTable.vue:3-9/46；tokens.css:77/78/92；`grep -rn -- sticky web/src web/tests` rc=1 真 0 命中；StatusTag.vue:7/22-28/29-33；AppShell.vue:6/11；SideRail.vue:4/7/8；componentTypes.ts:1/5-6；tsconfig.json:10；契约表:202 -> **逐条吻合**",
+          "13 件构成独立复算：12 个 .vue 合计 390 行 + componentTypes.ts 8 行 = **398 行**，与报告一致",
+          "唯一差异项三证：代码 componentTypes.ts:5-6 有 `| undefined`；文档 :28 约定「所有可选 props 都用 `?: T | undefined` 声明」；全表 `| undefined` 命中 17 行而 §2.13 是唯一例外",
+          "运行期影响实测为 P3：DataTable.vue:2 唯一接收方、WorkspacePage.vue:162-166 唯一消费点未显式传 undefined",
+          "越界自证：Q lane `git diff --name-only HEAD` 为空（未改任何既有文件），全仓 untracked 仅其自身目录"
+        ],
+        "action_taken": "立 D-037（defects 36->37）并同批更正 M0-03-public-components.md:202（行数 303 不变）；D-034 追加 path_caliber_resolved_A143（四项权威 file:line + 13 件口径 + 复核状态）；新增 resume.content_review_R9 权威记录；budget.subtask_log 追加 Q lane 条目并程序化重算 flash_share；记 R9-4（编排器自身 grep rc=2 假证据的自我更正）。",
+        "self_note": "Q lane 自报 33k token、超 20k 软上限 1.65x -> 如实入账不粉饰，并把教训写进 cost_lesson：复核类子任务的软上限应按**被复核面行数**估而非按报告份数估。另：编排器抽验时自己的 `grep -rn --cl-row-h-dense web/src` 因模式以 `-` 开头被 grep 当选项 -> rc=2，一度像「零引用」的假证据；按 D-024 纪律判红并改 `grep -rn -- <pat>` 重跑，才确认子智能体结论成立。记 R9-4：**以 `-` 开头的 grep 模式必须加 `--` 分隔**，且 rc=2 一律判红禁当无匹配。"
       }
     ],
     "round7_predispatch": {
@@ -10892,6 +11100,34 @@
           "R9-2",
           "gate_measurement_caliber.rule_ledger_write_structure_preserving"
         ]
+      },
+      {
+        "id": "R9-4",
+        "at": "2026-11-14T01:27:21+08:00",
+        "what_was_wrong": "编排器抽验 Q lane 结论时，用 `grep -rn --cl-row-h-dense web/src web/tests` 验证「dense 令牌零引用」。模式以 `-` 开头被 grep 解析为**选项**而非模式 -> **rc=2（命令自身错误）**、hits=0。该输出与「零引用」的真结论**表象相同**，若不核 rc 就会把一次命令失败当成一条证据（假绿）。",
+        "how_found": "按门禁四元组记账时注意到 rc=2 而非 1；依 dispatch_requirements 里 D-024 的 rc 语义条目（0=有匹配 / 1=无匹配 / 2=命令自身错误，rc=2 必须判红并修命令、禁记为 1）判红。",
+        "correction": "改用 `grep -rn -- <pattern> <paths>`（`--` 分隔选项与模式）重跑：`--cl-row-h-dense` rc=0 hits=1（仅 tokens.css:78 自身定义行）、`--cl-fs-table-dense` rc=0 hits=1（仅 tokens.css:92）、`--cl-row-h` rc=0 hits=3（定义 2 + DataTable.vue:46 消费 1）、`sticky` rc=1 hits=0（真无匹配）。=> Q lane 的「两 dense 令牌零消费者、无 sticky」结论**成立**，抽验通过。",
+        "prevention": "口径固化：**以 `-` 开头的 grep/rg 模式必须加 `--` 分隔**；且一切「hits=0」型结论必须同时记 rc，rc=2 一律判红重跑、禁当无匹配。已并入 resume.dispatch_requirements 的 D-024 条目语境，本轮另立 rule_grep_dash_pattern_needs_separator。",
+        "related": [
+          "D-024",
+          "A143",
+          "D-034",
+          "gate_measurement_caliber.rule_grep_dash_pattern_needs_separator"
+        ]
+      },
+      {
+        "id": "R9-5",
+        "at": "2026-11-14T01:29:30+08:00",
+        "what_was_wrong": "回填 Round 9 派单信息时，用 `r['in_flight_agents_previous'] = r.get('in_flight_agents')` **整体覆盖**了该键，而它在 HEAD 已有 **7 条历史 lane 记录** -> 6 条历史被丢弃，且丢失 `status` 键（被逐键语义 diff 的 REMOVED_KEY 计数拦下）。",
+        "how_found": "提交前逐键语义 diff（HEAD vs 工作树）报 `REMOVED_KEY=1: $.resume.in_flight_agents_previous[0].status` 与 `len 7->1`。行 diff 因 state.json 体量（约 77 万字符）不可读，机械门禁又全绿（该键无守护），唯有语义 diff 能拦住 —— 与 R9-3 同一形态，第二次实证 rule_ledger_write_structure_preserving 的必要性。",
+        "correction": "改为 **append-only 合并**：以 HEAD 的 7 条为基，逐条 deep-copy 后追加 HEAD `in_flight_agents` 的 Ramanujan 1 条（补 `status` 与 `moved_to_previous_at`），得 8 条；并断言 HEAD 的 7 条**逐条字节级相同**（json.dumps sort_keys 比对）后才写盘。",
+        "prevention": "把 rule_ledger_write_structure_preserving 的适用面从「既有键禁类型变更」扩展到「**列表型历史键禁整体覆盖**」：凡键名含 previous / history / log / returns / adjudications / corrections 者，一律 append-only；写入脚本必须先用 HEAD 版本做长度与逐条断言（new_len >= old_len 且 old 逐条保留），否则视为缺陷。已并入该规则键正文。",
+        "related": [
+          "R9-3",
+          "R9-4",
+          "A143",
+          "gate_measurement_caliber.rule_ledger_write_structure_preserving"
+        ]
       }
     ],
     "round9_orchestrator_self_served": [
@@ -10998,6 +11234,29 @@
           "A19",
           "D-036",
           "FU-23"
+        ]
+      },
+      {
+        "at": "2026-11-14T01:27:21+08:00",
+        "item": "Round 9 批次C：PENDING_CONTENT_REVIEW 收口（A143）—— Q lane 验收 + D-037 立单与更正 + D-034 path_caliber 落定",
+        "detail": [
+          "派 Q lane（Epicurus/flash）完成 checkpoint_R8 第 ⑦ 项挂账的内容级复核，编排器独立抽验后验收（PASS_WITH_DIFF）",
+          "立 D-037（MINOR/FIXED_PENDING_Q/blocking=false）并同批更正 M0-03-public-components.md:202（行内替换、303 行不变、代码零改动、不走 CR）",
+          "D-034 追加 path_caliber_resolved_A143：四项缺陷的权威 file:line + 正例对照 + 修复面形状；owner 仍依 A140 归 M0-03 收尾、AC-032 时限不变",
+          "新增 resume.content_review_R9；PENDING_CONTENT_REVIEW -> DONE",
+          "budget.subtask_log 追加 Q lane 条目（flash/33k/超软上限 1.65x，如实入账）并程序化重算 flash_share：tasks 0.6129->0.625（达标）、tokens 0.441->0.4658（仍不达标，主因单批规模过大非档位选错）、dev 0.2667 不变",
+          "in_flight_agents 刷新为 Round 9 三条开发 lane（Bohr/Volta/Mencius），Round 8 的 Ramanujan 句柄移入 previous；写权两两不相交已核验",
+          "记 R9-4 + rule_grep_dash_pattern_needs_separator（编排器自身 grep rc=2 假证据的自我更正）",
+          "counts 刷新：ruff_formatted_files 188->194（md 113->119、py 75 不变）、mypy 73、pytest 356；A101 恒等式 75+119+0+0==194 成立；在飞 lane 产物按 in-flight 口径排除"
+        ],
+        "accounting": "**不计入 budget.subtask_log**（依 accounting_rule_orch_self_served）；Q lane 派单本身**计入**（子智能体派单）",
+        "related": [
+          "A143",
+          "D-034",
+          "D-037",
+          "R9-4",
+          "checkpoint_R8",
+          "PENDING_CONTENT_REVIEW"
         ]
       }
     ],
@@ -11114,7 +11373,29 @@
       "readonly_check": "git status --porcelain spec/ contracts/ = 空",
       "followup_systemic": "同型排查发现 7 个含页面切片中 6 个存在同类自相矛盾（切片自带 pages[*].meta 引用的 op/AC 不在切片正文内，而卡片禁回读活契约 D-011/D-012 -> 实现方硬阻塞）；受影响：M1-04/M3-04（仅缺 AC 行）、M1-P01/M3-P01/M4-02/M4-03/M4-P01（缺 op，BLOCKING 级）-> 已立 **D-036** 批量治理（本提交内落地）；口径边界见 **A127**（只对 lane F 适用），四张 lane D/S 后端卡的重切已回滚，见自我更正 **R9-2**",
       "followup_defect": "D-036"
-    }
+    },
+    "content_review_R9": {
+      "at": "2026-11-14T01:27:21+08:00",
+      "what": "checkpoint_R8 第 ⑦ 项挂账的 PENDING_CONTENT_REVIEW：Lagrange 两份文档的内容级复核",
+      "status": "DONE",
+      "executor": "Q lane 子智能体 Epicurus（agent_id 01a1d5da-16b1-7bb3-9a6a-72aebd047ee0，qwen3.8-flash high）",
+      "verifier": "编排器独立抽验（不采信 lane 自报）：全部关键 file:line + 13 件/398 行计数逐条吻合",
+      "verdict": "PASS_WITH_DIFF（一致 12 件 / 差异 1 件 / NOT_FOUND 0 件；D-034 四项全 CONFIRMED、NOT_REPRODUCIBLE 0；「公共件无取数副作用」口径 PASS）",
+      "scope_reviewed": [
+        "orchestrator/handoff/M0-03-public-components.md（13 件组件契约表，303 行）× web/src/components/**（13 件 398 行）逐条对码",
+        "orchestrator/handoff/M0-03b-freeze.md（六态冻结登记）× web/src/components/state/**（实测不存在）+ ui/COMMON.md 口径",
+        "orchestrator/defects/D-034.md 四项缺陷的权威定址"
+      ],
+      "outcomes": [
+        "D-037 立单并已修（契约表 §2.13 单行更正，代码零改动）",
+        "D-034 的 path_caliber 由「暂不写死路径行号」落定为四项权威 file:line（追加 path_caliber_resolved_A143，原文不改写）",
+        "六态件代码零落地判为 NOT_FOUND 而非违约（与 freeze 文档 :115/:117/:331 自述一致；S2+S3 已派 F lane Mencius 在建）",
+        "A137「公共件无取数副作用」口径实测成立：现存 13 件网络调用族 0 命中、`@/api` 仅 4 处 import type、触发值全由页面 props 传入"
+      ],
+      "evidence": "evidence/M0/ORCHESTRATOR/r9-content-review/{00-index,01-component-contract-table-review,02-d034-four-defects-locations,03-freeze-doc-review,commands}.md",
+      "ruling": "A143"
+    },
+    "in_flight_agents_note_round9": "并发纪律核验：开发 lane 3 条（Bohr/S、Volta/S、Mencius/F）+ QA 1 条（Epicurus 已回收）=> 符合「开发 lane <=3 + QA 1」。三条开发 lane 写权**两两不相交**（evidence/M0/M0-02 vs src/campaignlab/infra/artifacts.py+tests vs web/src/components/state+web/tests/unit/state），且各自 hard_deny 覆盖他方写权。上一轮 Round 8 的 Ramanujan（D-016-batch5）句柄已失效，移入 in_flight_agents_previous。子智能体一律禁 git 写；全表复验编排器独占；多 lane 同树只跑路径限定门禁、非自有文件红点只归因不修。"
   },
   "acceptance": {
     "baseline_total": 35,
