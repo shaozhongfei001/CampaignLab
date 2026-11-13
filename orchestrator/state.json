@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T12:49:32+08:00",
+  "updated_at": "2026-11-13T13:13:55+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -549,6 +549,36 @@
         "verified_by_orchestrator": "独立复验：分母只从 git ls-tree -r HEAD 取（在飞免疫）、期望值全从 counts 读（文件内零写死计数）、口径与 reproduce_py/reproduce_md 逐字对账；A100 裁定「== ruff 报数」半句以派单文为准不实现；本轮 post-commit 实跑 5 passed rc=0（Lane A 提交后）",
         "outputs": [
           "tests/unit/test_counts_freshness.py(234/11282,新建)"
+        ]
+      },
+      {
+        "task": "M0-04",
+        "subtask": "S2 认领/续租/取消/重试（worker/ 7 模块 + JobRepository 10 新方法 + 9 条状态机迁移逐条落测）",
+        "lane": "S",
+        "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+        "nickname": "Volta",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 1,
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal/remainingTokens/completionBudgetReport 全 null；按纪律记 null，禁估算。客观量：65 次工具调用、12 文件、新文件 3402 行 + 追加 462 行、247658 B、新增 61 个测试函数（参数化后实跑 64 项）",
+        "over_cap": false,
+        "over_cap_note": "max 档上限 200k；无计量值故不判越限",
+        "returned_at": "2026-11-13T13:13:55+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "编排器独立复验：numstat 431/0 + 18/1 + 13/0 三项逐字吻合；ruff format 12 files already formatted、ruff check All checks passed、mypy 11 source files、pytest 自有 64 passed、近邻 78 passed，全 rc=0；TRANSITIONS 恰 9 项（T1..T9）；JobRepository 公开方法 14 = 既有 4 + 新增 10；jobs SQL 写点文件集合仍 == {repositories.py}；datetime.now()/type:ignore/noqa 三项 grep 均 0 命中。编排器一处探针（worker 包内 'UPDATE ' 字面量）报 2 命中，经逐行查明为 states.py:6/66/194 与 store.py:162/324/428/587/638 的**散文 docstring**，非 SQL，属探针误报，如实记录",
+        "outputs": [
+          "src/campaignlab/worker/{__init__,states,errors,leases,capacity,store,runner}.py(1723 行)",
+          "src/campaignlab/infra/db/repositories.py(431 add/0 del)",
+          "src/campaignlab/application/worker.py(18 add/1 del)",
+          "tests/unit/test_worker_runner.py(903 行/40 测试)",
+          "tests/unit/test_job_repository_terminal.py(776 行/21 测试)",
+          "orchestrator/handoff/M0-04-design.md(13 add/0 del)"
         ]
       }
     ],
@@ -1202,7 +1232,7 @@
       "status": "IN_PROGRESS",
       "lane": "S",
       "tier_planned": "max",
-      "tier_used": "",
+      "tier_used": "qwen3.8-max high（S1、S2）",
       "attempt": 0,
       "tokens": 0,
       "commit": "",
@@ -1293,6 +1323,26 @@
         "output": "orchestrator/handoff/M0-04-design.md",
         "lines": 101,
         "note": "S1 设计已入库；其 §10 的 N1-N8 八项未决已由 A81/A84/A86-A91 全部裁定或消解"
+      },
+      "subtask_progress": {
+        "S1": "DONE",
+        "S2": "DONE",
+        "S3": "TODO",
+        "S4": "TODO",
+        "S5": "TODO",
+        "S6": "TODO",
+        "S7": "TODO",
+        "S8": "TODO"
+      },
+      "subtask_progress_evidence": {
+        "S1": "0adf66e docs(M0-04/S1)：orchestrator/handoff/M0-04-design.md",
+        "S2": "本提交：worker/ 7 模块（1723 行）+ JobRepository 追加 10 方法（431 add/0 del）+ application/worker.py 追加 compute_lease_deadline（18 add/1 del，A83 豁免精确形状）+ 2 个测试文件（64 passed）+ design append-only 13 行",
+        "S3": "TODO：infra/artifacts.py 未落地（原子制品写入）",
+        "S4": "TODO：api/jobs.py + api/common.py::JobPage（A84/A91）",
+        "S5": "TODO：tests/integration/jobs/**（A89）",
+        "S6": "TODO：租约与制品争用用例（A89）",
+        "S7": "TODO：tests/unit/test_job_dto.py（A86）",
+        "S8": "TODO：evidence/M0/M0-04/**（AC-029 负例 + AC-031 写入侧）"
       }
     },
     "M1-01": {
@@ -4340,17 +4390,6 @@
     ],
     "in_flight_agents": [
       {
-        "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
-        "nickname": "Volta",
-        "lane": "S",
-        "task": "M0-04",
-        "subtask": "S2",
-        "tier": "qwen3.8-max",
-        "reasoning_effort": "high",
-        "budget": "50k",
-        "dispatched_at": "2026-11-13T11:53:59+08:00"
-      },
-      {
         "agent_id": "01a1d33a-d519-7293-80a3-ebd4715c439d",
         "nickname": "Ramanujan",
         "lane": "T",
@@ -4649,7 +4688,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 158,
+        "ruff_formatted_files": 167,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4658,8 +4697,8 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 158,
-          "in_scope_py": 57,
+          "total": 167,
+          "in_scope_py": 66,
           "in_scope_md": 101,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
@@ -4677,7 +4716,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 156,
+          "prev_total": 158,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4902,8 +4941,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T12:43:29+08:00",
-      "counts_refresh_reason": "Round 8 predispatch 落盘后重采样：ruff_formatted_files 156->158（md 99->101 = D-031.md + D-032.md；py 57 不变）。三份批次5 切片为 .json，不入 ruff format 分母。采样点依 A101/rule_counts_same_commit（5 路径已 git add、台账写入之后、commit 之前）。pytest_passed 213 / mypy 49 仍未刷新：Volta（M0-04/S2）在飞，全表门禁缓跑；本提交只跑守护与路径限定门禁",
+      "counts_refreshed_at": "2026-11-13T13:13:56+08:00",
+      "counts_refresh_reason": "Round 7 Lane B（M0-04/S2）入库后重采样：ruff_formatted_files 158->167（py 57->66 = worker/ 7 模块 + 2 个测试文件；md 101 不变，M0-04-design.md 属 append-only 修改）。采样点依 A101/rule_counts_same_commit（12 路径已 git add、台账写入之后、commit 之前）。pytest_passed/mypy 全表值待本 checkpoint 的 clean-tree 全表复跑后回填（Volta 回收后在飞 lane 仍有 Bohr/Lagrange，故本次提交仍缓跑全表）",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -6645,6 +6684,17 @@
         "returned_at": "2026-11-13T12:31:47+08:00",
         "commit": "PENDING(本提交)",
         "close_agent": "待三 lane 全部提交后统一 close"
+      },
+      {
+        "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+        "nickname": "Volta",
+        "lane": "S",
+        "task": "M0-04",
+        "subtask": "S2",
+        "tier": "qwen3.8-max",
+        "returned_at": "2026-11-13T13:13:55+08:00",
+        "commit": "本提交",
+        "close_agent": "checkpoint 时统一释放"
       }
     ],
     "round3_returns": {
@@ -8082,7 +8132,8 @@
       "rule_new_file_gate": "编排器自己新写的 .py/.md 在入库前必须先过 ruff format + ruff check + mypy（.py）与 BOM/CR/尾换行（全部）",
       "rule_counts_sampling_point": "counts/门禁采样必须发生在『工作树==待提交树』且『台账与缺陷单已落盘』之后、commit 之前；任何在门禁跑完后新增的 .md/.py（含缺陷单、证据档、守护测试）都必须触发重采样。提交前断言：counts.ruff_formatted_files == 实测 ruff format --check 报数 == tracked(py+md) + untracked。依据 R6-3。",
       "rule_same_name_tools": "同名多工具的门禁（实例：CLI `python -m campaignlab doctor` 与 `bash scripts/doctor.sh`）必须分字段记录且每字段附 cmd，禁把两者混记在一个 doctor 键下。依据 R6-4。",
-      "rule_counts_same_commit": "A101（2026-11-13T12:31:47+08:00）：counts 必须与新增文件在**同一次提交**内刷新，采样点 = 工作树 == 待提交树（新增文件已 git add）且台账写入之后、commit 之前；违反则 tests/unit/test_counts_freshness.py 在下一次提交后判红。为 rule_counts_sampling_point（R6-3）的推论。派单文禁写死计数、一律指向 resume.self_check_gates_rc0.counts 现值（D-012/D-014）。在飞 lane 的未入库文件不计入分母（git ls-files 只反映索引；守护从 git ls-tree -r HEAD 取数）。"
+      "rule_counts_same_commit": "A101（2026-11-13T12:31:47+08:00）：counts 必须与新增文件在**同一次提交**内刷新，采样点 = 工作树 == 待提交树（新增文件已 git add）且台账写入之后、commit 之前；违反则 tests/unit/test_counts_freshness.py 在下一次提交后判红。为 rule_counts_sampling_point（R6-3）的推论。派单文禁写死计数、一律指向 resume.self_check_gates_rc0.counts 现值（D-012/D-014）。在飞 lane 的未入库文件不计入分母（git ls-files 只反映索引；守护从 git ls-tree -r HEAD 取数）。",
+      "rule_no_hardcoded_symbol_counts": "R8-1/A115（2026-11-13T13:13:55+08:00）：派单文与卡片**禁写死符号面计数**（如 __all__ 项数、方法数、字段数），一律写「以 inspect 实取为准」或与 counts 现值对账；只有**冻结面**（如 9 条状态机迁移、20 个 Problem code、4 个既有 JobRepository 方法签名）允许在守护测试里写死，因其语义即「不得增长/改变」。本轮实测两处写错（paths.py::__all__ 16->17、api/common.py::__all__ 52->51）均由 lane 实取发现，未造成实现偏差。"
     },
     "round7_adjudications": [
       {
@@ -8183,7 +8234,8 @@
         "source": "api/common.py 实测缺 JobPage（编排器派单前置实测发现）",
         "question": "`listJobs` 的 200 响应是 `JobPage{items(0-100), next_cursor}`，但实测 `api/common.py.__all__` 52 项含 `Job`/`ObjectRef`/`WorkspacePage` 而**无 `JobPage`** -> 该 DTO 无落点。谁追加？",
         "ruling": "`JobPage` 由 **M0-04/S4** 在 `src/campaignlab/api/common.py` **append-only** 追加（与既有 `WorkspacePage` 同构：`items` + `next_cursor`，字段序、校验口径、`__all__` 位置一律对齐 `WorkspacePage`），按 A77/A78 纳入 **public_frozen 扩围**，此后禁改签名禁移除。**M0-02/S4 禁抢先添加**（避免双主写，与 A84 同理）。S2 不做 HTTP 层，本轮不涉及；本条为 Round 8 派单前置裁定，先行入库以免 S4 派单时临时阻塞。`api/common.py` 属 M0-02 的 scope、且已列为公共冻结件，故 S4 的该处追加须记为窄口径 append-only 豁免（numstat 对该文件须 0 删除行）。",
-        "action_taken": "无代码动作；裁定入库"
+        "action_taken": "无代码动作；裁定入库",
+        "correction_R8_1": "编排器自我更正（R8-1，2026-11-13T13:13:55+08:00）：本条原文所述 api/common.py::__all__ 为 52 项，经 Lane B（Volta）inspect 实取为 **51 项**。原文按 D-011 体例保留不改写。根因为违反 D-012/D-014「禁写死计数」；后续派单文一律写「以 inspect 实取为准」。同批更正：infra/db/paths.py::__all__ 实为 17 项（派单文写 16）。见 A115。"
       },
       {
         "id": "A94",
@@ -8328,6 +8380,60 @@
         "question": "AC 的 gates[*].rc 与 subtask_progress 由谁、在什么时点回填？",
         "ruling": "**① subtask_progress**：编排器在**该子任务的交付提交内**回填（与 counts 同一提交，A101 同型），值必须附提交哈希或产物路径。**② AC 的 rc/evidence**：由**拥有该证据的子任务**在交付时回填（M0-02/S5、M0-04/S8 这类证据采集子任务，以及各页面任务的取证子任务）；wave 出口由 Q lane 复核汇总。**③ 禁裸 null**：未取证者必须写 `evidence_status: NOT_YET_COLLECTED` + `deferred_to: <任务/子任务>`，使 47 条 AC 的收敛可度量。**④ 机器守护转 FU-19**。",
         "action_taken": "本提交回填 M0-02.S3d 与 M0-03.S3-S9；FU-19 入库"
+      },
+      {
+        "id": "A110",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-1",
+        "question": "worker/integrity.py 与 worker/deps.py 硬依赖 infra/artifacts.py（实测不存在，归 M0-04/S3），design §9 却把它们列在 S2 行。是降级先交、顺延、还是改判归属？",
+        "ruling": "**裁定 (A) 顺延**：两文件随 M0-04/S3（infra/artifacts.py）之后由 Round 9 的补交小片落地，避免与 S3 双主写与签名假定。新增子任务编号 **M0-04/S2b**（worker/integrity.py + worker/deps.py，档位 max，因涉及完整性校验判据与依赖注入冻结面）。AC-031 的判定仍归 M5-01（design §9-S8 不变）。",
+        "action_taken": "state.json 记 M0-04/S2b 待派；Round 9 派单"
+      },
+      {
+        "id": "A111",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-2",
+        "question": "design §9 把 worker/service.py::JobService 判给 S2，但 list_jobs 的响应 DTO JobPage 由 A91 判归 M0-04/S4，且需给 JobRepository 追加 list_page（扩冻结面）。",
+        "ruling": "**裁定 (A) 顺延给 S4**：service.py 与 JobRepository.list_page 随 M0-04/S4（Round 9）一并落地，与 api/common.py::JobPage 同步，避免冻结面两次扩张。cancel_job/retry_job 的语义已完整落在 JobStore.request_cancel/retry（含 404/409/412/429 分类 + 同事务审计 + 容量闸），S4 只做薄封装。",
+        "action_taken": "M0-04/S4 派单文须引本条"
+      },
+      {
+        "id": "A112",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-3",
+        "question": "design §4 要求 TX3/TX4/TX8 内「幂等命中检查 -> 谓词 UPDATE -> 写 audit -> 写 idempotency」同事务，但重放必须返回已存储的 HTTP 信封，其组装属 api/jobs.py（A84 判归 S4）。",
+        "ruling": "**裁定 (A) 随 S4 接线**：Round 9 给 JobStore 追加**可选** idem 参数（append-only，不破坏本轮已冻结签名），信封组装留在 api/jobs.py。本轮审计侧已按 design 同事务落地（T2/T4 写 JOB_CANCEL_REQUESTED、T8 写 JOB_CANCELLED、T9 写 JOB_RETRIED，outcome='ACCEPTED'），不受影响。",
+        "action_taken": "M0-04/S4 派单文须引本条"
+      },
+      {
+        "id": "A113",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-4",
+        "question": "A70 判据③固化「touch_lease 的唯一调用方是 WorkerSupervisor.heartbeat」，但 T3（JOBS.md:13 每 5 秒续租并写阶段进度）在结构上无法由 touch_lease 表达（不收 stage/progress、不校验 attempt）。",
+        "ruling": "**确认 Volta 的读法成立**：判据③不受影响——touch_lease 仍只有 heartbeat 一个调用方，S2 新增的 10 个方法一个都不调它（已由 test_new_job_repository_methods_only_grew_the_surface 与全文件 grep 双证）；T3 走新的 JobRepository.renew，运行期入口为 WorkerRunner.beat / JobContext.renew；两条路径共用唯一租约计算点 compute_lease_deadline（A83）。**禁**扩 touch_lease 签名（那会与 A82「禁改既有 4 方法签名」冲突并需走 CR）。",
+        "action_taken": "A70 判据③追加解释性注记（原文不改写）"
+      },
+      {
+        "id": "A114",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-5",
+        "question": "WorkerSupervisor.poll_once 传给 handler 的是 list_ready 阶段的旧 record（attempt=0、lease_token=None），胜出 token 存于私有字段 _lease_token，故无法写出类型正确又能提交 T5/T6 的适配器。生产接线走 (A) 改 _run 驱动 WorkerRunner、(B) 追加 public lease 访问器、还是 (C) 维持双路径？",
+        "ruling": "**裁定 (B) + 归 Round 9 的 M0-04/S4**：授权给 WorkerSupervisor **append-only** 追加一个 public 只读访问器（如 current_lease_token / claim_with_lease），属 A83 同型的 append-only 豁免扩围，**禁改既有方法签名、禁 (C) 双路径**（design §10-N3 自己标注不推荐，且与进程内 heartbeat_at 冲突）。Volta 拒绝造 unsound 适配器的判断**正确**，予以记录。",
+        "action_taken": "M0-04/S4 派单文须引本条 + A83 豁免扩围"
+      },
+      {
+        "id": "A115",
+        "round": 8,
+        "at": "2026-11-13T13:13:55+08:00",
+        "source": "Volta U-6",
+        "question": "派单文 §5.4 称 infra/db/paths.py::__all__ 为 16 项（实测 17）；A91 称 api/common.py::__all__ 为 52 项（实测 51）。",
+        "ruling": "**两处均为编排器写错，予以更正**（自我更正 R8-1）：paths.py::__all__ = 17 项、api/common.py::__all__ = 51 项。A91 条目追加更正注记（原文按 D-011 体例保留不改写）。**根因**：违反 D-012/D-014「禁写死计数」——派单文里的符号面计数必须写「以 inspect 实取为准」而非具体数字。已写入 gate_measurement_caliber.rule_no_hardcoded_symbol_counts。",
+        "action_taken": "A91 追加更正注记 + 新增口径规则 + R8-1"
       }
     ],
     "round7_predispatch": {
@@ -8821,6 +8927,24 @@
           "A101(U3)"
         ],
         "plan_correction_note": "R7-1：Lane C 原计划为 D-016 批次5，改派 FU-8+FU-14；批次5 顺延至 Round 8 predispatch（素材已在 d3f7671 备好）"
+      },
+      {
+        "lane": "B",
+        "nickname": "Volta",
+        "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+        "task": "M0-04",
+        "subtask": "S2",
+        "tier": "qwen3.8-max high",
+        "result": "DONE",
+        "returned_at": "2026-11-13T13:13:55+08:00",
+        "commit": "PENDING(本提交)",
+        "orchestrator_verification": "numstat/门禁/符号面/唯一性四类共 12 项独立复验全吻合（见 subtask_log）；6 项 U 上交裁定 A110-A115",
+        "not_delivered": [
+          "worker/integrity.py",
+          "worker/deps.py",
+          "worker/service.py"
+        ],
+        "not_delivered_reason": "硬依赖 infra/artifacts.py（M0-04/S3 未落地）与 api/common.py::JobPage（A91 判归 S4）；已按 design「签名不符即回报，禁自行假定」上交 U-1/U-2，未自行创建"
       }
     ],
     "in_flight_agents_note_round7": "Round 7 三 lane：A(Newton/M0-02-S3b,flash) 已回收并于本提交入库；C(Franklin/FU-8+FU-14,flash) 已回收已复验，待下一次提交；B(Volta/M0-04-S2,max high) 仍在飞（工作树实测 infra/db/repositories.py +429、application/worker.py +18/-1 为其中间态，src/campaignlab/worker/ 尚未落盘）。在飞期间全表门禁缓跑，只做路径限定门禁 + 守护；三 lane 全提交后由编排器独占补跑全表并回填 self_check_gates_rc0。",
@@ -8866,7 +8990,21 @@
       ],
       "in_flight": "Volta（M0-04/S2，qwen3.8-max high）；其写集 src/campaignlab/worker/**、infra/db/repositories.py、application/worker.py、tests/unit/test_worker_runner.py、tests/unit/test_job_repository_terminal.py、handoff/M0-04-design.md 与本轮三 lane 写集实测无交集",
       "full_table_gates": "仍缓跑（Volta 在飞的假 RED 窗口）；本提交只跑路径限定门禁 + 守护，提交信息明写未跑与原因（rule_precommit_full_table）"
-    }
+    },
+    "round8_self_corrections": [
+      {
+        "id": "R8-1",
+        "at": "2026-11-13T13:13:55+08:00",
+        "what_was_wrong": "派单文 §5.4 写 paths.py::__all__ = 16 项（实 17）；A91 写 api/common.py::__all__ = 52 项（实 51）",
+        "how_found": "Lane B（Volta）在 §5.4 符号面实取核对表中逐项 inspect 比对后上报 U-6",
+        "correction": "A115 裁定 + A91 追加 correction_R8_1 注记（原文不改写）",
+        "prevention": "新增 gate_measurement_caliber.rule_no_hardcoded_symbol_counts：派单文禁写死符号面计数，一律写「以 inspect 实取为准」；期望值只在守护测试里以**冻结面**形式出现（A75/D-012/D-014）",
+        "related": [
+          "A91",
+          "A115"
+        ]
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,

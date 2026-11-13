@@ -480,6 +480,437 @@ class JobRepository:
         )
         return int(result.rowcount or 0)
 
+    # ------------------------------------------------------------------ M0-04/S2（A82 纯追加）
+    #
+    # 以下是 A82 给 M0-04/S2 的**窄口径 append-only 豁免**落点：只新增方法。既有 4 个方法
+    # （``insert`` / ``get`` / ``list_ready`` / ``touch_lease``）的签名、函数体与 SQL 文本
+    # 一字未改，``job_from_row``、5 个 Record dataclass、其余 4 个 Repository 类同样未动，
+    # 故 ``git diff --numstat`` 对本文件恒为「N add / 0 del」。
+    #
+    # 三条不随方法数量增加的口径：
+    #
+    # 1. **只接受绑定参数**——``lease_deadline`` 一律由调用方从
+    #    ``application/worker.py::compute_lease_deadline`` 取来（A83 修订后的 A70 判据①），
+    #    本文件任何方法都不算时间、不出现 ``timedelta``；``now`` 也只以 ISO-8601 文本形态
+    #    作绑定参数进来，与同为 ISO 文本的 ``lease_until`` 做字典序比较（同 ``created_at``
+    #    的既有口径，见模块 docstring 第 3 条）。
+    # 2. **谓词 UPDATE**——每条状态写都是**单条**带 WHERE 谓词的 UPDATE，``rowcount`` 即
+    #    真值：worker 侧谓词含 ``attempt`` 与 ``lease_token``，操作员侧谓词含 ``revision``。
+    #    ``rowcount == 0`` 表示守卫不成立（租约失效／已终态／revision 过期），由调用方翻译
+    #    成领域错。**禁** SELECT-then-UPDATE 的无谓词写法：``BEGIN IMMEDIATE`` 串行化写者
+    #    ＋谓词 UPDATE 使败者 ``rowcount = 0``，是并发正确性的唯一机器保证（design §4）。
+    # 3. **终态唯一**——T1–T8 的前态集合**均不含** ``SUCCEEDED`` / ``FAILED`` /
+    #    ``CANCELLED``，故终态行的任何后续 UPDATE 恒 ``rowcount == 0``。这就是 JOBS.md:23
+    #    「若取消与完成争用，先成功提交的合法状态决定结果」的实现：败者改不动那一行，
+    #    也就覆写不了别人已提交的终态。
+    #
+    # ``lease_until`` 的**写语句**因此从 1 条变成 3 条（``touch_lease`` / ``claim_next`` /
+    # ``renew``），但 A70 判据②钉的是「SQL 层写点唯一在 ``infra/db/repositories.py``、
+    # 只接受绑定参数」——文件与口径都没变；判据③（``touch_lease`` 的唯一调用方是
+    # ``WorkerSupervisor.heartbeat``）也未受影响，本文件的 M0-04 方法一个都不调它。
+
+    def claim_next(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        lease_token: str,
+        lease_deadline: str,
+        stage: str,
+    ) -> JobRecord | None:
+        """T1 ``QUEUED -> RUNNING``：认领**事务内最早可认领**的一条作业（JOBS.md:11）。
+
+        两步都跑在调用方已开好的 ``BEGIN IMMEDIATE`` 短事务里（design §4 TX1）：先按显式
+        索引 ``jobs_ready(state, created_at, workspace_id, id)`` 顺扫取出最早的一条 QUEUED，
+        再发一条带 ``state`` ＋ ``revision`` 双谓词的 UPDATE。于是「两个执行者争用同一
+        作业」只有一个 ``rowcount == 1``：败者要么在 ``BEGIN IMMEDIATE`` 处被写锁挡住
+        （``OperationalError``），要么在胜者提交后读到 ``state`` 已非 QUEUED —— 两者都不
+        会留下半状态（AC-029「两次尝试争抢同一作业时只有有效租约可发布」）。
+
+        返回认领后的整行（``state == 'RUNNING'``、``attempt`` 已 +1、租约双列已写）；队列
+        为空或被别人抢先时返回 ``None`` 而**不抛异常**：worker 侧把「这一轮没拿到活」当
+        正常情况处理，与 ``WorkerSupervisor.heartbeat`` 返回 ``False`` 同一语义。
+        """
+        head = (
+            conn.execute(
+                text(
+                    "SELECT workspace_id, id, revision FROM jobs "
+                    "WHERE state = 'QUEUED' AND workspace_id = :ws "
+                    "ORDER BY created_at, workspace_id, id LIMIT 1"
+                ),
+                {"ws": workspace_id},
+            )
+            .mappings()
+            .first()
+        )
+        if head is None:
+            return None
+        head_id = str(head["id"])
+        touched = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'RUNNING', "
+                "attempt = attempt + 1, "
+                "lease_token = :lease_token, "
+                "lease_until = :lease_deadline, "
+                "stage = :stage, "
+                "progress = 0, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND state = 'QUEUED' AND revision = :revision"
+            ),
+            {
+                "lease_token": lease_token,
+                "lease_deadline": lease_deadline,
+                "stage": stage,
+                "ws": workspace_id,
+                "id": head_id,
+                "revision": int(head["revision"]),
+            },
+        )
+        if int(touched.rowcount or 0) != 1:
+            return None
+        return self.get(conn, workspace_id=workspace_id, job_id=head_id)
+
+    def renew(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        job_id: str,
+        attempt: int,
+        lease_token: str,
+        lease_deadline: str,
+        stage: str,
+        progress: int,
+    ) -> JobRecord | None:
+        """T3 ``RUNNING -> RUNNING``：续租并写阶段进度（JOBS.md:13，design §4 TX2）。
+
+        谓词是 ``attempt`` ＋ ``lease_token`` ＋ ``state IN ('RUNNING','CANCEL_REQUESTED')``：
+        attempt 不匹配（作业已被别人重认领）或 token 不匹配（租约已易主）都得到
+        ``rowcount == 0``，即 JOBS.md:21「完成和续租均匹配工作区、作业、attempt 和
+        lease token」与 AC-029「失效租约不能提交」的落点。前态含 ``CANCEL_REQUESTED``
+        是刻意的：取消请求不该剥夺执行进程的续租能力，否则它会被 T7 误判为中断。
+
+        返回续租后的整行，调用方据其 ``state`` 判断是否已被请求取消（design §4 末条
+        「TX2 续租顺带回读 ``state``」）；守卫不成立时返回 ``None``，由调用方抛
+        ``LeaseLost`` 并**不改任何字段**。
+        """
+        touched = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "lease_until = :lease_deadline, "
+                "stage = :stage, "
+                "progress = :progress, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND attempt = :attempt AND lease_token = :lease_token "
+                "AND state IN ('RUNNING', 'CANCEL_REQUESTED')"
+            ),
+            {
+                "lease_deadline": lease_deadline,
+                "stage": stage,
+                "progress": progress,
+                "ws": workspace_id,
+                "id": job_id,
+                "attempt": attempt,
+                "lease_token": lease_token,
+            },
+        )
+        if int(touched.rowcount or 0) != 1:
+            return None
+        return self.get(conn, workspace_id=workspace_id, job_id=job_id)
+
+    def request_cancel(
+        self, conn: Connection, *, workspace_id: str, job_id: str, revision: int
+    ) -> int:
+        """T2 ``QUEUED -> CANCELLED`` 与 T4 ``RUNNING -> CANCEL_REQUESTED`` 的共用谓词写。
+
+        JOBS.md 把「请求取消」按前态分成两行（:12 排队中直接落终态、:14 运行中先置
+        ``CANCEL_REQUESTED`` 等执行进程在安全分段确认），但两者是**同一条**带 ``revision``
+        谓词的 UPDATE：一个事务里发两条语句，等于给「先提交者定终态」凭空造出第二个
+        竞争者。故用 ``CASE`` 按**旧** ``state`` 分派（SQLite 的 SET 右值一律取行原值）：
+
+        - 旧 ``QUEUED`` → ``CANCELLED``；租约双列本就是 NULL（DDL CHECK 要求），
+          ``retryable`` 置 1（design §3 T2）。
+        - 旧 ``RUNNING`` → ``CANCEL_REQUESTED``；**保留** ``lease_token`` / ``lease_until``
+          ——DDL 那条 CHECK 是**双条件式**：state 属 RUNNING/CANCEL_REQUESTED **当且仅当**
+          租约双列非空，此处置 NULL 会直接违约；``retryable`` 不动，等 T8 收口。
+
+        谓词 ``revision = :revision`` 承接 ``If-Match``（design §6：不符 → 412
+        ``REVISION_CONFLICT``）。前态集合不含任何终态、也不含 ``CANCEL_REQUESTED``，故对
+        已终态或已请求过取消的作业 ``rowcount == 0`` → 409 ``STATE_CONFLICT``。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = CASE WHEN state = 'QUEUED' THEN 'CANCELLED' "
+                "ELSE 'CANCEL_REQUESTED' END, "
+                "lease_token = CASE WHEN state = 'QUEUED' THEN NULL ELSE lease_token END, "
+                "lease_until = CASE WHEN state = 'QUEUED' THEN NULL ELSE lease_until END, "
+                "retryable = CASE WHEN state = 'QUEUED' THEN 1 ELSE retryable END, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id AND revision = :revision "
+                "AND state IN ('QUEUED', 'RUNNING')"
+            ),
+            {"ws": workspace_id, "id": job_id, "revision": revision},
+        )
+        return int(result.rowcount or 0)
+
+    def confirm_cancel(
+        self, conn: Connection, *, workspace_id: str, job_id: str, attempt: int, lease_token: str
+    ) -> int:
+        """T8 的**执行确认**入口：``CANCEL_REQUESTED -> CANCELLED``（JOBS.md:18）。
+
+        JOBS.md:18 给的是「执行确认**或**租约到期」两条入口、同一终态：本方法是前者
+        （执行进程在安全分段读到取消信号后主动收口，走 design §4 TX4，谓词含 ``attempt``
+        与 ``lease_token``），后者是 ``cancel_expired_requested``（走 TX7 恢复扫描）。两条
+        入口的前态都只有 ``CANCEL_REQUESTED``，因此谁先提交谁定终态，败者 ``rowcount == 0``。
+
+        **保留原输入**：``input_json`` / ``input_digest`` / ``kind`` 一字不动（design §3 T8），
+        重试才能拿同一输入快照再跑一遍；``result_json`` / ``problem_json`` 置 NULL ——
+        取消不是失败，不该带 Problem；DDL 的双条件 CHECK 也要求非 SUCCEEDED 时
+        ``result_json`` 为 NULL。租约双列同步置 NULL 以满足该 CHECK 的另一半。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'CANCELLED', "
+                "result_json = NULL, "
+                "problem_json = NULL, "
+                "retryable = 1, "
+                "lease_token = NULL, "
+                "lease_until = NULL, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND attempt = :attempt AND lease_token = :lease_token "
+                "AND state = 'CANCEL_REQUESTED'"
+            ),
+            {"ws": workspace_id, "id": job_id, "attempt": attempt, "lease_token": lease_token},
+        )
+        return int(result.rowcount or 0)
+
+    def mark_succeeded(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        job_id: str,
+        attempt: int,
+        lease_token: str,
+        result_json: str,
+    ) -> int:
+        """T5 ``RUNNING -> SUCCEEDED``：成功且租约仍有效（JOBS.md:15，design §4 TX5）。
+
+        谓词 ``attempt`` ＋ ``lease_token`` ＋ ``state IN ('RUNNING','CANCEL_REQUESTED')``。
+        前态**含** ``CANCEL_REQUESTED`` 是 JOBS.md:23「若取消与完成争用，先成功提交的合法
+        状态决定结果」的正面实现：TX4（``confirm_cancel``）与 TX5 的前态集合相交，谁先
+        ``COMMIT`` 谁定终态，败者 ``rowcount == 0`` → 不得覆写、不得重试成第二终态。
+
+        ``result_json`` 存 ``ObjectRef`` 的 JSON 对象（A73 的映射口径），DDL 的双条件 CHECK
+        ``(state='SUCCEEDED') = (result_json IS NOT NULL)`` 保证「成功必有结果指针」，故空串
+        直接拒；``problem_json`` 置 NULL（成功作业不带 Problem）。制品行的同事务登记由
+        调用方（``worker/store.py``）用 ``ArtifactRepository.insert`` 完成——本方法只管
+        ``jobs`` 一张表，A81 要求 SQL 写点收敛在这里，不要求它跨表。
+        """
+        if not result_json:
+            raise ValueError(
+                "mark_succeeded 需要非空 result_json（DDL CHECK 要求 SUCCEEDED 必有结果）"
+            )
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'SUCCEEDED', "
+                "result_json = :result_json, "
+                "problem_json = NULL, "
+                "progress = 100, "
+                "retryable = 0, "
+                "lease_token = NULL, "
+                "lease_until = NULL, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND attempt = :attempt AND lease_token = :lease_token "
+                "AND state IN ('RUNNING', 'CANCEL_REQUESTED')"
+            ),
+            {
+                "result_json": result_json,
+                "ws": workspace_id,
+                "id": job_id,
+                "attempt": attempt,
+                "lease_token": lease_token,
+            },
+        )
+        return int(result.rowcount or 0)
+
+    def mark_failed(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        job_id: str,
+        attempt: int,
+        lease_token: str,
+        problem_json: str,
+        retryable: bool,
+    ) -> int:
+        """T6 ``RUNNING -> FAILED``：已知失败（JOBS.md:16，design §4 TX6）。
+
+        守卫与 T5 逐字相同（含 ``CANCEL_REQUESTED``），故失败与取消争用时同样是先提交者
+        定终态。``problem_json`` 存 ``Problem`` 的 JSON 对象（A73），**保留错误码**；
+        ``stage`` 与 ``progress`` 刻意**不写**——JOBS.md:16 要求「保留错误码、阶段」，
+        失败发生在哪个阶段本身就是诊断证据，抹成 0 会让页面看不出死在哪一步。
+
+        ``result_json`` 置 NULL（DDL 双条件 CHECK：非 SUCCEEDED 不得有结果）；
+        ``retryable`` 由调用方按 design §3 的口径算好传进来（``worker/states.py::
+        retryable_for``），本方法不内置业务判断；租约双列置 NULL。
+        """
+        if not problem_json:
+            raise ValueError("mark_failed 需要非空 problem_json（JOBS.md:16 要求保留错误码）")
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'FAILED', "
+                "problem_json = :problem_json, "
+                "result_json = NULL, "
+                "retryable = :retryable, "
+                "lease_token = NULL, "
+                "lease_until = NULL, "
+                "revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND attempt = :attempt AND lease_token = :lease_token "
+                "AND state IN ('RUNNING', 'CANCEL_REQUESTED')"
+            ),
+            {
+                "problem_json": problem_json,
+                "retryable": int(retryable),
+                "ws": workspace_id,
+                "id": job_id,
+                "attempt": attempt,
+                "lease_token": lease_token,
+            },
+        )
+        return int(result.rowcount or 0)
+
+    def fail_expired_running(self, conn: Connection, *, now: str, problem_json: str) -> int:
+        """T7 ``RUNNING -> FAILED``：租约超时且证据未提交（JOBS.md:17，design §4 TX7）。
+
+        这是**系统行为者**的迁移，故谓词里刻意**没有** ``lease_token``：中断的 worker 已经
+        死了，没人能出示 token；能用「租约已过期」当唯一守卫，正是因为过期本身就证明
+        原持有者失去了发布权（JOBS.md:21「只有有效租约可发布」的 contrapositive）。
+
+        ``now`` 是 ISO-8601 文本绑定参数，与同为 ISO 文本的 ``lease_until`` 做字典序比较
+        （同格式字符串的字典序即时序）。**绝不触碰** ``SUCCEEDED`` / ``FAILED`` /
+        ``CANCELLED`` / ``QUEUED``：前态集合只有 ``RUNNING``，即 JOBS.md:23「不重写已成功
+        作业」。``retryable`` 恒 1 —— 中断是可重试的原型场景（AC-029「中断后可重试」）。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'FAILED', "
+                "problem_json = :problem_json, "
+                "result_json = NULL, "
+                "retryable = 1, "
+                "lease_token = NULL, "
+                "lease_until = NULL, "
+                "revision = revision + 1 "
+                "WHERE state = 'RUNNING' AND lease_until < :now"
+            ),
+            {"problem_json": problem_json, "now": now},
+        )
+        return int(result.rowcount or 0)
+
+    def cancel_expired_requested(self, conn: Connection, *, now: str) -> int:
+        """T8 的**租约到期**入口：``CANCEL_REQUESTED -> CANCELLED``（JOBS.md:18，TX7）。
+
+        与 ``confirm_cancel`` 同一终态、不同守卫：那条要 ``attempt`` ＋ ``lease_token``
+        （执行者自证身份），这条只要 ``lease_until < :now``（执行者已失联，系统代为收口）。
+        JOBS.md:18 的「执行确认**或**租约到期」由此两条 UPDATE 承担，前态都只有
+        ``CANCEL_REQUESTED``，先提交者定终态。
+
+        ``stage`` / ``progress`` 保留（诊断证据），``input_json`` / ``input_digest`` / ``kind``
+        一字不改（design §3 T8「保留原输入」），``result_json`` / ``problem_json`` 置 NULL
+        （取消不是失败），``retryable`` 置 1（design §3：``CANCELLED`` → 1），租约双列置
+        NULL 以满足 DDL 的双条件 CHECK。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE jobs SET "
+                "state = 'CANCELLED', "
+                "result_json = NULL, "
+                "problem_json = NULL, "
+                "retryable = 1, "
+                "lease_token = NULL, "
+                "lease_until = NULL, "
+                "revision = revision + 1 "
+                "WHERE state = 'CANCEL_REQUESTED' AND lease_until < :now"
+            ),
+            {"now": now},
+        )
+        return int(result.rowcount or 0)
+
+    def enqueue_retry(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        source_job_id: str,
+        source_revision: int,
+        new_job: JobRecord,
+    ) -> int:
+        """T9 ``FAILED``／``CANCELLED`` → **新** QUEUED 作业（JOBS.md:19，design §4 TX8）。
+
+        重试不是把原作业改回 QUEUED，而是**新建一行**：``new_job.id`` 是新资源 ID、
+        ``retry_of`` 指向源作业、``attempt`` 从 0 重新起算，**源作业的终态一字不变**
+        （只 ``revision + 1``，让客户端的 ``If-Match`` 失效、被迫重读）。这样「终态唯一」
+        与「重试得到一次可见结果」（AC-029）才能同时成立：历史终态是可回查的证据，
+        不会被重试抹掉。
+
+        两步同一事务：先对源作业发带 ``state IN ('FAILED','CANCELLED')`` ＋ ``revision``
+        双谓词的 UPDATE，``rowcount != 1`` 即返回 0（源作业还在跑、已成功、或 revision
+        过期），**一行都不插**；成功后调用 ``self.insert`` 落新行 —— 刻意复用既有
+        ``insert`` 而不自己写一条插入语句：A81／FU-10 要求 ``jobs`` 的插入落点唯一，
+        本方法因此不含任何插入 SQL 文本。
+        """
+        if new_job.workspace_id != workspace_id:
+            raise ValueError("enqueue_retry 的新作业必须与源作业同工作区（FK 是复合键）")
+        if new_job.retry_of != source_job_id:
+            raise ValueError(f"new_job.retry_of 必须指向源作业：{new_job.retry_of!r}")
+        bumped = conn.execute(
+            text(
+                "UPDATE jobs SET revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id AND revision = :revision "
+                "AND state IN ('FAILED', 'CANCELLED')"
+            ),
+            {"ws": workspace_id, "id": source_job_id, "revision": source_revision},
+        )
+        if int(bumped.rowcount or 0) != 1:
+            return 0
+        self.insert(conn, job=new_job)
+        return 1
+
+    def count_pending(self, conn: Connection, *, workspace_id: str, states: tuple[str, ...]) -> int:
+        """统计某工作区处于 ``states`` 的作业数（``JOB_CAPACITY`` 闸的读数，A88②）。
+
+        ``states`` 由 ``worker/capacity.py::pending_states()`` 给出，取**非终态**三值
+        ``QUEUED|RUNNING|CANCEL_REQUESTED``（JOBS.md:7「默认工作区最多 10 个待办」）。
+        只读、不开事务、不改任何行。
+
+        IN 列表的占位符按 ``len(states)`` 现拼，但拼进去的只有 ``:s0``／``:s1`` 这类
+        **由整数生成**的参数名，状态值本身一律走绑定参数 —— SQL 文本里不出现任何调用方
+        数据，故没有注入面。
+        """
+        if not states:
+            raise ValueError("count_pending 的 states 不得为空（空集合会让 IN () 语法错）")
+        marks = ", ".join(":s" + str(index) for index in range(len(states)))
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, state in enumerate(states):
+            params["s" + str(index)] = state
+        total = conn.execute(
+            text("SELECT COUNT(*) FROM jobs WHERE workspace_id = :ws AND state IN (" + marks + ")"),
+            params,
+        ).scalar()
+        return int(total or 0)
+
 
 # ------------------------------------------------------------------------------------ idempotency
 

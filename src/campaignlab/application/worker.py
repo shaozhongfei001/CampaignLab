@@ -40,6 +40,7 @@ __all__ = [
     "WORKER_POLL_INTERVAL_SECONDS",
     "JobHandler",
     "WorkerSupervisor",
+    "compute_lease_deadline",
 ]
 
 #: 租约时长。取得／续约后，超过这个窗口没有心跳，别的 worker 才允许接管。
@@ -51,6 +52,22 @@ WORKER_BATCH_SIZE: Final = 8
 
 #: 作业处理器签名。M0-02 不注册任何处理器（见模块 docstring）。
 JobHandler = Callable[[JobRecord], None]
+
+
+def compute_lease_deadline(now: datetime, *, lease_seconds: int) -> str:
+    """租约期限的**全仓唯一** Python 计算点（A83 修订后的 A70 判据①）。
+
+    本函数是 ``heartbeat()`` 原第 142 行内联表达式的**值语义等值**提取：算法一字未变，
+    仍是「注入时钟给出的时刻 + 租约秒数」的 ISO-8601 文本。提取出来的动机是 M0-04 的
+    认领路径（``QUEUED -> RUNNING`` 取租约）也需要同一个值：若 ``worker/**`` 自己再算
+    一次，租约期限就有了第二个来源，A11「租约期限只由注入时钟派生、且只在 worker 内
+    计算」的机器可查面即被破坏。故收敛为：**计算点只有本函数，其余模块只准 import
+    调用、禁重算**（``worker/leases.py`` 因此只存常量与比较，不做加法）。
+
+    只接受调用方从 ``Clock`` 取来的 ``now``：本函数不取系统时间，调用方也不得用固定
+    时长休眠代替可控时钟（``campaignlab.clock`` 的 ``Clock`` / ``FixedClock``）。
+    """
+    return (now + timedelta(seconds=lease_seconds)).isoformat()
 
 
 class WorkerSupervisor:
@@ -139,7 +156,7 @@ class WorkerSupervisor:
         （抢占保护，见 ``JobRepository.touch_lease``）。两种情况都不是错误，调用方按
         「这一轮没拿到活」处理即可。
         """
-        lease_until = (now + timedelta(seconds=self._lease_seconds)).isoformat()
+        lease_until = compute_lease_deadline(now, lease_seconds=self._lease_seconds)
         with connect(self._engine) as conn, conn.begin():
             touched = self._jobs.touch_lease(
                 conn,
