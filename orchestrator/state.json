@@ -9652,11 +9652,13 @@
         "host": "WSL2 Ubuntu ext4",
         "branch": "m0-framework",
         "remote": "git@github.com:shaozhongfei001/CampaignLab.git",
-        "head_at_pause": "PENDING(第二提交 sha；第一提交为 bf54162)",
+        "head_at_pause": "6ce08f1（+ 其后一个 sha 回填提交；下次开工以 git log --oneline -4 实测为准）",
         "ahead_behind_at_pause": "0/0（本 checkpoint 提交前实测）",
         "commits_total_before_checkpoint": 72,
         "worktree_at_pause": "本 checkpoint 提交后应为干净（提交前仅 4 个新 md 未跟踪；orchestrator/checkpoints/ 已按 snapshot.disposal 处置归零）",
-        "commits_total_after_first_checkpoint_commit": 73
+        "commits_total_after_first_checkpoint_commit": 73,
+        "commits_total_after_checkpoint": 74,
+        "commits_total_note": "72（Round 8 四 lane 提交后、checkpoint 前实测）-> 73（bf54162）-> 74（6ce08f1）-> 75（sha 回填提交，预期）"
       },
       "round8_commits": [
         {
@@ -9893,8 +9895,13 @@
         },
         {
           "seq": 2,
-          "sha": "PENDING(本提交)",
+          "sha": "6ce08f1",
           "what": "chore(checkpoint): 追加四 lane 原始回报存档（R8-9 / A122）+ counts 180->181 同提交刷新"
+        },
+        {
+          "seq": 3,
+          "sha": "PENDING(本提交 —— sha 回填提交，其自身 sha 以 git log 实测为准，不再回填以避免无限递归)",
+          "what": "chore(checkpoint): 回填 checkpoint_R8 的两处 sha 悬空指针（6ce08f1）—— 纯台账指针收口，无文件增删，counts 不变（ruff_formatted_files 仍 181）"
         }
       ],
       "lane_raw_report_archive": {
