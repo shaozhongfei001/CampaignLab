@@ -263,3 +263,34 @@ AC-025←手册 3.6/6.1/6.2/6.3/6.4；AC-027←（行动闭环段，按 65 行�
 
 **禁**：git commit/push、sudo、`npm`/`node`/`vite`/`vitest`/`playwright`/`uv`/`mypy`/`ruff`（本任务只写 markdown，自检纯 `python3` 标准库即可）；
 禁改 `spec/**`、`contracts/**`、`docs/**`、`orchestrator/state.json`、`orchestrator/defects/**`、`orchestrator/change-requests/**`、`tests/unit/test_task_card_narrative.py`。
+
+---
+
+## 10. 编排器自我更正（2026-11-13T08:38:00+08:00 · 纯增量追加，上文第 0–9 节字节不改写）
+
+本节更正**编排器在本文件自身里犯的两处事实错误**，均由 D-016 批次 3 的 T lane（Locke）上报、编排器独立复核成立。
+**四张卡未受污染**：Locke 恪守「不自行决定、写 U 项」，把两处都上报为 U 项（`M3-P01.md` U-2；四卡 U-8/U-6/U-9），卡内正文照实记录了冲突而非照抄错误裁定。
+
+### ① 第 8 节第 2 项裁定里的 `analysis_results(kind='monthly_review')` 是编排器的臆断，**作废**
+
+实测 `contracts/sqlite-v1.sql` 第 102 行：
+`kind TEXT NOT NULL CHECK(kind IN ('comparison','review','diagnosis','question'))` —— **不含 `monthly_review`**。
+编排器撰写第 8 节时**未核 DDL 的 CHECK 约束**即发明了枚举值，属未经取证的臆断（与 D-021 初稿「schema 不存在」同类过失，按用户偏好当场更正留痕）。
+
+**更正后的裁定（A6 的正确落地形态，Round 5 起唯一依据）**：
+- 月报 Review 结果落 `analysis_results` 时 **`kind` 取既有值 `'review'`**；
+- 判别式为 **`input_json` 内的 `profile: "BANK_MONTHLY_V1"`**（`input_json` 有 `CHECK(json_valid(...))` 但**无枚举约束**，属非冻结面，可安全承载）；
+- 大对象/制品照旧落 `artifacts`（其 `kind` 的 CHECK 为 `('SOURCE','CLAUSE','COMPUTATION','TRACE','PREFLIGHT','RECEIPT','SIGNATURE','EXPERIMENT','REVIEW_NOTE')`，月报侧取 `COMPUTATION`，**同样不得扩枚举**）；
+- **扩 `kind` 枚举＝改 `contracts/sqlite-v1.sql` 与 `migrations/**` 的 CHECK 约束＝CR 级变更**，且会打破 `tests/integration/bootstrap/test_migration_equivalence.py` 与 `tests/unit/test_migration_schema.py` 的 DDL 等价断言 → **禁止**。任何 lane 不得为落库便利而扩枚举。
+- 已同步落 `state.json → decisions.monthly_analysis_result_kind`（ACCEPTED）。
+
+### ② 第 1 节「四份 `missing=[]`」的表述与切片实态不符，**口径更正**
+
+实测四份切片的顶层 key 为 `spec_version / source / operations / acceptance_rows / pages / ddl / truncated_schemas`，**不含 `missing` 键**：
+`scripts/contract_slice.py` 只在**有目标未命中时**才写 `missing`；全部命中时该键**不存在**（而非空数组）。
+编排器把脚本 **stderr 的诊断输出** `missing=[]` 误当成了**产物字段**。
+
+**更正后的 PRE-3 校验口径（Round 5 起唯一依据）**：判定「切片新鲜且目标全命中」应断言
+**`"missing" not in slice` 且 `slice["truncated_schemas"] == []`**；**不得**断言 `slice["missing"] == []`（后者会 `KeyError`）。
+四份切片的 stderr 诊断行实测均为 `missing=[] truncated_schemas=[] depth=5`，**结论不变**（切片确实新鲜、目标确实全命中），仅口径表述更正。
+已同步落 `state.json → resume.dispatch_requirements` 的 PRE-3 断言口径条目。

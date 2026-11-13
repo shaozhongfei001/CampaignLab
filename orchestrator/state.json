@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T08:12:00+08:00",
+  "updated_at": "2026-11-13T08:40:50+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -333,6 +333,34 @@
         "orchestrator_reverify": "编排器独立复验吻合：10 条 AC 原文逐字（D-011）；无写死指纹、有 counts 引用、loop_cap、四列表头齐备；档位占比自报全达标（flash 任务 62.5-71.4%、flash token 27.7-34.5%）。编排器另独立取证其 U 项主张：28 表实测确无 reviews/diagnoses/estimates/questions（成立，裁定 A6）；createExport/downloadExport 实测被 M3-01.md 与 M4-01.md 引用（故「全库无归属」主张**不成立**），但 getExport/listExports 在 16 张卡中零引用（成立，记入 card_gap）；U-6 对 Aquinas 的越界指控经核卡**不成立**。",
         "open_questions_raised": 21,
         "value_added": "U 项中的「28 表无 reviews/diagnoses/estimates/questions」是**阻塞级**发现：月报评审四类对象在参考 DDL 中无落点，若不在派单前裁定，三个 D lane 卡会各自发明表结构（改 migrations/** 与 28 表分母属 CR 级变更）。已裁定 A6 统一落 analysis_results.kind + artifacts。另主动申报「月报指标注册签名需前置」，促成 wave5 内 M3-P01 改为先于 L1 三卡的串行前置。"
+      },
+      {
+        "task": "D-016-batch3",
+        "subtask": "补 4 张任务卡 M4-02/M4-03/M3-P01/M1-P01 + KNOWN_MISSING 13->9",
+        "lane": "T",
+        "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+        "nickname": "Locke",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal=null/remainingTokens=null，无计量句柄；按纪律记 null，禁估算填数",
+        "over_cap": true,
+        "over_cap_note": "目标 ≤45k，子智能体§8 自陈越限（4 卡正文 96231 B + context 全文一次读入）；批次1 181k/8卡=22.6k每卡、批次2 50k/4卡=12.5k每卡、批次3 越限但切片侧定点抽取纪律严格",
+        "returned_at": "2026-11-13T08:42:00+08:00",
+        "outputs": [
+          "orchestrator/tasks/M4-02.md",
+          "orchestrator/tasks/M4-03.md",
+          "orchestrator/tasks/M3-P01.md",
+          "orchestrator/tasks/M1-P01.md",
+          "tests/unit/test_task_cards.py(KNOWN_MISSING 13->9, numstat 0 4)"
+        ],
+        "scope_violation": "NONE（本 lane 变更 = 4 新卡 + test_task_cards.py 删 4 行；其余 git status 条目逐条归因 S/F lane）",
+        "value_added": "上报 34 项 U，其中 3 项经编排器独立复核后触发编排器自我更正（analysis_results.kind 臆断、切片 missing 键口径）与新证据并入 D-022（SNAPSHOT_SUPERSEDED）；未自行决定、未改 DDL、未发明 operationId",
+        "commit": "PENDING(提交A)",
+        "guard_tests_real_pytest": "rc=0 / 18 passed"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -390,7 +418,10 @@
       "diagnosis": "① 子任务占比 44.4% < 60%：M0 阶段是环境与公共件奠基，手册 6.3 硬规则把 OpenAPI/DDL/状态机/公共冻结件变更全部强制 max，max 子任务天然偏多，属「设计先行」的必然形态而非降档失控；② token 占比 43.6% > 35%：主因是两条 flash 越限（Dirac 181k = 3.02×、Goodall 83k = 1.38×），合计 264k；若剔除越限部分，flash token 占比为 19.5%，说明护栏失效的直接原因是**单批任务过大**，不是档位选错。",
       "corrective_action": "批次 2/3 补卡降批至每批 4–5 张并**预抽 spec 摘要**（Dirac 自估可压到 35–45k/批）；wave3 起 D lane 的量产型子任务（参数化枚举、样板铺开、证据采集）严格按 6.3 强制 flash 清单派 flash，以程序级占比在 wave3–wave5 回升；护栏检查点仍为 wave2 出口（原 guardrail_checkpoint 不变）。  【2026-11-13T04:58:57+08:00 落地证据】批次 2 已按纠正措施执行：批量 8→4 张（M3-01/M3-02/M3-03/M4-01，全部 critical/slack=0），并预抽 orchestrator/handoff/D-016-batch2-context.md（16828B/198 行）作为唯一 spec 入口 + 预生成 4 份契约切片，手册由整读 758 行收窄为 5 段约 142 行；本批目标 ≤45k（批次1 实测 181k）。 另：M0-02/S3 因 ADR-005 §2.4 拆为 S3a(max 32k)/S3b(flash 14k)，flash 子任务占比 3/6=50% <60% —— 照实记账不凑配比，回补计划见 tasks[M0-02].s3_split_ruling.totals_v2.recovery_plan。",
       "checkpoint": "wave2 出口复算；若仍未达标，按手册 6.6「达 120% 暂停非关键路径任务并汇报」升级给项目负责人",
-      "round4_update": "【2026-11-13T06:55:00+08:00 Round 4 回收后重算】flash_share_tasks 0.4444->0.5（+4 flash 子任务单位来自 Archimedes 批次2），flash_share_tokens 0.4356->0.441（Heisenberg 56k 为 max 档入账，Archimedes 50k 为 flash 档入账；Gauss 与 Aquinas 记 null 不入分母）。两项护栏仍未达标，如实上报不粉饰。tasks 占比由 0.4444 升至 0.5，方向正确；tokens 占比小幅上升系 max 档设计任务的 56k 进入已知分母所致，非降档失控。批次2 单卡成本 12.5k（批次1 为 22.6k/卡），纠正措施实测有效，批次3 沿用。"
+      "round4_update": "【2026-11-13T06:55:00+08:00 Round 4 回收后重算】flash_share_tasks 0.4444->0.5（+4 flash 子任务单位来自 Archimedes 批次2），flash_share_tokens 0.4356->0.441（Heisenberg 56k 为 max 档入账，Archimedes 50k 为 flash 档入账；Gauss 与 Aquinas 记 null 不入分母）。两项护栏仍未达标，如实上报不粉饰。tasks 占比由 0.4444 升至 0.5，方向正确；tokens 占比小幅上升系 max 档设计任务的 56k 进入已知分母所致，非降档失控。批次2 单卡成本 12.5k（批次1 为 22.6k/卡），纠正措施实测有效，批次3 沿用。",
+      "batch3_status": "RETURNED_VERIFIED_OVER_CAP",
+      "corrective_action_next": "批次 4 起：① 每批降到 2-3 张卡（批次3 的 4 卡正文 96231 B 是主因，单卡 20-28 KB）；② 把「卡正文生成量」显式计入预算而非只算输入侧；③ context 分节交付（按卡拆成 4 个小节文件，让 lane 只读自己那节）；④ 沿用定点抽取配方与预生成切片。批次演进：181k/8卡(22.6k每卡,越限3.02×) -> 50k/4卡(12.5k每卡) -> 批次3 越限(自陈,无计量值)",
+      "updated_at": "2026-11-13T08:42:00+08:00"
     }
   },
   "tasks": {
@@ -1548,7 +1579,8 @@
         "AC-033"
       ],
       "deps": [
-        "M1-02"
+        "M1-02",
+        "M3-P01"
       ],
       "scope": [
         "src/campaignlab/domain/analytics/",
@@ -1561,7 +1593,8 @@
       "depth": 6,
       "height": 9,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "deps_note_A13": "A20：2026-11-13T08:42:00+08:00 追加 M3-P01 为前置（A13 的执行）——M3-P01 必须先交付并冻结 handoff/M3-P01-metric-registry.md，才可派本卡。原 deps 保留、只追加。"
     },
     "M3-02": {
       "status": "TODO",
@@ -1600,7 +1633,8 @@
         "AC-024"
       ],
       "deps": [
-        "M3-01"
+        "M3-01",
+        "M3-P01"
       ],
       "scope": [
         "src/campaignlab/domain/diagnosis/",
@@ -1613,7 +1647,8 @@
       "depth": 7,
       "height": 8,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "deps_note_A13": "A20：2026-11-13T08:42:00+08:00 追加 M3-P01 为前置（A13 的执行）——M3-P01 必须先交付并冻结 handoff/M3-P01-metric-registry.md，才可派本卡。原 deps 保留、只追加。"
     },
     "M3-03": {
       "status": "TODO",
@@ -1646,7 +1681,8 @@
       ],
       "deps": [
         "M3-01",
-        "M3-02"
+        "M3-02",
+        "M3-P01"
       ],
       "scope": [
         "src/campaignlab/domain/ask/",
@@ -1658,7 +1694,8 @@
       "depth": 8,
       "height": 7,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "deps_note_A13": "A20：2026-11-13T08:42:00+08:00 追加 M3-P01 为前置（A13 的执行）——M3-P01 必须先交付并冻结 handoff/M3-P01-metric-registry.md，才可派本卡。原 deps 保留、只追加。"
     },
     "M3-04": {
       "status": "TODO",
@@ -1799,7 +1836,13 @@
         "src/campaignlab/infra/audit/",
         "src/campaignlab/api/actions.py",
         "tests/domain/action/",
-        "tests/integration/audit/"
+        "tests/integration/audit/",
+        "src/campaignlab/api/exports.py",
+        "orchestrator/handoff/M4-02-design.md",
+        "evidence/M4/M4-02/",
+        "evidence/M4/summaries/M4-02.md",
+        "tests/unit/test_action_dto.py",
+        "tests/unit/test_export_dto.py"
       ],
       "blockers": [],
       "depth": 10,
@@ -1813,7 +1856,30 @@
           "at": "2026-11-13T04:25:00+08:00",
           "reason": "A1 裁定：evidence 的 HTTP 入口归 M1-03；M2-03 相关证据 deferred_to M2-04。双 owner 会导致两 lane 同写一文件"
         }
-      ]
+      ],
+      "scope_sync_A5": {
+        "at": "2026-11-13T08:42:00+08:00",
+        "added": [
+          "src/campaignlab/api/exports.py",
+          "orchestrator/handoff/M4-02-design.md",
+          "evidence/M4/M4-02/",
+          "evidence/M4/summaries/M4-02.md",
+          "tests/unit/test_action_dto.py",
+          "tests/unit/test_export_dto.py"
+        ],
+        "note": "依 A5「卡字面量为准」把卡 scope_allow 的补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      },
+      "card": {
+        "file": "orchestrator/tasks/M4-02.md",
+        "delivered_at": "2026-11-13T08:42:00+08:00",
+        "by": "Locke(D-016 批次3, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          43,
+          25,
+          78
+        ]
+      }
     },
     "M4-03": {
       "status": "TODO",
@@ -1851,13 +1917,41 @@
         "web/src/pages/report/",
         "web/src/pages/evidence/",
         "web/tests/unit/report/",
-        "web/tests/e2e/callback/"
+        "web/tests/e2e/callback/",
+        "web/tests/unit/evidence/",
+        "web/tests/e2e/report/",
+        "orchestrator/handoff/M4-03-design.md",
+        "evidence/M4/M4-03/",
+        "evidence/M4/summaries/M4-03.md"
       ],
       "blockers": [],
       "depth": 11,
       "height": 4,
       "slack": 0,
-      "critical": true
+      "critical": true,
+      "scope_sync_A5": {
+        "at": "2026-11-13T08:42:00+08:00",
+        "added": [
+          "web/tests/unit/evidence/",
+          "web/tests/e2e/report/",
+          "orchestrator/handoff/M4-03-design.md",
+          "evidence/M4/M4-03/",
+          "evidence/M4/summaries/M4-03.md"
+        ],
+        "note": "依 A5「卡字面量为准」把卡 scope_allow 的补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      },
+      "card": {
+        "file": "orchestrator/tasks/M4-03.md",
+        "delivered_at": "2026-11-13T08:42:00+08:00",
+        "by": "Locke(D-016 批次3, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          44,
+          24,
+          80
+        ]
+      },
+      "gate_literal_ruling_A28": "gates 字面「AC-025 至 AC-028、AC-030 页面侧」中的 AC-026/AC-027 经查 primary_owner 的 cross_ref 均不含 M4-03 -> 本卡对二者不承担取证义务，只对 acs 登记的 AC-025/AC-028/AC-030 承担 cross_ref。gates 历史值不改写。"
     },
     "M5-01": {
       "status": "TODO",
@@ -2165,14 +2259,37 @@
         "src/campaignlab/api/monthly_imports.py",
         "tests/domain/monthly_ingest/",
         "tests/golden/monthly_ingest/",
-        "evidence/monthly/M1-P01/"
+        "evidence/monthly/M1-P01/",
+        "orchestrator/handoff/M1-P01-design.md",
+        "tests/unit/test_monthly_import_dto.py",
+        "evidence/monthly/M1-P01/summaries/ingest-contract.md"
       ],
       "blockers": [],
       "note": "DISTINCT_CUSTOMER 与扩展粒度、SOURCE_JSON 与等价 CSV 归一、原子发布制品。改公共件（application/ 发布管线）须走 CR。",
       "depth": 6,
       "height": 5,
       "slack": 4,
-      "critical": false
+      "critical": false,
+      "scope_sync_A5": {
+        "at": "2026-11-13T08:42:00+08:00",
+        "added": [
+          "orchestrator/handoff/M1-P01-design.md",
+          "tests/unit/test_monthly_import_dto.py",
+          "evidence/monthly/M1-P01/summaries/ingest-contract.md"
+        ],
+        "note": "依 A5「卡字面量为准」把卡 scope_allow 的补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      },
+      "card": {
+        "file": "orchestrator/tasks/M1-P01.md",
+        "delivered_at": "2026-11-13T08:42:00+08:00",
+        "by": "Locke(D-016 批次3, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          46,
+          24,
+          80
+        ]
+      }
     },
     "M3-P01": {
       "status": "TODO",
@@ -2242,14 +2359,39 @@
         "src/campaignlab/api/monthly_reviews.py",
         "tests/domain/monthly/",
         "tests/golden/monthly/",
-        "evidence/monthly/M3-P01/"
+        "evidence/monthly/M3-P01/",
+        "orchestrator/handoff/M3-P01-metric-registry.md",
+        "orchestrator/handoff/M3-P01-design.md",
+        "evidence/monthly/M3-P01/summaries/metric-registry.md",
+        "tests/unit/test_monthly_dto.py"
       ],
       "blockers": [],
       "note": "分母/交集/去重/覆盖率口径 = 强制 max。infra/duckdb 与指标注册表属公共件，需扩展走 CR 由 T 串行合并。算法单测可在 M1-P01 完成前用包内样本先行。",
       "depth": 7,
       "height": 4,
       "slack": 4,
-      "critical": false
+      "critical": false,
+      "scope_sync_A5": {
+        "at": "2026-11-13T08:42:00+08:00",
+        "added": [
+          "orchestrator/handoff/M3-P01-metric-registry.md",
+          "orchestrator/handoff/M3-P01-design.md",
+          "evidence/monthly/M3-P01/summaries/metric-registry.md",
+          "tests/unit/test_monthly_dto.py"
+        ],
+        "note": "依 A5「卡字面量为准」把卡 scope_allow 的补齐项同步进 state；原值保留、只追加，不改写（A19）"
+      },
+      "card": {
+        "file": "orchestrator/tasks/M3-P01.md",
+        "delivered_at": "2026-11-13T08:42:00+08:00",
+        "by": "Locke(D-016 批次3, qwen3.8-flash)",
+        "commit": "PENDING(本提交)",
+        "head_tail_total": [
+          55,
+          25,
+          91
+        ]
+      }
     },
     "M3-P02": {
       "status": "TODO",
@@ -2958,7 +3100,7 @@
       "task": "契约面 / 治理面（v1.0.1 月报补丁自身不一致；影响 M3-P01、M4-P01，cross_ref M3-01/M4-01）",
       "severity": "MAJOR",
       "status": "OPEN",
-      "title": "月报补丁 architecture/MONTHLY-REVIEW.md §2 规定的两个 422 Problem code（MONTHLY_INVALID_SCOPE、MONTHLY_REPORT_KIND_REQUIRED）既不在活契约也不在 ADR-005 冻结的 20 码注册表",
+      "title": "月报补丁 architecture/MONTHLY-REVIEW.md §2 规定的两个 422 Problem code（MONTHLY_INVALID_SCOPE、MONTHLY_REPORT_KIND_REQUIRED）既不在活契约也不在 ADR-005 冻结的 20 码注册表；追加（2026-11-13T08:42:00+08:00）：同根因的第三个 code SNAPSHOT_SUPERSEDED（AC-MR-10 与 MONTHLY-REVIEW.md:16 要求 409，但 20 码权威表只有 SNAPSHOT_CONFLICT）已并入本单第 5 节",
       "found_by": "编排器（O lane），Round 5 派单前置为 D-016 批次 3 预抽上下文时实测发现",
       "file": "orchestrator/defects/D-022.md",
       "found_at": "2026-11-13T08:02:00+08:00",
@@ -2971,7 +3113,16 @@
         "monthly_prefixed_codes_in_registry": 0,
         "monthly_specific_operationIds_in_live_contract": 0,
         "monthly_contract_delta_additions": 11,
-        "command_note": "计数口径＝对 contracts/openapi.json（443309 B）与 src/campaignlab/api/common.py 做子串/键集实算，可复跑；PROBLEM_CODES 正则抽取键集得 20 个唯一 code，与 spec/CampaignLab-SDD-v1.0/architecture/API.md 第 22-29 行第 2 列逐字同序"
+        "command_note": "计数口径＝对 contracts/openapi.json（443309 B）与 src/campaignlab/api/common.py 做子串/键集实算，可复跑；PROBLEM_CODES 正则抽取键集得 20 个唯一 code，与 spec/CampaignLab-SDD-v1.0/architecture/API.md 第 22-29 行第 2 列逐字同序",
+        "MONTHLY-REVIEW.md:16_requires": "409 SNAPSHOT_SUPERSEDED",
+        "AC-MR-10_requires": "签认请求 409 SNAPSHOT_SUPERSEDED",
+        "openapi_hits_SNAPSHOT_SUPERSEDED": 0,
+        "openapi_hits_SNAPSHOT_CONFLICT": 0,
+        "api_md_hits_SNAPSHOT_SUPERSEDED": 0,
+        "api_md_hits_SNAPSHOT_CONFLICT": 1,
+        "sqlite_v1_sql_hits_SNAPSHOT_SUPERSEDED": 0,
+        "api_common_py_hits_SNAPSHOT_SUPERSEDED": 0,
+        "amendment_note": "活契约不枚举 Problem code，故 SNAPSHOT_CONFLICT 在 openapi.json 命中 0 属正常；判据必须取 API.md 第 22-29 行的 20 码权威表"
       },
       "blocking": false,
       "blocking_note": "不阻塞 Round 5：批次 3 只写卡不写实现，M3-P01 在 wave5、M4-P01 在 wave8。已写入 orchestrator/handoff/D-016-batch3-context.md 第 7 节陷阱 3，要求补卡 lane 以 U 项承接、禁自行发明 code",
@@ -2993,7 +3144,16 @@
         "contracts/openapi.json",
         "src/campaignlab/api/common.py"
       ],
-      "status_note": "NEEDS_OWNER_DECISION：契约面变更属手册第 7 节 CR 级、超出无人值守授权范围，故只立单 + 登记 pending_owner，按选项 A 暂用推进，不停摆长程流程。选项 B 若被采纳则另开 CR-003"
+      "status_note": "NEEDS_OWNER_DECISION：契约面变更属手册第 7 节 CR 级、超出无人值守授权范围，故只立单 + 登记 pending_owner，按选项 A 暂用推进，不停摆长程流程。选项 B 若被采纳则另开 CR-003",
+      "affected_tasks": [
+        "M3-P01",
+        "M4-P01",
+        "M1-P01",
+        "M3-01(cross_ref)",
+        "M4-01(cross_ref)"
+      ],
+      "self_correction": "第 3 节选项 B 原写「扩注册表 20→22」，因第 5 节并入第三个 code，正确值应为 20→23；上文字节不改写，以第 5 节末行为准（用户偏好：错了当场更正留痕、禁改写历史）",
+      "amended_at": "2026-11-13T08:42:00+08:00"
     }
   ],
   "change_requests": [
@@ -3251,26 +3411,6 @@
         "tier": "qwen3.8-max",
         "dispatched_at": "2026-11-13T08:12:00+08:00",
         "round": 5
-      },
-      {
-        "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
-        "nickname": "Pasteur",
-        "lane": "F",
-        "task": "M0-03",
-        "subtask": "S6 UI-01 页面样板 + S7 键盘基线参数化 + S8 vitest 脚手架与 AC-001/深链断言 + S9 Playwright 截图与证据（四片",
-        "tier": "qwen3.8-flash",
-        "dispatched_at": "2026-11-13T08:12:00+08:00",
-        "round": 5
-      },
-      {
-        "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
-        "nickname": "Locke",
-        "lane": "T",
-        "task": "D-016-batch3",
-        "subtask": "补 4 张任务卡 M4-02/M4-03/M3-P01/M1-P01 + KNOWN_MISSING 13->9",
-        "tier": "qwen3.8-flash",
-        "dispatched_at": "2026-11-13T08:12:00+08:00",
-        "round": 5
       }
     ],
     "dispatch_requirements": [
@@ -3278,7 +3418,8 @@
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
       "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
       "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串",
-      "补卡 lane（D-016）必须以 orchestrator/handoff/D-016-batch2-context.md 为唯一 spec/手册入口；禁整读 spec/**、contracts/openapi.json(443309B)、docs/delivery/LONG-HORIZON-ORCHESTRATION.md(758 行)、orchestrator/state.json(183065B)；手册只读 §3.2(174-204)/§6.3(312-333)/§6.4(334-383)/§15.5(656-679)/§15.6(680-694)"
+      "补卡 lane（D-016）必须以 orchestrator/handoff/D-016-batch2-context.md 为唯一 spec/手册入口；禁整读 spec/**、contracts/openapi.json(443309B)、docs/delivery/LONG-HORIZON-ORCHESTRATION.md(758 行)、orchestrator/state.json(183065B)；手册只读 §3.2(174-204)/§6.3(312-333)/§6.4(334-383)/§15.5(656-679)/§15.6(680-694)",
+      "PRE-3 断言口径（A18 更正）：判定切片新鲜且目标全命中须断言 ('missing' not in slice) and slice['truncated_schemas']==[]；禁断言 slice['missing']==[]（contract_slice.py 仅在有未命中目标时才写 missing 键，全命中时键不存在，断言会 KeyError）。守卫命令的 cwd 口径：一律在仓库根 /home/szf/dev/CampaignLab 执行（D-024 的教训：在 web/ 下跑 grep 'web/*.config.*' 通配不展开 -> rc=2 假绿）"
     ],
     "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
     "persisted": {
@@ -3550,15 +3691,17 @@
         },
         "ruff_lint_scope_files": 18,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T05:33:25+08:00",
-        "counts_refresh_reason": "手册 v1.8 治理提交 + Round 4 在飞产物使 ruff format 分母实测 88→91；纯 Python 稳定分母 ruff_lint_scope_files 保持 18 不变；pytest/mypy/契约/前端基线本轮未复跑（Lane A 正独占 Python 工具链，编排器不与之并发争用 .venv，避免 NOTE-10 假红），沿用 04:58:57 实测值 76/16/13/8。",
+        "counts_refreshed_at": "2026-11-13T08:40:50+08:00",
+        "counts_refresh_reason": "Round 5 回收（提交 A / T lane D-016 批次3）：编排器独立实测 task_cards_on_disk 16->20、known_missing_cards 13->9，恒等式 20+9==29 成立，KNOWN_MISSING 字面量与磁盘缺口双向对账相等、unregistered/recovered/orphans 均空。守护测试已用真实 pytest 实证：uv run --no-sync pytest -q tests/unit/test_task_cards.py tests/unit/test_task_card_narrative.py tests/unit/test_state_ledger.py -> rc=0 / 18 passed（非纯 python3 复现）。本提交不刷新 pytest/mypy/ruff 分母（属 S lane 产物，留提交 C），也不刷新前端分母（属 F lane，留提交 B）。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 56,
         "frontend_vitest_files": 4,
-        "known_missing_cards": 13,
-        "task_cards_on_disk": 16,
+        "known_missing_cards": 9,
+        "task_cards_on_disk": 20,
         "task_total_denominator": 29,
-        "ruff_check_visible_files": 25
+        "ruff_check_visible_files": 25,
+        "task_card_identity": "task_cards_on_disk(20) + known_missing_cards(9) == task_total_denominator(29) 实测成立",
+        "previous_values_cards": "task_cards_on_disk: 16（Round 4 快照）；known_missing_cards: 13（Round 4 快照）。按「历史值只加注不改写」保留于本字段。"
       },
       "denominator_history": [
         {
@@ -4313,27 +4456,21 @@
       "recorded_at": "2026-11-13T04:40:00+08:00",
       "source": "D-016 / Q-VERIFY-M0-01 F 项",
       "tasks_in_state": 29,
-      "cards_on_disk": 16,
-      "missing": 13,
+      "cards_on_disk": 20,
+      "missing": 9,
       "missing_ids": [
         "M1-04",
-        "M1-P01",
         "M2-04",
         "M3-04",
-        "M3-P01",
         "M3-P02",
-        "M4-02",
-        "M4-03",
         "M4-P01",
         "M5-01",
         "M5-02",
         "M5-03",
         "M5-P01"
       ],
-      "missing_critical": 7,
+      "missing_critical": 5,
       "missing_critical_ids": [
-        "M4-02",
-        "M4-03",
         "M4-P01",
         "M5-01",
         "M5-02",
@@ -4438,21 +4575,17 @@
       },
       "known_missing": [
         "M1-04",
-        "M1-P01",
         "M2-04",
         "M3-04",
-        "M3-P01",
         "M3-P02",
-        "M4-02",
-        "M4-03",
         "M4-P01",
         "M5-01",
         "M5-02",
         "M5-03",
         "M5-P01"
       ],
-      "known_missing_count": 13,
-      "identity": "16 + 13 == 29 成立（test_task_cards.py 机器守护）；批次 3 交付 4 卡后应为 20 + 9 == 29",
+      "known_missing_count": 9,
+      "identity": "20 + 9 == 29 成立（test_task_cards.py 机器守护，编排器独立复算吻合）",
       "export_ops_unowned": {
         "ops": [
           "getExport",
@@ -4461,10 +4594,12 @@
         "referenced_by": {},
         "action": "M4-02 补卡时明确落定 export 四 op 交付归属",
         "note": "createExport/downloadExport 实测被 M3-01.md 与 M4-01.md 引用，故非「全库无归属」",
-        "status": "IN_PROGRESS_BATCH3",
-        "status_note": "批次 3 已把「M4-02 卡内逐个落定 export 四 op 归属」写入 D-016-batch3-context.md 第 7 节陷阱 4，并要求把 src/campaignlab/api/exports.py 显式补进 scope_allow + 写 U 项"
+        "status": "RESOLVED",
+        "status_note": "批次 3 已把「M4-02 卡内逐个落定 export 四 op 归属」写入 D-016-batch3-context.md 第 7 节陷阱 4，并要求把 src/campaignlab/api/exports.py 显式补进 scope_allow + 写 U 项",
+        "resolved_at": "2026-11-13T08:42:00+08:00",
+        "resolution": "A14：四 op 全部归 M4-02，实现文件 src/campaignlab/api/exports.py（已同步进 tasks['M4-02'].scope）。M4-02.md 第 6 行逐个落定并附切片实测的 method+path"
       },
-      "updated_at": "2026-11-13T08:02:00+08:00",
+      "updated_at": "2026-11-13T08:42:00+08:00",
       "previous_batch2_snapshot": {
         "missing": 17,
         "missing_ids": [
@@ -4575,7 +4710,12 @@
         ],
         "slice_gate": "四份均 rc=0、missing=[]、truncated_schemas=[]、depth=5（D-020 修复后默认值）、spec_version=1.0.1、source.openapi={bytes:443309, sha16:592571099d638251}",
         "context_pre_abstracted": "orchestrator/handoff/D-016-batch3-context.md（265 行 / 33112 B，9 节：0 卡表 / 1 切片+定点抽取配方 / 2 AC 行号与 primary_owner / 3 UI 页面+月报页面增量 / 4 spec 小节行号图 / 5 手册必读区间 / 6 卡硬格式约束 / 7 陷阱 15 条 / 8 Archimedes 缓置 U 项逐条处置 / 9 交付清单与自检）",
-        "status": "DISPATCHED_PENDING"
+        "status": "RETURNED_VERIFIED",
+        "returned_at": "2026-11-13T08:42:00+08:00",
+        "actual_known_missing_after": 9,
+        "agent": "Locke（01a1d225-439d-7840-8074-b4fcd3bd40fe，qwen3.8-flash）",
+        "cost_breach": "目标 ≤45k，子智能体自陈越限（get_goal 无计量句柄故 tokens 记 null、禁估算）。其§8 归因：4 张卡正文落盘合计 96231 B（M3-P01 单卡 27981 B）+ context 全文一次读入；切片侧定点抽取纪律严格遵守（无一次整读 83-112 KB 切片）。纠正措施已记 budget.guardrail_status.corrective_action_next",
+        "remaining_plan": "批次 4（Round 6/7）：M4-P01、M5-01、M5-02、M5-03（4 张均 critical=true/slack=0）；批次 5：M5-P01、M1-04、M2-04、M3-04、M3-P02（5 张）。批次 4 起把「卡正文生成量」计入预算并按 Locke 建议评估降到 2-3 卡/批"
       }
     },
     "cr002_merge": {
@@ -5317,7 +5457,141 @@
       "slots_note": "手册 §15.11：派单前必须释放全部并发槽。Gauss(01a1d193) 与 Aquinas(01a1d194) 已于 Round 4 回收后关闭，本轮关闭余下两个",
       "predispatch_commit": "b190830",
       "dispatch_commit": "PENDING(本条)"
-    }
+    },
+    "round5_returns": {
+      "at": "2026-11-13T08:42:00+08:00",
+      "wave": 1,
+      "round": 5,
+      "mode": "parallel-3-lanes",
+      "dispatched": 3,
+      "returned": 2,
+      "in_flight": [
+        "01a1d222-9a42-7801-8b1e-30e388f25081 (Hilbert, S/M0-02-S3c)"
+      ],
+      "lanes": {
+        "T/D-016-batch3": {
+          "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+          "nickname": "Locke",
+          "tier": "qwen3.8-flash",
+          "result": "DONE",
+          "commit": "PENDING(本提交)",
+          "tokens_self_reported": null,
+          "tokens_note": "子智能体 get_goal 返回 goal=null，无计量句柄；按纪律记 null，禁估算。但其§8 诚实偏差清单自陈「目标 ≤45k，实际越限」，故 over_cap=true",
+          "over_cap": true,
+          "open_questions": 34,
+          "reverify": "吻合",
+          "deliverables": "orchestrator/tasks/{M4-02,M4-03,M3-P01,M1-P01}.md（4 新卡）+ tests/unit/test_task_cards.py 的 KNOWN_MISSING 13->9（numstat 实测 0 4）",
+          "orchestrator_reverify": "编排器独立复算（禁采信自报）：① head/tail/total 复现守护测试 _split() 口径 -> M4-02 43/25/78、M4-03 44/24/80、M3-P01 55/25/91、M1-P01 46/24/80，四卡 head<=60 / tail<=40 / total<=200 全达标，表头逐等于四列形态；② 全量 20 卡回归 violations=NONE（LEGACY_TAIL_ANNOTATED 的 M0-02 tail=147 / M0-03 tail=115 仍豁免中，head/total/表头三项实测达标）；③ KNOWN_MISSING 实取 9 项 == 实算缺口 9 项，unregistered/recovered/orphans 均空，恒等式 20+9==29 成立；④ 档位表占比脚本重算与自报逐位相等：M4-02 5/8=62.5% 44k/142k=31.0%、M4-03 7/10=70.0% 44k/134k=32.8%、M3-P01 4/9=44.4% 36k/190k=18.9%、M1-P01 4/8=50.0% 34k/150k=22.7%，max 合计 98/90/154/116k 全 <=200k，flash 合计 44/44/36/34k 全 <=60k，flash 行缺「低复杂度」理由数=0；⑤ AC 集合：四卡 state.acs 与各自切片 acceptance_rows 的 id 集合逐个相等（3/3/12/6=24 条），且全部编号在卡内命中；⑥ allow∩deny 四卡均 EMPTY；⑦ 卫生 CR=0 BOM=0 endsLF=True；⑧ 四份切片 + context + spec/** + contracts/openapi.json 的 sha16+bytes 无漂移",
+          "lane_findings_upheld": [
+            "U-2(M3-P01)：实测 contracts/sqlite-v1.sql:102 的 analysis_results.kind CHECK = ('comparison','review','diagnosis','question')，确不含 monthly_review -> 编排器在 batch3-context §8 第 2 项发明的 kind='monthly_review' 是臆断，已作废并更正（见 round5_adjudications.A17 与 context §10 ①）",
+            "U-3(M1-P01)：实测 SNAPSHOT_SUPERSEDED 在 API.md 20 码权威表命中 0、活契约 0、DDL 0、api/common.py 0，而 spec 补丁 MONTHLY-REVIEW.md:16 与 AC-MR-10 原文均要求 409 SNAPSHOT_SUPERSEDED -> 与 D-022 同根因，已并入 D-022 §5",
+            "U-8/U-6/U-9：实测四份切片顶层 key 无 missing（脚本仅在有未命中目标时才写该键）-> batch3-context §1「missing=[]」表述不准，已更正 PRE-3 断言口径（context §10 ②）"
+          ],
+          "self_corrections_by_lane": "Locke 自陈并已当场更正 2 处：① 自检脚本 check.py 首版把 'monthly' 当 'monthly_ingest' 的路径前缀，误报 3 处 allow∩deny 冲突，改 startswith(prefix+'/') 后 EMPTY（卡内容未改，是判定脚本错）；② M4-02/M4-03 第 2 行行内反引号未闭合，定点补齐后反引号计数为偶、head/tail/total 未变。另自陈 2 处操作事故：CreateProcess os error 206（文件名太长）-> 拆成两卡一命令；wsl.exe -C 不受支持 -> 改 wsl.exe -e git -C。均未改守护测试放宽判定",
+          "tool_chain_discipline": "pytest/uv/mypy/ruff/npm/node/vite/vitest/playwright 各 0 次（编排器采信其自证并经 git status 交叉核对：无 .venv/node_modules 侧产物变动）"
+        },
+        "F/M0-03-S6-S9": {
+          "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
+          "nickname": "Pasteur",
+          "tier": "qwen3.8-flash",
+          "result": "PASS_WITH_TODO",
+          "commit": "PENDING(F lane 提交)",
+          "tokens_self_reported": null,
+          "tokens_note": "get_goal 返回 goal=null，无计量句柄；按纪律记 null，禁估算",
+          "open_questions": 9,
+          "reverify": "吻合（12/12）",
+          "todo_reason": "S9 截图与键盘基线真实通过（Playwright 1.65.0 + chromium-1254 缓存实测可用，非 BLK-01 阻塞）；TODO 三项＝① 后端 S3b 未落地，12 条 e2e 全走 page.route 合成夹具，属前端层基线而非端到端联调；② /workspaces/:id 目标页属 M0-04；③ web/src/api/http.ts 的 304 防御面待裁（已裁 A21）",
+          "orchestrator_reverify": "编排器独立复跑（禁采信自报，且不碰 .venv 以免与 S lane 争用产生 NOTE-10 假红）：npm run typecheck rc=0、lint rc=0、test rc=0 实测 Test Files 7 passed(7) / Tests 104 passed(104)（基线 4/56 -> +3 files +48 tests，0 skipped）、build rc=0 实测 83 modules / dist/assets/index-C_xENgTm.js 122.90 kB / index-BL_mlG_f.css 377.54 kB、npx playwright test rc=0 实测 12 passed(7.1s)、rg 六位色值命中 0、探针残留 0、spec/ dirty=0、git diff web/package*.json 为空、web/src/api 与 web/vite.config.ts 等配置 dirty=0（证明其未擅动他人配置）、误落仓库外的 /home/szf/dev/evidence 已实测不存在、ifNoneMatch 在 http.ts 之外的调用点实测 0（支撑 A21 裁定）"
+        },
+        "S/M0-02-S3c": {
+          "agent_id": "01a1d222-9a42-7801-8b1e-30e388f25081",
+          "nickname": "Hilbert",
+          "tier": "qwen3.8-max",
+          "effort": "high",
+          "result": "IN_FLIGHT",
+          "progress_snapshot_at": "2026-11-13T08:42:00+08:00",
+          "progress_snapshot": "编排器只读快照（未干预）：config.py 279 行、clock.py 70、domain/errors.py 264、domain/ids.py 63、domain/values.py 27、domain/__init__.py 14、__main__.py 40、cli.py 332、api/app.py 127、api/deps.py 120、api/health.py 40 均已落盘，api/common.py 已改为 752 行（搬移后 re-export），evidence/M0/M0-02/problem-code-registry.json + commands.md + migration-diff.md 已产出"
+        }
+      }
+    },
+    "in_flight_agents_note": "Locke(T) 与 Pasteur(F) 已回收并即将 close_agent；仅 Hilbert(S) 在飞（手册 15.11：Round 6 派单前必须全部释放）",
+    "round5_adjudications": {
+      "at": "2026-11-13T08:42:00+08:00",
+      "total_received": 43,
+      "total_received_note": "T lane(Locke) 34 项 U + F lane(Pasteur) 9 项 R4-Q = 43 项；S lane(Hilbert) 在飞未计",
+      "adjudicated_now": 43,
+      "deferred": 0,
+      "deferred_note": "本轮全部当场裁定，无缓置。其中 3 项触发编排器自我更正（A17/A18 与 D-022 §5），2 项触发新立缺陷单（D-023/D-024，随 F lane 提交）。",
+      "A14_export_ops_ownership": "批准 Locke 的 U-1 落定：createExport/getExport/listExports/downloadExport 四 op 的 HTTP 实现全部归 M4-02，实现文件 src/campaignlab/api/exports.py。编排器已把该文件与另 5 个必需落点同步进 tasks['M4-02'].scope（依 A5）。card_gap.export_ops_unowned 转 RESOLVED。附实测支撑：exports 表 DDL 的 kind 为 TEXT NOT NULL 且无 CHECK 约束，故 REPORT_MD/MISSING_CSV/EVIDENCE_ZIP/REVIEW_CSV 可自由取值，无需改 DDL。",
+      "A15_actions_write_ownership": "批准：actions 与 action_followups 两表的写权唯一归 M4-02；M4-01 只在 reports/report_actions 侧出「行动提示待复核」，不得写 actions（承接批次 2 缓置项 M4-01/U-5）。listAudit 的 HTTP 入口亦归 M4-02 —— 编排器实测全库 20 卡仅 M4-02.md 引用 listAudit（3 次）、仅 tasks['M4-02'].scope 含 audit 路径，无双 owner；落点裁定为 src/campaignlab/api/actions.py（已在 scope_allow 内），不新增 api/audit.py，以免与 M0-02/S3d 的 application/audit.py（AuditWriter 写侧）混淆。读侧（listAudit）归 M4-02、写侧（AuditWriter）归 M0-02/S3d。",
+      "A16_monthly_api_files_have_no_routes": "批准 Locke 的 U-1（M3-P01）与 U-1（M1-P01）选项 ①：src/campaignlab/api/monthly_reviews.py 与 src/campaignlab/api/monthly_imports.py 认定为**非路由的领域/DTO 模块**；月报复盘的 HTTP 路由仍走既有 runReview/getReview + ReviewCreate.profile，月报导入仍走既有 createImport/attachImportFile/configureImport/validateImport/publishImport + map-monthly。依据：编排器实测活契约 80 个 operationId 无任何月报专属 op、monthly-contract-delta.json 的 11 项 additions 未新增 op、MONTHLY-REVIEW.md:26 原文明载「基座操作编号、响应头、作业类型、对象和路由沿用」。tasks[*].scope 的字面量**不改写**（历史值），以本裁定与卡内 U 项注记为准；若后续确需独立路由则走 CR。",
+      "A17_monthly_analysis_result_kind_SELF_CORRECTION": "**编排器自我更正**：批次 3 预抽上下文 §8 第 2 项裁定里写的 analysis_results(kind='monthly_review') 是编排器未核 DDL CHECK 的臆断，**作废**。实测 contracts/sqlite-v1.sql:102 的 CHECK 只含 ('comparison','review','diagnosis','question')。更正后裁定：月报 Review 结果落 analysis_results 时 kind 取既有值 'review'，判别式为 input_json 内的 profile='BANK_MONTHLY_V1'（input_json 只有 json_valid 约束、无枚举，属非冻结面）；制品落 artifacts 且 kind 取既有值 'COMPUTATION'（artifacts.kind 的 CHECK 为 9 值枚举，同样不得扩）。扩任一枚举＝改 sqlite-v1.sql 与 migrations/** 的 CHECK＝CR 级，且会打破迁移等价性测试 -> 禁止。已落 decisions.monthly_analysis_result_kind，并在 context §10 ① 纯增量留痕。",
+      "A18_slice_missing_key_semantics_SELF_CORRECTION": "**编排器自我更正**：context §1 写的「四份 missing=[]」不准。实测切片顶层无 missing 键 —— contract_slice.py 只在有目标未命中时才写该键，全命中时键不存在。编排器把脚本 stderr 的诊断输出误当产物字段。更正后 PRE-3 断言口径：判定切片新鲜且目标全命中须断言 ('missing' not in slice) and slice['truncated_schemas']==[]，禁断言 slice['missing']==[]（会 KeyError）。已落 resume.dispatch_requirements，并在 context §10 ② 纯增量留痕。",
+      "A19_scope_sync_A5_batch3": "依 A5「卡字面量为准」，编排器已把四卡的 scope_allow 补齐项同步进 state.json：tasks['M4-02'].scope += api/exports.py、handoff/M4-02-design.md、evidence/M4/M4-02/、evidence/M4/summaries/M4-02.md、tests/unit/test_action_dto.py、tests/unit/test_export_dto.py；tasks['M4-03'].scope += web/tests/unit/evidence/、web/tests/e2e/report/、handoff/M4-03-design.md、evidence/M4/M4-03/、evidence/M4/summaries/M4-03.md；tasks['M3-P01'].scope += handoff/M3-P01-metric-registry.md、handoff/M3-P01-design.md、evidence/monthly/M3-P01/summaries/metric-registry.md、tests/unit/test_monthly_dto.py；tasks['M1-P01'].scope += handoff/M1-P01-design.md、tests/unit/test_monthly_import_dto.py、evidence/monthly/M1-P01/summaries/ingest-contract.md。原 scope 历史值保留、只追加，不改写。",
+      "A20_wave5_serial_prerequisite_executed": "批准 Locke 的 M3-P01/U-5：执行 A13，编排器已把 M3-P01 追加进 tasks['M3-01'].deps、tasks['M3-02'].deps、tasks['M3-03'].deps（原 deps 保留、只追加）。wave5 的派发次序由此在 state 层被机器化固定：M3-P01 必须先交付并冻结 handoff/M3-P01-metric-registry.md，才可派 L1 三卡。",
+      "A21_http_304_defensive_dead_branch": "裁定 Pasteur 的 R4-Q8 选项 A（追认为防御性死分支）：web/src/api/http.ts 的 notModified/ifNoneMatch 与 304 分支**保留**，理由是编排器实测 ifNoneMatch 在 http.ts 之外的调用点为 **0**（默认永不发 If-None-Match），且代码在「收到 304 但未发 If-None-Match」时是 note()+failure() 而非静默成功 —— 符合 A7「前端不得依赖 304 做缓存」的实质意图，删除反而会让契约违规的服务端响应变成解析失败。附加硬条件：① ifNoneMatch 保持 opt-in 且任何 lane 不得开启；② 追加一条单测断言默认路径不发 If-None-Match 头（编排器实测 api-client.spec.ts 现无此断言，已记 followup）；③ 若日后契约声明 304 则走 CR。",
+      "A22_app_vue_in_scope_RULING_NOT_A_VIOLATION": "裁定 Pasteur 的 R4-Q1 **越界指控不成立**：M0-03.md 第 19 行 scope_allow 的字面量是 web/src/**，依 A5「卡字面量为准」已包含 web/src/App.vue；handoff/M0-03-design.md §7 的 S6 白名单是**更窄的内部指引**，不是 scope 权威。与 Round 4 对 Aquinas 写 web/src/main.ts 的 U-6 裁定同型（指控源于窄口径文档而非卡）。改动实测 numstat 2 added / 7 removed（M0-01 占位骨架 -> <router-view/>），且 project-baseline.spec.ts 的 4 个用例仍全绿，证明无守护依赖该占位文本。附加要求：编排器已在 tasks['M0-01'] 与 orchestrator/tasks/M0-01.md 追加纯增量注记，说明其 App.vue 占位已由 M0-03/S6 的路由出口取代（历史交付事实不改写）。",
+      "A23_problem_presentation_placement": "批准 Pasteur 的 R4-Q2 落位：code->呈现档位的纯函数映射落 web/src/features/shared/problemPresentation.ts（features 在 design §7 的 S6 白名单内，且卡 scope_allow 的 web/src/** 亦覆盖）。编排器实测 PROBLEM_CODE_BUCKETS 的 key 数 20、与 API.md 第 22-29 行解析出的 20 码 missing=[] extra=[]、档位集合恰 5（ENTRY/INVISIBLE/INPUT/CONFLICT/TRANSIENT）、problem-presentation.spec.ts 32 passed 含 it.each 展开 20 条 -> 满足 A8「20 个权威 code 的纯函数映射并有单测全覆盖」，且运行时常量仅此一份（未镜像冻结面，符合 Q4/RULING_NO_FRONTEND_MIRROR）。",
+      "A24_no_stub_page_for_workspace_route": "批准 Pasteur 的 R4-Q3：不为 /workspaces/:id 造 stub 页，现落 NotFoundPage（保留工作区标识 + 返回入口）符合 gates 的「404 回到合法入口」。M0-04 交付 UI-02 后只需替换该路由的 component，无需改页面 —— 已记入 tasks['M0-04'].handoff_from_M0-03 供其派单文承接。",
+      "A25_polling_ready_not_wired": "批准 Pasteur 的 R4-Q5「已就绪未接线」：web/src/features/jobs/polling.ts 是唯一 202 轮询 composable，UI-01 的 5 个 operationId 均无 202 故页面无消费点属正常。硬约束：契约 11 个返回 202 的 op 与 UI-25 作业页**必须复用该文件**，禁各处自建轮询。已把实现落点写进 decisions.poll_defaults.implementation。",
+      "A26_client_side_sort_only": "批准 Pasteur 的 R4-Q6：listWorkspaces 经 CR-002 后参数集只剩 cursor/limit/q，无 sort；前端只对已加载行按 Unicode 码位稳定排序并明示「契约无 sort 参数」，满足 COMMON.md「表格排序可键盘触发」。要求服务端排序＝扩契约＝CR，本轮不发起。",
+      "A27_e2e_is_frontend_baseline_only": "批准 Pasteur 的 R4-Q7 定性：12 条 Playwright 用例全走 page.route 合成夹具，是**前端层交互/呈现基线，不是端到端联调**，不得据此称 AC-001 服务端链路通过（AC-001 的 primary 本就是 M0-02）。已立 followup：S3b（Round 6）入库后必须排一轮真联调复跑，并把结论写进 evidence/M0/M0-03/，届时才可把 M0-03 的 AC-001 页面侧 gate 从 PASS_WITH_TODO 转 PASS。",
+      "A28_m403_gate_literal_overclaim": "裁定 Locke 的 M4-03/U-4：tasks['M4-03'].gates 的字面「AC-025 至 AC-028、AC-030 页面侧」是 wave 规划期的宽泛表述，**acs 才是权威登记**。编排器实测 primary_owner：AC-026 的 cross_ref=['M4-P01']、AC-027 的 cross_ref=['M4-P01']，**均不含 M4-03** -> M4-03 对 AC-026/AC-027 **不承担任何取证义务**，只对 AC-025/AC-028/AC-030 承担 cross_ref（页面侧呈现）。gates 历史值不改写，以本裁定为准；另立 followup 交 M5-02(Q lane) 复核是否应把 M4-03 补进 AC-026/AC-027 的 cross_ref（属台账变更，非本轮自裁）。",
+      "A29_ac_denominator_no_double_count": "裁定 Locke 的 M4-03/U-7：AC 分母恒为 47（基座 35 + 月报 12），页面证据不重复计入。M3-04 出 UI-19 页面证据（承接批次 2 缓置项 M3-03/U-3），M4-03 出 UI-21/22/23/24/26 页面证据，M1-04 出 UI-07 月报分支页面证据、M2-04 出 UI-08 月报分支页面证据（依 MONTHLY-PAGES.md:33-43 的关联页面增量表）——各归各卡，禁重复计。",
+      "A30_monthly_missing_state_carrier": "裁定 Locke 的 M1-P01/U-6：「旧快照选择月报返回 MISSING/取数清单」的契约承载位置**已实测确定，无需新增字段** —— Review.monthly_review.state 的枚举实测为 ['FULL','PARTIAL','MISSING']，MonthlyReview.issues 为 Issue 数组（Issue={code,location,message,severity}），且 Review.missing_requirements 是 Review 的既有**必填**字段。故取数清单落 Review.missing_requirements、缺项原因落 MonthlyReview.issues[]、就绪度落 state。MonthlyReview.additionalProperties=false 且 13 个属性全 required -> **禁增删字段**。",
+      "A31_monthly_import_page_evidence_owner": "裁定 Locke 的 M1-P01/U-7：月报导入的页面证据归 M1-04（UI-07 导入详情，wave4），月报快照的页面证据归 M2-04（UI-08 快照，wave4）。依据 MONTHLY-PAGES.md:33-43「关联页面增量」表实测列出 UI-07/UI-08/UI-24/UI-26 四页的月报新分支，而 M1-04/M2-04 正是这两页的 lane F 交付方。批次 4 补 M1-04/M2-04 卡时须把该行区间写进 inputs.specs。",
+      "A32_d022_option_A_interim": "确认 Locke 的 M4-02/U-3、M4-03/U-5、M3-P01/U-3、M1-P01/U-5：D-022 待项目负责人裁定前，四卡一律按选项 A 撰写（复用 INVALID_SCOPE / VALIDATION_ERROR / SNAPSHOT_CONFLICT，语义标签落 Problem.detail 与 Issue.code），禁实现 MONTHLY_INVALID_SCOPE / MONTHLY_REPORT_KIND_REQUIRED / SNAPSHOT_SUPERSEDED，禁扩 20 码注册表。D-022 §5 已并入第三个 code 并留痕「20→22 应为 20→23」的自我更正。",
+      "A33_m402_no_new_monthly_file": "确认 Locke 的 M4-02/U-2：月报侧无新 operationId，行动与导出复用本卡 ops；M4-P01（批次 4 交付）**不新增 api 文件**，只在 reports/actions 侧承接月报修订链与复核（AC-MR-09/10/11）。",
+      "A34_duckdb_extend_only": "确认 Locke 的 M3-P01/U-7：infra/duckdb/ 与指标注册表属公共件，M3-P01 可在该目录**新增**文件、只经既有入口扩展，**不得改既有公共签名**；改签名即走 CR 由 T lane 串行合并（承接批次 2 缓置项 M3-01/U-2 的同一口径）。",
+      "A35_m3p01_metric_registry_is_the_freeze_point": "确认 Locke 的 M3-P01/U-4 与批次 2 缓置项 M3-02/U-5：orchestrator/handoff/M3-P01-metric-registry.md 是 A13 的唯一冻结件，权威原文为 MONTHLY-REVIEW.md:51-56（### 改进项与指标证据绑定）；M4-02 的 createAction->reviewAction 与 M3-01/02/03 只消费不定义。",
+      "A36_createReport_getReport_owner": "确认 Locke 的 M3-P01/U-6：createReport/getReport 的实现归 M4-01，M3-P01 只调用；月报 Report 走既有 TOPIC kind、diagnosis_id 与 question_id 留空（MONTHLY-REVIEW.md:33），其他 kind 的 422 依 D-022 暂用 VALIDATION_ERROR。",
+      "A37_cr002_terminal_no_replacement": "确认 Locke 的 M4-03/U-8：CR-002/ADR-006 移除 listWorkspaces.status 已由「临时处置」转「终态」，UI-01 不提供状态筛选控件，**无替代入口**；需要状态筛选即扩契约＝CR，本轮不发起。",
+      "A38_wave7_L1_serial": "确认 Locke 的 M4-02/U-7 与 M4-03/U-1：waves[7] 的 L1=[M4-02, M4-03] 本就是「lane 内串行、lane 间并行」，故 M4-02 先交付冻结件、M4-03 后消费，时序在 state 层已固定，无需追加裁定。"
+    },
+    "followups": [
+      {
+        "id": "FU-1",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "S3b（Round 6）入库后排一轮前后端真联调复跑 Playwright，把结论写进 evidence/M0/M0-03/，届时才可把 M0-03 的 AC-001 页面侧 gate 从 PASS_WITH_TODO 转 PASS",
+        "owner": "编排器",
+        "source": "A27 / Pasteur R4-Q7"
+      },
+      {
+        "id": "FU-2",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "web/tests/unit/api-client.spec.ts 追加断言：默认路径不发 If-None-Match 头（编排器实测现无此断言）。归 M0-03/S10 或 M0-03b",
+        "owner": "M0-03/S10 或 M0-03b",
+        "source": "A21 附加硬条件②"
+      },
+      {
+        "id": "FU-3",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "M5-02(Q lane) 复核 acceptance.primary_owner 是否应把 M4-03 补进 AC-026/AC-027 的 cross_ref（属台账变更，非本轮自裁）",
+        "owner": "M5-02",
+        "source": "A28"
+      },
+      {
+        "id": "FU-4",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "M0-04 派单文须承接：/workspaces/:id 路由的 component 由 NotFoundPage 替换为 UI-02 实现，无需改页面（A24）",
+        "owner": "编排器(M0-04 派单文)",
+        "source": "A24 / Pasteur R4-Q3"
+      },
+      {
+        "id": "FU-5",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "批次 4 补 M1-04/M2-04 卡时（批次 5）须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属",
+        "owner": "编排器(D-016 批次5 派单文)",
+        "source": "A31"
+      },
+      {
+        "id": "FU-6",
+        "at": "2026-11-13T08:42:00+08:00",
+        "item": "D-022 待项目负责人裁定（选项 A/B），最迟须在 wave5 派单前给出；裁定前全项目按选项 A 暂用推进",
+        "owner": "项目负责人",
+        "source": "D-022 / pending_owner D-022-1"
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,
@@ -6078,7 +6352,8 @@
       "max_interval_ms": 8000,
       "stop_condition": "作业进入终态 SUCCEEDED / FAILED / CANCELLED",
       "applies_to": "契约共 11 个返回 202 的 operationId，统一走同一 composable，不得各处自建轮询",
-      "note": "契约未声明轮询间隔，故本值为项目级默认约定（非契约项），变更不需 CR 但须在此登记"
+      "note": "契约未声明轮询间隔，故本值为项目级默认约定（非契约项），变更不需 CR 但须在此登记",
+      "implementation": "web/src/features/jobs/polling.ts（M0-03/S6-S9 交付，唯一 202 轮询 composable；A25：UI-25 与契约 11 个 202 op 必须复用，禁各处自建）"
     },
     "dev_proxy_target": {
       "title": "dev/preview 的 /api 反代目标端口（R3-Q1 裁定落地）",
@@ -6090,6 +6365,27 @@
       "why_hardcoded": "web/vite.config.ts 必须保持对象形态导出（vitest.config.ts 以 ...viteConfig 展开继承别名与 server），故不可用 defineConfig 函数形态 + loadEnv；web/package.json 未声明 @types/node，故不可用 process.env。真实覆盖路径仍是 src/api/http.ts 的 VITE_API_BASE_URL。",
       "changeOrigin": "false（刻意保留原始 Host，使后端 OriginHostGuard 能真正校验；改 true 会让守卫永远看到 127.0.0.1 而成为假绿）",
       "note": "项目级默认约定而非契约项，变更不需 CR 但须在此登记"
+    },
+    "monthly_analysis_result_kind": {
+      "title": "月报分析结果在 analysis_results / artifacts 的落点口径（A17，含编排器自我更正）",
+      "status": "ACCEPTED",
+      "accepted_at": "2026-11-13T08:42:00+08:00",
+      "analysis_results_kind": "review",
+      "discriminator": "input_json.profile == 'BANK_MONTHLY_V1'（input_json 只有 CHECK(json_valid(...))、无枚举约束，属非冻结面）",
+      "artifacts_kind": "COMPUTATION",
+      "ddl_evidence": "contracts/sqlite-v1.sql:102 analysis_results.kind CHECK IN ('comparison','review','diagnosis','question')；artifacts.kind CHECK IN ('SOURCE','CLAUSE','COMPUTATION','TRACE','PREFLIGHT','RECEIPT','SIGNATURE','EXPERIMENT','REVIEW_NOTE')",
+      "forbidden": "扩任一 kind 枚举＝改 contracts/sqlite-v1.sql 与 migrations/** 的 CHECK＝CR 级变更，且会打破 tests/integration/bootstrap/test_migration_equivalence.py 与 tests/unit/test_migration_schema.py 的 DDL 等价断言（分母取 ddl_compare.EXPECTED_TABLE_COUNT）→ 禁止",
+      "supersedes": "orchestrator/handoff/D-016-batch3-context.md §8 第 2 项里编排器臆断的 kind='monthly_review'（已作废，见 context §10 ①）",
+      "note": "项目级落地口径而非契约项，变更不需 CR 但须在此登记"
+    },
+    "monthly_missing_state_carrier": {
+      "title": "月报 MISSING/取数清单的契约承载位置（A30，实测确定、无需新增字段）",
+      "status": "ACCEPTED",
+      "accepted_at": "2026-11-13T08:42:00+08:00",
+      "state_field": "Review.monthly_review.state，枚举实测 ['FULL','PARTIAL','MISSING']（Review.state 同枚举）",
+      "issues_field": "MonthlyReview.issues[]，元素为 Issue={code,location,message,severity}",
+      "missing_list_field": "Review.missing_requirements（Review 的既有必填字段）",
+      "schema_evidence": "MonthlyReview 实测 13 个属性全 required 且 additionalProperties=false → 禁增删字段"
     }
   }
 }

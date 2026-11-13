@@ -28,13 +28,9 @@ TASK_TOTAL_DENOMINATOR = 29
 KNOWN_MISSING: frozenset[str] = frozenset(
     {
         "M1-04",
-        "M1-P01",
         "M2-04",
         "M3-04",
-        "M3-P01",
         "M3-P02",
-        "M4-02",
-        "M4-03",
         "M4-P01",
         "M5-01",
         "M5-02",
