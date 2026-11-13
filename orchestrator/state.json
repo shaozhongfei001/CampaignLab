@@ -580,6 +580,38 @@
           "tests/unit/test_job_repository_terminal.py(776 行/21 测试)",
           "orchestrator/handoff/M0-04-design.md(13 add/0 del)"
         ]
+      },
+      {
+        "task": "D-016-batch5",
+        "subtask": "补卡批次5（3 张：M1-04/M2-04/M3-04）+ KNOWN_MISSING 6->3",
+        "lane": "T",
+        "agent_id": "01a1d33a-d519-7293-80a3-ebd4715c439d",
+        "nickname": "Ramanujan",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 3,
+        "loop_used": 1,
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal/remainingTokens/completionBudgetReport 全 null；按纪律记 null，禁估算。客观量：约 40 次工具调用、三卡正文合计 66107 B、内含 1 次自证数字返工（M2-04 档位表 flash token 38k->34k、合计 112k->108k，脚本重算发现）",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；批次演进 181k/8卡 -> 50k/4卡 -> 批次5 三卡 66107B（22.0k每卡）；无计量值故不判越限",
+        "returned_at": "2026-11-13T13:13:55+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "编排器独立复验：磁盘卡 26 + 缺口 3 == 29；三卡 head/tail/total 自算达标；KNOWN_MISSING numstat 0/3；守护 26 passed；ruff format/check + mypy 全 rc=0",
+        "deviations_reported": [
+          "档位表第二列用「档位」而非派单文所写「模型」（以 test_task_card_narrative.py 的 REQUIRED_TABLE_HEADER 为准，语义等价 -> 派单文措辞待更正，见 R8-3）",
+          "AC 原文权威路径实为 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md（派单文写的 spec/CampaignLab-SDD-v1.0/ACCEPTANCE.md 不存在）-> R8-3",
+          "A102 裁定文写「AC-024 primary 仍 M3-04」与台账实测 primary=M3-02 冲突 -> 待裁（round8_pending_rulings.U-3）"
+        ],
+        "outputs": [
+          "orchestrator/tasks/M1-04.md(77行/21371B)",
+          "orchestrator/tasks/M2-04.md(78行/22994B)",
+          "orchestrator/tasks/M3-04.md(77行/21742B)",
+          "tests/unit/test_task_cards.py(0 add/3 del)"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -4688,7 +4720,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 167,
+        "ruff_formatted_files": 170,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4697,9 +4729,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 167,
+          "total": 170,
           "in_scope_py": 66,
-          "in_scope_md": 101,
+          "in_scope_md": 104,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4716,7 +4748,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 158,
+          "prev_total": 167,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4941,8 +4973,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T13:13:56+08:00",
-      "counts_refresh_reason": "Round 7 Lane B（M0-04/S2）入库后重采样：ruff_formatted_files 158->167（py 57->66 = worker/ 7 模块 + 2 个测试文件；md 101 不变，M0-04-design.md 属 append-only 修改）。采样点依 A101/rule_counts_same_commit（12 路径已 git add、台账写入之后、commit 之前）。pytest_passed/mypy 全表值待本 checkpoint 的 clean-tree 全表复跑后回填（Volta 回收后在飞 lane 仍有 Bohr/Lagrange，故本次提交仍缓跑全表）",
+      "counts_refreshed_at": "2026-11-13T13:14:03+08:00",
+      "counts_refresh_reason": "Round 8 Lane T（D-016 批次5）入库后重采样：ruff_formatted_files 167->170（md 101->104 = M1-04.md + M2-04.md + M3-04.md；py 66 不变）。KNOWN_MISSING 6->3，磁盘卡 23->26，双向对账 26+3==29",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -6270,25 +6302,15 @@
       "recorded_at": "2026-11-13T04:40:00+08:00",
       "source": "D-016 / Q-VERIFY-M0-01 F 项",
       "tasks_in_state": 29,
-      "cards_on_disk": 20,
-      "missing": 9,
+      "cards_on_disk": 26,
+      "missing": 3,
       "missing_ids": [
-        "M1-04",
-        "M2-04",
-        "M3-04",
         "M3-P02",
-        "M4-P01",
-        "M5-01",
-        "M5-02",
         "M5-03",
         "M5-P01"
       ],
-      "missing_critical": 5,
+      "missing_critical": 1,
       "missing_critical_ids": [
-        "M4-P01",
-        "M5-01",
-        "M5-02",
-        "M5-03",
         "M5-P01"
       ],
       "blocking": "手册 15.5 无拆解表不得 spawn → wave2 起整条 DAG 实质停摆",
@@ -6574,6 +6596,28 @@
         "identity": "磁盘卡 23 + KNOWN_MISSING 6 == 29",
         "status": "DELIVERED_VERIFIED",
         "next": "批次5 候选 M1-04/M2-04/M3-04（wave4，slack>0）或 M3-P02（wave7）；FU-5：批次5 卡须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs 并落 A31 的页面证据归属；A61/A67 防复发：context 生成前必须 dump 切片实际键集"
+      },
+      "batch5": {
+        "dispatched_at": "2026-11-13T12:35:00+08:00",
+        "agent": "Ramanujan（qwen3.8-flash）",
+        "ids": [
+          "M1-04",
+          "M2-04",
+          "M3-04"
+        ],
+        "expected_known_missing_after": "6 -> 3",
+        "status": "RETURNED_VERIFIED",
+        "returned_at": "2026-11-13T13:13:55+08:00",
+        "actual_known_missing_after": 3,
+        "orchestrator_reverify": "编排器独立实测：磁盘卡 26 + 缺口 3 == 29 双向对账相等；三卡 head/tail/total = 47/19/78、48/19/79、48/20/78（上限 60/40/200 全部达标）；档位表四列且行数 10/10/8；KNOWN_MISSING 变更 numstat 0 add / 3 del（仅移除三个 id，其余字节未动）；编码三断言全过；守护 26 passed、ruff format --check 4 files already formatted，全 rc=0",
+        "card_bytes": {
+          "M1-04": 21371,
+          "M2-04": 22994,
+          "M3-04": 21742
+        },
+        "ac_two_column": "依 A107 两栏撰写：三卡栏一（本任务 primary）均为 **0 条**（acceptance.primary_owner.basis 明载「页面呈现面一律记 cross_ref」），栏二 cross_ref 分别 11/15/11 条，每条含 primary 归属 + ACCEPTANCE.md 行号 + 「页面渲染证据由本卡提供、AC 取证归属 primary 任务」",
+        "page_ownership": "依 A102-A106 终裁写入：M1-04=UI-06..11；M2-04=UI-02/03/04/05/12/13/16 + UI-14/15/20；M3-04=UI-17/19 + UI-18；UI-25 未写进任何一张卡（A105 归 M4-03 / FU-18）",
+        "pending_rulings": "7 项 U 上交，见 resume.round8_pending_rulings（其中 U-1 为阻塞级：M2-04 切片缺 UI-14/15/20 正文与 listRuns/getRun/getRunCase/computeEstimate/createCandidate 等 op，需重切后 S7/S8 方可开工）"
       }
     },
     "cr002_merge": {
@@ -9003,8 +9047,75 @@
           "A91",
           "A115"
         ]
+      },
+      {
+        "id": "R8-3",
+        "at": "2026-11-13T13:13:55+08:00",
+        "what_was_wrong": "批次5 派单文两处措辞与实际不符：① 档位表表头第二列写「模型」，而 test_task_card_narrative.py 的 REQUIRED_TABLE_HEADER 逐字为「| 子任务 | 档位 | 预估 token | 产出 |」；② AC 原文路径写 spec/CampaignLab-SDD-v1.0/ACCEPTANCE.md，实测不存在，权威在 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md（52 行）",
+        "how_found": "Lane T（Ramanujan）偏差清单第 1、2 条主动上报",
+        "correction": "以守护测试与磁盘实测为准（lane 处置正确，未擅改任一侧）；卡内行号全部按 qa/ACCEPTANCE.md 实测",
+        "prevention": "派单文引用守护测试的期望字面量与 spec 路径前必须先实测；模板固化「档位」措辞与 qa/ACCEPTANCE.md 路径",
+        "related": [
+          "D-018",
+          "D-011"
+        ]
       }
-    ]
+    ],
+    "round8_pending_rulings": {
+      "at": "2026-11-13T13:13:55+08:00",
+      "source": "Lane T（Ramanujan）批次5 回报的 7 项 U + 2 处派单文措辞",
+      "status": "PENDING（checkpoint 前未终裁，下次会话开工首件事）",
+      "items": [
+        {
+          "id": "U-1",
+          "level": "BLOCKING",
+          "q": "M2-04 切片缺 A102/A104 新判归的 UI-14/UI-15/UI-20 正文，且活契约的 listRuns/getRun/getRunCase/computeEstimate/createCandidate 等 op 未进该切片 26 op",
+          "provisional": "建议重切：--ops 取原 26 op ∪ 上述 5 op（须先按 round8_batch5_slice_plan.method 第④步从三页 spec 正文实抽 op 字面相交集，禁凭建议清单直接写死）、--ui 补 UI-14,UI-15,UI-20、--depth 6（A108）；重切后校验 truncated_schemas==[] 并更新 M2-04 卡的 slice 指纹引用与 S7/S8 解挂"
+        },
+        {
+          "id": "U-2",
+          "level": "ACTION",
+          "q": "三卡 scope_allow 依 D-008 补的落点（各卡 handoff/<id>-design.md、evidence/<M>/<id>/**、evidence/<M>/summaries/<id>.md，M2-04 另含 web/tests/unit/cases/**）需同步进 state.json",
+          "provisional": "按 A5 归一化约定并入 tasks[id].scope（目录通配 X/** 与尾斜杠 X/ 等价），并记 scope_synced_from_card"
+        },
+        {
+          "id": "U-3",
+          "level": "RULING",
+          "q": "A102 裁定文「AC-024 primary 仍 M3-04」与台账 acceptance.primary_owner.AC-024.primary=M3-02 冲突，更正哪一侧",
+          "provisional": "**以台账为准**（primary_owner 47 条自洽且经守护校验），A102 追加更正注记（原文不改写）；M3-04 卡采 (a)：保留 AC-024 的 cross_ref 但不提供 UI-20 页面证据（UI-20 归 M2-04，A102）"
+        },
+        {
+          "id": "U-4",
+          "level": "RULING",
+          "q": "三卡 gate 字面范围大于 acs（M1-04 含 AC-006..010、M2-04 含 AC-013..016、M3-04 含 AC-019..023）",
+          "provisional": "**允许**：gate 面按「页面呈现的全部 AC」列（栏二 cross_ref），tasks[id].acs 保持「主责或强相关」语义不变；两者口径差异写进 A107 的解释，禁为对齐而扩 acs（会污染 primary_owner 分母）"
+        },
+        {
+          "id": "U-5",
+          "level": "RULING",
+          "q": "M3-04 的 scope_allow web/src/pages/review/** 与 scope_deny web/src/pages/review/monthly/**（M3-P02 写权）字面包含冲突",
+          "provisional": "**deny 优先**（卡内已按此撰写）；并在 tasks[M3-04].scope 侧显式登记排除项，避免 M3-P02 派单时双双主张写权"
+        },
+        {
+          "id": "U-6",
+          "level": "RULING",
+          "q": "M1-04 的 UI-09/UI-10 是否要求页面提供 registerEvidence 登记入口（涉 M4-02 写权）",
+          "provisional": "**只读展示**（卡内现状）：登记入口归 M4-02，页面侧只消费；如需入口须由 M4-02 卡与 M1-04 卡互相点名，禁单方扩权"
+        },
+        {
+          "id": "U-7",
+          "level": "CALIBER",
+          "q": "三卡栏一均为 0 条 primary，是否确认「页面任务卡栏一可为空」并写入批次6 派单文",
+          "provisional": "**确认**：页面呈现面一律 cross_ref（acceptance.primary_owner.basis 原文），栏一为空是正确结果而非缺漏；批次6（M3-P02/M5-P01）派单文须明载此口径"
+        },
+        {
+          "id": "W-1",
+          "level": "WORDING",
+          "q": "派单文两处与实际不符：档位表表头第二列应为「档位」而非「模型」；AC 原文路径应为 spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md",
+          "provisional": "自我更正 R8-3；后续派单文模板统一改用「档位」与 qa/ACCEPTANCE.md 路径"
+        }
+      ]
+    }
   },
   "acceptance": {
     "baseline_total": 35,

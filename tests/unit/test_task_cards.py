@@ -27,9 +27,6 @@ TASK_TOTAL_DENOMINATOR = 29
 # D-016 登记时的已知缺口（25 张，其中 14 张 critical=true）。补齐一张即须从此处删掉一个 id。
 KNOWN_MISSING: frozenset[str] = frozenset(
     {
-        "M1-04",
-        "M2-04",
-        "M3-04",
         "M3-P02",
         "M5-03",
         "M5-P01",
