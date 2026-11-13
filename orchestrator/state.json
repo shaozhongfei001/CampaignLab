@@ -4901,7 +4901,7 @@
       "counts": {
         "pytest_passed": 350,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 180,
+        "ruff_formatted_files": 181,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4910,9 +4910,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 180,
+          "total": 181,
           "in_scope_py": 69,
-          "in_scope_md": 111,
+          "in_scope_md": 112,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4920,7 +4920,7 @@
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
           "measured_after": "2026-11-13T13:29:43+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式两个时点均成立：① 提交前实测 tracked in-scope py+md 176（py 69 + md 107）+ untracked in-scope 4 == ruff format --check 报数 180；② 提交后 tracked in-scope py+md 180（py 69 + md 111）+ untracked 0 == ruff format --check 报数 180。复现命令见本对象 reproduce_py / reproduce_md / identity_cmd 三键。",
+          "identity": "A101 恒等式在三个时点均成立：① 首提交前 tracked 176（py 69 + md 107）+ untracked 4 == ruff 报数 180；② 首提交后 tracked 180（py 69 + md 111）+ untracked 0 == ruff 报数 180（实测）；③ 第二提交前 tracked 180 + untracked 1 == ruff 报数 181（实测），提交后 tracked 181（py 69 + md 112）+ untracked 0 == 181。复现命令见本对象 reproduce_py / reproduce_md / identity_cmd 三键。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4929,7 +4929,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 176,
+          "prev_total": 180,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4943,7 +4943,7 @@
           "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入分母：git ls-files 只反映索引；Volta 的 repositories.py/application/worker.py 属已跟踪文件修改（不改文件数），src/campaignlab/worker/** 与其两测试尚未落盘。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫",
           "untracked_in_scope_md": 0,
           "identity_measured_at": "2026-11-13T13:23:04+08:00",
-          "caliber_note": "counts 为**本次提交后的树**口径（A101：counts 必须与新增文件同一次提交刷新）：in_scope_md 111 = 提交前 tracked md 107 + 本次提交新增 4 个 md（D-034.md / D-035.md / round8-lane-returns-digest.md / CHECKPOINT-2026-11-13-R8.md）；in_scope_py 69 不变（本 checkpoint 未新增任何 .py）。提交前实测 untracked in-scope md = 4，提交后归 0。"
+          "caliber_note": "counts 为**本次提交后的树**口径（A101：counts 必须与新增文件同一次提交刷新）：in_scope_md 112 = checkpoint 首提交（bf54162）后的 tracked md 111 + 第二提交新增 1 个 md（orchestrator/handoff/round8-lane-returns-raw.md）；in_scope_py 69 不变（本 checkpoint 全程未新增任何 .py）。提交前实测 untracked in-scope md = 1，提交后归 0。"
         },
         "ruff_lint_scope_files": 24,
         "ruff_format_check_rc_after_governance_files": 0,
@@ -5159,8 +5159,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T13:23:04+08:00",
-      "counts_refresh_reason": "Round 8 关机 checkpoint：四 lane 全部入库后的全表复跑真值回填。ruff_formatted_files 176->180（+4 md = D-034/D-035/round8-lane-returns-digest/CHECKPOINT-2026-11-13-R8；py 69 不变）；pytest_passed 213->350（G10 全表实测）；mypy_source_files 因 D-035 不可测，保留 49 并加注。",
+      "counts_refreshed_at": "2026-11-13T13:29:43+08:00",
+      "counts_refresh_reason": "Round 8 关机 checkpoint（两段提交）：① bf54162 回填全表真值并新增 4 md -> ruff_formatted_files 176->180（py 69 不变，md 107->111）、pytest_passed 213->350（G10 全表实测）、mypy_source_files 因 D-035 不可测保留 49 并加注；② 本提交新增 orchestrator/handoff/round8-lane-returns-raw.md（四 lane 原始回报存档，R8-9）-> 180->181（md 111->112）。",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -8408,7 +8408,9 @@
       "rule_counts_same_commit": "A101（2026-11-13T12:31:47+08:00）：counts 必须与新增文件在**同一次提交**内刷新，采样点 = 工作树 == 待提交树（新增文件已 git add）且台账写入之后、commit 之前；违反则 tests/unit/test_counts_freshness.py 在下一次提交后判红。为 rule_counts_sampling_point（R6-3）的推论。派单文禁写死计数、一律指向 resume.self_check_gates_rc0.counts 现值（D-012/D-014）。在飞 lane 的未入库文件不计入分母（git ls-files 只反映索引；守护从 git ls-tree -r HEAD 取数）。",
       "rule_no_hardcoded_symbol_counts": "R8-1/A115（2026-11-13T13:13:55+08:00）：派单文与卡片**禁写死符号面计数**（如 __all__ 项数、方法数、字段数），一律写「以 inspect 实取为准」或与 counts 现值对账；只有**冻结面**（如 9 条状态机迁移、20 个 Problem code、4 个既有 JobRepository 方法签名）允许在守护测试里写死，因其语义即「不得增长/改变」。本轮实测两处写错（paths.py::__all__ 16->17、api/common.py::__all__ 52->51）均由 lane 实取发现，未造成实现偏差。",
       "rule_full_tree_mypy_on_basename_collision": "凡新增 conftest.py、或与既有文件**同 basename** 的新文件入库，复验必须跑一次全树 uv run --no-sync mypy，禁以路径限定 mypy 替代（路径限定不会触发跨目录重复模块名检测）。立规原因：R8-4 / D-035 —— 57b6db5 只跑路径限定 mypy（3 source files rc=0）即提交，漏检 G9 全表红灯，且 errors prevented further checking 使三棵树类型检查归零。",
-      "rule_no_trust_handoff_summary_assertions": "会话交接摘要中的存在性/数值断言（副本已存、进度 N/M、提交总数、lane 字母）一律**必须实测复核**后才可采信。立规原因：R8-5（lane 字母）、R8-6（M0-02 6/8 实为 7/8）、R8-7（宿主副本实测不存在）。"
+      "rule_no_trust_handoff_summary_assertions": "会话交接摘要中的存在性/数值断言（副本已存、进度 N/M、提交总数、lane 字母）一律**必须实测复核**后才可采信。立规原因：R8-5（lane 字母）、R8-6（M0-02 6/8 实为 7/8）、R8-7（宿主副本实测不存在）。",
+      "rule_close_agent_returns_raw_report": "关闭任何 lane 句柄（close_agent）**之前**，必须先取回其 previous_status.completed 全文并落盘存档到 orchestrator/handoff/；该全文**仅在 close 动作的当次返回中可得**，句柄关闭后不可再取。立规原因：R8-9 / A122 —— Round 8 四条 lane 的原始回报差点被误判为『已随会话消失』。",
+      "rule_truncation_must_be_marked": "工具输出被截断处必须如实标注 [TRUNCATED] 并注明截断规模，同时给出可从仓库实测恢复的替代路径；**禁臆造补全**。Round 8 实测截断：Volta 中段约 10723 tokens（PROBLEM_CODES 20 个码名仅取回前 2 个）、Ramanujan 约 90 tokens、Bohr 约 38 tokens。"
     },
     "round7_adjudications": [
       {
@@ -8763,6 +8765,15 @@
         "question": "公共件 4 处既有缺陷在 M0-03b 期间不可修（越界），是否现在立单？",
         "ruling": "**按 F-U-7 临时意见立 D-034（MINOR/OPEN，blocking=false）**：细节充足（4 项逐条有原文口径），立单可避免信息随会话丢失。但**严重度与 owner 的最终确认仍待下次开工终裁 F-U-7**（owner 二选一：M0-03 收尾 / 独立 CR）；本单不写死文件路径与行号，因 13 件组件契约表的内容级复核仍为 PENDING_CONTENT_REVIEW（禁凭记忆填数，D-012/D-014）。约束固化：#1 ConfirmDialog 聚焦与 #3 StatusTag 五 tone 同形关联 **AC-032**，须在 M5-01 取证前处理。",
         "action_taken": "D-034 入库；F-U-7 仍留在 round8_pending_rulings_F 待终裁（立单不等于终裁关闭）"
+      },
+      {
+        "id": "A122",
+        "round": 8,
+        "at": "2026-11-13T13:29:43+08:00",
+        "source": "编排器（close_agent 返回值实测）",
+        "question": "四个子智能体句柄关闭后，其原始回报全文是否可恢复？checkpoint 是否应为存档这些原文追加第二段提交（已推送后再提交）？",
+        "ruling": "**可恢复，且必须存档**：close_agent 的返回值携带 previous_status.completed 全文，但**仅在关闭动作的当次返回中可得**，句柄关闭后不可再取。故裁定：① 追加第二段提交把四 lane 原文落盘为 orchestrator/handoff/round8-lane-returns-raw.md；② 立口径规则 rule_close_agent_returns_raw_report —— 今后关闭任何 lane 句柄前，必须先取回并存档其最终回报全文；③ 工具输出截断处如实标注 [TRUNCATED]（本次 Volta 中段约 10723 tokens、Ramanujan 约 90、Bohr 约 38 未取回），并给出可从仓库实测恢复的替代路径（如 PROBLEM_CODES 全集见 src/campaignlab/domain/errors.py），**禁臆造补全**。已推送后追加提交不构成 force-push、不改写历史，符合纪律。",
+        "action_taken": "raw 存档落盘 + digest §7 更正 + R8-9 + 两条口径规则入库 + counts 181 同提交刷新"
       }
     ],
     "round7_predispatch": {
@@ -9415,6 +9426,19 @@
         "related": [
           "resume.environment"
         ]
+      },
+      {
+        "id": "R8-9",
+        "at": "2026-11-13T13:29:43+08:00",
+        "what_was_wrong": "round8-lane-returns-digest.md §5 与 round8_returns 的 reconstruction_basis 原写「原始回报文本随会话句柄关闭而消失」，实测不成立：close_agent 的返回值 previous_status.completed **携带了各 lane 的最终回报全文**。该错误声明会导致后续会话误以为细节不可恢复而放弃查证",
+        "how_found": "执行 close_agent 释放四个句柄时，返回值中直接出现四条 lane 的完整回报文本",
+        "correction": "① 立即将原文落盘存档为 orchestrator/handoff/round8-lane-returns-raw.md（40019 B / 325 行，含 Volta §5.4 符号面实取核对表、Ramanujan AC 两栏明细与返工记录、Bohr 覆盖判定依据与自报 vs 实测 rc 对照、Lagrange 六态行号对照与抽取命令原文）；② digest 追加 §7 更正（append-only，原文不改写）；③ round8_returns 两条的 reconstructed_at_checkpoint 加注澄清语义为『台账条目系补记』而非『原文丢失』",
+        "prevention": "新增两条口径规则：rule_close_agent_returns_raw_report（关闭句柄前必须先取回 previous_status 全文并落盘存档，close 之后不可再取）与 rule_truncation_must_be_marked（工具输出截断处必须如实标注 [TRUNCATED] 并给出可从仓库实测恢复的替代路径，禁臆造补全）",
+        "related": [
+          "round8-lane-returns-raw.md",
+          "round8-lane-returns-digest.md",
+          "A122"
+        ]
       }
     ],
     "round8_pending_rulings": {
@@ -9503,7 +9527,8 @@
           "A115(U-6 -> R8-1)"
         ],
         "reconstructed_at_checkpoint": true,
-        "reconstruction_basis": "本条为 checkpoint 补记（原始回报文本随会话句柄关闭而消失）；重构依据 = budget.subtask_log 对应条目的 verified_by_orchestrator 原文 + 提交实测。禁把补记条目当作原始回报引用。"
+        "reconstruction_basis": "本条台账条目为 checkpoint 补记（依据 budget.subtask_log 对应条目的 verified_by_orchestrator 原文 + 提交实测）。**更正 R8-9**：原始回报全文并**未**丢失 —— 已由 close_agent 返回值取回并存档于 orchestrator/handoff/round8-lane-returns-raw.md，细节以该存档为准（截断处如实标注 [TRUNCATED]）。",
+        "raw_report_archive": "orchestrator/handoff/round8-lane-returns-raw.md"
       },
       {
         "lane": "T",
@@ -9528,7 +9553,8 @@
           "U-1..U-7 + W-1 见 round8_pending_rulings（**全部未终裁**），其中 U-1 为 BLOCKING"
         ],
         "reconstructed_at_checkpoint": true,
-        "reconstruction_basis": "本条为 checkpoint 补记（原始回报文本随会话句柄关闭而消失）；重构依据 = budget.subtask_log 对应条目的 verified_by_orchestrator 原文 + 提交实测。禁把补记条目当作原始回报引用。"
+        "reconstruction_basis": "本条台账条目为 checkpoint 补记（依据 budget.subtask_log 对应条目的 verified_by_orchestrator 原文 + 提交实测）。**更正 R8-9**：原始回报全文并**未**丢失 —— 已由 close_agent 返回值取回并存档于 orchestrator/handoff/round8-lane-returns-raw.md，细节以该存档为准（截断处如实标注 [TRUNCATED]）。",
+        "raw_report_archive": "orchestrator/handoff/round8-lane-returns-raw.md"
       },
       {
         "lane": "S",
@@ -9547,7 +9573,8 @@
           "A117(U-2 -> D-033)",
           "A118(U-3)",
           "A119(U-4)"
-        ]
+        ],
+        "raw_report_archive": "orchestrator/handoff/round8-lane-returns-raw.md"
       },
       {
         "lane": "F",
@@ -9562,7 +9589,8 @@
         "orchestrator_verification": "7 项机械复验全吻合（编码/ruff/外部注册/色值/越界/六态行号抽样/章节行号）；内容级复核（13 件组件契约表逐条对代码）顺延至下次会话，已在 checkpoint 标 PENDING_CONTENT_REVIEW",
         "adjudications_raised": [
           "U-1..U-7 见 round8_pending_rulings_F，其中 U-2 为 S4 阻塞级"
-        ]
+        ],
+        "raw_report_archive": "orchestrator/handoff/round8-lane-returns-raw.md"
       }
     ],
     "round8_pending_rulings_F": {
@@ -9624,10 +9652,11 @@
         "host": "WSL2 Ubuntu ext4",
         "branch": "m0-framework",
         "remote": "git@github.com:shaozhongfei001/CampaignLab.git",
-        "head_at_pause": "248f852",
+        "head_at_pause": "PENDING(第二提交 sha；第一提交为 bf54162)",
         "ahead_behind_at_pause": "0/0（本 checkpoint 提交前实测）",
         "commits_total_before_checkpoint": 72,
-        "worktree_at_pause": "本 checkpoint 提交后应为干净（提交前仅 4 个新 md 未跟踪；orchestrator/checkpoints/ 已按 snapshot.disposal 处置归零）"
+        "worktree_at_pause": "本 checkpoint 提交后应为干净（提交前仅 4 个新 md 未跟踪；orchestrator/checkpoints/ 已按 snapshot.disposal 处置归零）",
+        "commits_total_after_first_checkpoint_commit": 73
       },
       "round8_commits": [
         {
@@ -9808,6 +9837,7 @@
       "files_added_by_this_checkpoint": [
         "docs/delivery/CHECKPOINT-2026-11-13-R8.md",
         "orchestrator/handoff/round8-lane-returns-digest.md",
+        "orchestrator/handoff/round8-lane-returns-raw.md",
         "orchestrator/defects/D-035.md",
         "orchestrator/defects/D-034.md"
       ],
@@ -9847,13 +9877,52 @@
         "R8-5（lane 字母口径）",
         "R8-6（M0-02 6/8 实为 7/8）",
         "R8-7（宿主副本实测不存在）",
-        "R8-8（内层双引号 + $? 两处铁律违反）"
+        "R8-8（内层双引号 + $? 两处铁律违反）",
+        "R8-9（误称原始回报已消失；实已由 close_agent 取回并存档）"
       ],
       "new_defects_this_checkpoint": [
         "D-034（MINOR/OPEN，公共件 4 处既有缺陷，2 项关联 AC-032）",
         "D-035（MAJOR/OPEN/BLOCKING，G9 mypy 红灯）"
       ],
-      "human_tier_reminder": "M5-03 属 human tier，须用户本人确认，编排器与任何子智能体禁代完禁代签；CR-002 已由用户裁定采选项 B（从契约移除 listWorkspaces.status），执行须走契约变更流程（contracts/** 只读，须 CR + 重新登记 + 刷新 live_openapi_sha16）；sudo 密码只经 stdin 传入，禁写入任何文件或日志。"
+      "human_tier_reminder": "M5-03 属 human tier，须用户本人确认，编排器与任何子智能体禁代完禁代签；CR-002 已由用户裁定采选项 B（从契约移除 listWorkspaces.status），执行须走契约变更流程（contracts/** 只读，须 CR + 重新登记 + 刷新 live_openapi_sha16）；sudo 密码只经 stdin 传入，禁写入任何文件或日志。",
+      "checkpoint_commits": [
+        {
+          "seq": 1,
+          "sha": "bf54162",
+          "what": "chore(checkpoint): Round 8 关机暂停点 —— 全表门禁真值回填 + 立 D-034/D-035 + 快照保全（5 files changed, +1008/-75）"
+        },
+        {
+          "seq": 2,
+          "sha": "PENDING(本提交)",
+          "what": "chore(checkpoint): 追加四 lane 原始回报存档（R8-9 / A122）+ counts 180->181 同提交刷新"
+        }
+      ],
+      "lane_raw_report_archive": {
+        "path": "orchestrator/handoff/round8-lane-returns-raw.md",
+        "bytes": 40019,
+        "lines": 325,
+        "source": "close_agent 返回的 previous_status.completed 原文（四 lane）",
+        "truncation": "Volta 中段约 10723 tokens / Ramanujan 约 90 / Bohr 约 38 未取回，文中如实标注 [TRUNCATED]",
+        "rule": "rule_close_agent_returns_raw_report（A122）：今后关句柄前必须先取回并存档"
+      },
+      "post_commit_verification": {
+        "first_commit": {
+          "sha": "bf54162",
+          "push_rc": 0,
+          "ahead_behind": "0/0",
+          "worktree": "clean",
+          "guards": "test_counts_freshness 5 passed（提交前 test_committed_tree_denominator 一项如期 RED，提交后转绿）；test_state_ledger + test_task_cards + test_task_card_narrative + test_wave_deps_consistency + test_counts_freshness 合计 31 passed rc=0",
+          "identity": "tracked 180 + untracked 0 == ruff 报数 180；HEAD 树 py=69 md=111",
+          "readonly": "git status --porcelain spec/ contracts/ = 空；sha256sum contracts/openapi.json | cut -c1-16 = 592571099d638251",
+          "snapshot_dir_gone": "orchestrator/ 下已无 checkpoints/（ls 实测：BLOCKERS.md change-requests defects handoff state.json tasks）"
+        },
+        "second_commit": {
+          "pre_commit_identity": "tracked 180 + untracked 1 == ruff 报数 181（实测）",
+          "ruff": "format 2 files left unchanged rc=0；format --check . 181 files already formatted rc=0；check . All checks passed rc=0"
+        }
+      },
+      "handles_closed_at": "2026-11-13T13:29:43+08:00",
+      "handles_note": "四个句柄（Volta/Ramanujan/Bohr/Lagrange）均已 close_agent 释放，并发槽归零；previous_status 均为 completed，原文已存档（见 lane_raw_report_archive）。"
     }
   },
   "acceptance": {

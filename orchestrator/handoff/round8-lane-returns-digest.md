@@ -101,3 +101,16 @@ d140738 chore(orchestrator): Round 8 predispatch（A102-A109 + D-031/D-032 + 台
 - 仓库内 `orchestrator/checkpoints/` 的 13:02 在飞快照（`R8-inflight-tracked-*.patch` + `R8-inflight-untracked-*.tar`）**不入库**：
   四 lane 产物已全部提交推送，快照已无恢复价值；宿主副本保留于 `D:\ws\codex_rd\ss_campaignlab\.orch_checkpoints\20261113-130246\`。
 - 处置方式：先逐文件 sha256 比对宿主副本与仓库内字节一致 → 再删除仓库内两文件（单一 shell 端到端、显式绝对路径、先验后删）→ 工作树归零。
+
+## 7. 更正 R8-9（append-only，原文不改写）
+
+§5 第 1 条原写「原始回报文本随会话句柄关闭而消失」，**实测不成立**：四个句柄 `close_agent` 的返回值
+（`previous_status.completed`）**携带了各 lane 的最终回报全文**。故：
+
+- 原始回报已落盘存档 → `orchestrator/handoff/round8-lane-returns-raw.md`（含 Volta 的 §5.4 符号面实取核对表、
+  Ramanujan 的 AC 两栏明细与返工记录、Bohr 的覆盖判定依据与自报/实测 rc 对照、Lagrange 的六态行号对照与抽取命令原文）。
+- `resume.round8_returns` 中 Volta / Ramanujan 两条的 `reconstructed_at_checkpoint = true` 应理解为
+  **「台账条目系 checkpoint 补记」**，而非「原文已丢失」；已取回原文的部分**以 raw 存档为准**。
+- **⚠️ 工具截断**：`close_agent` 输出对 Volta 中段约 **10723 tokens 被截断**（`domain/errors.py::PROBLEM_CODES`
+  的 20 个码名只取回前 2 个），Ramanujan 约 90 tokens、Bohr 约 38 tokens 被截断。截断部分**未取回**，
+  raw 存档中如实标注 `[TRUNCATED]`，**禁臆造补全**；`PROBLEM_CODES` 全集可从 `src/campaignlab/domain/errors.py` 实测恢复。
