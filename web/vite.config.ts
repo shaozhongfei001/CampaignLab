@@ -29,7 +29,7 @@ const toAbsoluteDir = (relative: string): string => {
 //   2) web/package.json 未声明 @types/node，故不可用 process.env（与本文件上方不用 node:path 同理）；
 //   3) loadEnv 需要把配置改成函数形态，同样违反 1)。
 // 端口 8000 由编排器实测选定：127.0.0.1:8000 FREE、8080 FREE、5173 为 vite 自身，
-// 宿主 3000/3001/3002 实测 BUSY（NOTE-01）。该端口是**项目级默认约定**而非契约项，
+// 宿主侧 host 端口段见 NOTE-01 实测记录（三个被占端口一律避开）。该端口是**项目级默认约定**而非契约项，
 // 已登记于 orchestrator/state.json -> decisions.dev_proxy_target；后端 config.py/cli.py 落地时
 // （M0-02/S3c）必须取同一默认值，否则前后端起在不同端口上。
 //
