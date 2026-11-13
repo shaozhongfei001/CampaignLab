@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T12:43:29+08:00",
+  "updated_at": "2026-11-13T12:49:32+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -4349,6 +4349,61 @@
         "reasoning_effort": "high",
         "budget": "50k",
         "dispatched_at": "2026-11-13T11:53:59+08:00"
+      },
+      {
+        "agent_id": "01a1d33a-d519-7293-80a3-ebd4715c439d",
+        "nickname": "Ramanujan",
+        "lane": "T",
+        "task": "D-016-batch5",
+        "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+        "tier": "qwen3.8-flash",
+        "budget": "40k",
+        "loop_cap": 2,
+        "dispatched_at": "2026-11-13T12:49:32+08:00",
+        "write_set": [
+          "orchestrator/tasks/M1-04.md",
+          "orchestrator/tasks/M2-04.md",
+          "orchestrator/tasks/M3-04.md",
+          "tests/unit/test_task_cards.py(仅 KNOWN_MISSING 字面量)"
+        ]
+      },
+      {
+        "agent_id": "01a1d33b-8c31-72e3-80ac-09f156ac0893",
+        "nickname": "Bohr",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S4 契约测试参数化（写集依 A84 收窄为 tests/api/**）",
+        "tier": "qwen3.8-flash",
+        "budget": "20k",
+        "loop_cap": 2,
+        "dispatched_at": "2026-11-13T12:49:32+08:00",
+        "write_set": [
+          "tests/api/**"
+        ],
+        "constraints": [
+          "A95 declared_responses() 为状态码权威",
+          "A96 SameSite 大小写不敏感",
+          "FU-12 正向覆盖且禁改名既有两条用例",
+          "D-030/A94 的 413 必须有真绿用例",
+          "jobs 相关 deferred_to M0-04/S4"
+        ]
+      },
+      {
+        "agent_id": "01a1d33c-5eb5-77b2-ba56-53fdab6594c9",
+        "nickname": "Lagrange",
+        "lane": "F",
+        "task": "M0-03+M0-03b",
+        "subtask": "S10 公共组件清单与冻结边界 -> M0-03b/S1 六态冻结面裁定（仅两份文档，不动代码）",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "budget": "32k",
+        "loop_cap": "3+1",
+        "dispatched_at": "2026-11-13T12:49:32+08:00",
+        "write_set": [
+          "orchestrator/handoff/M0-03-public-components.md",
+          "orchestrator/handoff/M0-03b-freeze.md"
+        ],
+        "note": "M0-03/S10 是 M0-03b 的 inputs 前置（D-032 回填时实测确认 handoff 无该文件）；M0-03b 卡 dispatch 段要求 S1 与 S2-S4 分两次 spawn，本次只做 S1（max），S2-S4（flash）另派"
       }
     ],
     "dispatch_requirements": [
@@ -6105,6 +6160,43 @@
         "parallel_safety": "三方写集两两不相交（逐路径实测比对，见 round7_predispatch.disjointness_recheck 与 lane_c_plan_correction_R7_1.disjointness_recheck）；PRE-5 成员面已 inspect 实取核对（NotImplementedError=0、三 Protocol 有真实成员面）；M0-04/S2 的 N6 前置（S3c=f457ec9、S3d=46dca2b 均已入库）达成",
         "toolchain_policy": "三 lane 一律只准跑路径限定门禁，禁跑全仓 pytest/mypy/ruff check ./ruff format --check ./doctor.sh/verify.sh 与任何 npm/node/vite/vitest/playwright；非自有文件红点禁自行修复只回报归因；一律禁 git 写操作。全表复验为编排器回收后独占动作（手册第 746 行假 RED 窗口）",
         "plan_correction": "R7-1：Lane C 由 D-016 批次5 改派 FU-8+FU-14，批次5 顺延至 Round 8 predispatch（理由见 round7_predispatch.lane_c_plan_correction_R7_1.reason）；FU-15 一并顺延（需先设计已裁定豁免白名单机制）"
+      },
+      {
+        "round": 8,
+        "at": "2026-11-13T12:49:32+08:00",
+        "predispatch_commit": "d140738",
+        "mode": "parallel-lanes",
+        "lanes": [
+          {
+            "lane": "B(承 Round 7)",
+            "agent": "Volta",
+            "task": "M0-04/S2",
+            "tier": "qwen3.8-max high",
+            "status": "IN_FLIGHT(自 11:53:59)"
+          },
+          {
+            "lane": "T",
+            "agent": "Ramanujan",
+            "task": "D-016 批次5",
+            "tier": "qwen3.8-flash"
+          },
+          {
+            "lane": "S",
+            "agent": "Bohr",
+            "task": "M0-02/S4",
+            "tier": "qwen3.8-flash"
+          },
+          {
+            "lane": "F",
+            "agent": "Lagrange",
+            "task": "M0-03/S10 + M0-03b/S1",
+            "tier": "qwen3.8-max high"
+          }
+        ],
+        "concurrency_check": "手册 §7：同 wave 内开发 lane <=3 + QA 1。本轮开发 lane = Volta(M0-04/S2) + Bohr(M0-02/S4) + Lagrange(M0-03b/S1) = 3，T lane(Ramanujan) 为治理/卡片撰写非开发 lane -> 合规；§15.11 并发槽已在派单前显式释放（Newton、Franklin 于各自提交后 close_agent）",
+        "write_set_disjointness": "实测四者写集两两无交集：Volta=src/campaignlab/worker/**+infra/db/repositories.py+application/worker.py+tests/unit/test_worker_runner.py+test_job_repository_terminal.py+handoff/M0-04-design.md；Ramanujan=orchestrator/tasks/{M1-04,M2-04,M3-04}.md+tests/unit/test_task_cards.py；Bohr=tests/api/**；Lagrange=handoff/M0-03-public-components.md+handoff/M0-03b-freeze.md",
+        "gates_policy": "在飞期间只跑路径限定门禁 + 守护；全表门禁（全仓 pytest/mypy/ruff/doctor/verify）缓跑至四 lane 全部回收，由编排器独占补跑并回填 self_check_gates_rc0（rule_precommit_full_table）",
+        "predispatch_items": "批次5 三切片入库（A108：M2-04 depth 5->6）+ 5 处页面歧义终裁 A102-A106 + 系统性口径 A107 + D-031/D-032 + 台账回填（M0-02.S3d、M0-03.S3-S9）+ A109 取证口径 + FU-18/FU-19"
       }
     ],
     "q_verify": {
