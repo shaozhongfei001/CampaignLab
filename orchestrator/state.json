@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T11:53:59+08:00",
+  "updated_at": "2026-11-13T12:01:21+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -7889,6 +7889,342 @@
       "predispatch_commit": "af3808b",
       "predispatch_commit_note": "Round 7 predispatch 治理提交 af3808b 已推送（4 路径：state.json + defects/D-029.md + tasks/M0-02.md 的 D-029/A84-A85 卡尾加注 6 行 + handoff/M0-02-S3b.slice.json 素材入库）。提交前 18 项全表实跑 rc==expected（G4c 篡改负例与 G13 npm 未跑并记因）：pytest 213 passed、mypy 49 files、ruff check All checks passed、ruff format 149 files、check_contracts 13=13（--validate 元校验=6）、scripts/doctor.sh HEALTHY(PASS=15 WARN=1 FAIL=0)、CLI doctor DEGRADED(PASS=3 WARN=2 FAIL=0，2 WARN 均非判据项)、G1/G2 基线 rc=0、G3 前端 8/8、G11 字节级复现、G12 PACKAGE 6/6、G4/G4b 负例 rc=2、守护 26 passed；恒等式 py51+md98=149 tracked + untracked 0 == 149；spec+contracts dirty=0；push 后 behind/ahead=0/0。计划修订 R7-1（Lane C 由批次5 改派 FU-8+FU-14）随本 dispatch 提交入库，af3808b 内的原计划按纪律保留于 lane_c_plan_correction_R7_1.original_plan。",
       "dispatched_at": "2026-11-13T11:53:59+08:00"
+    },
+    "round8_batch5_slice_plan": {
+      "at": "2026-11-13T12:01:21+08:00",
+      "prepared_by": "编排器（Round 7 三 lane 在飞期间的前置准备，与三 lane 写集无交集）",
+      "purpose": "Round 8 predispatch 的批次5（M1-04/M2-04/M3-04 三张卡）切片定标，避免届时临时判断",
+      "method": "四步机械定标，全部可复现：① 解析 spec/CampaignLab-SDD-v1.0/ui/INDEX.md 的 26 行页面表取「页面/路由/导航/验收」四列；② 用任务的 acs 与页面 AC 求交集得候选页；③ 用 INDEX.md 的 nav 组与任务 scope 的 web/src/pages/<dir>/ 对应关系消歧（活动与规则->pages/rules/、数据与口径->pages/data/、仿真与验收->pages/cases/、策略复盘->pages/review/、报告与改进+作业与证据->pages/report/+pages/evidence/）；④ 对每个入选页，从该页 spec 文档正文提取与活契约 80 个 operationId 字面相交的 op 作为 --ops（实测有效：UI-06 命中 3 个、UI-17 命中 7 个、UI-02 命中 3 个），并集即该任务的 op 清单。",
+      "key_finding": "acceptance.primary_owner.basis 明载「纯验证任务与**页面呈现面一律记 cross_ref**」，故 M1-04/M2-04/M3-04 的 acs 全部为 cross_ref 而非 primary —— 这三张卡是**页面呈现面**任务，卡内 AC 段落必须按 cross_ref 口径撰写，禁把 primary 归属抄成本任务（D-011：AC 编号与措辞只引原文；A28/FU-3 同型教训）。",
+      "nav_to_scope_dir": {
+        "入口": "M0-03（web/src/**，已交付 UI-01）",
+        "活动与规则": "M2-04 web/src/pages/rules/",
+        "数据与口径": "M1-04 web/src/pages/data/",
+        "仿真与验收": "M2-04 web/src/pages/cases/",
+        "策略复盘": "M3-04 web/src/pages/review/",
+        "报告与改进": "M4-03 web/src/pages/report/",
+        "作业与证据": "M4-03 web/src/pages/evidence/",
+        "月报增量": "M3-P02 pages/review/monthly/、M4-P01 pages/report/monthly/"
+      },
+      "core_page_sets": {
+        "M1-04": {
+          "pages": [
+            "UI-06",
+            "UI-07",
+            "UI-08",
+            "UI-09",
+            "UI-10",
+            "UI-11"
+          ],
+          "basis": "nav 组「数据与口径」全 6 页 -> scope web/src/pages/data/；AC 交集另命中 UI-17（策略复盘，按 route/nav 判归 M3-04，已排除）",
+          "acs": [
+            "AC-005",
+            "AC-011",
+            "AC-020"
+          ],
+          "ac_role": "三条 AC 全部为 cross_ref（primary 分别 M1-01/M1-03/M3-01），符合 acceptance.primary_owner.basis 的「页面呈现面一律记 cross_ref」",
+          "ops_union": [
+            "attachImportFile",
+            "classifyChannel",
+            "configureImport",
+            "correctSnapshot",
+            "createImport",
+            "getComparison",
+            "getEvidence",
+            "getImport",
+            "getJob",
+            "getSnapshot",
+            "listDefinitions",
+            "listImports",
+            "listSnapshots",
+            "publishImport",
+            "registerEvidence",
+            "runComparison",
+            "validateImport",
+            "verifyLinks"
+          ],
+          "ops_union_count": 18,
+          "per_page_ops": {
+            "UI-06": [
+              "createImport",
+              "getImport",
+              "listImports"
+            ],
+            "UI-07": [
+              "attachImportFile",
+              "configureImport",
+              "getImport",
+              "getJob",
+              "getSnapshot",
+              "publishImport",
+              "validateImport"
+            ],
+            "UI-08": [
+              "correctSnapshot",
+              "getEvidence",
+              "getJob",
+              "getSnapshot",
+              "listSnapshots",
+              "registerEvidence"
+            ],
+            "UI-09": [
+              "getEvidence",
+              "listDefinitions",
+              "listSnapshots"
+            ],
+            "UI-10": [
+              "getComparison",
+              "getEvidence",
+              "getJob",
+              "listSnapshots",
+              "runComparison"
+            ],
+            "UI-11": [
+              "classifyChannel",
+              "getEvidence",
+              "verifyLinks"
+            ]
+          },
+          "slice_cmd": "python3 scripts/contract_slice.py --ops attachImportFile,classifyChannel,configureImport,correctSnapshot,createImport,getComparison,getEvidence,getImport,getJob,getSnapshot,listDefinitions,listImports,listSnapshots,publishImport,registerEvidence,runComparison,validateImport,verifyLinks --ac AC-005,AC-011,AC-020 --ui UI-06,UI-07,UI-08,UI-09,UI-10,UI-11 --depth 5 --out orchestrator/handoff/M1-04.slice.json"
+        },
+        "M2-04": {
+          "pages": [
+            "UI-02",
+            "UI-03",
+            "UI-04",
+            "UI-05",
+            "UI-12",
+            "UI-13",
+            "UI-16"
+          ],
+          "basis": "nav 组「活动与规则」4 页 -> scope web/src/pages/rules/；nav 组「仿真与验收」中 route 属 cases/preflight 的 3 页 -> scope web/src/pages/cases/；AC 交集另命中 UI-24（报告与改进，判归 M4-03，已排除）",
+          "acs": [
+            "AC-002",
+            "AC-004",
+            "AC-012",
+            "AC-017"
+          ],
+          "ac_role": "AC-017 primary=M2-03、M2-04 为 cross_ref",
+          "ops_union": [
+            "checkRule",
+            "compareRules",
+            "confirmCase",
+            "confirmRule",
+            "createActivity",
+            "createCase",
+            "createPreflight",
+            "createRule",
+            "createRun",
+            "getActivity",
+            "getCase",
+            "getEvidence",
+            "getPreflight",
+            "getReceipt",
+            "getRule",
+            "listActivities",
+            "listCandidates",
+            "listCases",
+            "listPreflights",
+            "listRules",
+            "recordReceipt",
+            "registerEvidence",
+            "reviewPreflight",
+            "updateActivity",
+            "updateCase",
+            "updateRule"
+          ],
+          "ops_union_count": 26,
+          "per_page_ops": {
+            "UI-02": [
+              "createActivity",
+              "getActivity",
+              "listActivities"
+            ],
+            "UI-03": [
+              "createRule",
+              "getActivity",
+              "getEvidence",
+              "getReceipt",
+              "listPreflights",
+              "listRules",
+              "recordReceipt",
+              "updateActivity"
+            ],
+            "UI-04": [
+              "checkRule",
+              "compareRules",
+              "confirmRule",
+              "getRule",
+              "registerEvidence",
+              "updateRule"
+            ],
+            "UI-05": [
+              "checkRule",
+              "createCase",
+              "getRule"
+            ],
+            "UI-12": [
+              "createCase",
+              "getCase",
+              "listCases"
+            ],
+            "UI-13": [
+              "confirmCase",
+              "createCase",
+              "createRun",
+              "getCase",
+              "registerEvidence",
+              "updateCase"
+            ],
+            "UI-16": [
+              "createPreflight",
+              "getPreflight",
+              "listCandidates",
+              "listPreflights",
+              "registerEvidence",
+              "reviewPreflight"
+            ]
+          },
+          "slice_cmd": "python3 scripts/contract_slice.py --ops checkRule,compareRules,confirmCase,confirmRule,createActivity,createCase,createPreflight,createRule,createRun,getActivity,getCase,getEvidence,getPreflight,getReceipt,getRule,listActivities,listCandidates,listCases,listPreflights,listRules,recordReceipt,registerEvidence,reviewPreflight,updateActivity,updateCase,updateRule --ac AC-002,AC-004,AC-012,AC-017 --ui UI-02,UI-03,UI-04,UI-05,UI-12,UI-13,UI-16 --depth 5 --out orchestrator/handoff/M2-04.slice.json"
+        },
+        "M3-04": {
+          "pages": [
+            "UI-17",
+            "UI-18",
+            "UI-19"
+          ],
+          "basis": "nav 组「策略复盘」全 3 页 -> scope web/src/pages/review/；AC 交集另命中 UI-09（数据与口径，判归 M1-04）与 UI-20（仿真与验收 estimate，见歧义清单）",
+          "acs": [
+            "AC-018",
+            "AC-024",
+            "AC-033"
+          ],
+          "ac_role": "三条 AC 全部为 cross_ref（primary 分别 M3-01/M3-02/M3-01）",
+          "ops_union": [
+            "createAction",
+            "createExport",
+            "createReport",
+            "createThreshold",
+            "executeQuestion",
+            "getDiagnosis",
+            "getEvidence",
+            "getJob",
+            "getQuestion",
+            "getReview",
+            "interpretQuestion",
+            "listSnapshots",
+            "listThresholds",
+            "runDiagnosis",
+            "runReview"
+          ],
+          "ops_union_count": 15,
+          "per_page_ops": {
+            "UI-17": [
+              "createExport",
+              "createReport",
+              "getEvidence",
+              "getJob",
+              "getReview",
+              "listSnapshots",
+              "runReview"
+            ],
+            "UI-18": [
+              "createAction",
+              "createThreshold",
+              "getDiagnosis",
+              "getEvidence",
+              "getJob",
+              "getReview",
+              "listThresholds",
+              "runDiagnosis"
+            ],
+            "UI-19": [
+              "createReport",
+              "executeQuestion",
+              "getEvidence",
+              "getJob",
+              "getQuestion",
+              "interpretQuestion",
+              "listThresholds"
+            ]
+          },
+          "slice_cmd": "python3 scripts/contract_slice.py --ops createAction,createExport,createReport,createThreshold,executeQuestion,getDiagnosis,getEvidence,getJob,getQuestion,getReview,interpretQuestion,listSnapshots,listThresholds,runDiagnosis,runReview --ac AC-018,AC-024,AC-033 --ui UI-17,UI-18,UI-19 --depth 5 --out orchestrator/handoff/M3-04.slice.json"
+        }
+      },
+      "ambiguities": [
+        {
+          "page": "UI-20",
+          "route": "/w/:workspace_id/estimate",
+          "nav": "仿真与验收",
+          "page_acs": [
+            "AC-024",
+            "AC-028"
+          ],
+          "conflict": "nav 组指向 M2-04（pages/cases/），但 AC-024 的 cross_ref 明确点名 M3-04，且 M2-04 的 acs 不含 AC-024/AC-028",
+          "recommendation": "判归 M3-04（依 acceptance.primary_owner 的 AC-024 cross_ref 点名，AC 归属优先于 nav 分组）；但 M3-04 的 scope 只有 web/src/pages/review/，需确认 estimate 页落在 pages/review/estimate/ 还是要扩 scope（属 D-008 同型的 scope 缺项，须编排器同步 state.json）"
+        },
+        {
+          "page": "UI-18",
+          "route": "/w/:workspace_id/diagnosis",
+          "nav": "策略复盘",
+          "page_acs": [
+            "AC-021",
+            "AC-022",
+            "AC-027"
+          ],
+          "conflict": "nav 组指向 M3-04（pages/review/），但三条 AC 无一在 M3-04 的 acs 内（AC-027 primary=M4-02）",
+          "recommendation": "判归 M3-04（route/nav 与 scope 目录一致，且无其他页面任务的 scope 覆盖 /diagnosis）；需在 M3-04 卡内登记 AC-021/AC-022/AC-027 为页面侧 cross_ref"
+        },
+        {
+          "page": "UI-14",
+          "route": "/w/:workspace_id/runs",
+          "nav": "仿真与验收",
+          "page_acs": [
+            "AC-013",
+            "AC-029"
+          ],
+          "conflict": "nav 组指向 M2-04（pages/cases/），但 AC-013/AC-029 均不在 M2-04 的 acs 内（AC-029 primary=M0-04）",
+          "recommendation": "判归 M2-04（route/nav 与 pages/cases/ 一致）；卡内登记两条 AC 为页面侧 cross_ref"
+        },
+        {
+          "page": "UI-15",
+          "route": "/w/:workspace_id/runs/:run_id",
+          "nav": "仿真与验收",
+          "page_acs": [
+            "AC-014",
+            "AC-015",
+            "AC-016",
+            "AC-030"
+          ],
+          "conflict": "同上；AC-016 primary=M2-03、AC-030 属 M4-03",
+          "recommendation": "判归 M2-04（route/nav 一致）；卡内登记四条 AC 为页面侧 cross_ref"
+        },
+        {
+          "page": "UI-25",
+          "route": "/w/:workspace_id/jobs",
+          "nav": "作业与证据",
+          "page_acs": [
+            "AC-029",
+            "AC-031"
+          ],
+          "conflict": "nav 组指向 M4-03（pages/evidence/），但 AC-029/AC-031 均不在 M4-03 的 acs（AC-025/AC-028/AC-030）内",
+          "recommendation": "判归 M4-03（scope 含 web/src/pages/evidence/，且无其他任务覆盖 /jobs）；不属批次5 的三张卡，留待 M4-03 卡复核（该卡已在磁盘）"
+        },
+        {
+          "page": "UI-01",
+          "route": "/",
+          "nav": "入口",
+          "page_acs": [
+            "AC-001",
+            "AC-034"
+          ],
+          "conflict": "无冲突：已由 M0-03 交付（S6-S9，UI-01 取证完成），列出仅为完整性",
+          "recommendation": "无需动作"
+        }
+      ],
+      "ambiguity_systemic_note": "26 个 UI 页中有 5 页（UI-14/UI-15/UI-18/UI-20/UI-25）的 nav 组归属与 AC 交集不一致，根因是 tasks[*].acs 只登记了该任务**主责或强相关**的 AC，而一个页面往往同时呈现多条他人 primary 的 AC。这不是台账错误（primary_owner 47 条自洽、waves 29/29 全覆盖），而是**卡片撰写口径**问题：页面任务的卡内 AC 段落必须区分「本任务 primary 的 AC」与「本页面呈现的他人 primary AC（cross_ref）」两栏。建议 Round 8 派批次5 时把该口径写进派单文，并考虑立一张 MINOR 缺陷单登记该口径缺失（避免批次6 的 M3-P02/M5-P01 重犯）。",
+      "fu5_carryover": "FU-5：批次5 补 M1-04/M2-04 卡时须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属",
+      "next_action": "Round 8 predispatch：① 裁定 5 处歧义（本文 recommendation 为编排器建议，非终裁）；② 按 slice_cmd 生成 3 份切片并校验 truncated_schemas==[]；③ 派 T lane（flash）补 3 张卡 + KNOWN_MISSING 6->3；④ 同轮可派 M0-02/S4、M0-04/S3+S4、M0-03b"
     }
   },
   "acceptance": {
