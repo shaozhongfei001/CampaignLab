@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T23:59:21+08:00",
+  "updated_at": "2026-11-14T00:42:34+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -4383,6 +4383,197 @@
         "not_weakened": "未 exclude 任何路径、未放宽 strict、未加 # type: ignore、未删/改名任何 conftest.py、未减少任何测试用例",
         "basename_census": "修复前普查：in-scope 69 个 .py 仅 3 组同名 —— __init__.py（7 个，均在有包标记的 src/campaignlab/** 内）、errors.py（domain 与 worker，**两者都已在有 __init__.py 的包内**，模块名 campaignlab.domain.errors / campaignlab.worker.errors，不冲突）、conftest.py（**唯一真冲突**）→ 证明加包标记后不会冒出新的重复模块名"
       }
+    },
+    {
+      "id": "D-036",
+      "task": "M4-03（缺 op，BLOCKING 形态）／M1-04、M3-04（缺 AC 行）；审计面为 orchestrator/handoff/*.slice.json 全量",
+      "severity": "MAJOR",
+      "status": "FIXED_PENDING_Q",
+      "title": "lane F 页面卡契约切片缺「页面调用面 op」：pages[*].meta.operation_ids 引用的 op 不在 operations 段内，而卡内禁回读活契约（D-011/D-012）-> lane 只能自造 opId 或停摆；M4-03 缺 9 个 op 属 BLOCKING 级，与 M2-04 的 U-1 完全同型",
+      "found_by": "编排器 —— Round 9 收口 U-1（A125）时做的全量切片自洽性审计（非单点修复；审计口径为切片自洽性 union(pages[*].meta) vs 切片正文段，不依赖任何外部建议清单）",
+      "file": "orchestrator/defects/D-036.md",
+      "found_at": "2026-11-14T00:29:01+08:00",
+      "closed_at": null,
+      "blocking": false,
+      "blocking_note": "M4-03 形态若未修即派单，会 BLOCKING（缺 9 个页面调用 op 的 DTO 且禁回读活契约）。已在派单前修毕并加守护，故 blocking=false；status 保持 FIXED_PENDING_Q，待 Q lane 复核后转 CLOSED（**禁自判 CLOSED**）。",
+      "owner": "编排器（Round 9 自办；切片与台账均只读于 lane，且须全表复验，不宜派单）",
+      "responsibility": "编排器侧：批次 2-5 生成切片时 --ops/--ac 按任务卡 acs 与编排器初判清单填写，未按「该卡页面实际调用哪些 op」机械求并集 -> 切片自带矛盾。lane 侧无过错（切片对 lane 只读、且明令禁自行重切）。与 D-020（--depth 默认过小致 45 处静默截断）同属「切片生成器入参与消费面口径未对齐」一类。",
+      "root_cause": "contract_slice.py 的 pages[*].meta（从 spec/ui/INDEX.md 与页面正文实抽）与 operations/acceptance_rows（完全由 --ops/--ac 入参决定）来源互相独立，且脚本只校验「请求的目标是否切到」（missing_targets），**不校验**「页面元数据引用的目标是否也在切片内」-> 该类矛盾可静默通过 rc=0。",
+      "measured": {
+        "audit_scope": "orchestrator/handoff/*.slice.json 全量 18 份，其中含 pages 段者 9 份",
+        "audit_caliber": "union(pages[*].meta.operation_ids) vs set(operations)；union(pages[*].meta.acceptance) vs set(acceptance_rows)",
+        "meta_faithful_to_spec": "附带校验 pages[*].meta 是否忠于 spec/ui/INDEX.md 的验收列与活契约 80 个 operationId -> **零处不符**（含 OPS_NOT_IN_LIVE 检查），故 meta 可作机械推导源",
+        "inconsistent_before_fix": "9 份含页面切片中 7 份不自洽：M1-04(缺8 AC)/M1-P01(缺3 op,3 AC)/M3-04(缺8 AC)/M3-P01(缺2 op,2 AC)/M4-02(缺7 op,4 AC)/M4-03(缺9 op,5 AC)/M4-P01(缺13 op,3 AC)",
+        "lane_F_affected": [
+          "M4-03（缺 9 op -> BLOCKING 级）",
+          "M1-04（缺 8 AC 行）",
+          "M3-04（缺 8 AC 行）"
+        ],
+        "lane_DS_not_applicable": [
+          "M1-P01(lane D)",
+          "M3-P01(lane D)",
+          "M4-02(lane S)",
+          "M4-P01(lane S，混合卡另立 FU-24)"
+        ],
+        "M4-03_missing_ops": [
+          "createAction",
+          "createReport",
+          "getJob",
+          "getReceipt",
+          "getReview",
+          "listAudit",
+          "registerEvidence",
+          "runReview",
+          "updateAction"
+        ]
+      },
+      "fix": "超集规则重切（结构性保证 DROPPED=0）：ops_new = union(pages[*].meta.operation_ids) ∪ set(既有 operations 键)；ac_new = union(pages[*].meta.acceptance) ∪ set(既有 acceptance_rows 键)；ui = 既有 pages 键集不变；tables = 既有 ddl 键去 __indexes 后缀原样传入（**防漏传 --tables 静默丢表**）；--depth 6（A108）。先 dry-run 到宿主暂存区、每份 12 项校验全过才覆盖真身。",
+      "fix_detail": "dry-run 12 项校验：rc=0 / truncated_schemas==[] / 无 missing 键 / spec_version==1.0.1 / source.openapi==活契约现值 / ops DROPPED==0 / acs DROPPED==0 / pages 集合不变 / **ddl 键集逐键相同** / 自洽性 ops / 自洽性 acs / meta 目标全部落入。7 份全部 ALL_PASS（含 4 份后端卡），随后按 A127 只落地 lane F 的 3 份、回滚 4 份后端卡。",
+      "fix_applied": {
+        "at": "2026-11-14T00:29:01+08:00",
+        "resliced": [
+          {
+            "slice": "orchestrator/handoff/M1-04.slice.json",
+            "old": {
+              "bytes": 166768,
+              "sha16": "065c6bac23b63991",
+              "operations": 18,
+              "acceptance_rows": 3,
+              "pages": 6,
+              "ddl": 0
+            },
+            "new": {
+              "bytes": 168670,
+              "sha16": "b8abc9e53f274e49",
+              "operations": 18,
+              "acceptance_rows": 11,
+              "pages": 6,
+              "ddl": 0,
+              "truncated_schemas": []
+            },
+            "checks_all_pass": true,
+            "failed_checks": [],
+            "tables_passed": []
+          },
+          {
+            "slice": "orchestrator/handoff/M3-04.slice.json",
+            "old": {
+              "bytes": 168868,
+              "sha16": "f8bf56f979c273ec",
+              "operations": 15,
+              "acceptance_rows": 3,
+              "pages": 3,
+              "ddl": 0
+            },
+            "new": {
+              "bytes": 170778,
+              "sha16": "9585956dbc06a74f",
+              "operations": 15,
+              "acceptance_rows": 11,
+              "pages": 3,
+              "ddl": 0,
+              "truncated_schemas": []
+            },
+            "checks_all_pass": true,
+            "failed_checks": [],
+            "tables_passed": []
+          },
+          {
+            "slice": "orchestrator/handoff/M4-03.slice.json",
+            "old": {
+              "bytes": 106933,
+              "sha16": "6fb6ff3bbf294c04",
+              "operations": 13,
+              "acceptance_rows": 3,
+              "pages": 5,
+              "ddl": 10
+            },
+            "new": {
+              "bytes": 188509,
+              "sha16": "0c057c1a6fc9f011",
+              "operations": 22,
+              "acceptance_rows": 8,
+              "pages": 5,
+              "ddl": 10,
+              "truncated_schemas": []
+            },
+            "checks_all_pass": true,
+            "failed_checks": [],
+            "tables_passed": [
+              "action_followups",
+              "actions",
+              "artifacts",
+              "evidence",
+              "exports",
+              "jobs",
+              "report_actions",
+              "reports"
+            ]
+          }
+        ],
+        "reverted_backend_slices": [
+          {
+            "task": "M1-P01",
+            "slice": "orchestrator/handoff/M1-P01.slice.json",
+            "sha16_restored": "2f80df94417b2efa",
+            "bytes_restored": 111801,
+            "method": "git checkout -- <显式路径>（HEAD=2d7722e 字节，sha16 与 dry-run 前记录逐位核对相同）"
+          },
+          {
+            "task": "M3-P01",
+            "slice": "orchestrator/handoff/M3-P01.slice.json",
+            "sha16_restored": "30c776e4e6a51bbd",
+            "bytes_restored": 83931,
+            "method": "git checkout -- <显式路径>（HEAD=2d7722e 字节，sha16 与 dry-run 前记录逐位核对相同）"
+          },
+          {
+            "task": "M4-02",
+            "slice": "orchestrator/handoff/M4-02.slice.json",
+            "sha16_restored": "febd8628e02b0d02",
+            "bytes_restored": 82954,
+            "method": "git checkout -- <显式路径>（HEAD=2d7722e 字节，sha16 与 dry-run 前记录逐位核对相同）"
+          },
+          {
+            "task": "M4-P01",
+            "slice": "orchestrator/handoff/M4-P01.slice.json",
+            "sha16_restored": "73a9bcf1c483adbd",
+            "bytes_restored": 109729,
+            "method": "git checkout -- <显式路径>（HEAD=2d7722e 字节，sha16 与 dry-run 前记录逐位核对相同）"
+          }
+        ],
+        "live_contract_unchanged": "contracts/openapi.json 443309 B / 592571099d638251；spec/、contracts/ dirty=0",
+        "cards_synced": [
+          "M1-04.md",
+          "M3-04.md",
+          "M4-03.md"
+        ],
+        "card_edit_caliber": "锚点断言式替换（每处先断言命中次数再写），head 行数不变；tail 各 append-only 追注 1 条；三卡 head/tail/total = 47/20/79、48/21/79、44/25/81，均在守护上限 60/40/200 内；指纹与字节数依 D-012/D-014 不写进卡"
+      },
+      "recurrence_guard": "tests/unit/test_slice_self_consistency.py（6 例）：分母断言 >= 5（防 glob 扫空假绿）+ union(pages[*].meta.operation_ids) ⊆ set(operations) + truncated_schemas==[] + 无 missing 键 + source.openapi 与磁盘活契约逐位一致 + spec_version == 活契约 info.version。lane 归属从 state.json tasks[*].lane **动态读取**，不写死任务号；只取 lane F，故后端卡不会被误判（A127）。",
+      "regression_guard": "tests/unit/test_slice_self_consistency.py",
+      "related_adjudications": [
+        "A125",
+        "A126",
+        "A127"
+      ],
+      "related": [
+        "D-011",
+        "D-012",
+        "D-020",
+        "D-004",
+        "U-1",
+        "R9-2",
+        "FU-23",
+        "FU-24"
+      ],
+      "followup": [
+        "FU-23（三卡 gates[0].id 范围式改枚举式，派单前收口）",
+        "FU-24（M4-P01 混合卡页面消费面切分口径待裁）"
+      ],
+      "evidence": [
+        "orchestrator/defects/D-036.md",
+        "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log"
+      ]
     }
   ],
   "change_requests": [
@@ -4752,7 +4943,7 @@
       "29be319"
     ],
     "self_check_gates_rc0": {
-      "checked_at": "2026-11-13T23:19:14+08:00",
+      "checked_at": "2026-11-14T00:34:27+08:00",
       "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
       "note": "第 3 次接管（模型切换）后由新实例从磁盘全表重跑，rc 全部实跑取得，非转录。G4/G4b/G4c 的 expected 为 2/2/1（篡改与未命中负例），Q 复核时不得据此判红。全表 rc==expected；spec_untouched=0；full_dirty=0；HEAD==origin/m0-framework。 治理文件落盘后复测 G7/G8：ruff check 全通过、ruff format --check . rc=0（分母 39）。 2026-11-12T23:30:05+08:00 追记：D-007 修复后重测 G7/G8/G9/G10 全 rc=0（pytest 32 passed、mypy 7 files、ruff format 46 files）；doctor 连跑 30 次假 WARN 0/30。 2026-11-13T00:42:29+08:00 追记（第 4 次接管）：D-009 收口后重测 G7/G8/G9/G10 全 rc=0；ruff format 应用后分母 ruff=53（py=8/md=45）、pytest=38 passed、mypy=8 源文件；恒等式 tracked(53)+untracked(0)==53 成立；spec/ dirty=0。 2026-11-13T01:37:27+08:00 追记：Ohm(M0-03/S1+S2) 产出入库，编排器 15/15 独立复验吻合；G7-G14 全 rc=0（G13 为 npm ci+build 实跑）；分母 ruff=56(py=8/md=48)、pytest=38、mypy=8；恒等式 tracked(55)+untracked(1)==56 成立（untracked 为 Plato 在飞报告）；doctor PASS/WARN/FAIL 见 last_summary。 2026-11-13T02:07:05+08:00 追记：Q-VERIFY-M0-01 judge 入库，编排器 12/12 论断独立复核成立；M0-01 判 PASS_WITH_TODO（挂 T-A1..T-A5）；D-001..D-009 全部 CLOSED；新立 D-011(MAJOR)/D-012/D-013/D-014/D-015/D-016(MAJOR)；BLK-Q1/BLK-Q2 修净；手册升 v1.6（15.9/15.10）。G7-G14 全 rc=0；分母 ruff=63(py=9/md=54)、pytest=43、mypy=9；双口径 tracked 63==63；spec/ dirty=0。 2026-11-13T02:46:54+08:00 追记（第 5 次接管）：CR-002 选项 B 原子提交前，从磁盘全表重跑 16 项 G（含 G4c 真实篡改负例），rc 全部 == expected；分母 ruff=64(py=9/md=55)、pytest=43、mypy=9；双口径 tracked 64 + untracked 0 == 64 成立；spec/ dirty=0。提交前复核另检出并修复 3 类问题（均记入 CR-002.md §7 第 9/10/11 行）：① state.json.contract 曾被整块替换、丢失 HEAD 的 live_dir/registry/gate/ci_job/baselines（含两份 spec 基线 sha256 锚点）→ 已按无损合并修复；② 4 处历史/门禁文本仍写死旧指纹却未加注（tasks/M0-03.md:134、M0-03-design.md:9、M0-02-design.md:7 与 §5 V1、两卡 Q4/Q7 裁定结果）→ 已按 D-011 体例补纯增量标注（两设计文档 numstat removed=0）；③ 设计文档 Q4/Q7 追注曾被塞成 4 列表格的第 5 个单元格且缺收尾竖线、嵌套双星号破坏加粗 → 已还原原文字节并改为表后独立 blockquote。另：CHANGES.json 缩进规范化为 indent=2（符合 check_contracts.py:6 与其余 10 个同目录文件），语义等价已程序化证明，显式登记非静默夹带。  2026-11-13T04:58:57+08:00 追记（第 8 次接管 · Round 4 派单前置）：编排器产物落盘后从磁盘复跑 G1/G2/G3/G5/G6/G7/G8/G9/G10/G14 共 10 项，rc 全部 == expected（G4/G4b/G4c 负例本轮未复跑，沿用 02:46:54 实测值）；ruff format 分母 87→88（+1 md），恒等式 tracked(87)+untracked(1)==88 成立；pytest 76 passed、mypy 16 源文件、契约登记项 13、前端基线 8/8、doctor HEALTHY；spec/ dirty=0。  2026-11-13T06:55:00+08:00 追记（Round 4 四 lane 全部回收 + D-020/D-021 修复入库后）：编排器从磁盘全表实跑，rc 全部实取得非转录。pytest 110 passed（99 + D-020 新增 11 守卫）、mypy 22 source files、ruff format --check 101 files（恒等式 tracked 99 + untracked 2 == 101）、ruff check 可见 25（24 py + pyproject.toml）、契约登记项 13、前端 vitest Test Files 4 passed / Tests 56 passed、KNOWN_MISSING 13、磁盘卡 16、恒等式 16+13==29 成立、doctor 仍 rc=1（基线范围缺口，随 M0-02/S3c 移交）、G4/G4b 负例 rc=2 且未产出文件。过程中编排器自身复验脚本 4 处输入错误（API.md 权威 code 在第 2 列以「、」分隔而非首列反引号；PROBLEM_CODES 元组序为 (status, type_urn, title) 而非 (status, title, urn)——曾因此对 title 产生一次假 PASS；paths 的 home= 形参需 Path 而非 str；x_db_path 需文件系统路径而非 URL）与 1 处过严检查（env.py 的 sqlite:/// 命中在模块 docstring 内，非 docstring 命中为 0），以及 1 次操作事故（用 PowerShell Set-Content -Encoding utf8 写数据文件带入 UTF-8 BOM，追加进测试文件中部导致 SyntaxError U+FEFF，并一度覆盖 tests/unit/test_contract_slice.py 的 254 行既有护栏）——已 git checkout 还原并改为 BOM 感知重追加，最终该文件为纯增量 +91/-0、原前缀字节不变。以上全部当场更正并留痕，未误判任何 lane。",
       "gates": {
@@ -4762,9 +4953,16 @@
           "expected": 0,
           "elapsed_s": 0.0,
           "last_summary": "",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G2_baseline_v1.0.1_patch": {
           "cmd": "( cd spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta && sha256sum -c DELTA-SHA256SUMS --quiet )",
@@ -4772,39 +4970,67 @@
           "expected": 0,
           "elapsed_s": 0.0,
           "last_summary": "",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G3_frontend_baseline": {
           "cmd": "python3 scripts/check_frontend_baseline.py",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0.1,
-          "last_summary": "baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html | FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "baseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html | FRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G4_slice_unknown_op_negative": {
           "cmd": "python3 scripts/contract_slice.py --ops noSuchOp --out /tmp/neg_op_r9.json",
           "rc": 2,
           "expected": 2,
           "elapsed_s": 0.1,
-          "last_summary": "spec_version=1.0.1 slice_bytes=622 slice_lines=17 sections=['spec_version', 'source', 'operations', 'truncated_schemas'] missing=['operations:noSuchOp'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 2,
+              "last_summary": "spec_version=1.0.1 slice_bytes=622 slice_lines=17 sections=['spec_version', 'source', 'operations', 'truncated_schemas'] missing=['operations:noSuchOp'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['operations:noSuchOp']",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G4b_slice_unknown_ac_negative": {
           "cmd": "python3 scripts/contract_slice.py --ac AC-MR-99 --out /tmp/neg_ac_r9.json",
           "rc": 2,
           "expected": 2,
           "elapsed_s": 0.1,
-          "last_summary": "spec_version=1.0.1 slice_bytes=599 slice_lines=15 sections=['spec_version', 'source', 'acceptance_rows', 'truncated_schemas'] missing=['acceptance_rows:AC-MR-99'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 2,
+              "last_summary": "spec_version=1.0.1 slice_bytes=599 slice_lines=15 sections=['spec_version', 'source', 'acceptance_rows', 'truncated_schemas'] missing=['acceptance_rows:AC-MR-99'] depth=5 truncated_schemas=[] | FAIL 切片目标未命中（禁止静默，见手册 13.3/15.4）: ['acceptance_rows:AC-MR-99']",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G4c_frontend_tamper_negative": {
           "cmd": "printf '\\n' >> spec/frontend-template-spdb-v1.1/css/tokens.css && python3 scripts/check_frontend_baseline.py",
@@ -4812,11 +5038,21 @@
           "expected": 1,
           "elapsed_s": 0.1,
           "last_summary": "FRONTEND BASELINE FAIL (1 项): ['css/tokens.css']",
-          "measured_at": "2026-11-13T02:41:57+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "note": "本轮真实执行篡改负例：备份 -> printf 追加换行 -> 实测 rc -> cp 还原 -> 断言 spec/ dirty=0。不沿用转录值。",
           "spec_dirty_after_restore": 0,
           "checkpoint_R8_not_rerun": "本 checkpoint 点未重跑。原因：该门需临时写入只读的 spec/frontend-template-spdb-v1.1/css/tokens.css（备份->追加换行->实测->还原->断言 spec/ dirty=0），是全表唯一会写只读区的门；关机前不做可避免的只读区写入风险。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。",
-          "not_rerun_note_R9": "本轮仍未重跑：G4c 是全表唯一会临时写入只读 spec/ 的门，而 D-035 的修复写集为 tests/**（未改 pyproject.toml、未触 web/spec），与该门无因果关系。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。下次触碰 scripts/check_frontend_baseline.py 或 spec/frontend-template-* 时必须重跑。"
+          "not_rerun_note_R9": "本轮仍未重跑：G4c 是全表唯一会临时写入只读 spec/ 的门，而 D-035 的修复写集为 tests/**（未改 pyproject.toml、未触 web/spec），与该门无因果关系。保留 2026-11-13T02:41:57+08:00 实测值 rc=1 / 期望 1 / spec_dirty_after_restore=0。下次触碰 scripts/check_frontend_baseline.py 或 spec/frontend-template-* 时必须重跑。",
+          "history": [
+            {
+              "rc": 1,
+              "last_summary": "FRONTEND BASELINE FAIL (1 项): ['css/tokens.css']",
+              "measured_at": "2026-11-13T02:41:57+08:00"
+            }
+          ],
+          "status": "OK",
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "restore_verified": "tamper 后 git checkout -- spec/frontend-template-spdb-v1.1/css/tokens.css 还原，git status --porcelain spec/ contracts/ = 空（实测）"
         },
         "G5_contract_gate": {
           "cmd": "python3 scripts/check_contracts.py check",
@@ -4824,9 +5060,16 @@
           "expected": 0,
           "elapsed_s": 0.1,
           "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=skipped",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G6_contract_meta_validate": {
           "cmd": "uv run --no-sync python scripts/check_contracts.py check --validate",
@@ -4834,9 +5077,16 @@
           "expected": 0,
           "elapsed_s": 1.7,
           "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G7_ruff_check": {
           "cmd": "uv run --no-sync ruff check .",
@@ -4844,27 +5094,41 @@
           "expected": 0,
           "elapsed_s": 0.0,
           "last_summary": "All checks passed!",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "All checks passed!",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G8_ruff_format": {
           "cmd": "uv run --no-sync ruff format --check .",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0.0,
-          "last_summary": "186 files already formatted",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "188 files already formatted",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "186 files already formatted",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G9_mypy": {
           "cmd": "uv run --no-sync mypy",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0.6,
-          "last_summary": "Success: no issues found in 72 source files",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "Success: no issues found in 73 source files",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
           "previous_rc": 0,
           "previous_last_summary": "Success: no issues found in 16 source files",
@@ -4876,70 +5140,117 @@
               "measured_at": "2026-11-13T13:23:04+08:00",
               "superseded_at": "2026-11-13T23:19:14+08:00",
               "reason": "D-035 修复后全表复跑实测变化（历史值只加注不改写）"
+            },
+            {
+              "rc": 0,
+              "last_summary": "Success: no issues found in 72 source files",
+              "measured_at": "2026-11-13T23:19:14+08:00"
             }
           ],
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log"
         },
         "G10_pytest": {
           "cmd": "uv run --no-sync pytest -q",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 72.4,
-          "last_summary": "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 350 passed, 6 warnings in 72.09s (0:01:12)",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "356 passed, 6 warnings in 76.67s (0:01:16)",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 350 passed, 6 warnings in 72.09s (0:01:12)",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G11_prototype_verify": {
           "cmd": "bash scripts/verify.sh",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0.6,
-          "last_summary": "==> 4/4 字节级复现 | PASS: 字节级复现",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "PASS: 字节级复现",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "==> 4/4 字节级复现 | PASS: 字节级复现",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G12_package_verify": {
           "cmd": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 0.1,
-          "last_summary": "PASS 四版规则、15 个案例双版本、五种预发状态 | PACKAGE PASS 6/6",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "PACKAGE PASS 6/6",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "PASS 四版规则、15 个案例双版本、五种预发状态 | PACKAGE PASS 6/6",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G13_npm_ci_and_build": {
           "cmd": "npm --prefix web ci && npm --prefix web run build",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 8.6,
-          "last_summary": "dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB | ✓ built in 708ms",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "✓ built in 618ms",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
-          "rerun_note_R9": "本轮已实跑 rc=0 / built in 663ms；checkpoint 期曾以『web/ 未触及』为由保留历史值，现以本次实测取代。"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "rerun_note_R9": "本轮已实跑 rc=0 / built in 663ms；checkpoint 期曾以『web/ 未触及』为由保留历史值，现以本次实测取代。",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "dist/assets/index-C_xENgTm.js   122.90 kB │ gzip: 47.02 kB | ✓ built in 708ms",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G14_doctor": {
           "cmd": "bash scripts/doctor.sh",
           "rc": 0,
           "expected": 0,
           "elapsed_s": 1.7,
-          "last_summary": "PASS=15  WARN=1  FAIL=0 | RESULT: HEALTHY",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "  RESULT: HEALTHY",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "PASS=15  WARN=1  FAIL=0 | RESULT: HEALTHY",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         },
         "G14b_cli_doctor": {
           "cmd": "uv run --no-sync python -m campaignlab doctor",
           "rc": 0,
           "expected": null,
           "elapsed_s": 0.3,
-          "last_summary": "PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s | PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED",
-          "measured_at": "2026-11-13T23:19:14+08:00",
+          "last_summary": "  PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED",
+          "measured_at": "2026-11-14T00:34:27+08:00",
           "status": "OK",
-          "evidence": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log"
+          "evidence": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+          "history": [
+            {
+              "rc": 0,
+              "last_summary": "PASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s | PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED",
+              "measured_at": "2026-11-13T23:19:14+08:00"
+            }
+          ]
         }
       },
       "spec_untouched": {
@@ -4947,7 +5258,8 @@
         "result": "empty",
         "rc": 0,
         "expected": 0,
-        "measured_at": "2026-11-13T23:19:14+08:00"
+        "measured_at": "2026-11-14T00:34:27+08:00",
+        "note": "本轮含 G4c：先对只读区做篡改负例、再 git checkout 还原，还原后复测 spec/ 与 contracts/ 仍为空（只读区未被污染）。原 str 形态属意外 TYPE 变更，已按 HEAD 的 dict 结构恢复。"
       },
       "evidence_ignored_count": {
         "cmd": "git status --porcelain --ignored=matching -- evidence | grep -c '^!!'",
@@ -4955,9 +5267,9 @@
         "expected": 0
       },
       "counts": {
-        "pytest_passed": 350,
-        "mypy_source_files": 72,
-        "ruff_formatted_files": 186,
+        "pytest_passed": 356,
+        "mypy_source_files": 73,
+        "ruff_formatted_files": 188,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4966,24 +5278,24 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 186,
-          "in_scope_py": 74,
-          "in_scope_md": 112,
+          "total": 188,
+          "in_scope_py": 75,
+          "in_scope_md": 113,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-13T23:19:14+08:00",
+          "measured_after": "2026-11-14T00:34:27+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式：提交前 tracked in-scope py+md 181（py 69 + md 112）+ untracked 5（全为 .py）== ruff format --check 报数 186（实测）；提交后 tracked 186（py 74 + md 112）+ untracked 0 == 186。复现命令见 reproduce_py / reproduce_md / identity_cmd。",
+          "identity": "A101 恒等式：提交前 tracked in-scope py+md 186（py 74 + md 112）+ untracked 2（py 1 + md 1）== ruff format --check 报数 188（实测）；提交后 tracked 188（py 75 + md 113）+ untracked 0 == 188。复现命令见 reproduce_py / reproduce_md / identity_cmd。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
-            "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
-            "+2 md（orchestrator/tasks/M3-01.md、M3-02.md，T lane Archimedes / D-016 批次2，尚余 M3-03、M4-01 在飞）"
+            "+1 py（tests/unit/test_slice_self_consistency.py，D-036 防复发守护）",
+            "+1 md（orchestrator/defects/D-036.md，缺陷单）"
           ],
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
-          "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
+          "untracked_component_note": "在飞中间态，非提交后终态；提交后两者均转 tracked，untracked 归 0。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
           "prev_total": 181,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
@@ -4998,13 +5310,14 @@
           "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。",
           "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入分母：git ls-files 只反映索引；Volta 的 repositories.py/application/worker.py 属已跟踪文件修改（不改文件数），src/campaignlab/worker/** 与其两测试尚未落盘。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫",
           "untracked_in_scope_md": 0,
-          "identity_measured_at": "2026-11-13T23:19:14+08:00",
-          "caliber_note": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74 = 提交前 tracked py 69 + 本次新增 5 个 tests 包标记（tests/__init__.py、tests/api/__init__.py、tests/integration/__init__.py、tests/integration/bootstrap/__init__.py、tests/unit/__init__.py）；in_scope_md 112 不变（本次未新增 md）。新增的证据文件 fulltable.log 为 .log，不在 ruff format 作用域（只纳管 .py 与 .md），故不计入分母。"
+          "identity_measured_at": "2026-11-14T00:34:27+08:00",
+          "caliber_note": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74 = 提交前 tracked py 69 + 本次新增 5 个 tests 包标记（tests/__init__.py、tests/api/__init__.py、tests/integration/__init__.py、tests/integration/bootstrap/__init__.py、tests/unit/__init__.py）；in_scope_md 112 不变（本次未新增 md）。新增的证据文件 fulltable.log 为 .log，不在 ruff format 作用域（只纳管 .py 与 .md），故不计入分母。",
+          "caliber_note_R9_d036": "counts 为**本次提交后的树**口径（A101）。in_scope_py 74->75 = 新增 tests/unit/test_slice_self_consistency.py；in_scope_md 112->113 = 新增 orchestrator/defects/D-036.md；total 186->188。本轮改动的三份 orchestrator/handoff/*.slice.json 属 .json、evidence/**/fulltable.log 属 .log，**均不在 ruff format 作用域**（只纳管 .py 与 .md），故不计入分母。上一轮的 caliber_note（D-035：+5 个 tests 包标记）按「原值保留不改写」体例留存，不以本条覆盖。"
         },
-        "ruff_lint_scope_files": 24,
+        "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T11:34:54+08:00",
-        "counts_refresh_reason": "Round 7 predispatch 落盘后重采样：ruff_formatted_files 148->149（+1 = orchestrator/defects/D-029.md，md 97->98）；M0-02.md 为纯增量加注（6 add / 0 del）不改变分母；pytest/mypy/契约节点/AC 分母/openapi 指纹待本提交树全表复跑后确认。",
+        "counts_refreshed_at": "2026-11-14T00:34:27+08:00",
+        "counts_refresh_reason": "Round 9 / D-036 批量重切与守护落地后全表复跑重采样（17 项全绿 mismatch=none，证据 evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log）：ruff_formatted_files 186->188（+2 = tests/unit/test_slice_self_consistency.py 与 orchestrator/defects/D-036.md；py 74->75、md 112->113）；pytest_passed 350->356（+6 = 新守护 6 例）；mypy_source_files 72->73（+1 = 新守护文件）；ruff_lint_scope_files 24->75（**再锚定**，见 ruff_lint_scope_files_note_R9_d036）。三份切片 .json、evidence/**.log 均不在 ruff format 作用域，不计入分母。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -5021,9 +5334,9 @@
         "pytest_passed_self_correction": "编排器自我更正（2026-11-13T09:06:04+08:00）：本键先前被写为 165，因取值自「D-025.md 已落盘、其 state.json 台账条目尚未写入」的中间态运行（当时 test_state_ledger.py::test_every_md_on_disk_has_ledger_entry 如实判红 -> 1 failed, 165 passed）。台账补齐后重跑实测为 166 passed / 0 failed，以本值为准。教训：counts 采样必须在同一提交的台账写入**之后**进行，否则会把手册 §15.9 守护测试的中间态红点固化进 counts。",
         "gate_measurement": {
           "caliber_ref": "resume.gate_measurement_caliber（D-027/R6-2）",
-          "gates_run": 18,
+          "gates_run": 17,
           "all_green": true,
-          "measured_at": "2026-11-13T10:49:12+08:00"
+          "measured_at": "2026-11-14T00:34:27+08:00"
         },
         "pytest_passed_note_round7_laneA": "counts.pytest_passed 仍为 213（af3808b/d3f7671 全表实测值），本轮**未刷新**：全表 pytest 在 Volta 在飞期间会对其半成品判假 RED，故缓跑。本提交只做路径限定实测：tests/unit/test_s3b_routes.py 7 passed（rc=0）+ 近邻与守护 82 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值（禁估算）。",
         "mypy_source_files_note_round7_laneA": "同上：mypy 49 为上次全表实测值；本轮路径限定 mypy 4 source files rc=0，全表值待回收后补测",
@@ -5031,7 +5344,11 @@
         "mypy_source_files_note_round7_laneC": "mypy 49 为上次全表实测；本轮路径限定 mypy 5 source files rc=0；全表值待回收后补测（预期 +4：session/workspaces/migration_head + 测试按 mypy 口径计入者以实跑为准）",
         "pytest_passed_note_R8_checkpoint": "全表实测（G10 rc=0，146.63s，350 passed / 6 warnings）。上次记录值 213（af3808b/d3f7671 时点）由本值取代；增量主因 Round 8 入库 tests/api 51 例 + tests/unit/test_worker_runner.py + test_job_repository_terminal.py 等。",
         "mypy_source_files_note_R9": "D-035 修复后**重新可测**：G9 实测 rc=0 / 'Success: no issues found in 72 source files'（2026-11-13T23:19:14+08:00）。49 -> 72 的跃升并非新增代码，而是**覆盖面恢复**：自 57b6db5 起 mypy 在首个错误即中止（errors prevented further checking），tests/scripts 两棵树从未被真正检查；checkpoint 期该键标『不可测』并保留 49，现以本次实测取代。gates.G9.history 保留 16 source files（04:58:57）与 rc=2（13:23:04）两个历史值，只加注不改写。",
-        "pytest_passed_note_R9": "D-035 修复后全表复跑实测 **350 passed / 6 warnings / 72.4s**（rc=0），与 checkpoint 期 350 逐数一致 → **零回归**；新增 5 个包标记未影响任何用例的收集与导入。"
+        "pytest_passed_note_R9": "D-035 修复后全表复跑实测 **350 passed / 6 warnings / 72.4s**（rc=0），与 checkpoint 期 350 逐数一致 → **零回归**；新增 5 个包标记未影响任何用例的收集与导入。",
+        "ruff_lint_scope_files_note_R9_d036": "**再锚定**：本键文档口径为「in-scope 纯 Python 文件数」（drift_rule 明写为稳定分母、与含 md 的 ruff_formatted_files 相对），但自 2026-11-13T11:34:54+08:00（Round 7 predispatch）记为 24 后**从未重测**，而同期 in_scope_py 已随 Round 8/9 增至 74 —— 两值严重漂移，属陈旧值冒充现值。本次按 reproduce_py 文档命令重测为 75 并以其为准；历史值 24 只加注不改写（禁追溯改写历史测量值）。",
+        "ruff_check_visible_files_note_R9_d036": "本键（现值 42）与 ruff_lint_scope_files 语义重叠且**无文档化复现命令**，本轮**未重测**、原值保留。禁把它当现值引用；需引用纯 Python 分母时一律用 ruff_lint_scope_files（本次已再锚定并附复现命令）。",
+        "pytest_passed_note_R9_d036": "D-036 落地后全表复跑实测 **356 passed / 6 warnings**（G10 rc=0）；较上轮 350 增 6 例，全部来自新增守护 tests/unit/test_slice_self_consistency.py，**既有 350 例零回归**。",
+        "mypy_source_files_note_R9_d036": "G9 实测 rc=0 / 'Success: no issues found in 73 source files'；较上轮 72 增 1 = 新守护文件（mypy strict 干净，无 type: ignore）。"
       },
       "denominator_history": [
         {
@@ -5156,6 +5473,25 @@
             "identity_holds": true
           },
           "post_commit_expectation": "提交后 untracked_in_scope 归 0、tracked_in_scope 升至 87，恒等式仍为 87；提交前须再实测一次并回填"
+        },
+        {
+          "at": "2026-11-14T00:34:27+08:00",
+          "ruff_total": 188,
+          "in_scope_py": 75,
+          "in_scope_md": 113,
+          "pytest_passed": 356,
+          "mypy_source_files": 73,
+          "ruff_lint_scope_files": 75,
+          "cause": "Round 9 / D-036：lane F 三切片重切（M1-04/M3-04/M4-03）+ 新增守护 test_slice_self_consistency.py + D-036.md + 三卡事实同步 + A127/R9-2/FU-23/FU-24",
+          "prev": {
+            "ruff_total": 186,
+            "in_scope_py": 74,
+            "in_scope_md": 112,
+            "pytest_passed": 350,
+            "mypy_source_files": 72,
+            "ruff_lint_scope_files": 24
+          },
+          "identity": "tracked 186（py 74 + md 112）+ untracked 2（py 1 + md 1）== ruff 188 实测成立"
         }
       ],
       "post_write_confirmation": {
@@ -5216,8 +5552,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T23:19:14+08:00",
-      "counts_refresh_reason": "Round 9 首件（D-035 修复 / FU-22）：ruff_formatted_files 181->186（+5 py = tests 包标记；md 112 不变）；mypy_source_files 49->72（**覆盖面恢复**，非新增代码）；pytest_passed 350 不变（零回归）。",
+      "counts_refreshed_at": "2026-11-14T00:34:27+08:00",
+      "counts_refresh_reason": "Round 9 / D-036 批量重切与守护落地后全表复跑重采样（17 项全绿 mismatch=none，证据 evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log）：ruff_formatted_files 186->188（+2 = tests/unit/test_slice_self_consistency.py 与 orchestrator/defects/D-036.md；py 74->75、md 112->113）；pytest_passed 350->356（+6 = 新守护 6 例）；mypy_source_files 72->73（+1 = 新守护文件）；ruff_lint_scope_files 24->75（**再锚定**，见 ruff_lint_scope_files_note_R9_d036）。三份切片 .json、evidence/**.log 均不在 ruff format 作用域，不计入分母。",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -5454,25 +5790,26 @@
         "note": "G9 红灯期间对 wave1 出口 Q 复核与 AC 取证的封锁自本时点解除。"
       },
       "fulltable_evidence": {
-        "path": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
-        "host_json_copy": "D:\\ws\\codex_rd\\ss_campaignlab\\.orch_tmp\\evidence\\fulltable-r9-d035.json",
-        "script": "/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/fulltable_r9b.py",
-        "gates_run": 16,
-        "gates_not_run": [
-          "G4c_frontend_tamper_negative"
-        ],
+        "path": "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log",
+        "host_json_copy": "D:\\ws\\codex_rd\\ss_campaignlab\\.orch_tmp\\evidence\\fulltable-r9-d036.json",
+        "script": "/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/d036_fulltable.py",
+        "gates_run": 17,
+        "gates_not_run": [],
         "mismatch": [],
         "all_green": true,
-        "measured_at": "2026-11-13T23:19:14+08:00",
-        "finished_at": "2026-11-13T23:19:14+08:00",
+        "measured_at": "2026-11-14T00:34:27+08:00",
+        "finished_at": "2026-11-14T00:34:27+08:00",
+        "evidence_log_sha256": "4fcb13a08a6871ea6846a0945ec15660fb5213e3f419a2f6383dd0e8ba030db9",
         "evidence_placement_rule": "依 .gitignore 第 16-18 行（D-003）：证据 .log 必须入库，否则 gates[].evidence 指针会指向仓库中不存在的文件，Q lane 无法复核、宿主重置即永久丢失。故本次证据落仓库内 evidence/**.log 而非 /tmp。",
+        "g4c_note": "本轮**已跑** G4c（负例：篡改 tokens.css 后 check_frontend_baseline 须 rc=1），跑完立即 git checkout 还原并断言 spec/、contracts/ dirty=0；上一轮该门未跑。",
         "previous": {
-          "path": "/tmp/fulltable.json（**已随 WSL VM 空闲终止而丢失**，见 R9-1）",
-          "gates_run": 15,
-          "mismatch": [
-            "G9_mypy"
+          "path": "evidence/M0/ORCHESTRATOR/round9-d035-fix/fulltable.log",
+          "gates_run": 16,
+          "gates_not_run": [
+            "G4c_frontend_tamper_negative"
           ],
-          "measured_at": "2026-11-13T13:23:04+08:00"
+          "mismatch": [],
+          "measured_at": "2026-11-13T23:19:14+08:00"
         }
       }
     },
@@ -7964,6 +8301,25 @@
         "status": "DONE",
         "resolved_at": "2026-11-13T23:19:14+08:00",
         "resolution": "D-035 已修（选项 A：5 个 tests 包标记 + 2 处 import 改包路径，**零配置改动**）。G9 rc=0 / 72 source files；pytest 350 passed 零回归；全表 16 项全绿。详见 defects[D-035].fix_applied 与 A123。"
+      },
+      {
+        "id": "FU-23",
+        "at": "2026-11-14T00:29:01+08:00",
+        "status": "PENDING",
+        "item": "M1-04／M3-04／M4-03 三卡 `tasks[*].gates[0].id` 的范围式字面（「AC-005 至 AC-011 页面侧」／「AC-018 至 AC-024、AC-033 页面侧」／「AC-025 至 AC-028、AC-030 页面侧」）按 A126 改为**枚举式**并与各自切片 `acceptance_rows`（11／11／8 条）逐一对应；同时同步卡内「逐字承接、禁改写」的 gate 原文引用（M4-03.md:22 型）与 card-local U 项（M1-04 U-3／M3-04 U-4／M4-03 U-4）的收口注记。",
+        "owner": "编排器",
+        "source": "D-036 / A126 / A127",
+        "trigger": "**各卡派单前**（不得晚于 wave4 / wave6 / wave7 的对应派单动作）；三卡均 status=TODO，当前无在飞 lane，故不构成即时阻塞",
+        "why_deferred": "gate 字面被卡内逐字引用，改台账必须同批改卡文，属两文件耦合改动；本提交焦点是切片自洽性修复，避免一次提交混两类口径变更。"
+      },
+      {
+        "id": "FU-24",
+        "at": "2026-11-14T00:29:01+08:00",
+        "status": "PENDING",
+        "item": "M4-P01（lane S，但 scope 含 `web/src/pages/report/monthly/` 与 `web/tests/e2e/monthly_report/`，属**混合卡**）的页面消费面切分口径待裁：其切片 `operations` 现为 8 个「本卡实现面」op，而其 4 个页面（UI-21／22／24／26 月报面）的 meta 引用 20 个 op。裁定选项：(a) 维持实现面 8 op 不动，月报页面的 DTO 消费面由 M4-03（lane F，已含 22 op）承载，M4-P01 只做后端 + monthly 子目录页面；(b) 为 M4-P01 另出一份**前端消费面切片**（如 M4-P01-web.slice.json），与实现面切片并存；(c) 按 lane F 口径直接扩其 operations 到 21 op。**建议 (a)**（成本最低、与 A127 的 lane 语义边界一致，且 M4-03 重切后已覆盖 22 个 op 含全部月报页面所需）。",
+        "owner": "编排器（若裁 (b)/(c) 需同步改卡文与 scope）",
+        "source": "D-036 / A127",
+        "trigger": "M4-P01 派单前（wave8，mode=serial，次序 M4-P01 -> M5-01）"
       }
     ],
     "commit_backfill_round6": {
@@ -8502,7 +8858,9 @@
       "rule_truncation_must_be_marked": "工具输出被截断处必须如实标注 [TRUNCATED] 并注明截断规模，同时给出可从仓库实测恢复的替代路径；**禁臆造补全**。Round 8 实测截断：Volta 中段约 10723 tokens（PROBLEM_CODES 20 个码名仅取回前 2 个）、Ramanujan 约 90 tokens、Bohr 约 38 tokens。",
       "rule_no_tmp_only_evidence": "门禁证据**禁只存 /tmp**：WSL2 VM 在命令间空闲即被自动终止，/tmp（tmpfs）随之清空，实测已丢失两份全表证据（R9-1）。证据一律落仓库内 evidence/**/<run>/fulltable.log 并入库（依 .gitignore 的 !evidence/**/*.log / D-003，使 gates[].evidence 指针指向仓库内真实文件、Q lane 可复核），宿主 .orch_tmp/evidence/ 另存机读 JSON 副本。/tmp 仅可用于可重生成的中间产物（如 contract_slice 负例输出）。",
       "rule_verify_worktree_after_vm_restart": "发现 /tmp 内容异常丢失（疑似 VM 重启）时，**必须先核验三者再继续**：① 工作树改动是否仍在（ext4 持久，通常完好）② HEAD 与 ahead/behind ③ state.json 是否被半写（原子写 + os.replace 保证不会）。核验通过后才可重跑门禁；禁直接重跑覆盖，禁假定改动已丢失而重做。",
-      "rule_ruff_e501_counts_east_asian_width": "ruff 的 E501 按**东亚字符宽度**计（中文算 2，非 Python 的 len()）：实测一行 85 个字符（含中文）被报 117 > 100、96 字符被报 123 > 100。写含中文的单行 docstring/注释时必须按宽度而非字符数控制在 line-length=100 内，超长改为多行 docstring。"
+      "rule_ruff_e501_counts_east_asian_width": "ruff 的 E501 按**东亚字符宽度**计（中文算 2，非 Python 的 len()）：实测一行 85 个字符（含中文）被报 117 > 100、96 字符被报 123 > 100。写含中文的单行 docstring/注释时必须按宽度而非字符数控制在 line-length=100 内，超长改为多行 docstring。",
+      "rule_semantic_homomorphism_before_invariant": "把某一口径推广为不变量或守护测试之前，必须先核对该口径在各类对象上的**语义是否同构**；同名不同义即不得统一钉死。范例（R9-2 / A127）：切片 `operations` 段在 lane F（纯前端卡）是「本卡**消费面**」——页面要调的 op 必须全在切片内，否则违反 D-011/D-012 的禁回读活契约而硬阻塞；在 lane D/S（后端卡）是「本卡**实现面**」——只含本卡要实现的 op，切片里的 pages 段仅作上下文参考，页面引用的他人 op 不必也不应进入。故「切片自洽性」不变量只对 lane F 成立。配套要求：批量改动落地后、提交前必须做一次角色/lane 归属复核，不得只凭机械校验通过就提交。",
+      "rule_ledger_write_structure_preserving": "回填 state.json 台账时对既有键只允许**值更新**，不允许**类型变更**：写入脚本必须逐键断言 type(new)==type(old)（或该键在 HEAD 不存在），TYPE 变更即缺陷；每次台账写入后、git add 前必须跑一次逐键语义 diff（HEAD vs 工作树），REMOVED_KEY 与 TYPE_CHANGE 计数必须为 0。理由：state.json 体量过大，行 diff 不可读，而「全表 17 项全绿」只证明被测口径正确、不证明台账写入正确（R9-3 实证）。"
     },
     "round7_adjudications": [
       {
@@ -8923,9 +9281,26 @@
         "evidence": [
           "M2-04 重切后 acceptance_rows 实测 15 条：AC-002/003/004/012/013/014/015/016/017/024/028/029/030/032/034",
           "tasks[M2-04].acs 保持 4 条（AC-002/004/012/017）未扩；acceptance.primary_owner 分母 47 未变动",
-          "同型排查：M1-04 gate『AC-005 至 AC-011』vs 切片 acceptance_rows 3 条、M3-04 gate『AC-018 至 AC-024』vs 3 条 —— 两卡的范围式字面同样隐含未落切片的号，其处置随后续批量重切治理一并收口（本条只落 M2-04，因其切片已重切、gate 面须与 acceptance_rows 逐一对应）"
+          "同型排查：M1-04 gate『AC-005 至 AC-011』vs 切片 acceptance_rows 3 条、M3-04 gate『AC-018 至 AC-024』vs 3 条 —— 两卡的范围式字面同样隐含未落切片的号，其处置随 **D-036** 批量重切收口，gate 字面枚举化另立 **FU-23** 在派单前落地（本条只落 M2-04，因其切片已重切、gate 面须与 acceptance_rows 逐一对应）"
         ],
-        "action_taken": "tasks[M2-04].gates[0].id 改为 15 条枚举式并标注 A126 口径；U-4 -> ADJUDICATED；M1-04/M3-04 的同型 gate 字面挂到后续批量重切治理一并处理"
+        "action_taken": "tasks[M2-04].gates[0].id 改为 15 条枚举式并标注 A126 口径；U-4 -> ADJUDICATED；M1-04/M3-04/M4-03 的同型 gate 字面挂 **FU-23**，在各卡派单前收口（切片侧已随 D-036 重切）"
+      },
+      {
+        "id": "A127",
+        "round": 9,
+        "at": "2026-11-14T00:29:01+08:00",
+        "source": "编排器（Round 9：D-036 切片自洽性不变量的适用边界裁定）",
+        "question": "切片自洽性不变量「union(pages[*].meta.operation_ids) ⊆ set(operations)」应适用于哪些切片？全量审计显示 9 份含页面切片中 7 份违反，其中 4 份（M1-P01/M3-P01/M4-02/M4-P01）属 lane D/S 后端卡。是否一律重切？",
+        "ruling": "**只适用于 lane F（纯前端页面卡）**。后端卡（lane D/S）的 `operations` 段语义是「**本卡实现面**」，卡内原文形如「本切片 `operations` 段 11 个 opId **全取**」并逐个枚举要实现的 op；其切片里的 `pages` 段只是**上下文参考**，页面引用的 op 多数由别的卡实现。若把页面引用的他人 op 塞进后端卡 operations，① 卡内「N 个 opId 全取」与枚举列表立即自相矛盾，② 会诱导实现方去实现不属于自己的 op（越权 + 双 owner，正是 M4-02 U-5／M3-P01 U-6 已在防的形态）。故 lane D/S 卡**不适用**本不变量，其 pages 段与 operations 段的口径差异属**设计如此**。lane F 卡的 operations 段语义是「**本卡消费面**」，页面要调的 op 必须全部在切片内（否则违反 D-011/D-012 的禁回读活契约 -> 硬阻塞），故适用。",
+        "evidence": [
+          "state.json tasks[*].lane 实测：lane F = {M0-03, M0-03b, M1-04, M2-04, M3-04, M3-P02, M4-03}；lane D = 9 张、lane S = 7 张（含 M4-02/M4-P01）",
+          "M1-04.md:6 与 M3-04.md:6 原文均自述「**纯前端卡**：不写 src/**、不新增 operationId」；M4-03.md:6 同型 -> 三者 operations 段确为消费面",
+          "M4-02.md:11 原文「本切片 `operations` 段 11 个 opId **全取**（path 前缀＋scope 文件名的编排器初判，改判见 U-5）」+ M1-P01.md:53 档位表 S5「10 个 opId 的 DTO 与路由样板铺开」-> 后端卡 operations 段确为实现面",
+          "M1-04.md U-3 与 M3-04.md U-4 原文均自述「本卡按栏二**全列 11 条**撰写以覆盖字面范围」-> 与重切后 acceptance_rows = 11 条逐条吻合，反向印证 lane F 卡按页面呈现全量取 AC 行是既有意图",
+          "守护实现：tests/unit/test_slice_self_consistency.py 的 lane 归属从 state.json tasks[*].lane 动态读取，只取 lane F，新增 lane F 页面卡自动纳入、后端卡永不误判"
+        ],
+        "action_taken": "回滚 M1-P01/M3-P01/M4-02/M4-P01 四份切片到 HEAD 字节（git checkout -- 显式路径，sha16 逐位核对：2f80df94417b2efa / 30c776e4e6a51bbd / febd8628e02b0d02 / 73a9bcf1c483adbd）；只落地 M1-04/M3-04/M4-03 三份 lane F 切片；守护只钉 ops 自洽性（**不钉 AC 自洽性**，因 A126 已裁 gate 面与 acs 口径分离、cross_ref AC 原文权威落点是卡内逐字引用 + qa/ACCEPTANCE.md 行号，钉死会与 A126 冲突）；M4-P01 混合卡另立 FU-24",
+        "self_note": "审计初版把不变量无差别套到全部含页面切片并已重切 4 张后端卡，属**过度泛化**；在提交前查 tasks[*].lane 与卡内角色自述才发现，已回滚（零数据损失）。教训：把某一口径推广为不变量前，必须先核对该口径在各类对象上的**语义**是否同构 —— 本例中 operations 段在 lane F 是「消费面」、在 lane D/S 是「实现面」，同名不同义。记为 R9-2。"
       }
     ],
     "round7_predispatch": {
@@ -9630,7 +10005,7 @@
           "ruling_id": "A126",
           "adjudicated_at": "2026-11-13T23:59:21+08:00",
           "adjudicated_by": "编排器（owner_decisions.ruling_scope 授权默认值裁定）",
-          "resolution": "允许 gate 面 > acs；M2-04 gates[0].id 改 15 条枚举式；acs 保持 4 条不扩；M1-04/M3-04 同型随后续批量重切治理收口"
+          "resolution": "允许 gate 面 > acs；M2-04 gates[0].id 改 15 条枚举式；acs 保持 4 条不扩；M1-04/M3-04/M4-03 同型随 D-036 重切、gate 字面枚举化挂 FU-23"
         },
         {
           "id": "U-5",
@@ -10121,6 +10496,35 @@
           "D-003",
           "gate_measurement_caliber.rule_no_tmp_only_evidence"
         ]
+      },
+      {
+        "id": "R9-2",
+        "at": "2026-11-14T00:29:01+08:00",
+        "what_was_wrong": "把「切片自洽性」不变量（union(pages[*].meta.operation_ids) ⊆ set(operations)）**无差别推广**到全部 9 份含页面切片，并据此重切了 M1-P01／M3-P01／M4-02／M4-P01 四张 lane D／S 后端卡的切片（ops 分别 10->13、7->9、11->18、8->21）。后端卡 operations 段语义是「本卡实现面」而非「页面消费面」，此举会让卡内「N 个 opId 全取」与其枚举列表自相矛盾，并诱导实现方去实现不属于自己的 op。",
+        "how_found": "落地覆盖后、提交前，逐卡核对 state.json `tasks[*].lane` 与卡内 L1-L6 角色自述：M1-04／M3-04／M4-03 明写「**纯前端卡**：不写 src/**、不新增 operationId」，而 M1-P01／M3-P01 为 lane D、M4-02／M4-P01 为 lane S，且 M4-02.md:11 明写「11 个 opId **全取**」、M1-P01.md:53 档位表 S5 明写「10 个 opId 的 DTO 与路由样板铺开」-> 语义不同构，不变量不适用。",
+        "correction": "① `git checkout -- <4 个显式路径>` 回滚四份切片，sha16 与回滚前台账记录**逐位核对相同**（2f80df94417b2efa／30c776e4e6a51bbd／febd8628e02b0d02／73a9bcf1c483adbd），零数据损失（四份均已提交于 HEAD=2d7722e，工作树无未提交内容）；② 只保留 M1-04／M3-04／M4-03 三份 lane F 切片的重切；③ 立 A127 明确不变量的 lane 边界；④ 守护 tests/unit/test_slice_self_consistency.py 的 lane 归属从 state.json 动态读取、只取 lane F，使误判在结构上不可能；⑤ M4-P01 混合卡不擅自处置，另立 FU-24 待裁。",
+        "prevention": "新增口径规则 rule_semantic_homomorphism_before_invariant（见 resume.gate_measurement_caliber）：把某一口径推广为不变量／守护前，必须先核对它在各类对象上的**语义是否同构**；同名不同义（本例 operations 段在 lane F 是消费面、在 lane D/S 是实现面）即不得统一钉死。另：批量改动落地后、提交前必须做一次「角色/lane 归属」复核，不得只靠机械校验通过就提交。",
+        "related": [
+          "A127",
+          "D-036",
+          "FU-24",
+          "gate_measurement_caliber.rule_semantic_homomorphism_before_invariant"
+        ]
+      },
+      {
+        "id": "R9-3",
+        "at": "2026-11-14T00:42:34+08:00",
+        "what_was_wrong": "D-036 台账回填时对 resume.self_check_gates_rc0 下的既有键做了**同键覆盖**而非结构保持更新，造成 2 处意外 TYPE 变更：① gates.G14b_cli_doctor.expected 由 null 被写成 0；② spec_untouched 由 dict（{cmd,result,rc,expected,measured_at}）被压成一句 str，丢掉了 cmd/rc/expected 三个可复现字段。另有 3 处同源陈旧：counts 内层 counts_refresh_reason 仍为 Round 7 文案、composition.identity_measured_at 停在上一轮时点、composition.caliber_note 仍是 D-035 轮口径叙述。",
+        "how_found": "提交前做「语义 diff 复核」（逐键 HEAD vs 工作树，只报 REMOVED_KEY / TYPE 变更 / 值变更，不看行 diff）。行 diff 因 state.json 体量（约 69.6 万字符）不可读，机械校验 17 项又全绿，唯有逐键语义比对才暴露出 TYPE 变更 —— 说明「全表全绿」不足以证明台账写入正确。",
+        "correction": "① expected 改回 null（rc=0/history/evidence 保留）；② spec_untouched 按 HEAD 的 dict 结构恢复，只更新 measured_at 并新增 note 承载「含 G4c 还原后复测」语义；③ counts.counts_refresh_reason 用与 resume.self_check_gates_rc0.counts_refresh_reason 相同的 D-036 文案刷新（两层不再漂移）；④ identity_measured_at 对齐本轮测量时点；⑤ caliber_note 不覆盖，改以 append-only 新键 caliber_note_R9_d036 记本轮口径推导。全部改动仍走 indent=2 / ensure_ascii=False / 尾换行 / 无 BOM 无 CR 的原子写。",
+        "prevention": "新增口径规则 rule_ledger_write_structure_preserving（见 resume.gate_measurement_caliber）：回填台账时对既有键**只允许值更新，不允许类型变更**；写入脚本必须先断言 type(new)==type(old) 或该键在 HEAD 不存在，TYPE 变更一律视为缺陷；且每次台账写入后、提交前必须跑一次逐键语义 diff（HEAD vs 工作树）并把 REMOVED_KEY/TYPE_CHANGE 计数打印为 0 才允许 git add。",
+        "related": [
+          "D-036",
+          "A127",
+          "R9-1",
+          "R9-2",
+          "gate_measurement_caliber.rule_ledger_write_structure_preserving"
+        ]
       }
     ],
     "round9_orchestrator_self_served": [
@@ -10143,6 +10547,33 @@
           "tests/api/test_contract_declarations.py"
         ],
         "gates_after": "全表 16 项全绿（mismatch=none）；mypy 72 source files；pytest 350 passed；ruff format 186 files"
+      },
+      {
+        "at": "2026-11-14T00:29:01+08:00",
+        "item": "U-1 收口（A125/A126）+ D-036 全量切片自洽性审计与批量重切（A127）",
+        "who": "编排器自办，**未派子智能体**",
+        "why_not_dispatched": "切片与 state.json 对 lane 一律只读，且改动须与全表复验、counts 同提交刷新耦合；子智能体禁一切 git 写操作，派单协调成本高于自办。审计-重切-回滚-立缺陷-加守护是一条强耦合链，拆派会丢失中间判定上下文。",
+        "accounting": "**不计入 budget.subtask_log**（依 accounting_rule_orch_self_served：该口径只统计子智能体派单，编排器自办计入会污染 flash_share 分母）",
+        "files_added": [
+          "tests/unit/test_slice_self_consistency.py",
+          "orchestrator/defects/D-036.md",
+          "evidence/M0/ORCHESTRATOR/round9-d036-slice-selfconsistency/fulltable.log"
+        ],
+        "files_modified": [
+          "orchestrator/handoff/M2-04.slice.json",
+          "orchestrator/handoff/M1-04.slice.json",
+          "orchestrator/handoff/M3-04.slice.json",
+          "orchestrator/handoff/M4-03.slice.json",
+          "orchestrator/tasks/M2-04.md",
+          "orchestrator/tasks/M1-04.md",
+          "orchestrator/tasks/M3-04.md",
+          "orchestrator/tasks/M4-03.md",
+          "orchestrator/state.json"
+        ],
+        "commits": [
+          "2d7722e（U-1/A125/A126：M2-04 重切）",
+          "本提交（D-036/A127/R9-2/FU-23/FU-24 + 守护）"
+        ]
       }
     ],
     "accounting_rule_orch_self_served": "编排器自办的小修复**不入** budget.subtask_log（避免污染 flash_share 分母，该口径只统计子智能体派单），一律记入 resume.round<N>_orchestrator_self_served。",
@@ -10256,7 +10687,8 @@
       ],
       "card_edit_caliber": "head 48 行不变（<=60）、tail 19->20（<=40）、total 79->80（<=200）；10 处锚点替换均断言命中次数后才写；U-1 条目 append-only 追加终裁行",
       "readonly_check": "git status --porcelain spec/ contracts/ = 空",
-      "followup_systemic": "同型排查发现 7 个含页面切片中 6 个存在同类自相矛盾（切片自带 pages[*].meta 引用的 op/AC 不在切片正文内，而卡片禁回读活契约 D-011/D-012 -> 实现方硬阻塞）；受影响：M1-04/M3-04（仅缺 AC 行）、M1-P01/M3-P01/M4-02/M4-03/M4-P01（缺 op，BLOCKING 级）-> 批量重切治理，缺陷编号于下一提交分配后回填此处（禁悬空指针）"
+      "followup_systemic": "同型排查发现 7 个含页面切片中 6 个存在同类自相矛盾（切片自带 pages[*].meta 引用的 op/AC 不在切片正文内，而卡片禁回读活契约 D-011/D-012 -> 实现方硬阻塞）；受影响：M1-04/M3-04（仅缺 AC 行）、M1-P01/M3-P01/M4-02/M4-03/M4-P01（缺 op，BLOCKING 级）-> 已立 **D-036** 批量治理（本提交内落地）；口径边界见 **A127**（只对 lane F 适用），四张 lane D/S 后端卡的重切已回滚，见自我更正 **R9-2**",
+      "followup_defect": "D-036"
     }
   },
   "acceptance": {
