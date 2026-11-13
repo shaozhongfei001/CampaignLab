@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T11:34:54+08:00",
+  "updated_at": "2026-11-13T11:53:59+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -4077,7 +4077,39 @@
       "⑦ 每次回收后程序化重算 flash_share（units=subtask_count or 1；dev=task.startswith('M')），wave2 出口复核两护栏，禁为凑配比降档",
       "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+        "nickname": "Newton",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S3b",
+        "tier": "qwen3.8-flash",
+        "budget": "14k",
+        "dispatched_at": "2026-11-13T11:53:59+08:00"
+      },
+      {
+        "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+        "nickname": "Volta",
+        "lane": "S",
+        "task": "M0-04",
+        "subtask": "S2",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "budget": "50k",
+        "dispatched_at": "2026-11-13T11:53:59+08:00"
+      },
+      {
+        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+        "nickname": "Franklin",
+        "lane": "G",
+        "task": "FU-8+FU-14",
+        "subtask": "D-028 收口 + counts 新鲜度守护",
+        "tier": "qwen3.8-flash",
+        "budget": "16k",
+        "dispatched_at": "2026-11-13T11:53:59+08:00"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -5722,6 +5754,111 @@
         "dispatch_commit_note": "本条 = Round 6 dispatch 记录提交；predispatch_commit 已回填为 76cf311",
         "at_dispatch": "2026-11-13T09:47:18+08:00",
         "mode_actual": "parallel-2-lanes 已成型：S/M0-02-S3d(Godel, qwen3.8-max, high, 40k, loop<=2) ∥ T/D-016批次4(Planck, qwen3.8-flash, 40k, loop<=2)"
+      },
+      {
+        "at": "2026-11-13T11:53:59+08:00",
+        "wave": 1,
+        "round": 7,
+        "mode": "parallel-3-lanes",
+        "predispatch_commit": "af3808b",
+        "predispatch_commit_note": "Round 7 predispatch 治理提交 af3808b 已推送（4 路径：state.json + defects/D-029.md + tasks/M0-02.md 的 D-029/A84-A85 卡尾加注 6 行 + handoff/M0-02-S3b.slice.json 素材入库）。提交前 18 项全表实跑 rc==expected（G4c 篡改负例与 G13 npm 未跑并记因）：pytest 213 passed、mypy 49 files、ruff check All checks passed、ruff format 149 files、check_contracts 13=13（--validate 元校验=6）、scripts/doctor.sh HEALTHY(PASS=15 WARN=1 FAIL=0)、CLI doctor DEGRADED(PASS=3 WARN=2 FAIL=0，2 WARN 均非判据项)、G1/G2 基线 rc=0、G3 前端 8/8、G11 字节级复现、G12 PACKAGE 6/6、G4/G4b 负例 rc=2、守护 26 passed；恒等式 py51+md98=149 tracked + untracked 0 == 149；spec+contracts dirty=0；push 后 behind/ahead=0/0。计划修订 R7-1（Lane C 由批次5 改派 FU-8+FU-14）随本 dispatch 提交入库，af3808b 内的原计划按纪律保留于 lane_c_plan_correction_R7_1.original_plan。",
+        "concurrency_slots_released_before_dispatch": [
+          {
+            "agent_id": "01a1d275-7c5b-7dc0-9ddf-677eef887e4a",
+            "nickname": "Godel",
+            "closed_at": "2026-11-13T11:53:59+08:00",
+            "note": "Round 6 S lane / M0-02-S3d（max），交付已随 46dca2b 入库"
+          },
+          {
+            "agent_id": "01a1d295-65e6-7083-ae17-78b6d5365938",
+            "nickname": "Planck",
+            "closed_at": "2026-11-13T11:53:59+08:00",
+            "note": "Round 6 T lane / D-016 批次4（flash），交付已随 f0e20d4 入库"
+          }
+        ],
+        "dispatched": [
+          {
+            "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+            "nickname": "Newton",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S3b DTO 与路由样板铺开（exchangeSession/getSession/listWorkspaces/createWorkspace 四个 operationId）",
+            "tier": "qwen3.8-flash",
+            "budget": "14k",
+            "loop_cap": 2,
+            "write_set": [
+              "src/campaignlab/api/session.py(new)",
+              "src/campaignlab/api/workspaces.py(new)",
+              "src/campaignlab/api/app.py(<=6 行挂载，A85 豁免)",
+              "tests/unit/test_s3b_routes.py(new)"
+            ],
+            "key_rulings": [
+              "CR-002（listWorkspaces 无 status、删 422 INVALID_SCOPE）",
+              "A84",
+              "A85",
+              "A69",
+              "A47",
+              "A77/A78"
+            ]
+          },
+          {
+            "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+            "nickname": "Volta",
+            "lane": "S",
+            "task": "M0-04",
+            "subtask": "S2 认领/续租/取消/重试与 9 条状态机迁移实现（§6.3 并发与租约强制 max）",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high",
+            "budget": "50k",
+            "loop_cap": 2,
+            "write_set": [
+              "src/campaignlab/worker/**(new)",
+              "src/campaignlab/infra/db/repositories.py(append-only，A82 豁免)",
+              "src/campaignlab/application/worker.py(append-only + :142 等价替换，A83 豁免)",
+              "tests/unit/test_worker_runner.py(new)",
+              "tests/unit/test_job_repository_terminal.py(new)",
+              "orchestrator/handoff/M0-04-design.md(append-only 加注)"
+            ],
+            "key_rulings": [
+              "A81",
+              "A82",
+              "A83",
+              "A86",
+              "A87",
+              "A88",
+              "A89",
+              "A90",
+              "A70(判据①已由 A83 修订)",
+              "A72/A73",
+              "FU-10"
+            ]
+          },
+          {
+            "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+            "nickname": "Franklin",
+            "lane": "G",
+            "task": "FU-8+FU-14",
+            "subtask": "D-028 收口（alembic head 唯一实现）+ counts 新鲜度机器守护",
+            "tier": "qwen3.8-flash",
+            "budget": "16k",
+            "loop_cap": 2,
+            "write_set": [
+              "src/campaignlab/infra/db/migration_head.py(new)",
+              "src/campaignlab/cli.py(仅 _migration_head() 委托)",
+              "src/campaignlab/application/health_service.py(仅 read_migration_head() 委托 + re-export 保持向后兼容)",
+              "tests/unit/test_migration_head_single_source.py(new)",
+              "tests/unit/test_counts_freshness.py(new)"
+            ],
+            "key_rulings": [
+              "A80/D-028/FU-8",
+              "R6-3/FU-14",
+              "A75/D-012/D-014（禁写死计数）"
+            ]
+          }
+        ],
+        "parallel_safety": "三方写集两两不相交（逐路径实测比对，见 round7_predispatch.disjointness_recheck 与 lane_c_plan_correction_R7_1.disjointness_recheck）；PRE-5 成员面已 inspect 实取核对（NotImplementedError=0、三 Protocol 有真实成员面）；M0-04/S2 的 N6 前置（S3c=f457ec9、S3d=46dca2b 均已入库）达成",
+        "toolchain_policy": "三 lane 一律只准跑路径限定门禁，禁跑全仓 pytest/mypy/ruff check ./ruff format --check ./doctor.sh/verify.sh 与任何 npm/node/vite/vitest/playwright；非自有文件红点禁自行修复只回报归因；一律禁 git 写操作。全表复验为编排器回收后独占动作（手册第 746 行假 RED 窗口）",
+        "plan_correction": "R7-1：Lane C 由 D-016 批次5 改派 FU-8+FU-14，批次5 顺延至 Round 8 predispatch（理由见 round7_predispatch.lane_c_plan_correction_R7_1.reason）；FU-15 一并顺延（需先设计已裁定豁免白名单机制）"
       }
     ],
     "q_verify": {
@@ -7650,7 +7787,7 @@
       }
     ],
     "round7_predispatch": {
-      "at": "2026-11-13T11:34:54+08:00",
+      "at": "2026-11-13T11:44:06+08:00",
       "round": 7,
       "wave": 1,
       "mode": "parallel-3-lanes",
@@ -7662,13 +7799,16 @@
           "subtask": "S3b DTO 与路由样板铺开",
           "tier": "qwen3.8-flash",
           "budget": "14k",
-          "loop_cap": 3,
+          "loop_cap": 2,
           "write_set": [
             "src/campaignlab/api/session.py(new)",
             "src/campaignlab/api/workspaces.py(new)",
             "src/campaignlab/api/app.py(<=6 行挂载，A85 豁免)",
             "tests/unit/test_s3b_routes.py(new)"
-          ]
+          ],
+          "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+          "nickname": "Newton",
+          "exit_condition": "4 个 operationId 逐字对应且状态码集合==切片声明；listWorkspaces 形参恰为 {cursor,limit,q} 无 status；无 422 INVALID_SCOPE 分支；app.py ≤6 add/0 del 且挂载落在 A69 分支内；路径限定 ruff/mypy/pytest 全 rc=0"
         },
         {
           "lane": "S",
@@ -7685,21 +7825,28 @@
             "tests/unit/test_worker_runner.py(new)",
             "tests/unit/test_job_repository_terminal.py(new)",
             "orchestrator/handoff/M0-04-design.md(append-only 加注)"
-          ]
+          ],
+          "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
+          "nickname": "Volta",
+          "exit_condition": "9 条状态机迁移逐条实现且逐条有测试；两次并发认领只一个成功；失效 lease token 提交被拒；终态唯一；JOB_INTERRUPTED 落 Issue.code 而非 Problem.code；jobs SQL 写点文件集合仍==1；repositories.py 与 application/worker.py 为 append-only（numstat 0 del，worker.py 唯一允许 :142 一行等价替换）；守护测试 5 项齐备"
         },
         {
-          "lane": "T",
-          "task": "D-016-batch5",
-          "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+          "lane": "G",
+          "task": "FU-8 + FU-14",
+          "subtask": "D-028 收口（alembic head 唯一实现）+ counts 新鲜度机器守护",
           "tier": "qwen3.8-flash",
-          "budget": "24k",
+          "budget": "16k",
           "loop_cap": 2,
           "write_set": [
-            "orchestrator/tasks/M1-04.md(new)",
-            "orchestrator/tasks/M2-04.md(new)",
-            "orchestrator/tasks/M3-04.md(new)",
-            "tests/unit/test_task_cards.py(KNOWN_MISSING 6->3)"
-          ]
+            "src/campaignlab/infra/db/migration_head.py(new)",
+            "src/campaignlab/cli.py(仅 _migration_head() 委托改写)",
+            "src/campaignlab/application/health_service.py(仅 read_migration_head() 委托改写)",
+            "tests/unit/test_migration_head_single_source.py(new)",
+            "tests/unit/test_counts_freshness.py(new)"
+          ],
+          "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+          "nickname": "Franklin",
+          "exit_condition": "get_current_head() 调用点唯一（只在 infra/db/migration_head.py）；health_service 仍 re-export read_migration_head 与 UNMIGRATED_REVISION；doctor 行为零变化（由 test_cli_doctor/test_doctor_determinism 近邻回归证明）；test_counts_freshness 用 git ls-tree -r HEAD 口径、无写死数字、在 af3808b 上为绿"
         }
       ],
       "write_set_disjointness": "三方两两不相交（实测逐路径比对）：A 只碰 api/{session,workspaces,app}.py 与 tests/unit/test_s3b_routes.py；B 只碰 worker/**、repositories.py、application/worker.py、两个新 test_worker*/test_job_repository* 与 M0-04-design.md；C 只碰三张新卡与 test_task_cards.py。无一路径被两方同时写入。",
@@ -7713,7 +7860,35 @@
       "toolchain_contention_mitigation": "三 lane 同处一个工作树，并发跑全仓门禁会互撞在飞的半成品文件而得到假 RED（手册第 746 行明载该窗口）。故本轮派单文对三 lane 一律规定：① 只准跑**路径限定**的门禁——`ruff check <自有路径>`、`ruff format --check <自有路径>`、`mypy <自有路径>`、`pytest -q <自有测试文件>`；② **禁**跑全仓 `pytest` / `mypy` / `ruff check .` / `ruff format --check .` / `bash scripts/doctor.sh` / `bash scripts/verify.sh` / 任何 `npm`/`node`/`vite`/`vitest`/`playwright`（全表复验是编排器回收后的独占动作）；③ 若看见非自有文件的红点（尤其 application/worker.py、worker/**、api/*.py、tests/unit/test_task_cards.py 等对方在飞路径），**禁自行修复、禁改对方文件**，只在回报中列出并归因；④ 一律不执行任何 git 写操作（add/commit/push/checkout/stash/reset/branch/tag/rebase/merge），交付物留在工作区由编排器统一复验后分任务提交。",
       "batch5_card_choice_reason": "KNOWN_MISSING 实测 6 张：M1-04/M2-04/M3-04/M3-P02/M5-03/M5-P01。按 waves 实测（29/29 全覆盖、无重复无孤儿）缺卡的最近波次是 **wave4（M1-04、M2-04 与 M1-P01 并行）** 与 **wave6（M3-04 与 M4-01 并行）**，故批次 5 取这 3 张；M3-P02（wave7）、M5-P01（wave9）、M5-03（wave10）留批次 6。手册 15.5：无拆解表不得 spawn，故这 3 个任务在补卡前不可派单。",
       "fu5_carryover": "FU-5 要求批次 5 补 M1-04/M2-04 卡时把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属 -> 已写进 Lane C 派单文",
-      "gates_before_dispatch": "见 resume.self_check_gates_rc0.round7_predispatch_gates（本提交树全表实跑）"
+      "gates_before_dispatch": "见 resume.self_check_gates_rc0.round7_predispatch_gates（本提交树全表实跑）",
+      "lane_c_plan_correction_R7_1": {
+        "at": "2026-11-13T11:44:06+08:00",
+        "severity": "MINOR",
+        "kind": "编排器派单前计划修订（无 lane 在飞，非历史改写）",
+        "original_plan": {
+          "lane": "T",
+          "task": "D-016-batch5",
+          "subtask": "补 M1-04/M2-04/M3-04 三张卡 + KNOWN_MISSING 6->3",
+          "tier": "qwen3.8-flash",
+          "budget": "24k",
+          "loop_cap": 2,
+          "write_set": [
+            "orchestrator/tasks/M1-04.md(new)",
+            "orchestrator/tasks/M2-04.md(new)",
+            "orchestrator/tasks/M3-04.md(new)",
+            "tests/unit/test_task_cards.py(KNOWN_MISSING 6->3)"
+          ]
+        },
+        "committed_in": "af3808b（原计划随该提交入库，原文字节保留于本条 original_plan，不改写）",
+        "reason": "批次5 的 M1-04/M2-04/M3-04 三张卡经实测均为 **lane F 前端任务**，scope 全部落在 web/**（M1-04: web/src/pages/data/ 等；M2-04: web/src/pages/rules/、pages/cases/；M3-04: web/src/pages/review/），其切片需要的是 --ui 页面维度而非 operationId 维度；而 handoff/ 实测无这三份切片，且 spec 内 UI 页面共 26 个（UI-01..UI-26，权威索引 spec/CampaignLab-SDD-v1.0/ui/INDEX.md）。页面归属须由编排器依 INDEX.md 与各任务 scope 逐一定标后用 scripts/contract_slice.py --ui ... --ac ... 预生成——定标错误会直接产出错误卡并需返工（手册 15.5：无拆解表不得 spawn，而拆解表的质量完全取决于切片质量）。故不与两条关键路径 lane（M0-02 critical/slack0、M0-04 critical/slack0）抢同一轮的准备时间。",
+        "new_plan": "第 3 槽改派 FU-8（D-028 收口，flash 8k）+ FU-14（counts 新鲜度守护，flash 8k）：两者均为已登记的确定性债务，无需新素材，且与 Lane A/B 写集实测不相交。",
+        "batch5_rescheduled_to": "Round 8 predispatch（编排器先定标并预生成 3 份切片，再派 T lane 补卡；须承接 FU-5 的 MONTHLY-PAGES.md:33-43 关联页面增量表与 A31 页面证据归属）",
+        "disjointness_recheck": "Lane C 写 cli.py 与 application/health_service.py；Lane A 写 api/{session,workspaces,app}.py + tests/unit/test_s3b_routes.py；Lane B 写 worker/** + infra/db/repositories.py(append) + application/worker.py(append) + 2 个新单测 + M0-04-design.md(加注)。三方两两不相交（cli.py 仅 C 触碰；app.py 仅 A 触碰；application/ 下 C 碰 health_service.py、B 碰 worker.py，为同目录不同文件）。",
+        "fu15_deferred": "FU-15（档位表产出列越界守护）一并顺延至 Round 8：其判据需先设计「已裁定豁免」白名单机制（A82/A83/A85 刻意让 M0-04/S2 与 S3b 写各自 scope 外的路径，且 M0-02 卡 v3 的 S4 行按纪律保留原文不改写），否则守护会把已裁定的豁免判红。设计定稿后再派，避免产出需要立即返工的守护。"
+      },
+      "predispatch_commit": "af3808b",
+      "predispatch_commit_note": "Round 7 predispatch 治理提交 af3808b 已推送（4 路径：state.json + defects/D-029.md + tasks/M0-02.md 的 D-029/A84-A85 卡尾加注 6 行 + handoff/M0-02-S3b.slice.json 素材入库）。提交前 18 项全表实跑 rc==expected（G4c 篡改负例与 G13 npm 未跑并记因）：pytest 213 passed、mypy 49 files、ruff check All checks passed、ruff format 149 files、check_contracts 13=13（--validate 元校验=6）、scripts/doctor.sh HEALTHY(PASS=15 WARN=1 FAIL=0)、CLI doctor DEGRADED(PASS=3 WARN=2 FAIL=0，2 WARN 均非判据项)、G1/G2 基线 rc=0、G3 前端 8/8、G11 字节级复现、G12 PACKAGE 6/6、G4/G4b 负例 rc=2、守护 26 passed；恒等式 py51+md98=149 tracked + untracked 0 == 149；spec+contracts dirty=0；push 后 behind/ahead=0/0。计划修订 R7-1（Lane C 由批次5 改派 FU-8+FU-14）随本 dispatch 提交入库，af3808b 内的原计划按纪律保留于 lane_c_plan_correction_R7_1.original_plan。",
+      "dispatched_at": "2026-11-13T11:53:59+08:00"
     }
   },
   "acceptance": {
