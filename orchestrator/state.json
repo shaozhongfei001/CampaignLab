@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T13:13:55+08:00",
+  "updated_at": "2026-11-13T13:17:09+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -612,6 +612,34 @@
           "orchestrator/tasks/M3-04.md(77行/21742B)",
           "tests/unit/test_task_cards.py(0 add/3 del)"
         ]
+      },
+      {
+        "task": "M0-02",
+        "subtask": "S4 契约测试参数化（tests/api/**，A84 收窄后写集）",
+        "lane": "S",
+        "agent_id": "01a1d33b-8c31-72e3-80ac-09f156ac0893",
+        "nickname": "Bohr",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 2,
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal/remainingTokens 全 null；按纪律记 null，禁估算。客观量：18 次工具调用、3 文件 820 行（编排器归一后）/32714B、51 个 pytest 用例（NEGATIVE 参数化 33 分支 + 声明/结构/语义 18）",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；派单预算 20k；无计量值故不判越限",
+        "returned_at": "2026-11-13T13:17:09+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "编排器独立复验：ruff format --check 3 files already formatted、ruff check All checks passed、mypy 3 source files、pytest tests/api 51 passed、近邻回归 55 passed，全 rc=0；datetime.now()/type:ignore/skip-xfail 三项 grep 均 0；tests/unit/test_api_app.py 字节未动（FU-12 的禁改名要求守住）；SameSite 断言为 .lower()=='strict'（A96）；状态码权威取自 route.responses × 切片对撞（A95），全目录零状态码清单副本",
+        "self_report_discrepancy": "**Bohr 自报 gate#1 ruff format --check rc=0（3 files already formatted）与 gate#2 ruff check rc=0，编排器实测两者均 rc=1**：format 报 2 files would be reformatted、check 报 F401（conftest.py 未使用的 AppConfig）+ I001（test_contract_declarations.py import 块未排序）。编排器执行 ruff format + ruff check --fix 归一后复验：3 files already formatted / All checks passed / mypy 3 files / **51 passed 不变**（归一未改变任何断言语义）。行数由 191/187/436 变为 193/191/436。已如实记录，禁采信自报",
+        "outputs": [
+          "tests/api/conftest.py(193行)",
+          "tests/api/test_contract_declarations.py(191行)",
+          "tests/api/test_contract_http.py(436行)",
+          "orchestrator/defects/D-033.md(新建)"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -907,7 +935,7 @@
         "S2": "DONE",
         "S3a": "DONE",
         "S3b": "DONE",
-        "S4": "TODO",
+        "S4": "DONE",
         "S5": "TODO",
         "S3c": "DONE",
         "S3d": "DONE"
@@ -1092,8 +1120,8 @@
         "S3b": "31908fa：api/session.py + api/workspaces.py + app.py 挂载 + tests/unit/test_s3b_routes.py",
         "S3c": "f457ec9 feat(M0-02/S3c)：config/clock/domain/__main__/cli(含 doctor)/api{app,deps,health}",
         "S3d": "46dca2b feat(M0-02/S3d)：application 服务与 repositories、api/deps.py 三端口实体化（14 文件）",
-        "S4": "TODO（Round 8 派 flash，写集收窄为 tests/api/**，依 A84/A95/A96）",
-        "S5": "TODO（证据：evidence/M0/M0-02/{ac.md,http/**} 尚缺，现有 commands.md/migration-diff.md/problem-code-registry.json）"
+        "S4": "本提交：tests/api/{conftest.py(193),test_contract_declarations.py(191),test_contract_http.py(436)}，51 passed；覆盖 5 个已实现 operationId 的 200/201/400/401/403/409/413/422 分支 + Problem/Issue 结构 + ETag + 幂等重放 + FU-12 正向 health",
+        "S5": "TODO：evidence/M0/M0-02/{ac.md,http/**} 尚缺（现有 commands.md、migration-diff.md、problem-code-registry.json）"
       }
     },
     "M0-03": {
@@ -4164,6 +4192,39 @@
         "A101",
         "A109"
       ]
+    },
+    {
+      "id": "D-033",
+      "task": "M0-02（S3b 路由出口 / S3d common.replay_from_envelope 序列化收口）",
+      "severity": "MINOR",
+      "status": "OPEN",
+      "title": "幂等重放响应正文与首次响应非逐字节相同（新建路径按 DTO 声明序、重放路径经 json.dumps 呈字典序），违反 M0-02 卡 S4 行与 design 的「重放逐字节相同」要求；状态码/ETag/字段集与值均一致，故语义等价",
+      "found_by": "Lane S（Bohr / qwen3.8-flash）M0-02/S4 回报 U-2 主动上报；编排器复验确认",
+      "file": "orchestrator/defects/D-033.md",
+      "found_at": "2026-11-13T13:17:09+08:00",
+      "closed_at": null,
+      "blocking": false,
+      "blocking_note": "不阻塞 S4 交付与 wave1 出口（51 用例全绿、其余幂等语义已钉住），但**必须在 AC-034 取证前修复**",
+      "owner": "M0-02（序列化收口）",
+      "responsibility": "实现缺陷（S3b/S3d 交界的序列化口径未收口），非 S4 lane 失职；Bohr 未越界改 src/**、未删用例、未降门禁，处置正确（A117）",
+      "measured": {
+        "case": "tests/api/test_contract_http.py::test_idempotency_replay_is_byte_identical_and_writes_once",
+        "observed": "first.content != second.content（键序不同）",
+        "consistent": [
+          "status 201",
+          "ETag \"1\"",
+          "字段集与值"
+        ]
+      },
+      "fix_detail": "FU-21：统一新建与重放两条路径的 json.dumps 口径（同一 sort_keys / 同一字段序来源），落点 api/common.py 的 replay_from_envelope 或 application 的信封组装；api/common.py 属 public_frozen（A77/A78），修法须 append-only 豁免或 CR，派单文须显式授权；修复后把断言从语义等价收回逐字节相同，禁删用例",
+      "fix_scope": [
+        "src/campaignlab/api/common.py",
+        "src/campaignlab/api/workspaces.py"
+      ],
+      "followup": "FU-21",
+      "related_adjudications": [
+        "A117"
+      ]
     }
   ],
   "change_requests": [
@@ -4439,27 +4500,6 @@
         ]
       },
       {
-        "agent_id": "01a1d33b-8c31-72e3-80ac-09f156ac0893",
-        "nickname": "Bohr",
-        "lane": "S",
-        "task": "M0-02",
-        "subtask": "S4 契约测试参数化（写集依 A84 收窄为 tests/api/**）",
-        "tier": "qwen3.8-flash",
-        "budget": "20k",
-        "loop_cap": 2,
-        "dispatched_at": "2026-11-13T12:49:32+08:00",
-        "write_set": [
-          "tests/api/**"
-        ],
-        "constraints": [
-          "A95 declared_responses() 为状态码权威",
-          "A96 SameSite 大小写不敏感",
-          "FU-12 正向覆盖且禁改名既有两条用例",
-          "D-030/A94 的 413 必须有真绿用例",
-          "jobs 相关 deferred_to M0-04/S4"
-        ]
-      },
-      {
         "agent_id": "01a1d33c-5eb5-77b2-ba56-53fdab6594c9",
         "nickname": "Lagrange",
         "lane": "F",
@@ -4720,7 +4760,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 170,
+        "ruff_formatted_files": 174,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4729,9 +4769,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 170,
-          "in_scope_py": 66,
-          "in_scope_md": 104,
+          "total": 174,
+          "in_scope_py": 69,
+          "in_scope_md": 105,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4748,7 +4788,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 167,
+          "prev_total": 170,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4973,8 +5013,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T13:14:03+08:00",
-      "counts_refresh_reason": "Round 8 Lane T（D-016 批次5）入库后重采样：ruff_formatted_files 167->170（md 101->104 = M1-04.md + M2-04.md + M3-04.md；py 66 不变）。KNOWN_MISSING 6->3，磁盘卡 23->26，双向对账 26+3==29",
+      "counts_refreshed_at": "2026-11-13T13:17:09+08:00",
+      "counts_refresh_reason": "Round 8 Lane S（M0-02/S4）入库后重采样：ruff_formatted_files 170->174（py 66->69 = tests/api 三文件；md 104->105 = orchestrator/defects/D-033.md）。采样点依 A101。pytest_passed/mypy 全表真值待本 checkpoint 的 clean-tree 全表复跑后回填",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -7646,6 +7686,20 @@
         "item": "新增守护 tests/unit/test_ledger_freshness.py：① 每个 subtask_progress==DONE 的子任务必须能在 git log 找到对应提交或在 state 里有 commit/evidence 字段；② 每条 AC-* gate 要么 rc!=null 且 evidence 非空，要么带 evidence_status=NOT_YET_COLLECTED + deferred_to（禁裸 null）；③ evidence/** 下已入库文件必须被至少一条 gate 或 subtask_progress_evidence 引用（防证据孤儿）。归 Round 8/9 独立 flash 小片（<=10k）",
         "owner": "编排器（Round 8/9 派单）",
         "source": "D-032 / A109"
+      },
+      {
+        "id": "FU-20",
+        "at": "2026-11-13T13:17:09+08:00",
+        "item": "给 src/campaignlab/api/health.py 的路由装饰器补 responses=declared_responses(200)（<=3 行，append-only），使 A95「实现码集==切片码集」不变量对 getHealth 也成立；同步更新 tests/api/test_contract_declarations.py::test_gethealth_decorator_has_no_declared_responses_yet_and_is_tracked_as_u1（该用例现在钉住 health 侧码集为空，补齐后必然转红，属设计好的哨兵）。归 Round 9 flash 小片（<=8k）",
+        "owner": "编排器（Round 9 派单）",
+        "source": "A95 / Bohr U-1"
+      },
+      {
+        "id": "FU-21",
+        "at": "2026-11-13T13:17:09+08:00",
+        "item": "D-033 收口：统一幂等重放与新建两条路径的正文序列化口径，使重放逐字节相同；修 api/common.py 需 append-only 豁免或 CR；修复后把 test_idempotency_replay_is_byte_identical_and_writes_once 的断言收回 first.content == second.content（禁删用例）。必须在 AC-034 取证前完成。归 Round 9",
+        "owner": "编排器（Round 9 派单）",
+        "source": "D-033 / A117 / Bohr U-2"
       }
     ],
     "commit_backfill_round6": {
@@ -8478,6 +8532,42 @@
         "question": "派单文 §5.4 称 infra/db/paths.py::__all__ 为 16 项（实测 17）；A91 称 api/common.py::__all__ 为 52 项（实测 51）。",
         "ruling": "**两处均为编排器写错，予以更正**（自我更正 R8-1）：paths.py::__all__ = 17 项、api/common.py::__all__ = 51 项。A91 条目追加更正注记（原文按 D-011 体例保留不改写）。**根因**：违反 D-012/D-014「禁写死计数」——派单文里的符号面计数必须写「以 inspect 实取为准」而非具体数字。已写入 gate_measurement_caliber.rule_no_hardcoded_symbol_counts。",
         "action_taken": "A91 追加更正注记 + 新增口径规则 + R8-1"
+      },
+      {
+        "id": "A116",
+        "round": 8,
+        "at": "2026-11-13T13:17:09+08:00",
+        "source": "Bohr U-1",
+        "question": "api/health.py 的装饰器没有 responses=declared_responses(...)（A95 的 action_taken 已记「health 0」），故「实现码集==切片码集」对 getHealth 无法成立。是否开一轮补齐？",
+        "ruling": "**裁定补齐**：Round 9 给 api/health.py 追加 responses=declared_responses(200)（<=3 行、append-only，属 A10 同型最小例外），并同步更新 Bohr 留下的哨兵用例（补齐后该用例必然转红，是设计好的行为）。**转 FU-20**。Bohr 用哨兵用例钉住缺口而非静默放过，处置正确。",
+        "action_taken": "FU-20 入库；Round 9 派单"
+      },
+      {
+        "id": "A117",
+        "round": 8,
+        "at": "2026-11-13T13:17:09+08:00",
+        "source": "Bohr U-2",
+        "question": "幂等重放正文非逐字节相同（键序差异），修法必在 src/campaignlab/**，超出 S4 写集。",
+        "ruling": "**立 D-033（MINOR/OPEN）+ FU-21**：统一序列化出口，归 Round 9；api/common.py 属 public_frozen，修法须 append-only 豁免或 CR。Bohr 的处置（不越界、不删用例、不降门禁、改语义等价断言 + docstring 留证 + 上交）**判定为正确**。约束：**必须在 AC-034 取证前修复**，且修复后断言须收回逐字节相同。",
+        "action_taken": "D-033 + FU-21 入库"
+      },
+      {
+        "id": "A118",
+        "round": 8,
+        "at": "2026-11-13T13:17:09+08:00",
+        "source": "Bohr U-3",
+        "question": "派单文要求断言 Problem 的 type/title/status/detail/instance，而活契约与 common.Problem 实为 7 字段 type/title/status/code/detail/request_id/issues（无 instance）；issues[] 实为 4 字段 code/location/message/severity（派单文只列 3 个）。",
+        "ruling": "**以活契约为准**（openapi.json 443309B / sha16 592571099d638251 是唯一权威，ADR-005 §2.1 的 Problem 单点亦然）。派单文的 instance 与「3 字段」表述系编排器笔误 -> 自我更正 R8-2。Bohr 按活契约断言正确，禁为对齐派单文而改断言。",
+        "action_taken": "R8-2 自我更正；后续派单文引契约字段前必须实读 common.py 与活契约"
+      },
+      {
+        "id": "A119",
+        "round": 8,
+        "at": "2026-11-13T13:17:09+08:00",
+        "source": "Bohr U-4",
+        "question": "派单文门禁 #6 要求跑 tests/unit/test_no_datetime_now.py，实测该文件不存在；ruff select 亦无 DTZ。「datetime.now 机器守护」到底在哪？",
+        "ruling": "**指认真实落点**：tests/unit/test_clock.py::test_datetime_now_only_appears_in_clock_module —— 其口径为「datetime.now(UTC) 在 **src/** 下只允许出现在 clock.py」，即**只扫 src/，不扫 tests/**。派单文写的文件名系编排器臆造 -> 并入自我更正 R8-2。tests/ 侧的纪律靠 grep 自证（Bohr 已做，0 命中）。**后续派单文引用守护文件名前必须先 ls 实测**。",
+        "action_taken": "R8-2 自我更正；A119 记入裁定台账"
       }
     ],
     "round7_predispatch": {
@@ -9059,6 +9149,20 @@
           "D-018",
           "D-011"
         ]
+      },
+      {
+        "id": "R8-2",
+        "at": "2026-11-13T13:17:09+08:00",
+        "what_was_wrong": "M0-02/S4 派单文三处与实测不符：① Problem 字段写成 type/title/status/detail/instance（活契约实为 7 字段 type/title/status/code/detail/request_id/issues，无 instance）；② issues[] 写成 3 字段（实为 4 字段含 severity）；③ 门禁引用 tests/unit/test_no_datetime_now.py（该文件不存在，真实守护为 tests/unit/test_clock.py::test_datetime_now_only_appears_in_clock_module，且只扫 src/）",
+        "how_found": "Lane S（Bohr）回报 U-3 与 U-4",
+        "correction": "A118/A119 裁定以活契约与磁盘实测为准；Bohr 的断言与替代门禁（test_clock.py + test_counts_freshness.py + grep 自证）予以采纳",
+        "prevention": "派单文引用契约字段与守护文件名前必须实读（contracts/openapi.json 与 ls tests/unit/）；禁凭记忆列举字段名与文件名",
+        "related": [
+          "A118",
+          "A119",
+          "D-012",
+          "D-014"
+        ]
       }
     ],
     "round8_pending_rulings": {
@@ -9115,7 +9219,28 @@
           "provisional": "自我更正 R8-3；后续派单文模板统一改用「档位」与 qa/ACCEPTANCE.md 路径"
         }
       ]
-    }
+    },
+    "round8_returns": [
+      {
+        "lane": "S",
+        "nickname": "Bohr",
+        "agent_id": "01a1d33b-8c31-72e3-80ac-09f156ac0893",
+        "task": "M0-02",
+        "subtask": "S4",
+        "tier": "qwen3.8-flash",
+        "result": "DONE",
+        "returned_at": "2026-11-13T13:17:09+08:00",
+        "commit": "PENDING(本提交)",
+        "orchestrator_verification": "归一后 5 项门禁全 rc=0（51 passed + 近邻 55 passed）；FU-12 正向覆盖落实且既有两条用例字节未动；A95/A96 落实自证已复核",
+        "discrepancy": "自报 ruff format/check rc=0，编排器实测 rc=1（2 files would be reformatted + F401/I001）-> 编排器归一后 51 passed 不变；已记入 subtask_log.self_report_discrepancy",
+        "adjudications_raised": [
+          "A116(U-1)",
+          "A117(U-2 -> D-033)",
+          "A118(U-3)",
+          "A119(U-4)"
+        ]
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,
