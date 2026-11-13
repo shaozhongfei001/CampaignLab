@@ -185,3 +185,25 @@ alembic -c migrations/alembic.ini upgrade head    # 重建
 | mypy | `mypy 2.4.1 (compiled: yes)` |
 | pytest | `pytest 9.2.0` |
 
+---
+
+# S5 证据面复核（追加，2026-11-14，不改动上文 S2 原记录）
+
+- 复核方式：**复跑 S2 既有比对器**（`src/campaignlab/infra/db/ddl_compare.py::compare_schema`），非重新实现；
+  迁移库为 `uv run --no-sync alembic -c migrations/alembic.ini upgrade head` 在证据期临时目录的全新产出（rc=0）。
+- cwd=`/home/szf/dev/CampaignLab`，HEAD=`4a82190f69c0b0b864ce3a55a11a06fddf2a9b38`，命令 rc=0，stdout 原样：
+
+```console
+ddl_sha256 ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e
+table_count_expected 28
+table_count_migration_db 28
+compare_schema_diffs []
+integrity [('ok',)]
+fk_violations []
+head [('0001_initial_schema',)]
+```
+
+- 与 S2 结论一致性：`ddl_sha256` 与上文 §0 逐字相同（`ec9ddfbc…c8c0e`）；表数 **28=28**；`compare_schema` 返回 **`[]`**；
+  `PRAGMA integrity_check`=`ok`；`foreign_key_check`=0 行；head=`0001_initial_schema`——**S2 的等价性结论在 S5 时点复现成立**。
+- 补充旁证（同一迁移库的真实运行面）：`GET /api/v1/health` 已迁移时 `schema_revision=0001_initial_schema`、`status=READY`
+  （`http/01-health-after-boot.http`）；未迁移时 `schema_revision=UNMIGRATED`、`status=DEGRADED`（`http/20-health-unmigrated-degraded.http`，FU-7）。

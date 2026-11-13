@@ -1,0 +1,16 @@
+### REQUEST
+GET /api/v1/workspaces HTTP/1.1
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 200
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+content-length: 408
+content-type: application/json
+vary: Origin
+x-request-id: f2c6a9248ae448e7b00589f8083c90f9
+
+{"items":[{"id":"ws-c2e7912cb36f4d5bb7f958709772de57","revision":1,"created_at":"2026-11-13T17:22:08.954614Z","name":"S5-AC001-Beta","source_class":"AUTHORIZED_DEIDENTIFIED","authorization_note":"s5-evidence"},{"id":"ws-e65dcdd379eb4489b064ba1a741b1873","revision":1,"created_at":"2026-11-13T17:22:08.885411Z","name":"S5-AC001-Alpha","source_class":"SYNTHETIC","authorization_note":null}],"next_cursor":null}

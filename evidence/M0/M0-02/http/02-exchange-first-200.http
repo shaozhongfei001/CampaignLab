@@ -1,0 +1,20 @@
+### REQUEST
+POST /api/v1/session/exchange HTTP/1.1
+Origin: http://127.0.0.1:8765
+Content-Type: application/json
+
+{"token": "u4ZDu9TZ0vvXUn2yVFseI_s_E5kLAKDcFKsw7C-uQcg"}
+
+### RESPONSE
+HTTP/1.1 200
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+set-cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds; Path=/api/v1; Max-Age=3600; HttpOnly; SameSite=strict
+content-length: 120
+content-type: application/json
+access-control-allow-credentials: true
+access-control-allow-origin: http://127.0.0.1:8765
+vary: Origin
+x-request-id: 1dd9e1bbb3e14ea7a3038f5d5c6e50af
+
+{"actor_id":"szf","actor_name":"szf","allowed_roles":["OPERATOR","DESIGNER","DATA_OWNER","ANALYST","TESTER","REVIEWER"]}

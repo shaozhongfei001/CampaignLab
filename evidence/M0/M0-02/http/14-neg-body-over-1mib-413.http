@@ -1,0 +1,21 @@
+### REQUEST
+POST /api/v1/workspaces HTTP/1.1
+Origin: http://127.0.0.1:8765
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+Idempotency-Key: s5-neg-413-key-0000000001
+Content-Type: application/json
+
+{"name":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+### RESPONSE
+HTTP/1.1 413
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: a3fbdb1d998a403dbc907f4d1ce00d75
+content-length: 233
+content-type: application/problem+json
+access-control-allow-credentials: true
+access-control-allow-origin: http://127.0.0.1:8765
+vary: Origin
+
+{"type":"urn:campaignlab:problem:input_too_large","title":"输入体积超过上限","status":413,"code":"INPUT_TOO_LARGE","detail":"JSON 正文超过 1048576 字节上限","request_id":"a3fbdb1d998a403dbc907f4d1ce00d75","issues":[]}

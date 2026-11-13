@@ -1,0 +1,14 @@
+cwd=/home/szf/dev/CampaignLab
+command=sqlite3 /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ac001/state/campaignlab.db SELECT ... audit/workspaces/idempotency
+rc=0
+ts=2026-11-14T01:22:10+0800
+
+audit rows:
+('ws-c2e7912cb36f4d5bb7f958709772de57', 1, 'WORKSPACE_CREATED', 'ACCEPTED', 'szf', 'cb50c3995a7746bca3a41ff96aabfde5')
+('ws-e65dcdd379eb4489b064ba1a741b1873', 1, 'WORKSPACE_CREATED', 'ACCEPTED', 'szf', '58032a27b2314b53b77185fbf7c2095d')
+
+workspaces rows:
+('ws-e65dcdd379eb4489b064ba1a741b1873', 'S5-AC001-Alpha', 'SYNTHETIC', 1)
+('ws-c2e7912cb36f4d5bb7f958709772de57', 'S5-AC001-Beta', 'AUTHORIZED_DEIDENTIFIED', 1)
+
+idempotency row count: 2

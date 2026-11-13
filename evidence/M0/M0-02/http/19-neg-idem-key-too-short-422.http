@@ -1,0 +1,21 @@
+### REQUEST
+POST /api/v1/workspaces HTTP/1.1
+Origin: http://127.0.0.1:8765
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+Idempotency-Key: abc
+Content-Type: application/json
+
+{"name": "S5-AC001-Alpha", "source_class": "SYNTHETIC"}
+
+### RESPONSE
+HTTP/1.1 422
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: 6c4eeeefb3254a1389a81453a058e34b
+content-length: 369
+content-type: application/problem+json
+access-control-allow-credentials: true
+access-control-allow-origin: http://127.0.0.1:8765
+vary: Origin
+
+{"type":"urn:campaignlab:problem:validation_error","title":"字段校验未通过","status":422,"code":"VALIDATION_ERROR","detail":"请求体或查询参数校验未通过","request_id":"6c4eeeefb3254a1389a81453a058e34b","issues":[{"code":"VALIDATION_ERROR","location":"/header/Idempotency-Key","message":"String should have at least 8 characters","severity":"ERROR"}]}

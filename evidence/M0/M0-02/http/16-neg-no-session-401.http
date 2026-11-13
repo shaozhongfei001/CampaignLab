@@ -1,0 +1,15 @@
+### REQUEST
+GET /api/v1/session HTTP/1.1
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 401
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: a1ad41e8ae694149a140bdcd53a3d4f3
+content-length: 246
+content-type: application/problem+json
+vary: Origin
+
+{"type":"urn:campaignlab:problem:session_expired","title":"会话已失效","status":401,"code":"SESSION_EXPIRED","detail":"会话不可用，请重新使用一次性令牌换取会话","request_id":"a1ad41e8ae694149a140bdcd53a3d4f3","issues":[]}

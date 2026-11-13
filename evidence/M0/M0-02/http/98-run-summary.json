@@ -1,0 +1,203 @@
+{
+ "results": {
+  "rc_alembic_upgrade": 0,
+  "token_ttl_s": 60,
+  "entry_token_sha12": "05e8026524f7",
+  "health_ready": {
+   "status": "READY",
+   "app_version": "0.0.0",
+   "contract_version": "1.0.1",
+   "worker": "READY",
+   "schema_revision": "0001_initial_schema"
+  },
+  "boot_wait_seconds": 0.8,
+  "exchange_status": 200,
+  "set_cookie_name": "cl_session",
+  "set_cookie_attrs": "Path=/api/v1;Max-Age=3600;HttpOnly;SameSite=strict",
+  "replay_token_status": 401,
+  "replay_token_code": "SESSION_EXPIRED",
+  "create_alpha": {
+   "status": 201,
+   "etag": "\"1\"",
+   "location": null,
+   "body": "{\"id\":\"ws-e65dcdd379eb4489b064ba1a741b1873\",\"revision\":1,\"created_at\":\"2026-11-13T17:22:08.885411Z\",\"name\":\"S5-AC001-Alpha\",\"source_class\":\"SYNTHETIC\",\"authorization_note\":null}"
+  },
+  "replay_alpha": {
+   "status": 201,
+   "etag": "\"1\"",
+   "body": "{\"authorization_note\":null,\"created_at\":\"2026-11-13T17:22:08.885411Z\",\"id\":\"ws-e65dcdd379eb4489b064ba1a741b1873\",\"name\":\"S5-AC001-Alpha\",\"revision\":1,\"source_class\":\"SYNTHETIC\"}"
+  },
+  "d033": {
+   "byte_identical": false,
+   "status_equal": true,
+   "etag_equal": true,
+   "json_equal": true,
+   "key_order_first": [
+    "id",
+    "revision",
+    "created_at",
+    "name",
+    "source_class",
+    "authorization_note"
+   ],
+   "key_order_replay": [
+    "authorization_note",
+    "created_at",
+    "id",
+    "name",
+    "revision",
+    "source_class"
+   ]
+  },
+  "conflict_409_code": "IDEMPOTENCY_CONFLICT",
+  "ws_beta_id": "ws-c2e7912cb36f4d5bb7f958709772de57",
+  "list_total": 2,
+  "list_names": [
+   "S5-AC001-Beta",
+   "S5-AC001-Alpha"
+  ],
+  "q_filter_names": [
+   "S5-AC001-Alpha"
+  ],
+  "health_after": {
+   "status": "READY",
+   "app_version": "0.0.0",
+   "contract_version": "1.0.1",
+   "worker": "READY",
+   "schema_revision": "0001_initial_schema"
+  },
+  "neg_413": {
+   "status": 413,
+   "code": "INPUT_TOO_LARGE"
+  },
+  "neg_422": {
+   "status": 422,
+   "code": "VALIDATION_ERROR",
+   "location": "/bogus"
+  },
+  "neg_no_session": {
+   "status": 401,
+   "code": "SESSION_EXPIRED"
+  },
+  "neg_unknown_token": {
+   "status": 401,
+   "code": "SESSION_EXPIRED",
+   "detail": "会话不可用，请重新使用一次性令牌换取会话"
+  },
+  "neg_bad_origin": {
+   "status": 403,
+   "code": "ORIGIN_DENIED"
+  },
+  "neg_short_key": {
+   "status": 422,
+   "code": "VALIDATION_ERROR",
+   "location": "/header/Idempotency-Key"
+  },
+  "neg_bad_host": {
+   "status": 403,
+   "code": "ORIGIN_DENIED"
+  },
+  "port_A_released": true,
+  "fu7": {
+   "status_code": 200,
+   "body": {
+    "status": "DEGRADED",
+    "app_version": "0.0.0",
+    "contract_version": "1.0.1",
+    "worker": "READY",
+    "schema_revision": "UNMIGRATED"
+   }
+  },
+  "port_B_released": true,
+  "audit_row_count": 2,
+  "idempotency_count": 2,
+  "request_index": [
+   {
+    "name": "01-health-after-boot.http",
+    "status": 200
+   },
+   {
+    "name": "02-exchange-first-200.http",
+    "status": 200
+   },
+   {
+    "name": "03-exchange-replay-401.http",
+    "status": 401
+   },
+   {
+    "name": "04-get-session-200.http",
+    "status": 200
+   },
+   {
+    "name": "05-create-workspace-alpha-201.http",
+    "status": 201
+   },
+   {
+    "name": "06-create-workspace-alpha-replay.http",
+    "status": 201
+   },
+   {
+    "name": "07-create-workspace-alpha-conflict-409.http",
+    "status": 409
+   },
+   {
+    "name": "08-create-workspace-beta-201.http",
+    "status": 201
+   },
+   {
+    "name": "09-list-workspaces-200.http",
+    "status": 200
+   },
+   {
+    "name": "10-list-workspaces-q-alpha-200.http",
+    "status": 200
+   },
+   {
+    "name": "11-health-with-worker.http",
+    "status": 200
+   },
+   {
+    "name": "14-neg-body-over-1mib-413.http",
+    "status": 413
+   },
+   {
+    "name": "15-neg-unknown-field-422.http",
+    "status": 422
+   },
+   {
+    "name": "16-neg-no-session-401.http",
+    "status": 401
+   },
+   {
+    "name": "17-neg-unknown-token-401.http",
+    "status": 401
+   },
+   {
+    "name": "18-neg-bad-origin-403.http",
+    "status": 403
+   },
+   {
+    "name": "19-neg-idem-key-too-short-422.http",
+    "status": 422
+   }
+  ]
+ },
+ "commands": [
+  {
+   "cwd": "/home/szf/dev/CampaignLab",
+   "command": "uv run --no-sync alembic -c migrations/alembic.ini upgrade head",
+   "rc": 0,
+   "ts": "2026-11-14T01:22:08+0800",
+   "stdout_tail": "",
+   "stderr_tail": "INFO  [alembic.runtime.migration] Context impl SQLiteImpl.\nINFO  [alembic.runtime.migration] Will assume non-transactional DDL.\nINFO  [alembic.runtime.migration] Running upgrade  -> 0001_initial_schema, 首迁：CampaignLab SQLite v1 的 28 张表与 6 个显式索引。\n"
+  },
+  {
+   "cwd": "/home/szf/dev/CampaignLab",
+   "command": "uv run --no-sync alembic -c migrations/alembic.ini current",
+   "rc": 0,
+   "ts": "2026-11-14T01:22:08+0800",
+   "stdout_tail": "0001_initial_schema (head)\n",
+   "stderr_tail": "INFO  [alembic.runtime.migration] Context impl SQLiteImpl.\nINFO  [alembic.runtime.migration] Will assume non-transactional DDL.\n"
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+[
+ {
+  "label": "defect-D037-mtime",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "stat -c %y %n orchestrator/defects/D-037.md",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:08+0800",
+  "out": "2026-11-14 01:18:41.795687764 +0800 orchestrator/defects/D-037.md\n"
+ },
+ {
+  "label": "unreachable-404-429-decl",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q tests/api/test_contract_declarations.py -k unreachable",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:10+0800",
+  "out": " StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 11 deselected, 1 warning in 1.05s\n"
+ },
+ {
+  "label": "cross-workspace-repo-tests",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q tests/unit/test_s3d_repositories.py -k workspace",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:12+0800",
+  "out": "..                                                                       [100%]\n2 passed, 12 deselected in 1.22s\n"
+ },
+ {
+  "label": "grep-schema-revision-web",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "grep -rn schema_revision web/src",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:12+0800",
+  "out": "web/src/api/types.ts:1058:            schema_revision: string;\n"
+ },
+ {
+  "label": "grep-unmigrated-web",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "grep -rn UNMIGRATED web/src prototype",
+  "rc": 1,
+  "ts": "2026-11-14T01:26:12+0800",
+  "out": ""
+ },
+ {
+  "label": "grep-degraded-branch",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "grep -rn DEGRADED web/src/composables web/src/api web/src/pages",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:12+0800",
+  "out": "web/src/composables/useWorkspaces.ts:50:  /** Health.worker === \"OFFLINE\" 或 status === \"DEGRADED\" → UI-01 顶栏「作业受限」。 */\nweb/src/composables/useWorkspaces.ts:180:      state.workerRestricted = result.data.worker === \"OFFLINE\" || result.data.status === \"DEGRADED\";\nweb/src/api/endpoints.ts:59: * 注意：Health.status 是合法响应字段（READY/DEGRADED），与 CR-002 移除的\nweb/src/api/types.ts:1053:            status: \"READY\" | \"DEGRADED\";\n"
+ },
+ {
+  "label": "grep-selfdiff",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "bash -lc git diff --name-only HEAD | wc -l",
+  "rc": 0,
+  "ts": "2026-11-14T01:26:12+0800",
+  "out": "7\n"
+ }
+]

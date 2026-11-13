@@ -1,0 +1,20 @@
+### REQUEST
+POST /api/v1/workspaces HTTP/1.1
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+Origin: http://evil.invalid:9
+Idempotency-Key: s5-neg-origin-key-0000000001
+Content-Type: application/json
+
+{"name": "S5-AC001-Alpha", "source_class": "SYNTHETIC"}
+
+### RESPONSE
+HTTP/1.1 403
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: 72c5741b73094459a19b65a03c3d6ba0
+content-length: 232
+content-type: application/problem+json
+access-control-allow-credentials: true
+vary: Origin
+
+{"type":"urn:campaignlab:problem:origin_denied","title":"来源不受信任","status":403,"code":"ORIGIN_DENIED","detail":"请求的 Origin 不在本机回环白名单内","request_id":"72c5741b73094459a19b65a03c3d6ba0","issues":[]}

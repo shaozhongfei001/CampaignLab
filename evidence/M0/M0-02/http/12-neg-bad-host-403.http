@@ -1,0 +1,16 @@
+### REQUEST
+GET /api/v1/health HTTP/1.1
+Host: evil.invalid
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 403
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: 161f6c5144014dc0bef59611e49c58e3
+content-length: 230
+content-type: application/problem+json
+vary: Origin
+
+{"type":"urn:campaignlab:problem:origin_denied","title":"来源不受信任","status":403,"code":"ORIGIN_DENIED","detail":"请求的 Host 不在本机回环白名单内","request_id":"161f6c5144014dc0bef59611e49c58e3","issues":[]}

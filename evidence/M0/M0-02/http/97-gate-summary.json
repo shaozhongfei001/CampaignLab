@@ -1,0 +1,209 @@
+[
+ {
+  "label": "doctor-transcript",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run python -m campaignlab doctor",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:16+0800",
+  "stdout": "[doctor] host=127.0.0.1 port=8000 data_dir=/home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ac001\n[doctor] db=sqlite:////home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ac001/state/campaignlab.db level=ENV_DATA_DIR source=环境变量 CAMPAIGNLAB_DATA_DIR + /state/campaignlab.db\nPASS  version   app=0.0.0 contract=1.0.1 source=/home/szf/dev/CampaignLab/contracts/openapi.json\nPASS  binding   127.0.0.1:8000 回环且空闲，可 serve\nPASS  data_dir  /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ac001 可写且七个子目录齐备\nPASS  database  /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ac001/state/campaignlab.db revision=0001_initial_schema==head，PRAGMA 双检通过\nPASS  worker    campaignlab.application.worker 可导入；心跳窗口=15s\n  PASS=5 WARN=0 FAIL=0 RESULT=HEALTHY\n",
+  "stderr": ""
+ },
+ {
+  "label": "AC035-verify-package",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "python3 spec/CampaignLab-SDD-v1.0/qa/verify_package.py",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:16+0800",
+  "stdout": "PASS 清单与逐文件 SHA-256 共 89 项\nPASS 接口和本地 Schema 引用共 80 个操作\nPASS 26 个页面、35 个验收用例、55 个材料点位、47 个手册操作点及文档链接\nPASS SQLite DDL 可执行，共 28 表，含完整性与外键负例\nPASS 甲乙各 510 切片、元分与六行 CSV/JSON、分母、量率、估算、补数及 60 个问法条目\nPASS 四版规则、15 个案例双版本、五种预发状态\nPACKAGE PASS 6/6\n",
+  "stderr": ""
+ },
+ {
+  "label": "AC035-check-contracts",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync python scripts/check_contracts.py check --validate",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:18+0800",
+  "stdout": "CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6\n",
+  "stderr": ""
+ },
+ {
+  "label": "AC035-frontend-baseline",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync python scripts/check_frontend_baseline.py",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:18+0800",
+  "stdout": "emplate_blank_singlefile.html sha16=4b966e044d3305a1 expect=4b966e044d3305a1 bytes=139725 expect=139725\nOK   css/tokens.css sha16=a4e27cc208ccc428 expect=a4e27cc208ccc428 bytes=3199 expect=3199\nOK   css/youxia-ui.css sha16=7ab1eadff01dc5f8 expect=7ab1eadff01dc5f8 bytes=104677 expect=104677\nOK   js/youxia-charts.js sha16=6d831e1415154721 expect=6d831e1415154721 bytes=10260 expect=10260\nOK   js/youxia-shell.js sha16=c3cdc9761e4a407c expect=c3cdc9761e4a407c bytes=7438 expect=7438\nbaseline_files=45 manifest_rows=8 self_excluded=README_设计与使用说明.md,00_模版入口.html\nFRONTEND BASELINE PASS 8/8（哈希与字节数逐项一致）\n",
+  "stderr": ""
+ },
+ {
+  "label": "mig-equiv",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q tests/integration/bootstrap/test_migration_equivalence.py tests/unit/test_migration_schema.py",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:39+0800",
+  "stdout": "..........................                                               [100%]\n26 passed in 19.72s\n",
+  "stderr": ""
+ },
+ {
+  "label": "expired-session-api",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q tests/api/test_contract_http.py -k expired",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:41+0800",
+  "stdout": "..                                                                       [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.14/site-packages/fastapi/testclient.py:1\n  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 36 deselected, 1 warning in 0.93s\n",
+  "stderr": ""
+ },
+ {
+  "label": "expired-session-unit",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q tests/unit/test_s3d_application.py -k expir",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:42+0800",
+  "stdout": "ated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\ntests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail\ntests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail\n  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/starlette/testclient.py:518: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.\n    return super().request(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 22 deselected, 3 warnings in 0.37s\n",
+  "stderr": ""
+ },
+ {
+  "label": "ruff-check",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync ruff check .",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:42+0800",
+  "stdout": "All checks passed!\n",
+  "stderr": ""
+ },
+ {
+  "label": "ruff-format",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync ruff format --check .",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:42+0800",
+  "stdout": "194 files already formatted\n",
+  "stderr": ""
+ },
+ {
+  "label": "mypy",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync mypy",
+  "rc": 0,
+  "ts": "2026-11-14T01:23:42+0800",
+  "stdout": "Success: no issues found in 73 source files\n",
+  "stderr": ""
+ },
+ {
+  "label": "pytest-full",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync pytest -q",
+  "rc": 1,
+  "ts": "2026-11-14T01:25:20+0800",
+  "stdout": "ates_session_via_new_app_instance\ntests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail\ntests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail\n  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/starlette/testclient.py:518: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.\n    return super().request(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/unit/test_state_ledger.py::test_every_md_on_disk_has_ledger_entry\n1 failed, 355 passed, 6 warnings in 101.94s (0:01:41)\n",
+  "stderr": ""
+ },
+ {
+  "label": "uv-lock-check",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv lock --check",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:20+0800",
+  "stdout": "",
+  "stderr": "Resolved 52 packages in 1ms\n"
+ },
+ {
+  "label": "env-uv",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv --version",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:20+0800",
+  "stdout": "uv 0.13.7 (x86_64-unknown-linux-gnu)\n",
+  "stderr": ""
+ },
+ {
+  "label": "env-node",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "node -v",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:20+0800",
+  "stdout": "v24.22.3\n",
+  "stderr": ""
+ },
+ {
+  "label": "env-npm",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "npm -v",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:21+0800",
+  "stdout": "11.19.1\n",
+  "stderr": ""
+ },
+ {
+  "label": "env-git-head",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "git rev-parse HEAD",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:21+0800",
+  "stdout": "4a82190f69c0b0b864ce3a55a11a06fddf2a9b38\n",
+  "stderr": ""
+ },
+ {
+  "label": "py-versions",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "/home/szf/dev/CampaignLab/.venv/bin/python3 -c import platform,sqlite3,sys;print(platform.python_version(), sys.version.split()[0], sqlite3.sqlite_version)",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:21+0800",
+  "stdout": "3.14.10 3.14.10 3.53.1\n",
+  "stderr": ""
+ },
+ {
+  "label": "openapi-sha16",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "/home/szf/dev/CampaignLab/.venv/bin/python3 -c import hashlib,pathlib;d=pathlib.Path('contracts/openapi.json').read_bytes();print(hashlib.sha256(d).hexdigest()[:16],len(d))",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:21+0800",
+  "stdout": "592571099d638251 443309\n",
+  "stderr": ""
+ },
+ {
+  "label": "openapi-gen-types",
+  "cwd": "/home/szf/dev/CampaignLab/web",
+  "command": "npx openapi-typescript ../contracts/openapi.json -o /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/types.gen.ts",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:22+0800",
+  "stdout": "✨ openapi-typescript 7.13.0\n🚀 ../contracts/openapi.json → /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/types.gen.ts [172.2ms]\n",
+  "stderr": ""
+ },
+ {
+  "label": "gen-types-byte-equal-live-web",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "cmp generated types.ts vs web/src/api/types.ts",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:22+0800",
+  "stdout": "True",
+  "stderr": ""
+ },
+ {
+  "label": "vue-tsc-typecheck",
+  "cwd": "/home/szf/dev/CampaignLab/web",
+  "command": "npm run typecheck",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:24+0800",
+  "stdout": "\n> campaignlab-web@0.0.0 typecheck\n> vue-tsc --noEmit -p tsconfig.json\n\n",
+  "stderr": ""
+ },
+ {
+  "label": "ddl-head",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "uv run --no-sync alembic -c migrations/alembic.ini upgrade head",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:25+0800",
+  "stdout": "",
+  "stderr": " SQLiteImpl.\nINFO  [alembic.runtime.migration] Will assume non-transactional DDL.\nINFO  [alembic.runtime.migration] Running upgrade  -> 0001_initial_schema, 首迁：CampaignLab SQLite v1 的 28 张表与 6 个显式索引。\n"
+ },
+ {
+  "label": "ddl-compare-rerun",
+  "cwd": "/home/szf/dev/CampaignLab",
+  "command": "/home/szf/dev/CampaignLab/.venv/bin/python3 -c \nimport hashlib, pathlib, sqlite3, sys\nsys.path.insert(0, \"src\") if not hasattr(sys, \"campaignlab_imported\") else None\nfrom campaignlab.infra.db.ddl_compare import (compare_schema, table_names, pragma_problems,\n    EXPECTED_TABLE_COUNT, MIGRATION_ONLY_TABLES)\nddl = pathlib.Path(\"contracts/sqlite-v1.sql\").read_text(encoding=\"utf-8\")\nprint(\"ddl_sha256\", hashlib.sha256(ddl.encode()).hexdigest())\nref = sqlite3.connect(\":memory:\")\nref.executescript(ddl)\nmig = sqlite3.connect(sys.argv[1])\ndiffs = compare_schema(ref, mig)\nusers = [t for t in table_names(mig) if t not in MIGRATION_ONLY_TABLES]\nprint(\"table_count_expected\", EXPECTED_TABLE_COUNT)\nprint(\"table_count_migration_db\", len(users))\nprint(\"compare_schema_diffs\", diffs)\nprint(\"integrity\", mig.execute(\"PRAGMA integrity_check\").fetchall())\nprint(\"fk_violations\", mig.execute(\"PRAGMA foreign_key_check\").fetchall())\nprint(\"head\", mig.execute(\"SELECT version_num FROM alembic_version\").fetchall())\nmig.close(); ref.close()\n /home/szf/dev/CampaignLab/evidence/M0/M0-02/_runtime/ddlcheck/state/campaignlab.db",
+  "rc": 0,
+  "ts": "2026-11-14T01:25:25+0800",
+  "stdout": "ddl_sha256 ec9ddfbc4e7dba4c0a565161b50a222fee484eb07e6586588871bffa2efc8c0e\ntable_count_expected 28\ntable_count_migration_db 28\ncompare_schema_diffs []\nintegrity [('ok',)]\nfk_violations []\nhead [('0001_initial_schema',)]\n",
+  "stderr": ""
+ }
+]

@@ -1,0 +1,15 @@
+### REQUEST
+GET /api/v1/health HTTP/1.1
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 200
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+content-length: 124
+content-type: application/json
+vary: Origin
+x-request-id: 2a84a42a0b2a4a7e8c88b5d7999080d6
+
+{"status":"READY","app_version":"0.0.0","contract_version":"1.0.1","worker":"READY","schema_revision":"0001_initial_schema"}

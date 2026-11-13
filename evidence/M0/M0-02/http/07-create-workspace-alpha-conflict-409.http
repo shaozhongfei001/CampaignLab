@@ -1,0 +1,21 @@
+### REQUEST
+POST /api/v1/workspaces HTTP/1.1
+Origin: http://127.0.0.1:8765
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+Idempotency-Key: s5-m0-02-ac001-ws-alpha-0001
+Content-Type: application/json
+
+{"name": "S5-DIFFERENT-BODY", "source_class": "SYNTHETIC"}
+
+### RESPONSE
+HTTP/1.1 409
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: 28ab398fe7b346d78027ec54a123eac9
+content-length: 249
+content-type: application/problem+json
+access-control-allow-credentials: true
+access-control-allow-origin: http://127.0.0.1:8765
+vary: Origin
+
+{"type":"urn:campaignlab:problem:idempotency_conflict","title":"幂等键冲突","status":409,"code":"IDEMPOTENCY_CONFLICT","detail":"同一 Idempotency-Key 已用于不同的请求内容","request_id":"28ab398fe7b346d78027ec54a123eac9","issues":[]}

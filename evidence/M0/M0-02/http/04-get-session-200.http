@@ -1,0 +1,16 @@
+### REQUEST
+GET /api/v1/session HTTP/1.1
+Cookie: cl_session=zG2ktEUsmFIMKxtTMZ2tvI4Tn14ODMX2rQ36qKdY5Ds
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 200
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+content-length: 120
+content-type: application/json
+vary: Origin
+x-request-id: c6bbe9a901be4babaeb8e318ae398a1c
+
+{"actor_id":"szf","actor_name":"szf","allowed_roles":["OPERATOR","DESIGNER","DATA_OWNER","ANALYST","TESTER","REVIEWER"]}

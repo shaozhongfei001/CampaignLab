@@ -1,0 +1,19 @@
+### REQUEST
+POST /api/v1/session/exchange HTTP/1.1
+Origin: http://127.0.0.1:8765
+Content-Type: application/json
+
+{"token": "00000000000000000000000000000000"}
+
+### RESPONSE
+HTTP/1.1 401
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+x-request-id: b122b700e4184b7bb5c7d35d66db43e5
+content-length: 246
+content-type: application/problem+json
+access-control-allow-credentials: true
+access-control-allow-origin: http://127.0.0.1:8765
+vary: Origin
+
+{"type":"urn:campaignlab:problem:session_expired","title":"会话已失效","status":401,"code":"SESSION_EXPIRED","detail":"会话不可用，请重新使用一次性令牌换取会话","request_id":"b122b700e4184b7bb5c7d35d66db43e5","issues":[]}

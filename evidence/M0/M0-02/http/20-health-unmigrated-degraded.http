@@ -1,0 +1,16 @@
+### REQUEST
+GET /api/v1/health HTTP/1.1
+Host: 127.0.0.1:8766
+
+(no body)
+
+### RESPONSE
+HTTP/1.1 200
+date: Fri, 13 Nov 2026 17:22:09 GMT
+server: uvicorn
+content-length: 118
+content-type: application/json
+vary: Origin
+x-request-id: 1119a28876aa455e839a741004feb761
+
+{"status":"DEGRADED","app_version":"0.0.0","contract_version":"1.0.1","worker":"READY","schema_revision":"UNMIGRATED"}
