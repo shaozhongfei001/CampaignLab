@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T12:26:18+08:00",
+  "updated_at": "2026-11-13T12:31:47+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -498,6 +498,57 @@
           "src/campaignlab/api/app.py(6 add/0 del)",
           "tests/unit/test_s3b_routes.py(199/7989,新建)",
           "orchestrator/defects/D-030.md(55行/5513B,新建)"
+        ]
+      },
+      {
+        "task": "FU-8",
+        "subtask": "D-028 收口：infra/db/migration_head.py 唯一实现 + cli/health_service 双委托 + 定义点唯一守护",
+        "lane": "G",
+        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+        "nickname": "Franklin",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 1,
+        "tokens": null,
+        "tokens_note": "get_goal 无计量句柄；按纪律记 null，禁估算。客观量：3 文件（migration_head.py 新建 61 行/3491B、health_service.py 14 add/35 del、cli.py 8 add/15 del）+ 1 守护（189 行）",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；派单预算 16k（FU-8+FU-14 合并）；无计量值故不判越限，以客观量留痕",
+        "returned_at": "2026-11-13T12:31:47+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "独立复验：函数对象同一性 True、三方同值 '0001_initial_schema'、显式目录同值、缺失目录返回 None、签名逐字、get_current_head 真实调用点=1、__all__ 五项未变、路径门禁 5 项 rc=0",
+        "outputs": [
+          "src/campaignlab/infra/db/migration_head.py(61/3491,新建)",
+          "src/campaignlab/application/health_service.py(14 add/35 del)",
+          "src/campaignlab/cli.py(8 add/15 del)",
+          "tests/unit/test_migration_head_single_source.py(189行,新建)"
+        ]
+      },
+      {
+        "task": "FU-14",
+        "subtask": "counts 新鲜度机器守护 tests/unit/test_counts_freshness.py",
+        "lane": "G",
+        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+        "nickname": "Franklin",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 1,
+        "tokens": null,
+        "tokens_note": "同上（与 FU-8 同批同 lane，无计量句柄，记 null）。客观量：1 文件 234 行/11282B，5 个测试",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；无计量值故不判越限",
+        "returned_at": "2026-11-13T12:31:47+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "独立复验：分母只从 git ls-tree -r HEAD 取（在飞免疫）、期望值全从 counts 读（文件内零写死计数）、口径与 reproduce_py/reproduce_md 逐字对账；A100 裁定「== ruff 报数」半句以派单文为准不实现；本轮 post-commit 实跑 5 passed rc=0（Lane A 提交后）",
+        "outputs": [
+          "tests/unit/test_counts_freshness.py(234/11282,新建)"
         ]
       }
     ],
@@ -3788,12 +3839,12 @@
       "id": "D-028",
       "task": "M0-02（S3c/S3d 交界：alembic head 读取的单一来源）",
       "severity": "MINOR",
-      "status": "OPEN",
+      "status": "CLOSED",
       "title": "alembic head 读取存在两份判据相同的实现（cli._migration_head 与 health_service.read_migration_head），违反单一来源；任一侧改判据另一侧会静默分叉，导致 doctor 与 /health 的 schema_revision 给出不同答案",
       "found_by": "S lane（Godel / qwen3.8-max）S3d 交付回报 Q4 主动上报；编排器 grep 实测确认",
       "file": "orchestrator/defects/D-028.md",
       "found_at": "2026-11-13T10:56:43+08:00",
-      "closed_at": null,
+      "closed_at": "2026-11-13T12:31:47+08:00",
       "measured": {
         "grep_cmd": "grep -rn 'get_current_head' src/campaignlab/ --include=*.py",
         "hits": [
@@ -3803,23 +3854,45 @@
         ],
         "real_implementations": 2,
         "same_criterion": true,
-        "same_ini": "migrations/alembic.ini"
+        "same_ini": "migrations/alembic.ini",
+        "closure_verification": {
+          "identity_func": "health_service.read_migration_head is migration_head.read_migration_head == True",
+          "values_equal": "migration_head() == health_service() == cli._migration_head() == '0001_initial_schema'",
+          "explicit_dir_equal": true,
+          "missing_dir_returns": null,
+          "signatures": "read_migration_head(migrations_dir: 'Path | None' = None) -> 'str | None'；cli._migration_head() -> 'str | None'；cli.MIGRATIONS_DIR == 'migrations'",
+          "get_current_head_hits": "2 行 = migration_head.py:59（唯一真实调用）+ :3（docstring）；收口前 2 处真实实现",
+          "health_all": [
+            "MIGRATIONS_DIR",
+            "UNMIGRATED_REVISION",
+            "HealthService",
+            "WorkerStatus",
+            "read_migration_head"
+          ],
+          "numstat": "migration_head.py 新建 61/3491；health_service.py 14 add/35 del；cli.py 8 add/15 del；两守护新建 189+234 行",
+          "path_gates": "ruff format 5 files already formatted / ruff check All checks passed! / mypy 5 source files / pytest 两守护 15 passed / 近邻+账本卡片守护 79 passed，全 rc=0",
+          "doctor_zero_change": "由 test_cli_doctor + test_doctor_determinism 证明；全表 doctor 待 Volta 回收后补跑"
+        }
       },
       "blocking": false,
       "blocking_note": "不阻塞：两处判据当前逐字相同，doctor rc=0（PASS=3 WARN=2 FAIL=0），/health 路由尚未挂载（S3b/S4 才接）；属可复现技术债而非当前错误行为",
       "responsibility": "不属 Godel 越界或失职——S3d 写集只许改 cli.py 两处（serve 装配 + 移除 WARN），无法把 cli._migration_head() 改成委托；根因是 S3c 交付该 helper 时未预留收口落点。Godel 主动上报并在 docstring 标注，处置正确（A80）",
-      "fix_detail": "Round 7/8 派独立 flash 小片（<=8k）：helper 收口到 infra/db/migration_head.py::read_migration_head()，cli._migration_head() 与 health_service.read_migration_head() 双双委托并删除重复实现；新增守护断言「get_current_head 在 src/ 下的定义点唯一（1 处定义 + N 处委托调用）」",
+      "fix_detail": "FU-8 收口：新增 src/campaignlab/infra/db/migration_head.py 作为 alembic head 的唯一实现；cli._migration_head() 与 health_service.read_migration_head() 双双改为委托并删除重复实现；新增 tests/unit/test_migration_head_single_source.py 钉住「定义点唯一」。编排器独立复验：函数对象同一性 True、三方返回值同为 '0001_initial_schema'、get_current_head 真实调用点由 2 降为 1（migration_head.py:59）、__all__ 五项未变、路径门禁 5 项全 rc=0。",
       "fix_scope": [
-        "src/campaignlab/infra/db/migration_head.py（新增）",
-        "src/campaignlab/cli.py（改委托）",
-        "src/campaignlab/application/health_service.py（改委托）",
-        "tests/unit/<新增守护>"
+        "src/campaignlab/infra/db/migration_head.py",
+        "src/campaignlab/application/health_service.py",
+        "src/campaignlab/cli.py",
+        "tests/unit/test_migration_head_single_source.py"
       ],
       "owner": "编排器（Round 7/8 派单）",
       "related_adjudications": [
-        "A80"
+        "A80",
+        "A99",
+        "A100",
+        "A101"
       ],
-      "followup": "FU-8"
+      "followup": "FU-16（cli.MIGRATIONS_DIR 与 migration_head 两处 'migrations' 字面量归一，A99）",
+      "closed_by": "Lane C（Franklin / qwen3.8-flash）交付 + 编排器独立复验"
     },
     {
       "id": "D-029",
@@ -4169,16 +4242,6 @@
         "reasoning_effort": "high",
         "budget": "50k",
         "dispatched_at": "2026-11-13T11:53:59+08:00"
-      },
-      {
-        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
-        "nickname": "Franklin",
-        "lane": "G",
-        "task": "FU-8+FU-14",
-        "subtask": "D-028 收口 + counts 新鲜度守护",
-        "tier": "qwen3.8-flash",
-        "budget": "16k",
-        "dispatched_at": "2026-11-13T11:53:59+08:00"
       }
     ],
     "dispatch_requirements": [
@@ -4424,7 +4487,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 153,
+        "ruff_formatted_files": 156,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4433,8 +4496,8 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 153,
-          "in_scope_py": 54,
+          "total": 156,
+          "in_scope_py": 57,
           "in_scope_md": 99,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
@@ -4443,7 +4506,7 @@
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
           "measured_after": "2026-11-13T11:34:54+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "index/py+md 在域 153 = py 54 + md 99（git ls-files 口径，索引 == 待提交树）；本次 +4 = 新增 session.py、workspaces.py、test_s3b_routes.py（py 51->54）+ D-030.md（md 98->99）",
+          "identity": "索引/在域 py+md 156 = py 57 + md 99；本次 +3 py = migration_head.py + test_migration_head_single_source.py + test_counts_freshness.py；md 不变（D-028.md 为 append-only 修改，已在册）",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4452,7 +4515,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 149,
+          "prev_total": 153,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4463,7 +4526,7 @@
           "sampling_discipline": "counts 一律在「工作树 == 待提交树」时采样（本次 S3d 12 个文件已 git add、其余全入库，untracked=0），且在台账写入之后、commit 之前完成",
           "historical_value_147": "2026-11-13T10:49:12+08:00 实测 147（py 51 + md 96）。该次测量早于 D-028.md 落盘与本台账写入（updated_at 10:56:43），故对『待提交树』而言偏小 1。原值按 D-011 体例保留于此，不改写。",
           "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。",
-          "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入本分母：git ls-files 只反映索引，Volta 的中间态（repositories.py/application/worker.py 为已跟踪文件的修改，不改变文件数；src/campaignlab/worker/** 与其两个测试尚未落盘）不属本提交树。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫（FU-14 设计意图）"
+          "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入分母：git ls-files 只反映索引；Volta 的 repositories.py/application/worker.py 属已跟踪文件修改（不改文件数），src/campaignlab/worker/** 与其两测试尚未落盘。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫"
         },
         "ruff_lint_scope_files": 24,
         "ruff_format_check_rc_after_governance_files": 0,
@@ -4490,7 +4553,9 @@
           "measured_at": "2026-11-13T10:49:12+08:00"
         },
         "pytest_passed_note_round7_laneA": "counts.pytest_passed 仍为 213（af3808b/d3f7671 全表实测值），本轮**未刷新**：全表 pytest 在 Volta 在飞期间会对其半成品判假 RED，故缓跑。本提交只做路径限定实测：tests/unit/test_s3b_routes.py 7 passed（rc=0）+ 近邻与守护 82 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值（禁估算）。",
-        "mypy_source_files_note_round7_laneA": "同上：mypy 49 为上次全表实测值；本轮路径限定 mypy 4 source files rc=0，全表值待回收后补测"
+        "mypy_source_files_note_round7_laneA": "同上：mypy 49 为上次全表实测值；本轮路径限定 mypy 4 source files rc=0，全表值待回收后补测",
+        "pytest_passed_note_round7_laneC": "pytest_passed 仍为 213（上次全表实测），本轮未刷新：全表在 Volta 在飞期间缓跑（假 RED 窗口）。本提交路径限定实测：两个新守护 15 passed（rc=0）+ 近邻与账本/卡片守护 79 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值。预期增量：S3b 7 + FU-8/FU-14 15 = +22（以实跑为准，禁写死）",
+        "mypy_source_files_note_round7_laneC": "mypy 49 为上次全表实测；本轮路径限定 mypy 5 source files rc=0；全表值待回收后补测（预期 +4：session/workspaces/migration_head + 测试按 mypy 口径计入者以实跑为准）"
       },
       "denominator_history": [
         {
@@ -4675,8 +4740,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T12:26:18+08:00",
-      "counts_refresh_reason": "Round 7 Lane A（M0-02/S3b）入库后重采样：ruff_formatted_files 149->153（py 51->54 = session.py/workspaces.py/test_s3b_routes.py；md 98->99 = orchestrator/defects/D-030.md）。采样点依 A101/rule_counts_sampling_point：工作树 == 待提交树（5 路径已 git add，Volta 在飞产物不在索引内）、台账写入之后、commit 之前。pytest/mypy/契约节点/AC 分母/openapi 指纹本轮不变（契约零影响：443309B / sha16 592571099d638251 / 80 operationId / 13 节点 / AC 47），全表值待 Volta 回收后补测",
+      "counts_refreshed_at": "2026-11-13T12:31:47+08:00",
+      "counts_refresh_reason": "Round 7 Lane C（FU-8+FU-14）入库后重采样：ruff_formatted_files 153->156（py 54->57 = migration_head.py + 两个守护；md 99 不变，D-028.md 为 append-only 修改）。采样点依 A101/rule_counts_same_commit：6 路径已 git add（索引 == 待提交树）、台账写入之后、commit 之前。契约面零变化（443309B / sha16 592571099d638251 / 80 operationId / 13 节点 / AC 47）；pytest/mypy 全表值待 Volta 回收后补测",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -6368,6 +6433,19 @@
         "returned_at": "2026-11-13T12:26:18+08:00",
         "commit": "PENDING(本提交)",
         "close_agent": "待三 lane 全部提交后统一 close（释放并发槽）"
+      },
+      {
+        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+        "nickname": "Franklin",
+        "lane": "G",
+        "task": "FU-8+FU-14",
+        "subtask": "D-028 收口 + counts 新鲜度守护",
+        "tier": "qwen3.8-flash",
+        "budget": "16k",
+        "dispatched_at": "2026-11-13T11:53:59+08:00",
+        "returned_at": "2026-11-13T12:31:47+08:00",
+        "commit": "PENDING(本提交)",
+        "close_agent": "待三 lane 全部提交后统一 close"
       }
     ],
     "round3_returns": {
@@ -7191,7 +7269,10 @@
         "at": "2026-11-13T10:56:43+08:00",
         "item": "D-028 收口：新增 infra/db/migration_head.py 作为 alembic head 的唯一实现，cli._migration_head() 与 health_service.read_migration_head() 双双委托并删重复实现 + 新增「定义点唯一」守护（独立 flash 小片 <=8k，纯重构、doctor 行为零变化）",
         "owner": "编排器（Round 7/8 派单）",
-        "source": "A80 / D-028"
+        "source": "A80 / D-028",
+        "status": "DONE",
+        "closed_at": "2026-11-13T12:31:47+08:00",
+        "closure": "Round 7 / Lane C（Franklin，flash）交付：migration_head.py 唯一实现 + cli/health_service 双委托 + test_migration_head_single_source.py 守护；D-028 同提交翻 CLOSED。编排器独立复验通过（见 D-028.md §6.2）"
       },
       {
         "id": "FU-9",
@@ -7233,7 +7314,10 @@
         "at": "2026-11-13T11:08:43+08:00",
         "item": "新增机器守护 tests/unit/test_counts_freshness.py：从 git 重算 ruff format 分母（tracked py+md 去 spec/prototype/web + untracked 同口径），断言 == state.json counts.ruff_formatted_files，并断言 == `ruff format --check .` 报数；不一致即判红，杜绝 R6-3 类的时点失真再次进入权威 counts。归 Round 7/8 的独立 flash 小片（<=8k），可与 FU-8（alembic head 收口）同批。",
         "owner": "编排器（Round 7/8 派单）",
-        "source": "R6-3"
+        "source": "R6-3",
+        "status": "DONE",
+        "closed_at": "2026-11-13T12:31:47+08:00",
+        "closure": "Round 7 / Lane C 交付 tests/unit/test_counts_freshness.py（234 行，5 passed）：分母只从 git ls-tree -r HEAD 取（对在飞 lane 免疫），期望值一律从 resume.self_check_gates_rc0.counts 读、文件内不写死任何计数。**口径按 A100 以派单文为准**（纯 git + 纯 Python，禁 shell ruff），故 item 原文末句「并断言 == `ruff format --check .` 报数」**刻意未实现**；ruff 与 counts 的对账由编排器全表复验的恒等式承担（tracked + untracked == ruff 报数），两级检查已闭环。原文按 D-011 体例保留、只加本注记不改写。"
       },
       {
         "id": "FU-15",
@@ -7241,6 +7325,20 @@
         "item": "新增守护 tests/unit/test_card_output_scope.py：解析每张非 LEGACY 卡档位表「产出」列的路径字面量，断言其全部落在 state.json -> tasks[id].scope 的允许前缀内，越界即判红并打印越界路径与所属任务。现守护（test_task_cards.py）只查卡<->tasks 键双向对账与必需段落，不查产出列越界，属 D-029 的机器盲区。归 Round 8 独立 flash 小片（<=8k），可与 FU-8（alembic head 收口）、FU-14（counts 新鲜度守护）同批。",
         "owner": "编排器（Round 8 派单）",
         "source": "D-029"
+      },
+      {
+        "id": "FU-16",
+        "at": "2026-11-13T12:31:47+08:00",
+        "item": "cli.MIGRATIONS_DIR 与 infra/db/migration_head.py 两处 'migrations' 字面量归一：改 cli 从 migration_head re-export（约 3 add / 3 del），使迁移目录字面量单一来源。收口前后数量未增、守护已钉定义点集合，故非阻塞。归 Round 8+ 独立 flash 小片（<=8k）",
+        "owner": "编排器（Round 8+ 派单）",
+        "source": "A99 / D-028"
+      },
+      {
+        "id": "FU-17",
+        "at": "2026-11-13T12:31:47+08:00",
+        "item": "api 私有助手提升：session.py 的 JSON_MEDIA_TYPE / PROBLEM_STATUSES / declared_responses / validation_issues / parse_json_body / render_session_cookie 现被 workspaces.py import 复用（合规）。**若第三个 api 模块需要其中任一助手，必须提升到 api/common.py（append-only 豁免），禁第三份复制**。归 Round 8+ 独立 flash 小片（<=8k），触发点为 M0-04/S4 的 api/jobs.py",
+        "owner": "编排器（Round 8+ 派单）",
+        "source": "A98 / D-030"
       }
     ],
     "commit_backfill_round6": {
@@ -7770,7 +7868,8 @@
       "rule_precommit_full_table": "提交前必须跑全表（pytest / mypy / ruff check / ruff format --check / doctor / check_contracts / spec+contracts dirty / ruff 恒等式 / 专项 grep）；lane 全部回报即解禁工具链；任一未跑必须在提交信息里写明「未跑 + 原因」",
       "rule_new_file_gate": "编排器自己新写的 .py/.md 在入库前必须先过 ruff format + ruff check + mypy（.py）与 BOM/CR/尾换行（全部）",
       "rule_counts_sampling_point": "counts/门禁采样必须发生在『工作树==待提交树』且『台账与缺陷单已落盘』之后、commit 之前；任何在门禁跑完后新增的 .md/.py（含缺陷单、证据档、守护测试）都必须触发重采样。提交前断言：counts.ruff_formatted_files == 实测 ruff format --check 报数 == tracked(py+md) + untracked。依据 R6-3。",
-      "rule_same_name_tools": "同名多工具的门禁（实例：CLI `python -m campaignlab doctor` 与 `bash scripts/doctor.sh`）必须分字段记录且每字段附 cmd，禁把两者混记在一个 doctor 键下。依据 R6-4。"
+      "rule_same_name_tools": "同名多工具的门禁（实例：CLI `python -m campaignlab doctor` 与 `bash scripts/doctor.sh`）必须分字段记录且每字段附 cmd，禁把两者混记在一个 doctor 键下。依据 R6-4。",
+      "rule_counts_same_commit": "A101（2026-11-13T12:31:47+08:00）：counts 必须与新增文件在**同一次提交**内刷新，采样点 = 工作树 == 待提交树（新增文件已 git add）且台账写入之后、commit 之前；违反则 tests/unit/test_counts_freshness.py 在下一次提交后判红。为 rule_counts_sampling_point（R6-3）的推论。派单文禁写死计数、一律指向 resume.self_check_gates_rc0.counts 现值（D-012/D-014）。在飞 lane 的未入库文件不计入分母（git ls-files 只反映索引；守护从 git ls-tree -r HEAD 取数）。"
     },
     "round7_adjudications": [
       {
@@ -7917,6 +8016,33 @@
         "question": "session.py 内新建了 6 个私有助手（JSON_MEDIA_TYPE / PROBLEM_STATUSES / declared_responses / validation_issues / parse_json_body / render_session_cookie），workspaces.py 直接复用它们（import 而非复制）。是否要求即刻提升到 api/common.py？",
         "ruling": "**接受现状（复用非复制，合规）**：本轮不强制提升，避免在飞期间动 common.py 这个冻结件。**硬约束：若第三个 api 模块需要其中任一助手，必须提升到 api/common.py（append-only 豁免），禁第三份复制** -> 立 FU-17。",
         "action_taken": "FU-17 入库（Round 8+ flash 小片）"
+      },
+      {
+        "id": "A99",
+        "round": 7,
+        "at": "2026-11-13T12:31:47+08:00",
+        "source": "Lane C 回报 U1",
+        "question": "cli.MIGRATIONS_DIR 与新建 migration_head.py 各自持有 'migrations' 字面量，是否违反单一来源、是否必须本轮归一？",
+        "ruling": "**接受现状**：收口前后该字面量的定义点数量未增（仍 2 处），且 test_migration_head_single_source.py 已把定义点集合钉成机器断言，静默分叉已被拦住。归一（cli 从 migration_head re-export，约 3 add / 3 del）转 **FU-16**，Round 8+ 的 flash 小片；本轮不在在飞期间扩大写集。",
+        "action_taken": "FU-16 入库；D-028 条目 followup 指向 FU-16"
+      },
+      {
+        "id": "A100",
+        "round": 7,
+        "at": "2026-11-13T12:31:47+08:00",
+        "source": "Lane C 回报 U2",
+        "question": "FU-14 的 item 原文要求守护「断言 == state.json counts.ruff_formatted_files，并断言 == `ruff format --check .` 报数」，而派单文明令「纯 git + 纯 Python，禁 shell ruff」。守护未实现后半句，是否判未完成？",
+        "ruling": "**口径以派单文为准**，FU-14 记 **DONE**。理由：① 派单文是本轮的权威约束（禁在守护里跑 ruff：慢、依赖 .venv、会与在飞 lane 抢工具链）；② ruff 报数与 counts 的对账已由编排器全表复验的恒等式承担（tracked(py+md) + untracked == ruff format --check 报数），两级检查闭环、无盲区；③ 守护从 git ls-tree -r HEAD 取数，对在飞 lane 的工作树噪声免疫，这正是本轮三 lane 同树所需。followups 原文按「历史值只加注不改写」处理，只加 closure 注记。",
+        "action_taken": "FU-14 status=DONE + closure 注记；不改写 item 原文"
+      },
+      {
+        "id": "A101",
+        "round": 7,
+        "at": "2026-11-13T12:31:47+08:00",
+        "source": "Lane C 回报 U3",
+        "question": "counts 的采样时点如何固化，才能杜绝 R6-3 那类「门禁与采样早于台账/缺陷单落盘 -> 权威分母偏小 -> 下一条 lane 撞假 RED」？",
+        "ruling": "**固化：counts 必须与新增文件在同一次提交内刷新**——采样点为「工作树 == 待提交树（新增文件已 git add）、台账写入之后、commit 之前」。否则 test_counts_freshness 会在**下一次**提交后判红。这是 rule_counts_sampling_point（R6-3）的推论，写入 gate_measurement_caliber.rule_counts_same_commit；派单文引用计数时一律指向 counts 现值、禁写死（D-012/D-014）。",
+        "action_taken": "gate_measurement_caliber 新增 rule_counts_same_commit；本轮两次提交（Lane A / Lane C）均按此采样"
       }
     ],
     "round7_predispatch": {
@@ -8392,6 +8518,24 @@
           "A97(U4)"
         ],
         "attribution_correction": "Newton 回报把 M application/health_service.py 误标为 Lane B/Volta；编排器用 numstat(14 add/35 del) 与 Franklin 自报交叉确认，实为 Lane C（Franklin）的 FU-8 产物。归因以编排器为准"
+      },
+      {
+        "lane": "C",
+        "nickname": "Franklin",
+        "agent_id": "01a1d308-5ba6-7ae2-8cfd-28781086a07c",
+        "task": "FU-8+FU-14",
+        "subtask": "D-028 收口 + counts 新鲜度守护",
+        "tier": "qwen3.8-flash",
+        "result": "DONE",
+        "returned_at": "2026-11-13T12:31:47+08:00",
+        "commit": "PENDING(本提交)",
+        "orchestrator_verification": "复验吻合（同一性/等价性/签名/唯一性/__all__/numstat/路径门禁 15+79 passed）；A/B 等价一项由编排器本轮亲自实跑复现（三方同值 0001_initial_schema），非采信自报",
+        "adjudications_raised": [
+          "A99(U1)",
+          "A100(U2)",
+          "A101(U3)"
+        ],
+        "plan_correction_note": "R7-1：Lane C 原计划为 D-016 批次5，改派 FU-8+FU-14；批次5 顺延至 Round 8 predispatch（素材已在 d3f7671 备好）"
       }
     ],
     "in_flight_agents_note_round7": "Round 7 三 lane：A(Newton/M0-02-S3b,flash) 已回收并于本提交入库；C(Franklin/FU-8+FU-14,flash) 已回收已复验，待下一次提交；B(Volta/M0-04-S2,max high) 仍在飞（工作树实测 infra/db/repositories.py +429、application/worker.py +18/-1 为其中间态，src/campaignlab/worker/ 尚未落盘）。在飞期间全表门禁缓跑，只做路径限定门禁 + 守护；三 lane 全提交后由编排器独占补跑全表并回填 self_check_gates_rc0。"

@@ -21,16 +21,20 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pathlib import Path
-from typing import Final, Literal, Protocol, runtime_checkable
+from typing import Literal, Protocol, runtime_checkable
 
 from sqlalchemy import Engine
 from sqlalchemy.exc import OperationalError
 
 from campaignlab.api.common import Health
 from campaignlab.clock import Clock
-from campaignlab.config import AppConfig, repo_root
+from campaignlab.config import AppConfig
 from campaignlab.infra.db.engine import connect
+from campaignlab.infra.db.migration_head import (
+    MIGRATIONS_DIR,
+    UNMIGRATED_REVISION,
+    read_migration_head,
+)
 
 __all__ = [
     "MIGRATIONS_DIR",
@@ -40,38 +44,13 @@ __all__ = [
     "read_migration_head",
 ]
 
-#: 迁移目录（相对仓库根）。与 ``cli.MIGRATIONS_DIR`` 同值；见 ``read_migration_head`` 的
-#: 单一来源说明（Q 项已上报编排器）。
-MIGRATIONS_DIR: Final = "migrations"
-
-#: 库尚未迁移时 ``Health.schema_revision`` 的取值。刻意**不等于**任何合法 revision 串，
-#: 这样 ``status`` 才会落 DEGRADED 而不是假 READY。
-UNMIGRATED_REVISION: Final = "UNMIGRATED"
-
-
-def read_migration_head(migrations_dir: Path | None = None) -> str | None:
-    """alembic 脚本目录的当前 head；取不到返回 ``None``（调用方降级，不猜 revision）。
-
-    **单一来源说明（已列为 Q 项）**：``cli._migration_head()`` 是同一段逻辑的既有实现，
-    但 ``cli.py`` 在本片只允许改两处，把它改成委托本函数属越界。故本轮两处并存，
-    已请编排器裁定后续由哪一侧收口；两处的判据完全一致（同一个 ``alembic.ini``、
-    同一个 ``ScriptDirectory.get_current_head()``），不存在口径分叉。
-    """
-    directory = migrations_dir if migrations_dir is not None else repo_root() / MIGRATIONS_DIR
-    ini = directory / "alembic.ini"
-    if not ini.is_file():
-        return None
-    try:
-        from alembic.config import Config
-        from alembic.script import ScriptDirectory
-    except ImportError:
-        return None
-    try:
-        cfg = Config(str(ini))
-        cfg.set_main_option("script_location", str(ini.parent))
-        return ScriptDirectory.from_config(cfg).get_current_head()
-    except Exception:
-        return None
+#: ``MIGRATIONS_DIR`` / ``UNMIGRATED_REVISION`` / ``read_migration_head`` 自 FU-8（D-028 /
+#: 裁定 A80）起以 ``campaignlab.infra.db.migration_head`` 为**唯一来源**，本模块只 re-export，
+#: 不再自己实现一遍：``cli._migration_head()`` 与本模块 ``HealthService.snapshot()`` 从此共用
+#: 同一个 head 判据，「doctor 报的迁移状态」与「/api/v1/health 的 schema_revision」不可能分叉。
+#: 上面的 ``__all__`` 逐字未变，既有 ``from campaignlab.application.health_service import
+#: UNMIGRATED_REVISION, HealthService`` 的读取方（含 S3d 用例）签名与语义都不受影响。
+#: 唯一性守护：tests/unit/test_migration_head_single_source.py。
 
 
 @runtime_checkable

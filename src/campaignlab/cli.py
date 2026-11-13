@@ -34,6 +34,7 @@ from campaignlab.config import (
     repo_root,
     resolve_local_identity,
 )
+from campaignlab.infra.db.migration_head import read_migration_head
 
 __all__ = [
     "CHECK_IDS",
@@ -76,21 +77,13 @@ def _port_in_use(host: str, port: int) -> bool:
 
 
 def _migration_head() -> str | None:
-    """alembic 脚本目录的当前 head；取不到返回 ``None``（调用方报 WARN，不猜 revision）。"""
-    try:
-        from alembic.config import Config
-        from alembic.script import ScriptDirectory
-    except ImportError:
-        return None
-    ini = repo_root() / MIGRATIONS_DIR / "alembic.ini"
-    if not ini.is_file():
-        return None
-    try:
-        cfg = Config(str(ini))
-        cfg.set_main_option("script_location", str(ini.parent))
-        return ScriptDirectory.from_config(cfg).get_current_head()
-    except Exception:
-        return None
+    """alembic 脚本目录的当前 head；取不到返回 ``None``（调用方报 WARN，不猜 revision）。
+
+    实现已收口到 ``campaignlab.infra.db.migration_head``（D-028 / 裁定 A80 / FU-8），本函数
+    只剩委托：传进去的还是收口前自己算的那个 ``repo_root() / MIGRATIONS_DIR``，ini 路径、
+    head 判据与降级口径逐字不变。
+    """
+    return read_migration_head(repo_root() / MIGRATIONS_DIR)
 
 
 def _check_version(config: AppConfig) -> CheckResult:
