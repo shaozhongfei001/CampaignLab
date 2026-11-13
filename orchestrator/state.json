@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T13:17:09+08:00",
+  "updated_at": "2026-11-13T13:19:23+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -640,6 +640,33 @@
           "tests/api/test_contract_http.py(436行)",
           "orchestrator/defects/D-033.md(新建)"
         ]
+      },
+      {
+        "task": "M0-03",
+        "subtask": "S10 公共组件清单与冻结边界（M0-03b 与后续页面任务的 inputs 前置）",
+        "lane": "F",
+        "agent_id": "01a1d33c-5eb5-77b2-ba56-53fdab6594c9",
+        "nickname": "Lagrange",
+        "tier_planned": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 4,
+        "tokens": null,
+        "tokens_note": "get_goal 返回 goal/remainingTokens 全 null；按纪律记 null，禁估算。客观量：35 次工具调用、两文档合计 60777 B / 634 行、loop 4 轮（3 生产 + 1 自复审，未超 3+1 上限）",
+        "over_cap": false,
+        "over_cap_note": "max 档上限 200k；派单预算 32k；无计量值故不判越限",
+        "returned_at": "2026-11-13T13:19:23+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "编排器独立复验：两文档编码三断言全过（无 BOM/无 CR/尾换行）；ruff format --check 2 files already formatted（rc=0）；外部注册 grep -c = 8（gate >=1）；六位十六进制色值 grep -c = 0（两文档均 0，禁写死色值守住）；web/src 越界 git status --porcelain = 0；六态行号抽样复核——COMMON.md :27 首载 / :28 无记录 / :30 部分可比与待补（同一行）/ :31 校验失败 / :32 过期，与文档对照表逐条一致；章节标题实测 :23「共享状态与操作」",
+        "self_review_value": "R4 自复审自查出 6 处行号不准（EvidenceDrawer emit close :29->:30、PageGrid data-narrow/span/media 块、main.ts 样式装载与 provide 块、ConfirmDialog 消费点、S2 参照文件行数），全部以唯一子串替换修正并 assert count==1，修后 G1-G6 复跑全绿 —— loop engineering 自迭代有效",
+        "outputs": [
+          "orchestrator/handoff/M0-03-public-components.md(303行/26803B)",
+          "orchestrator/handoff/M0-03b-freeze.md(331行/33974B)"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -1199,7 +1226,7 @@
         "S7": "DONE",
         "S8": "DONE",
         "S9": "DONE",
-        "S10": "TODO"
+        "S10": "DONE"
       },
       "design_doc": "orchestrator/handoff/M0-03-design.md",
       "last_commit_note": "2026-11-13T01:37:27+08:00 S1+S2 入库；9 条未决问题已裁定；立 D-010",
@@ -1232,14 +1259,15 @@
         "S7": "5d16d4d：web/tests/**（11 文件）键盘基线参数化",
         "S8": "5d16d4d：vitest 单测脚手架 + AC-001 断言 + 深链断言（framework/FRONTEND.md:12）",
         "S9": "5d16d4d + evidence/M0/ui/{ui-01-desktop-1440x900.png,ui-01-laptop-1024x768.png,ui-01-visual-notes.md} + evidence/M0/M0-03/playwright-readiness.json",
-        "S10": "TODO：orchestrator/handoff/ 实测无 M0-03-public-components.md（ls 全量核对）；M0-03b 的 inputs 依赖该清单，故 S10 必须先于或与 M0-03b/S1 同轮交付"
-      }
+        "S10": "本提交：orchestrator/handoff/M0-03-public-components.md（303 行/26803B），13 件公共组件的 props/slots/emits 契约表（30 行 grep 实抽）、依赖关系、冻结边界、消费方指引、与 26 页覆盖对账"
+      },
+      "note_round8": "S1–S10 **全部交付**（10/10）。待 wave1 出口由 Q lane 复核 gates 与 AC 取证回填（A109），故 status 暂维持 IN_PROGRESS，禁在无取证的情况下自行判 DONE"
     },
     "M0-03b": {
       "status": "TODO",
       "lane": "F",
       "tier_planned": "max",
-      "tier_used": "",
+      "tier_used": "qwen3.8-max high（S1）",
       "attempt": 0,
       "tokens": 0,
       "commit": "",
@@ -1286,7 +1314,19 @@
         "rule": "A5 裁定：以任务卡 scope_allow 的路径字面量为准并入 state.json。归一化约定：卡的目录通配 `X/**` 与 state.json 既有尾斜杠形式 `X/` 语义等价，统一写为 `X/`，已存在者不重复添加；文件路径（如 api/evidence.py）保持逐字一致。allow∩deny 已断言为空（D-008）。"
       },
       "tier_override_reason": "C10 裁定：本卡是公共件冻结任务，手册 6.3 硬规则「公共冻结件变更」强制 qwen3.8-max，硬规则优先于任务级默认档；15.5 规定档位表是派单唯一依据、tier_planned 仅默认档。per-subtask 档位不变：S1=max、S2-S4=flash。与 orchestrator/tasks/M0-03b.md:2 记载一致",
-      "tier_override_at": "2026-11-13T04:25:00+08:00"
+      "tier_override_at": "2026-11-13T04:25:00+08:00",
+      "subtask_progress": {
+        "S1": "DONE",
+        "S2": "TODO",
+        "S3": "TODO",
+        "S4": "TODO"
+      },
+      "subtask_progress_evidence": {
+        "S1": "本提交：orchestrator/handoff/M0-03b-freeze.md（331 行/33974B）——六态与 ui/COMMON.md 行号逐条对齐（:27 首载 / :28 无记录 / :30 部分可比与待补 / :31 校验失败 / :32 过期，编排器已抽样复核原文一致）、props/slots/事件契约、外部注册扩展点方案（命中 8 处，gate 要求 >=1）、CR 边界、给 S2-S4 的派单就绪清单",
+        "S2": "TODO：web/tests/unit/state/** 六态参数化 vitest（flash 3k）",
+        "S3": "TODO：web/src/components/state/** 件内样板收敛（flash 2k）",
+        "S4": "**BLOCKED**：截图需 e2e harness，而 web/tests/e2e/** 不在 scope_allow（Lagrange U-2）-> 裁定前无可执行输入，见 resume.round8_pending_rulings_F"
+      }
     },
     "M0-04": {
       "status": "IN_PROGRESS",
@@ -4498,23 +4538,6 @@
           "orchestrator/tasks/M3-04.md",
           "tests/unit/test_task_cards.py(仅 KNOWN_MISSING 字面量)"
         ]
-      },
-      {
-        "agent_id": "01a1d33c-5eb5-77b2-ba56-53fdab6594c9",
-        "nickname": "Lagrange",
-        "lane": "F",
-        "task": "M0-03+M0-03b",
-        "subtask": "S10 公共组件清单与冻结边界 -> M0-03b/S1 六态冻结面裁定（仅两份文档，不动代码）",
-        "tier": "qwen3.8-max",
-        "reasoning_effort": "high",
-        "budget": "32k",
-        "loop_cap": "3+1",
-        "dispatched_at": "2026-11-13T12:49:32+08:00",
-        "write_set": [
-          "orchestrator/handoff/M0-03-public-components.md",
-          "orchestrator/handoff/M0-03b-freeze.md"
-        ],
-        "note": "M0-03/S10 是 M0-03b 的 inputs 前置（D-032 回填时实测确认 handoff 无该文件）；M0-03b 卡 dispatch 段要求 S1 与 S2-S4 分两次 spawn，本次只做 S1（max），S2-S4（flash）另派"
       }
     ],
     "dispatch_requirements": [
@@ -4760,7 +4783,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 174,
+        "ruff_formatted_files": 176,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4769,9 +4792,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 174,
+          "total": 176,
           "in_scope_py": 69,
-          "in_scope_md": 105,
+          "in_scope_md": 107,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4788,7 +4811,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 170,
+          "prev_total": 174,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -5013,8 +5036,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T13:17:09+08:00",
-      "counts_refresh_reason": "Round 8 Lane S（M0-02/S4）入库后重采样：ruff_formatted_files 170->174（py 66->69 = tests/api 三文件；md 104->105 = orchestrator/defects/D-033.md）。采样点依 A101。pytest_passed/mypy 全表真值待本 checkpoint 的 clean-tree 全表复跑后回填",
+      "counts_refreshed_at": "2026-11-13T13:19:23+08:00",
+      "counts_refresh_reason": "Round 8 Lane F（M0-03/S10 + M0-03b/S1）入库后重采样：ruff_formatted_files 174->176（md 105->107 = M0-03-public-components.md + M0-03b-freeze.md；py 69 不变）。四 lane 全部回收，工作树归零，全表真值于 checkpoint 提交内回填",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -9239,8 +9262,72 @@
           "A118(U-3)",
           "A119(U-4)"
         ]
+      },
+      {
+        "lane": "F",
+        "nickname": "Lagrange",
+        "agent_id": "01a1d33c-5eb5-77b2-ba56-53fdab6594c9",
+        "task": "M0-03+M0-03b",
+        "subtask": "S10 + S1",
+        "tier": "qwen3.8-max high",
+        "result": "DONE",
+        "returned_at": "2026-11-13T13:19:23+08:00",
+        "commit": "PENDING(本提交)",
+        "orchestrator_verification": "7 项机械复验全吻合（编码/ruff/外部注册/色值/越界/六态行号抽样/章节行号）；内容级复核（13 件组件契约表逐条对代码）顺延至下次会话，已在 checkpoint 标 PENDING_CONTENT_REVIEW",
+        "adjudications_raised": [
+          "U-1..U-7 见 round8_pending_rulings_F，其中 U-2 为 S4 阻塞级"
+        ]
       }
-    ]
+    ],
+    "round8_pending_rulings_F": {
+      "at": "2026-11-13T13:19:23+08:00",
+      "source": "Lane F（Lagrange）M0-03/S10 + M0-03b/S1 回报的 7 项 U",
+      "status": "PENDING（checkpoint 前未终裁，下次会话开工首件事）",
+      "items": [
+        {
+          "id": "F-U-1",
+          "level": "RULING",
+          "q": "AlertBanner/EmptyState 是否物理迁入 web/src/components/state/？迁入必改 web/src/pages/**（WorkspacePage.vue:9-10），而 pages/** 在 scope_deny",
+          "provisional": "**采纳 Lagrange 的 F-1/F-2 裁定**：不迁移、原址冻结、state/ 内组合复用。若日后要求物理迁移，须同时放开 pages/** 并走独立 CR"
+        },
+        {
+          "id": "F-U-2",
+          "level": "BLOCKING",
+          "q": "web/tests/e2e/** 不在 scope_allow，但六态截图（S4）需要 harness，而页面不在本卡 scope",
+          "provisional": "三选一，下次会话首裁：(a) 扩 tasks[M0-03b].scope 增 web/tests/e2e/state/**；(b) 指定其他落点（如 evidence/M0/M0-03b/state/ 由 vitest + @vitest/browser 或既有 playwright.config.ts 承载）；(c) 把截图推迟到首个消费 ViewState 的页面任务（M1-04）。**(c) 成本最低且与 A31 页面证据归属一致，建议 (c) + 在 M0-03b 卡记 PASS_WITH_TODO**"
+        },
+        {
+          "id": "F-U-3",
+          "level": "RULING",
+          "q": "数字单位换算（COMMON.md:36 后半句）是否纳入本次冻结面",
+          "provisional": "**不纳入**（Lagrange 的 F-E 裁定）：features/shared 属 deny 且会与 M1-04/M3-04 重复；留待首个需要单位换算的页面任务"
+        },
+        {
+          "id": "F-U-4",
+          "level": "RULING",
+          "q": "partial-comparable / pending-fill 的服务器数据源未在活契约落地（StatusBand 属 UI-10/M2-04）",
+          "provisional": "**确认 Lagrange 处置**：本卡只冻结呈现契约，触发值由页面显式传入；两态的真实数据接线随 M2-04（UI-10）落地"
+        },
+        {
+          "id": "F-U-5",
+          "level": "ACTION",
+          "q": "tasks[M0-03b].scope 仍缺冻结登记文件与证据落点",
+          "provisional": "实测 state.json 已含 orchestrator/handoff/M0-03b-freeze.md、evidence/M0/M0-03b/、evidence/M0/summaries/M0-03b.md（A5 于 04:25 同步过）-> **本项已满足，无需动作**，仅需在下次派单文里指明"
+        },
+        {
+          "id": "F-U-6",
+          "level": "CALIBER",
+          "q": "越界自证 gate 用 git diff --name-only HEAD 对未跟踪新文件不敏感",
+          "provisional": "**采纳**：把「git status --porcelain web/src | wc -l == 0」写进后续所有 F lane 卡的越界自证 gate（双检），并在 M0-03b 卡尾 append-only 加注"
+        },
+        {
+          "id": "F-U-7",
+          "level": "RULING",
+          "q": "公共件既有 4 处缺陷（ConfirmDialog 打开未主动聚焦致 Esc 依赖焦点在框内；DataTable 缺 36px 密集档与宽表冻结首列；StatusTag 五 tone 形状相同；AppShell 未透传 drawer/entryActive 给 SideRail）在 M0-03b 期间不可修（越界）",
+          "provisional": "**立独立缺陷单**（下次会话开工第一件事：D-034，severity 建议 MINOR，status OPEN，owner M0-03 收尾或独立 CR），禁在 M0-03b 期间夹带修复；其中 ConfirmDialog 聚焦与 StatusTag「不靠颜色区分」两项**关联 AC-032**（归属 M5-01），须在 M5-01 取证前处理"
+        }
+      ]
+    }
   },
   "acceptance": {
     "baseline_total": 35,
