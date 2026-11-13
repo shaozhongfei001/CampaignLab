@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T12:01:21+08:00",
+  "updated_at": "2026-11-13T12:26:18+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -471,6 +471,34 @@
         "adjudications": "A69-A80（见 resume.round6_adjudications）",
         "deviations_self_declared": 11,
         "value_added": "Q1 主动暴露「create_app 自动装配」与既有 2 条用例的结构性冲突，并选择「不注入就不装配 + 显式 raise RuntimeError」而非改既有测试（守住禁改既有测试与禁静默回落两条铁律）；Q2 主动暴露派单文门禁 7 与门禁 8 无法同时满足的措辞缺陷（编排器据此更正判据）；Q4 主动上报自己造成的单一来源风险（未掩饰）；Q8 主动质疑派单文写死的 ruff 基线数字（编排器据此更正为指向 counts，落实 D-012/D-014）；偏差 3 主动声明 jobs 终态写入未实现并说明归 M0-04（避免无人校验的死代码）"
+      },
+      {
+        "task": "M0-02",
+        "subtask": "S3b 路由层（api/session.py + api/workspaces.py 新建、api/app.py 挂载 6 行、tests/unit/test_s3b_routes.py）",
+        "lane": "S",
+        "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+        "nickname": "Newton",
+        "tier_planned": "qwen3.8-flash",
+        "tier_used": "qwen3.8-flash",
+        "tier_match": true,
+        "attempt": 1,
+        "result": "DONE",
+        "subtask_count": 1,
+        "loop_used": 2,
+        "tokens": null,
+        "tokens_note": "get_goal 无计量句柄（goal/remainingTokens/completionBudgetReport 全 null）；按纪律记 null，禁估算。客观量：4 文件（session.py 170 行/6945B 新建、workspaces.py 112/5045 新建、app.py 157/7120 的 6 add/0 del、test_s3b_routes.py 199/7989 新建）、新增测试 7 个、回报含 4 项裁定请求（U1-U4）",
+        "over_cap": false,
+        "over_cap_note": "flash 档上限 60k；无计量值故不判越限，以客观量留痕",
+        "returned_at": "2026-11-13T12:26:18+08:00",
+        "commit": "PENDING(本提交)",
+        "verified_by_orchestrator": "9/9 项独立复验吻合（operationId 逐字、两路由形参实取、INVALID 命中 0、noqa: B008 计 7 处、type: ignore 0、datetime.now() 0、路径门禁 5 项 rc=0、切片状态码集合比对、responses= 计数）；禁采信自报",
+        "outputs": [
+          "src/campaignlab/api/session.py(170/6945,新建)",
+          "src/campaignlab/api/workspaces.py(112/5045,新建)",
+          "src/campaignlab/api/app.py(6 add/0 del)",
+          "tests/unit/test_s3b_routes.py(199/7989,新建)",
+          "orchestrator/defects/D-030.md(55行/5513B,新建)"
+        ]
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -765,7 +793,7 @@
         "S1": "DONE",
         "S2": "DONE",
         "S3a": "DONE",
-        "S3b": "TODO",
+        "S3b": "DONE",
         "S4": "TODO",
         "S5": "TODO",
         "S3c": "DONE",
@@ -942,7 +970,8 @@
           }
         ],
         "s4_scope_narrowed_by_A84": "M0-02/S4（Round 8）产出收窄为 tests/api/**，不碰 api/app.py 与 api/jobs.py"
-      }
+      },
+      "s3b_note": "S3b 于 2026-11-13T12:26:18+08:00 由 Lane A（Newton / qwen3.8-flash）交付并经编排器 9/9 独立复验通过；产出 api/session.py + api/workspaces.py（4 条 APIRoute：exchangeSession/getSession/listWorkspaces/createWorkspace）+ app.py 条件挂载 6 行 + tests/unit/test_s3b_routes.py（7 passed）。裁定 A94-A98 生效、立 D-030（MAJOR/CLOSED）。listWorkspaces 无 status 查询参数（CR-002/ADR-006 选项 B）。S4 收窄为 tests/api/**（A84），须以 declared_responses() 为权威（A95）、SameSite 大小写不敏感断言（A96）。"
     },
     "M0-03": {
       "status": "IN_PROGRESS",
@@ -3821,6 +3850,58 @@
       "card_line_budget": "split-total 190 -> 196（守护上限 200，余量 4）；head/表头未动；卡片守护 12 passed",
       "recurrence_guard": "FU-15：新增 tests/unit/test_card_output_scope.py，解析每张非 LEGACY 卡档位表「产出」列的路径字面量并断言全部落在 tasks[id].scope 允许前缀内（现守护只查卡<->tasks 键双向对账与必需段落，不查产出列越界，属盲区）",
       "commit": "PENDING(Round 7 predispatch)"
+    },
+    {
+      "id": "D-030",
+      "task": "M0-02（S3b 路由层：api/session.py、api/workspaces.py）",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "title": "M0-02-design §1 的冻结正文形参 payload: SessionExchange / payload: WorkspaceCreate 与 §4/§7.3 的 read_body_within_limit 两阶段 413 限流互斥：FastAPI 会先消费请求体流，路由体内二次读取必得空流或 RuntimeError，413 INPUT_TOO_LARGE 成为不可达分支，AC-034「上传失败 -> 413」取证面丢失",
+      "found_by": "编排器本人（Round 7 派单前置检查）；Lane A（Newton / qwen3.8-flash）交付回报 U1 独立复现同一冲突",
+      "file": "orchestrator/defects/D-030.md",
+      "found_at": "2026-11-13T12:26:18+08:00",
+      "closed_at": "2026-11-13T12:26:18+08:00",
+      "blocking": false,
+      "blocking_note": "契约零影响（openapi.json 443309B / sha16 592571099d638251 / 80 operationId 未变；app openapi_url=None，活契约非 app 生成）；派单前置发现，返工 0 行",
+      "owner": "编排器（O lane）",
+      "responsibility": "设计缺陷（design §1 与 §4/§7.3 自相矛盾），非 Lane A 越界或失职；Newton 主动上报并请求裁定，处置正确",
+      "measured": {
+        "design_lines": "M0-02-design.md:26（exchangeSession 冻结签名，声明 413）、:30（createWorkspace 冻结签名，声明 413）",
+        "impl_evidence": "api/session.py:17-18 明载偏差理由；:37 import read_body_within_limit；:141 raw = await read_body_within_limit(request, max_bytes=max_bytes)",
+        "params_exchange_session": [
+          "request",
+          "svc",
+          "clock"
+        ],
+        "params_list_workspaces": [
+          "request",
+          "cursor",
+          "limit",
+          "q",
+          "actor",
+          "svc"
+        ],
+        "operationIds": [
+          "exchangeSession",
+          "getSession",
+          "listWorkspaces",
+          "createWorkspace"
+        ],
+        "path_limited_gates": "ruff format 4 files already formatted / ruff check All checks passed! / mypy Success: no issues found in 4 source files / pytest tests/unit/test_s3b_routes.py 7 passed / 近邻+守护回归 82 passed，全 rc=0",
+        "full_table_gates": "缓跑（Lane B/Volta M0-04-S2 同树在飞，全仓 pytest/mypy 会对其半成品判假 RED），回收后编排器独占补跑"
+      },
+      "fix_detail": "A94：两个 POST 路由正文形参改取 request: Request，路由体内经 read_body_within_limit 手工读取 + parse_json_body[ModelT] 校验；其余形参名、Depends 注入位、-> Response 返回类型逐字不变。design §1 冻结签名按「历史值只加注不改写」保留原文字节，本缺陷单即注记",
+      "fix_scope": [
+        "src/campaignlab/api/session.py",
+        "src/campaignlab/api/workspaces.py"
+      ],
+      "followup": "FU-17（api 私有助手若被第三个模块需要，必须提升到 api/common.py，禁第三份复制）",
+      "related_adjudications": [
+        "A94",
+        "A95",
+        "A96",
+        "A98"
+      ]
     }
   ],
   "change_requests": [
@@ -4078,16 +4159,6 @@
       "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
     "in_flight_agents": [
-      {
-        "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
-        "nickname": "Newton",
-        "lane": "S",
-        "task": "M0-02",
-        "subtask": "S3b",
-        "tier": "qwen3.8-flash",
-        "budget": "14k",
-        "dispatched_at": "2026-11-13T11:53:59+08:00"
-      },
       {
         "agent_id": "01a1d306-e808-7c32-a77a-030d7c91fa35",
         "nickname": "Volta",
@@ -4353,7 +4424,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 149,
+        "ruff_formatted_files": 153,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4362,9 +4433,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 149,
-          "in_scope_py": 51,
-          "in_scope_md": 98,
+          "total": 153,
+          "in_scope_py": 54,
+          "in_scope_md": 99,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4372,7 +4443,7 @@
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
           "measured_after": "2026-11-13T11:34:54+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "tracked(149 = py 51 + md 98) + untracked(0) == 149 == ruff format --check 报数，成立",
+          "identity": "index/py+md 在域 153 = py 54 + md 99（git ls-files 口径，索引 == 待提交树）；本次 +4 = 新增 session.py、workspaces.py、test_s3b_routes.py（py 51->54）+ D-030.md（md 98->99）",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4381,7 +4452,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 128,
+          "prev_total": 149,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4391,7 +4462,8 @@
           "round6_progression": "128（提交C 时）-> 144（S3d 在飞时实测，含未跟踪）-> 146（批次4 入库 + 守护 + D-026.md）-> 147（D-027.md 入库）；本提交后 untracked 归 0、tracked 147",
           "sampling_discipline": "counts 一律在「工作树 == 待提交树」时采样（本次 S3d 12 个文件已 git add、其余全入库，untracked=0），且在台账写入之后、commit 之前完成",
           "historical_value_147": "2026-11-13T10:49:12+08:00 实测 147（py 51 + md 96）。该次测量早于 D-028.md 落盘与本台账写入（updated_at 10:56:43），故对『待提交树』而言偏小 1。原值按 D-011 体例保留于此，不改写。",
-          "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。"
+          "historical_value_148": "2026-11-13T11:08:43+08:00 实测 148（py 51 + md 97）= S3d 提交树 46dca2b 的分母；+1 = orchestrator/defects/D-029.md（Round 7 predispatch）。原值保留不改写。",
+          "in_flight_exclusion": "Lane B（Volta/M0-04-S2）在飞的未入库文件不计入本分母：git ls-files 只反映索引，Volta 的中间态（repositories.py/application/worker.py 为已跟踪文件的修改，不改变文件数；src/campaignlab/worker/** 与其两个测试尚未落盘）不属本提交树。test_counts_freshness 从 git ls-tree -r HEAD 取数，对在飞噪声免疫（FU-14 设计意图）"
         },
         "ruff_lint_scope_files": 24,
         "ruff_format_check_rc_after_governance_files": 0,
@@ -4416,7 +4488,9 @@
           "gates_run": 18,
           "all_green": true,
           "measured_at": "2026-11-13T10:49:12+08:00"
-        }
+        },
+        "pytest_passed_note_round7_laneA": "counts.pytest_passed 仍为 213（af3808b/d3f7671 全表实测值），本轮**未刷新**：全表 pytest 在 Volta 在飞期间会对其半成品判假 RED，故缓跑。本提交只做路径限定实测：tests/unit/test_s3b_routes.py 7 passed（rc=0）+ 近邻与守护 82 passed（rc=0）。三 lane 全部提交后由编排器独占补跑全表并回填真值（禁估算）。",
+        "mypy_source_files_note_round7_laneA": "同上：mypy 49 为上次全表实测值；本轮路径限定 mypy 4 source files rc=0，全表值待回收后补测"
       },
       "denominator_history": [
         {
@@ -4601,8 +4675,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T11:34:54+08:00",
-      "counts_refresh_reason": "Round 7 predispatch 落盘后重采样：ruff_formatted_files 148->149（+1 = orchestrator/defects/D-029.md，md 97->98）；M0-02.md 为纯增量加注（6 add / 0 del）不改变分母；pytest/mypy/契约节点/AC 分母/openapi 指纹待本提交树全表复跑后确认。",
+      "counts_refreshed_at": "2026-11-13T12:26:18+08:00",
+      "counts_refresh_reason": "Round 7 Lane A（M0-02/S3b）入库后重采样：ruff_formatted_files 149->153（py 51->54 = session.py/workspaces.py/test_s3b_routes.py；md 98->99 = orchestrator/defects/D-030.md）。采样点依 A101/rule_counts_sampling_point：工作树 == 待提交树（5 路径已 git add，Volta 在飞产物不在索引内）、台账写入之后、commit 之前。pytest/mypy/契约节点/AC 分母/openapi 指纹本轮不变（契约零影响：443309B / sha16 592571099d638251 / 80 operationId / 13 节点 / AC 47），全表值待 Volta 回收后补测",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -6281,6 +6355,19 @@
         "task": "D-016",
         "subtask": "批次2",
         "status": "RETURNED"
+      },
+      {
+        "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+        "nickname": "Newton",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S3b",
+        "tier": "qwen3.8-flash",
+        "budget": "14k",
+        "dispatched_at": "2026-11-13T11:53:59+08:00",
+        "returned_at": "2026-11-13T12:26:18+08:00",
+        "commit": "PENDING(本提交)",
+        "close_agent": "待三 lane 全部提交后统一 close（释放并发槽）"
       }
     ],
     "round3_returns": {
@@ -7729,7 +7816,8 @@
         "source": "api/app.py:149 挂载位归属（S3b）",
         "question": "app.py:149 预留了 session/workspaces 的挂载位注释，但 M0-02 的 state.json scope 不含 api/app.py；S3d 已把 app.py 改造为 A69「不注入就不装配」（health.router 在 :147 的显式注入分支内）。S3b 追加两行挂载该落在哪一侧？",
         "ruling": "`api/app.py:149` 的挂载位归 **M0-02/S3b（Round 7）**：追加 `app.include_router(session.router)` 与 `app.include_router(workspaces.router)` 两行，且**必须落在 A69「显式注入才挂载」的分支内**（与 `health.router`（:147）同侧），不得让未注入服务的 app 装配出必然 500 的路由。`app.py` 总变更 **<=6 行**（含必要的 import），其余部分（CORS／中间件／异常处理装配／`openapi_url=None` 等设置）**一字不改**。S3b 因此获得对 `api/app.py` 的窄口径豁免，记入 tasks['M0-02'].scope_waivers_round7。",
-        "action_taken": "豁免写入 tasks['M0-02'].scope_waivers_round7；S3b 派单文逐字引用"
+        "action_taken": "豁免写入 tasks['M0-02'].scope_waivers_round7；S3b 派单文逐字引用",
+        "correction_R7_2": "编排器自我更正（R7-2，2026-11-13T12:26:18+08:00）：本条原文所述前提「health.router(app.py:147) 位于显式注入分支内」经 Lane A 实测与编排器复核确认为**错误**——app.include_router(health.router) 是无条件挂载，「不注入就不装配」由 app.state.* 条件赋值 + deps 提供器 raise RuntimeError 共同实现（app.py:126-157）。本条的**结论仍有效**（挂载位归 S3b、<=6 行、须满足 A69），仅参照物写错。Lane A 采用 if session_service is not None: / if workspace_service is not None: 条件挂载（6 add / 0 del），比 health 的无条件挂载更忠于 A69（未注入 -> 404 而非 500），已由 A97 裁定接受。原文按 D-011 体例保留，不改写。"
       },
       {
         "id": "A86",
@@ -7784,6 +7872,51 @@
         "question": "`listJobs` 的 200 响应是 `JobPage{items(0-100), next_cursor}`，但实测 `api/common.py.__all__` 52 项含 `Job`/`ObjectRef`/`WorkspacePage` 而**无 `JobPage`** -> 该 DTO 无落点。谁追加？",
         "ruling": "`JobPage` 由 **M0-04/S4** 在 `src/campaignlab/api/common.py` **append-only** 追加（与既有 `WorkspacePage` 同构：`items` + `next_cursor`，字段序、校验口径、`__all__` 位置一律对齐 `WorkspacePage`），按 A77/A78 纳入 **public_frozen 扩围**，此后禁改签名禁移除。**M0-02/S4 禁抢先添加**（避免双主写，与 A84 同理）。S2 不做 HTTP 层，本轮不涉及；本条为 Round 8 派单前置裁定，先行入库以免 S4 派单时临时阻塞。`api/common.py` 属 M0-02 的 scope、且已列为公共冻结件，故 S4 的该处追加须记为窄口径 append-only 豁免（numstat 对该文件须 0 删除行）。",
         "action_taken": "无代码动作；裁定入库"
+      },
+      {
+        "id": "A94",
+        "round": 7,
+        "at": "2026-11-13T12:26:18+08:00",
+        "source": "Lane A 回报 U1 + 编排器派单前置检查",
+        "question": "M0-02-design §1 冻结 exchange_session(payload: SessionExchange, request: Request, ...) 与 create_workspace(payload: WorkspaceCreate, ...)，同时 §4/§7.3 要求 413 必走 common.read_body_within_limit 的两阶段判定。FastAPI 解析 DTO 形参会先消费请求体流，路由体内二次读取必得空流或抛 RuntimeError，413 失去触发面。两者谁优先？",
+        "ruling": "**判 design §1 的 DTO 正文形参为设计缺陷（立 D-030，MAJOR/CLOSED）**：两个 POST 路由的正文形参取 request: Request，路由体内经 read_body_within_limit(request, max_bytes=...) 手工读取、再由 parse_json_body[ModelT] 完成解析与 DTO 校验（400/413/422 各归其位）。**其余形参名、Depends 注入位、-> Response 返回类型逐字不变**；createWorkspace 的 Idempotency-Key Header 与 actor: Session = Depends(require_session) 保持冻结原样。design §1 原文字节保留，D-030 即其注记。",
+        "action_taken": "Lane A 已按此交付（session.py:141）；编排器独立复验通过；本提交入库"
+      },
+      {
+        "id": "A95",
+        "round": 7,
+        "at": "2026-11-13T12:26:18+08:00",
+        "source": "Lane A 回报 U2",
+        "question": "路由装饰器是否保留 responses=declared_responses(...)？app 侧 openapi_url=None、活契约非 app 生成，保留它是否有意义、是否构成契约面风险？",
+        "ruling": "**保留 declared_responses()**。零契约影响（openapi.json 指纹不变），且它使「实现声明的状态码集合 == 切片状态码集合」成为可机器断言的不变量。**硬约束：M0-02/S4（Round 8）的契约测试必须以 declared_responses() 为权威**，禁另立一份状态码清单。",
+        "action_taken": "session.py PROBLEM_STATUSES 覆盖 400/401/403/404/409/412/413/422/428/429/500；responses= 计数 session 2 / workspaces 2 / health 0"
+      },
+      {
+        "id": "A96",
+        "round": 7,
+        "at": "2026-11-13T12:26:18+08:00",
+        "source": "Lane A 回报 U3",
+        "question": "SessionCookie.samesite 的冻结字面量是小写 \"strict\"，而 design §1 与契约描述写作 SameSite=Strict。路由侧是否规范化为 Strict？",
+        "ruling": "**禁在路由侧规范化**。SessionCookie 属 public_frozen（A77/A78），改字面量须走 CR。RFC 6265bis 规定 SameSite 值比较大小写不敏感 → \"strict\" 与 \"Strict\" 功能等价。**M0-02/S4 的契约测试须按大小写不敏感断言，或直接断言冻结字面量 \"strict\"，禁断言 \"Strict\"**。",
+        "action_taken": "无代码改动；约束下传 S4"
+      },
+      {
+        "id": "A97",
+        "round": 7,
+        "at": "2026-11-13T12:26:18+08:00",
+        "source": "Lane A 回报 U4 + 编排器自我更正 R7-2",
+        "question": "A85 要求 S3b 的 session/workspaces 挂载落 app.py:149 且「不注入就不装配」，并声称参照 health.router(:147) 在显式注入分支内的写法。Newton 实测发现 health.router 是无条件挂载，遂改用 if session_service is not None: / if workspace_service is not None: 包住两行挂载（恰用满 6 行额度）。是否要求改回 health 的写法？",
+        "ruling": "**接受 Newton 的条件挂载，不改**。A85 的前提「health.router(:147) 在显式注入分支内」**是编排器写错**（自我更正 R7-2）：实测 app.include_router(health.router) 为无条件挂载，「不注入就不装配」靠 app.state.* 条件赋值 + deps 提供器 raise RuntimeError 实现（app.py:126-157）。条件挂载比 health 更忠于 A69（未注入 -> 404 而非 500）。",
+        "action_taken": "app.py 6 add / 0 del；A85 条目已追加 correction_R7_2 注记，原文不改写"
+      },
+      {
+        "id": "A98",
+        "round": 7,
+        "at": "2026-11-13T12:26:18+08:00",
+        "source": "Lane A 回报偏差2",
+        "question": "session.py 内新建了 6 个私有助手（JSON_MEDIA_TYPE / PROBLEM_STATUSES / declared_responses / validation_issues / parse_json_body / render_session_cookie），workspaces.py 直接复用它们（import 而非复制）。是否要求即刻提升到 api/common.py？",
+        "ruling": "**接受现状（复用非复制，合规）**：本轮不强制提升，避免在飞期间动 common.py 这个冻结件。**硬约束：若第三个 api 模块需要其中任一助手，必须提升到 api/common.py（append-only 豁免），禁第三份复制** -> 立 FU-17。",
+        "action_taken": "FU-17 入库（Round 8+ flash 小片）"
       }
     ],
     "round7_predispatch": {
@@ -8225,7 +8358,43 @@
       "ambiguity_systemic_note": "26 个 UI 页中有 5 页（UI-14/UI-15/UI-18/UI-20/UI-25）的 nav 组归属与 AC 交集不一致，根因是 tasks[*].acs 只登记了该任务**主责或强相关**的 AC，而一个页面往往同时呈现多条他人 primary 的 AC。这不是台账错误（primary_owner 47 条自洽、waves 29/29 全覆盖），而是**卡片撰写口径**问题：页面任务的卡内 AC 段落必须区分「本任务 primary 的 AC」与「本页面呈现的他人 primary AC（cross_ref）」两栏。建议 Round 8 派批次5 时把该口径写进派单文，并考虑立一张 MINOR 缺陷单登记该口径缺失（避免批次6 的 M3-P02/M5-P01 重犯）。",
       "fu5_carryover": "FU-5：批次5 补 M1-04/M2-04 卡时须把 MONTHLY-PAGES.md:33-43 的关联页面增量表写进 inputs.specs，并落 A31 的页面证据归属",
       "next_action": "Round 8 predispatch：① 裁定 5 处歧义（本文 recommendation 为编排器建议，非终裁）；② 按 slice_cmd 生成 3 份切片并校验 truncated_schemas==[]；③ 派 T lane（flash）补 3 张卡 + KNOWN_MISSING 6->3；④ 同轮可派 M0-02/S4、M0-04/S3+S4、M0-03b"
-    }
+    },
+    "round7_self_corrections": [
+      {
+        "id": "R7-2",
+        "at": "2026-11-13T12:26:18+08:00",
+        "what_was_wrong": "A85 的参照物前提写错：声称 health.router(app.py:147) 在显式注入分支内，实为无条件挂载",
+        "how_found": "Lane A（Newton）回报 U4 提出实测异议；编排器亲自复读 app.py:126-157 原文确认",
+        "correction": "A85 结论不变（挂载位归 S3b、<=6 行、须满足 A69），仅参照物更正；A85 条目追加 correction_R7_2 注记，原文字节保留；Newton 的条件挂载由 A97 裁定接受",
+        "prevention": "派单文引用「参照现有写法」时必须附实测行号与代码原文片段，禁凭记忆断言控制流结构",
+        "related": [
+          "A85",
+          "A97"
+        ]
+      }
+    ],
+    "round7_returns": [
+      {
+        "lane": "A",
+        "nickname": "Newton",
+        "agent_id": "01a1d304-abbb-7310-b741-aa18a7acec2c",
+        "task": "M0-02",
+        "subtask": "S3b",
+        "tier": "qwen3.8-flash",
+        "result": "DONE",
+        "returned_at": "2026-11-13T12:26:18+08:00",
+        "commit": "PENDING(本提交)",
+        "orchestrator_verification": "9/9 吻合；路径门禁 ruff format/rc0、ruff check/rc0、mypy 4 files/rc0、pytest s3b 7 passed/rc0、近邻+守护 82 passed/rc0",
+        "adjudications_raised": [
+          "A94(U1)",
+          "A95(U2)",
+          "A96(U3)",
+          "A97(U4)"
+        ],
+        "attribution_correction": "Newton 回报把 M application/health_service.py 误标为 Lane B/Volta；编排器用 numstat(14 add/35 del) 与 Franklin 自报交叉确认，实为 Lane C（Franklin）的 FU-8 产物。归因以编排器为准"
+      }
+    ],
+    "in_flight_agents_note_round7": "Round 7 三 lane：A(Newton/M0-02-S3b,flash) 已回收并于本提交入库；C(Franklin/FU-8+FU-14,flash) 已回收已复验，待下一次提交；B(Volta/M0-04-S2,max high) 仍在飞（工作树实测 infra/db/repositories.py +429、application/worker.py +18/-1 为其中间态，src/campaignlab/worker/ 尚未落盘）。在飞期间全表门禁缓跑，只做路径限定门禁 + 守护；三 lane 全提交后由编排器独占补跑全表并回填 self_check_gates_rc0。"
   },
   "acceptance": {
     "baseline_total": 35,
