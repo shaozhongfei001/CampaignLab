@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T10:33:50+08:00",
+  "updated_at": "2026-11-13T10:47:02+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -3604,6 +3604,54 @@
         "A63",
         "A67"
       ]
+    },
+    {
+      "id": "D-027",
+      "task": "编排器自身（提交前门禁校验流程）",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "title": "编排器提交前门禁校验不完整且 rc 采集经管道失真：f0e20d4 入库的新守护首版含 ruff 11 errors + mypy 2 errors + 1 file would be reformatted，而提交前只跑了 pytest；同时 `cmd | tail` 使 subprocess 取到 tail 的 rc（恒 0），assert rc==0 假绿",
+      "found_by": "编排器本人（S lane 提交前全表实测时，由 ruff 恒等式断言 tracked(146)+untracked(0) != ruff_total(145) 中止，进而追出 rc 采集失真与守护文件违规）",
+      "file": "orchestrator/defects/D-027.md",
+      "found_at": "2026-11-13T10:47:02+08:00",
+      "closed_at": "2026-11-13T10:47:02+08:00",
+      "measured": {
+        "offending_commit": "f0e20d4",
+        "offending_file": "tests/unit/test_wave_deps_consistency.py",
+        "ruff_check_errors": 11,
+        "ruff_error_codes": [
+          "E501 x3（docstring 与 assert 行超 100 字符）",
+          "B905 x2（zip 无 strict=）",
+          "RUF007 x2（应用 itertools.pairwise）",
+          "其余为同源重复计数"
+        ],
+        "mypy_errors": 2,
+        "mypy_error_detail": "test_wave_deps_consistency.py:85 与 :156 的 arg-type（wave.get('wave') 是 Any|None，目标容器标注 int）",
+        "ruff_format": "1 file would be reformatted（两处 assert 需括号折行）",
+        "false_green_evidence": "G3 打印 'Found 11 errors' 而 rc3=0；G4 打印 '1 file would be reformatted' 而 rc4=0 —— 两者均因 `| tail -N` 使 rc 取自 tail",
+        "caught_by": "G10 恒等式断言（tracked+untracked 必须 == ruff format 报的 total）",
+        "after_fix": {
+          "ruff_check": "All checks passed! RC=0",
+          "mypy": "Success: no issues found in 49 source files RC=0",
+          "ruff_format_check": "146 files already formatted RC=0",
+          "guard_pytest": "8 passed",
+          "identity": "tracked 146 + untracked 0 == 146 == ruff_total 成立"
+        }
+      },
+      "blocking": false,
+      "blocking_note": "不阻塞：功能与守护断言本身正确（8/8 全绿、pytest 213 passed），无业务代码受影响；受影响的是「lint/type 干净」这一维度的提交质量与门禁可信度",
+      "fix_detail": "① 立即修正守护文件（超行改写、zip -> itertools.pairwise、新增 _wave_no() 整数断言、按 ruff format 折行），四项工具实测全绿；② 门禁 rc 采集口径固化：一律 set -o pipefail 或不接管道，且 **rc 与输出文本双判**（ruff format 必须匹配 'N files already formatted' 且不含 'would be reformatted'；pytest 必须匹配 'N passed' 且不含 'failed'）；③ 提交前门禁清单固化为全表，任一未跑必须在提交信息写明「未跑 + 原因」；④ 已推送的 f0e20d4 不改写历史（禁 force-push），以本提交前向修正并在 state.json 留 R6-1 自我更正",
+      "fix_scope": [
+        "tests/unit/test_wave_deps_consistency.py（重写修正）",
+        "orchestrator/state.json（R6-1 自我更正 + 门禁口径固化）",
+        "orchestrator/defects/D-027.md（新增）"
+      ],
+      "related": [
+        "D-009（静默跳过比崩溃更危险，同类）",
+        "D-006（ruff format 作用域含 .md 的计数口径）",
+        "R6-1",
+        "R6-2"
+      ]
     }
   ],
   "change_requests": [
@@ -6887,6 +6935,39 @@
       "in_flight": [
         "01a1d275-7c5b-7dc0-9ddf-677eef887e4a (Godel/S3d，已回报待提交)"
       ]
+    },
+    "round6_self_corrections": [
+      {
+        "id": "R6-1",
+        "at": "2026-11-13T10:47:02+08:00",
+        "severity": "MAJOR",
+        "kind": "编排器自身错误",
+        "item": "提交 f0e20d4 前只跑了 pytest（213 passed）就入库新守护 tests/unit/test_wave_deps_consistency.py，未跑 ruff check / ruff format / mypy；该文件首版实测含 ruff 11 errors（E501 x3、B905 x2、RUF007 x2 等）+ mypy 2 errors（arg-type）+ 1 file would be reformatted。属「提交前门禁不完整」，已立 D-027。",
+        "root_cause": "误判工具链仍被占用：两个 lane（Godel/S3d、Planck/批次4）当时**均已回报**，工具链早已解禁；编排器沿用了「lane 在飞禁跑工具链」（NOTE-10）的约束却没有重新评估其前提是否仍成立，于是只跑了不依赖 .venv 的 pytest 与纯 python3 守护直调。",
+        "corrective_action": "① 前向修正守护文件（禁 force-push、不改写历史）；② 固化规则：lane 全部回报即解禁工具链，提交前必须跑全表；③ 新守护文件在写入后必须先过 ruff format + ruff check + mypy 再入库",
+        "evidence": "修正后实测：ruff check 'All checks passed!' RC=0；mypy 'Success: no issues found in 49 source files' RC=0；ruff format --check '146 files already formatted' RC=0；pytest tests/unit/test_wave_deps_consistency.py 8 passed",
+        "commit": "PENDING(本提交)"
+      },
+      {
+        "id": "R6-2",
+        "at": "2026-11-13T10:47:02+08:00",
+        "severity": "MAJOR",
+        "kind": "编排器自身错误（量测方法）",
+        "item": "门禁命令写成 `cmd 2>&1 | tail -N` 后，subprocess 拿到的 returncode 是 **tail 的**（恒 0），导致 `assert rc == 0` 假绿：本次 G3 输出 'Found 11 errors' 而 rc=0、G4 输出 '1 file would be reformatted' 而 rc=0。",
+        "root_cause": "shell 管道的退出码默认取最后一个命令；未设 pipefail，也未对输出文本做判定。",
+        "corrective_action": "门禁采集口径固化：一律 `set -o pipefail` 或干脆不接管道（输出过长时在 Python 侧截断），且 **rc 与输出文本双判**——pytest 必须匹配 'N passed' 且不含 'failed'；ruff format 必须匹配 'N files already formatted' 且不含 'would be reformatted'；ruff check 必须含 'All checks passed'；mypy 必须含 'Success'；doctor 必须 RC=0 且逐项读 PASS/WARN/FAIL 计数。",
+        "evidence": "本次假绿由 G10 恒等式断言（tracked+untracked == ruff_total）意外拦下：146+0 != 145 触发 AssertionError 中止，未污染台账",
+        "impact_if_missed": "若未拦下，台账会记下「ruff check rc=0 / ruff format rc=0」的假绿，后续所有提交都以该假基线为准（与 D-009 的静默跳过同类危险）",
+        "commit": "PENDING(本提交)"
+      }
+    ],
+    "gate_measurement_caliber": {
+      "at": "2026-11-13T10:47:02+08:00",
+      "source": "D-027 / R6-2",
+      "rule_rc": "门禁命令一律 `set -o pipefail` 或不接管道；rc 必须由被测命令本身产生，禁取自 tail/head/grep 等管道尾端",
+      "rule_double_judge": "rc 与输出文本必须双判，任一不符即判红：pytest 匹配 'N passed' 且不含 'failed'；ruff check 含 'All checks passed'；ruff format --check 匹配 'N files already formatted' 且不含 'would be reformatted'；mypy 含 'Success: no issues found in N source files'；doctor RC=0 且逐项核对 PASS/WARN/FAIL；check_contracts 含 'CONTRACT CHECK PASS' 且登记项==实测差异",
+      "rule_precommit_full_table": "提交前必须跑全表（pytest / mypy / ruff check / ruff format --check / doctor / check_contracts / spec+contracts dirty / ruff 恒等式 / 专项 grep）；lane 全部回报即解禁工具链；任一未跑必须在提交信息里写明「未跑 + 原因」",
+      "rule_new_file_gate": "编排器自己新写的 .py/.md 在入库前必须先过 ruff format + ruff check + mypy（.py）与 BOM/CR/尾换行（全部）"
     }
   },
   "acceptance": {
