@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T02:55:00+08:00",
+  "updated_at": "2026-11-14T03:10:00+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -5677,7 +5677,7 @@
       "counts": {
         "pytest_passed": 356,
         "mypy_source_files": 73,
-        "ruff_formatted_files": 200,
+        "ruff_formatted_files": 201,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -5686,9 +5686,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 200,
+          "total": 201,
           "in_scope_py": 75,
-          "in_scope_md": 125,
+          "in_scope_md": 126,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -5726,8 +5726,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T02:55:00+08:00",
-        "counts_refresh_reason": "Round 10 / M0-03b·S2+S3 复验证据入库后重采样：新增 3 个作用域内 .md（evidence/M0/ORCHESTRATOR/r10-verification/ 的 00-index.md、commands.md、verify-report.md）-> in_scope_md 122->125、total 197->200、ruff_formatted_files 197->200；in_scope_py 恒 75（本批零 .py）。同批修改 orchestrator/handoff/M0-03b-freeze.md（331->363 行，已跟踪件的行内更正 + 追加 §9，不改分母）；logs/*.log 3 份不在 ruff format 作用域（仅 .py/.md 计入）；Mencius 的 12 件产物全在 web/ 下，依 pyproject.toml:51 extend-exclude 与 :68 mypy exclude 一律不计入分母。",
+        "counts_refreshed_at": "2026-11-14T03:10:00+08:00",
+        "counts_refresh_reason": "Round 10 / wave1 出口 Q 复核派单前：新增 1 个作用域内 .md（orchestrator/handoff/Q-VERIFY-WAVE1-brief.md，Q lane 上下文包，123 行/12194 B）-> in_scope_md 125->126、total 200->201、ruff_formatted_files 200->201；in_scope_py 恒 75（本批零 .py）。**必须在派单前入库**：该文件位于 Q lane 写权之外，若留为未跟踪状态，会让 Q lane 的 A144(c)「写权外未跟踪新文件 == 0」自证撞假 RED。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -5773,6 +5773,13 @@
           "total": 197,
           "ruff_formatted_files": 197,
           "counts_refreshed_at": "2026-11-14T02:20:00+08:00"
+        },
+        "previous_values_R10B": {
+          "in_scope_py": 75,
+          "in_scope_md": 125,
+          "total": 200,
+          "ruff_formatted_files": 200,
+          "counts_refreshed_at": "2026-11-14T02:55:00+08:00"
         }
       },
       "denominator_history": [
@@ -11840,7 +11847,16 @@
         "impact": "**未造成错误裁定**（两条裁定结论均正确），但引用证据一度失真；若未被本轮自查抓出，Q lane 复核时会按错误命令复跑得到「0 命中」并误信 A148 的依据链。属证据可信性缺陷，非结论缺陷。",
         "detection": "自查触发点：r10_gen_evidence.py 用 ERE 重跑同一模式时得到 measured=1，与前一轮 BRE 的 0 命中**矛盾** -> 立即停手查实，未直接采信任一版本。这正是「同一守卫用两种口径交叉」的价值，已写进规则的对照要求。"
       }
-    ]
+    ],
+    "q_verify_wave1": {
+      "task": "Q-VERIFY-WAVE1",
+      "stage": "DISPATCHED",
+      "dispatched_at": "2026-11-14T03:10:00+08:00",
+      "scope": "wave1 出口复核：M0-02（5 gate）+ M0-03（6 gate），共 11 个 gate 现值全为裸 rc:null（违反 A109 ③），需给出真值与 evidence 指针，并判定两任务能否翻 DONE",
+      "brief": "orchestrator/handoff/Q-VERIFY-WAVE1-brief.md",
+      "prior_record_preserved_at": "resume.q_verify（Q-VERIFY-M0-01 / Plato / judge_DONE，未触）",
+      "why_separate_key": "R9-5：列表型/历史型键禁整体覆盖。初版本脚本直接赋值覆盖 q_verify，被提交前语义 diff 的 REMOVED_KEY=6 拦下（returned_at / agent / report / verdict_summary / new_defects / orchestrator_reverify），已改为新增独立键。"
+    }
   },
   "acceptance": {
     "baseline_total": 35,
