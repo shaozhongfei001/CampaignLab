@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-14T05:38:21+08:00",
+  "updated_at": "2026-11-14T06:29:57+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -5461,6 +5461,25 @@
       "followup": "FU-33",
       "file": "orchestrator/defects/D-041.md",
       "closed_at": null
+    },
+    {
+      "id": "D-042",
+      "title": "D-042 · 台账 counts 的卡片三键腐化（task_cards_on_disk=20 / known_missing_cards=9，磁盘实测 26 / 3）：R11-T 入库 6 张卡却漏刷卡数，违反 A101 rule_counts_same_commit，且无任何机器守护照到该三键，静默腐化一整轮",
+      "found_by": "编排器（R12 接管自检：宿主自动更新重启 + 模型切换后的恢复点复核）",
+      "found_at": "2026-11-14T06:29:57+08:00",
+      "severity": "MINOR",
+      "blocking": false,
+      "status": "OPEN",
+      "task": "GOVERNANCE",
+      "owner": "编排器（台账校正）+ lane X / FU-33（新增机器守护）",
+      "evidence": "恒等式 `20 + 9 == 29` 在算术上成立，因此**任何只做加法核对的复核都会放过它**；但两个操作数**都与磁盘不符**（真值是 `26 + 3 == 29`）。即：恒等式为真、**代入值为假**——这是一类比「等式不平」更隐蔽的腐化形态，因为它能同时骗过人工目视与恒等式断言。\n\n漂移量恰为 **6**，与 R11-T（提交 `4df3858`，lane T / Peirce / qwen3.8-flash）入库的 6 张 wave3 契约切片卡（M1-01、M1-02、M1-03、M2-01、M2-02、M2-03）**逐项对应**。该提交的 `counts_refresh_reason` 只记了「6 张 wave3 契约切片入库 + A170 终裁 + D-041/FU-33」，未见卡片三键的刷新记录；其后 R11-U1（`75ec2e1`）、R11-U2（`cf6dda1`）、R11-V（`cf39d64`）三次提交的 `counts_refresh_reason` 分别只刷新了 pytest/mypy 与 ruff 分母（482→490、78→79、222→225），**均未触及卡片三键**。故腐化自 `4df3858` 起持续 4 个提交、跨 2 个自然日。",
+      "measured": "台账 task_cards_on_disk=20 / known_missing_cards=9；磁盘实测 26 张卡 / 缺 3 张。漂移量 6 与 R11-T（4df3858）入库的 6 张 wave3 卡逐项对应，跨 4 个提交、2 个自然日未被任何门禁照到。",
+      "root_cause": "**双重根因，缺一不会腐化这么久：**\n\n① **写入侧**：A101 / `rule_counts_same_commit` 要求「counts 必须与新增文件在**同一次提交**内刷新」，但该规则的执行是**人工的**——由编排器在提交时逐项判断「本次新增了哪几类文件、该刷哪几个键」。R11-T 新增的是 `.md`（任务卡），编排器刷了 `ruff_formatted_files`（因为 `.md` 在 ruff 分母内）却**没有**把「任务卡」这一语义类别对应的 `task_cards_on_disk` / `known_missing_cards` 一并刷新。规则本身没错，错在**规则的落地面是「按文件后缀」而不是「按语义类别」**，导致同一批文件只触发了部分键的刷新。\n\n② **守护侧**：`tests/unit/test_counts_freshness.py` 是 counts 新鲜度的**唯一**机器守护，而它的 docstring 与实现都只覆盖 `counts.ruff_formatted_files` 一个键（从 `git ls-tree -r HEAD` 重算 py+md 件数并与台账对账）。卡片三键**没有任何机器守护**。于是 ① 的错误在提交时未被拦下、在提交后也未被任何一轮全表门禁照到——490 个用例全绿，腐化静默存活。\n\n**这不是 lane T 的过错**：lane 只交付卡片文件，台账写入权归编排器（`orchestrator/**` 在 lane 的 hard_deny 内）。",
+      "responsibility": "编排器（治理面：counts 刷新遗漏 + 守护覆盖缺口）。",
+      "blocking_note": "**不阻塞**：卡片三键不参与任何门禁的 rc 判定，`test_task_cards.py` 与 `test_task_card_narrative.py` 都从**磁盘与 `tasks` 键集**取数（而非从 counts 取数），故 26 张卡的派单与守护全部照常工作。\n\n**但它有真实的下游危害**：手册 §15.5 与 A115 / `rule_no_hardcoded_symbol_counts` 规定「派单文**禁写死计数**、一律指向 `counts` 现值」。若 R12 的派单文照此规定引用 `counts.task_cards_on_disk`，就会把 **20** 这个假现值写进 lane X 的上下文，而 lane X 的任务恰是补齐卡片——一个偏小 6 的现值会让 lane 对「还缺几张」产生错误预期，进而可能撞上「实测 != 台账」的**假 RED**（这正是 `test_counts_freshness.py` docstring 里描述的同一类事故形态）。故必须在 wave3 派单前校正。",
+      "fix_scope": "① `orchestrator/state.json` 的 `resume.self_check_gates_rc0.counts` 三键 + `task_card_identity` 文本；② 新增一条机器守护，把「台账卡片三键 == 磁盘实测」钉成断言，堵住守护覆盖缺口。",
+      "fix_detail": "**①（编排器自办，随 FU-33 的提交同批入库）**：`task_cards_on_disk` 20 → **29**、`known_missing_cards` 9 → **0**、`task_total_denominator` 29 不变；`task_card_identity` 改写为「task_cards_on_disk(29) + known_missing_cards(0) == task_total_denominator(29) 实测成立（R12 校正，D-042）」。按「历史值只加注不改写」纪律，旧值 20 / 9 保留于 `previous_values_cards` 字段并追加 R11-T 漂移说明。校正**必须与 lane X 的三张新卡在同一次提交**内完成——否则 `26 + 3` 会再一次与 `29 + 0` 错开半个提交，重演本缺陷。\n\n**②（归 lane X / FU-33，写集内）**：新增 `tests/unit/test_task_cards_complete.py`，除 D-041 §6④ 要求的「`tasks` 键集 == 卡文件名集」双向断言外，**追加台账三键对账**：从 `counts` 读 `task_cards_on_disk` / `known_missing_cards` / `task_total_denominator`，断言三者分别等于「磁盘实测卡数」「实测缺口数」「29」，且恒等式成立。守护须自带分母断言（手册 §15.4）与 `tmp_path` 正向对照（多卡 / 少卡两种形态各自能报 `orphan` / `missing`），禁写死期望值以外的任何计数。\n\n**③（规则面，编排器自办）**：把 A101 的执行口径从「按文件后缀判断该刷哪些键」升级为「按**语义类别**判断」——新增任务卡必刷卡片三键、新增 `.py`/`.md` 必刷 ruff 分母、新增测试必刷 pytest/mypy。该口径写入本轮自我更正（R12-2）并作为后续每轮 counts 刷新的检查清单。",
+      "related": "D-041、D-012、D-014、D-038；A101、A115、A159；rule_counts_sampling_point（R6-3）、rule_counts_same_commit；手册 §15.4/§15.5；FU-33、R12-2"
     }
   ],
   "change_requests": [
@@ -6229,8 +6248,8 @@
       },
       "counts": {
         "pytest_passed": 490,
-        "mypy_source_files": 79,
-        "ruff_formatted_files": 225,
+        "mypy_source_files": 80,
+        "ruff_formatted_files": 229,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -6239,17 +6258,17 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 225,
-          "in_scope_py": 81,
-          "in_scope_md": 144,
+          "total": 229,
+          "in_scope_py": 82,
+          "in_scope_md": 147,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-14T05:38:21+08:00",
+          "measured_after": "2026-11-14T06:29:57+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。",
+          "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。 || R12 追加（append-only，不改上文）：待提交树 tracked 229（py 82 + md 147），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 229 于冻结索引树上成立；本次新增 scripts/orch_harness.py（编排器提交工装，1 py）+ 两份 R12 派单文 + D-042（3 md）。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "本提交入库 1 件新 in-scope .py（tests/unit/test_layering_edges.py）、2 件新 in-scope .md（evidence/M0/M0-04/{s2b1-hash-file,commands-s2b1}.md），并修改 2 件既有 in-scope .py（src/campaignlab/infra/artifacts.py、tests/unit/test_artifacts.py，不改变分母）",
@@ -6466,8 +6485,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T05:38:21+08:00",
-        "counts_refresh_reason": "R11V：lane V M0-04/S2b-1 入库 —— 1 件新 .py + 2 件新 .md + 2 件既有 .py 修改；ruff 分母 222→**225**（py 80→81、md 142→144）；**pytest_passed 482→490（+8）、mypy_source_files 78→79（+1）**，均在冻结索引树上实测（R11-3）。counts 与新增文件同一次提交刷新（A101 / rule_counts_same_commit）。本提交是 R11 的收口提交，入库后工作树 == HEAD、在飞 0 条。",
+        "counts_refreshed_at": "2026-11-14T06:29:57+08:00",
+        "counts_refresh_reason": "R12 predispatch：宿主自动更新重启销毁了未跟踪的 .orch_tmp/（lane_commit_lib.py + msg_commit_lib.py 丢失），编排器把提交工装重建为 scripts/orch_harness.py 并**入库**（根治：此前它是未跟踪 scratch，故会被宿主重置销毁）。同批入库 R12 两条 lane 的派单文与 D-042 缺陷单。新增 1 py + 3 md -> ruff 分母 225->229（py 81->82、md 144->147）、mypy 79->80、pytest 490 不变。**卡片三键本提交刻意不动**：依 D-042 §6① 必须与 lane X 的三张新卡同批校正（29/0/29），否则会重演「错开半个提交」的腐化。counts 与新增文件同一次提交刷新（A101 / rule_counts_same_commit）。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -6586,7 +6605,18 @@
           "counts_refreshed_at": "2026-11-14T01:20:00+08:00"
         },
         "pytest_passed_note_R11V": "**冻结索引树口径**（rule_commit_gates_measured_on_frozen_index_tree，R11-3）：scratch 内 `pytest -q` 排除 GIT_ENV_IGNORES 两个文件后 **469 passed / 0 failed**（rc=0），加上这两个文件静态 collect 的 21 例 = **490**。增量 = 482（R11-U1 后）+ 8（本提交新增 test_layering_edges.py，`--collect-only` 实测恰 8）= 490，failed=0，零回归。**本提交是 R11 的最后一次入库，入库后工作树 == HEAD**，故该值同时是工作树全表真值（两侧口径收敛，见 convergence_note）。",
-        "mypy_source_files_note_R11V": "**冻结索引树口径**：scratch 内 `uv run --no-sync mypy` → `Success: no issues found in 79 source files`，rc=0。78（R11-U1 后）+ 1（test_layering_edges.py）= 79。工作树侧同值（已无在飞件）。"
+        "mypy_source_files_note_R11V": "**冻结索引树口径**：scratch 内 `uv run --no-sync mypy` → `Success: no issues found in 79 source files`，rc=0。78（R11-U1 后）+ 1（test_layering_edges.py）= 79。工作树侧同值（已无在飞件）。",
+        "previous_values_R12": {
+          "in_scope_py": 81,
+          "in_scope_md": 144,
+          "total": 225,
+          "ruff_formatted_files": 225,
+          "pytest_passed": 490,
+          "mypy_source_files": 79,
+          "counts_refreshed_at": "2026-11-14T05:38:21+08:00"
+        },
+        "mypy_source_files_note_R12": "**冻结索引树口径**（rule_commit_gates_measured_on_frozen_index_tree，R11-3）：scratch 内 `uv run --no-sync mypy` -> `Success: no issues found in 80 source files`，rc=0。79（R11-V 后）+ 1（scripts/orch_harness.py，落在 mypy files=[src,tests,scripts] 域内）= 80。",
+        "task_cards_note_D042": "**已知失真，本提交刻意不校正**：task_cards_on_disk=20 / known_missing_cards=9 与磁盘实测 26 / 3 不符（D-042）。校正必须与 FU-33 的三张新卡同批完成（终值 29 / 0 / 29），故留待 lane X 的提交。在此之前，任何派单文**禁**引用这两个键的现值（手册 §15.5 / A115），一律以 `ls orchestrator/tasks/*.md | wc -l` 实测为准。"
       },
       "denominator_history": [
         {
@@ -10009,6 +10039,25 @@
           "A133",
           "手册 15.5"
         ]
+      },
+      {
+        "id": "FU-34",
+        "status": "OPEN",
+        "created_at": "2026-11-14T06:29:57+08:00",
+        "created_by": "A179（R12）",
+        "what": "为 M3-P02 / M5-P01 / M5-03 三张卡补切契约切片（复用 lane T 的口径，含 A170② 的 __indexes 剔除规则）。D-041 §6③ 原要求与补卡同批做，A179 裁定顺延：wave3–wave6 仍可能经 CR 改动活契约，此刻切出的 sha16 基准会腐化（D-013 教训）。",
+        "trigger": "**各卡派单前**（实际只有 M3-P02 在 wave7 需要；M5-P01 是独立 QA 线、M5-03 是 human_only_action，二者不消费契约切片）。切片须在派单当轮针对当时的 contracts/openapi.json 现切，并同步 sha16 基准文本。",
+        "owner": "编排器（派单给 flash 档切片 lane）",
+        "compensation": "lane X 须在三张卡的 inputs 段显式写明「切片待 FU-34 于派单前补切」，防下游 lane 误以为切片已存在（D-036 同型事故）。"
+      },
+      {
+        "id": "FU-35",
+        "status": "OPEN",
+        "created_at": "2026-11-14T06:29:57+08:00",
+        "created_by": "R12 工装重建",
+        "what": "为 scripts/orch_harness.py 补单测（冻结树导出、双判规则、越界分类、悬空引用扫描、counts 对账各一条正向对照）。本轮它以「本提交由它自身把门」自证，属权宜。",
+        "trigger": "wave3 出口前（M1-01/M2-01 派单后的第一次 Q 复核之前）",
+        "owner": "编排器"
       }
     ],
     "commit_backfill_round6": {
@@ -11819,6 +11868,32 @@
           "A176",
           "R11-1"
         ]
+      },
+      {
+        "id": "A178",
+        "round": 12,
+        "at": "2026-11-14T06:29:57+08:00",
+        "source": "编排器 R12 派单前预检（os.path.exists 实测）",
+        "question": "D-041 §6① 指定月报 AC 原文权威路径为 spec/CampaignLab-SDD-Patch-v1.0.1-Monthly-Review-Delta/qa/ACCEPTANCE-MONTHLY.md，该路径是否可用？",
+        "ruling": "**不可用，纠正为 CampaignLab-Review-Acceptance-Checklist.append.md。** 编排器实测 os.path.exists=False；而 state.json -> acceptance.monthly_source 逐字指向 qa/CampaignLab-Review-Acceptance-Checklist.append.md（12 条 AC-MR-01..12），且该文件实测存在。D-041 §6① 属笔误，以 acceptance.monthly_source 为权威。同时把月报 UI 权威定为 patch 的 ui/MONTHLY-PAGES.md（既有页面 UI-17 = spec/CampaignLab-SDD-v1.0/ui/UI-17-strategy-review.md），月报架构权威定为 patch 的 architecture/MONTHLY-REVIEW.md。三条路径均已实测存在并写入 lane X 派单文 §1.1，禁 lane 引用任何未实测存在的路径（编排器的悬空引用扫描会复核）。",
+        "evidence": [
+          "编排器实测：spec/.../qa/ACCEPTANCE-MONTHLY.md -> False；spec/.../qa/CampaignLab-Review-Acceptance-Checklist.append.md -> True；spec/.../architecture/MONTHLY-REVIEW.md -> True；spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md -> True",
+          "state.json -> acceptance.monthly_source 与 acceptance.monthly_ids（AC-MR-01..12，12 条）"
+        ],
+        "closes": "D-041 §6① 的路径笔误（D-041 本体仍 OPEN，由 FU-33 闭合）"
+      },
+      {
+        "id": "A179",
+        "round": 12,
+        "at": "2026-11-14T06:29:57+08:00",
+        "source": "编排器 R12 对 FU-33 范围的裁定",
+        "question": "D-041 §6③ 要求「卡写完后补切 3 张切片（M3-P02/M5-P01/M5-03）」，是否纳入本轮 FU-33 的 lane X 写集？",
+        "ruling": "**不纳入，顺延为 FU-34，trigger = 各卡派单前。** 理由：wave3–wave6 仍可能经 CR 改动活契约 contracts/openapi.json，此刻切出的 sha16 基准文本会腐化 —— D-013 的教训正是「契约改动后必须重切切片并同步全部 sha16 基准文本」。且 M5-P01 是独立 QA 线、M5-03 是 human_only_action，二者本就不消费契约切片，只有 M3-P02（wave7 页面卡）真正需要，届时切才新鲜。作为补偿，lane X 须在三张卡的 inputs 段显式写明「切片待 FU-34 于派单前补切」，以免下游 lane 误以为切片已存在（D-036 的同型事故：卡内禁回读活契约却无切片可用，lane 只能自造 opId 或停摆）。",
+        "evidence": [
+          "state.json -> contract.live_openapi_sha16=592571099d638251 / bytes=443309 / info.version=1.0.1；change_requests 现有 2 条（CR-001/CR-002）证明契约确在演进",
+          "D-013、D-036 的根因记录；waves[3..6] 的任务清单含多张消费/改动契约面的卡"
+        ],
+        "closes": "D-041 §6③ 的时序安排（不改变其必要性，只改触发点）"
       }
     ],
     "round7_predispatch": {
@@ -13910,7 +13985,127 @@
         "4. **FU-33**（max）：补 M3-P02 / M5-P01 / M5-03 三张缺失任务卡 + test_task_cards_complete.py 双向守护；硬截止 = wave6 出口之前（M3-P02 派单前）",
         "5. wave2 出口 Q 复核（A109 的唯一合法路径）：M0-04 与 M0-03b 均翻 DONE 后派 QA lane"
       ]
-    }
+    },
+    "round12_predispatch": {
+      "at": "2026-11-14T06:29:57+08:00",
+      "round": 12,
+      "wave": 2,
+      "mode": "parallel-2-lanes",
+      "as_of_head": "cf39d64",
+      "branch": "m0-framework",
+      "worktree_at_dispatch": "clean（提交本条目前 git status --porcelain 为空）",
+      "baseline_reproduced_by_new_instance": {
+        "measured_at": "2026-11-14T06:29:57+08:00",
+        "method": "第 4 次接管的新实例从磁盘全表重跑（rule_no_trust_handoff_summary_assertions），非采信交接摘要",
+        "ruff_format_check": "rc=0 / 225 files already formatted",
+        "ruff_check": "rc=0 / All checks passed!",
+        "mypy": "rc=0 / Success: no issues found in 79 source files",
+        "pytest": "rc=0 / 490 passed, 6 warnings in 82.59s",
+        "frozen_tree_caliber": "git checkout-index 冻结树上实测 pytest 469 passed + GIT_ENV_IGNORES 静态收集 21 == 490，与台账 pytest_passed 逐字相符（R11-3 口径复现成功）"
+      },
+      "harness_rebuilt": {
+        "why": "宿主自动更新重启把未跟踪的 .orch_tmp/ 整体销毁，lane_commit_lib.py 与 msg_commit_lib.py 丢失；仓库工作树与 HEAD 无损（ext4 在 WSL2 内，未受宿主重启影响），丢失的只是编排器侧工装。",
+        "what": "重建为 scripts/orch_harness.py 并**入库**（此前是未跟踪 scratch，这是它会被宿主重置销毁的根因）。入库后它自身也受 ruff format / ruff check / mypy strict 三门约束，且不会再因宿主重置丢失。",
+        "api": "run_commit(tag, add_paths, msg, mutate_ledger=, expect_counts=, untracked_owner_map=, allow_dangling=, ...) / commit_and_verify / frozen_tree / run_gates / predict_counts / set_counts / classify_untracked / dangling_refs / normalize_file",
+        "gate_order": "卫生 -> 台账 -> 显式 git add -> 从索引导出冻结树 -> 四门双判 -> 实测对账预测值 -> A144(c) 越界分类 -> 悬空引用扫描 -> commit -F -> 复验 HEAD 推进；任一步失败即 git reset 回滚，HEAD 不动。",
+        "self_validation": "本提交即由该工装自身把门（frozen_tree 四门全绿方可提交），属自证；未额外新增针对工装的单测，立 FU-35 于 wave3 出口前补。"
+      },
+      "lanes": [
+        {
+          "lane": "W",
+          "task": "M0-04",
+          "subtask": "FU-29",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R12-lane-W-FU-29.md",
+          "critical": true,
+          "loop_cap": 2,
+          "write_set": [
+            "src/campaignlab/domain/errors.py",
+            "src/campaignlab/worker/errors.py",
+            "src/campaignlab/infra/artifacts.py",
+            "tests/unit/test_layering_edges.py",
+            "evidence/M0/FU-29/"
+          ],
+          "hard_deny": [
+            "src/campaignlab/api/common.py",
+            "tests/unit/test_domain_errors.py",
+            "tests/unit/test_artifacts.py",
+            "tests/unit/test_problem_code_registry.py",
+            "src/campaignlab/worker/__init__.py",
+            "tests/integration/jobs/test_artifact_write.py",
+            "orchestrator/",
+            "spec/",
+            "contracts/",
+            "web/",
+            "scripts/"
+          ],
+          "tier_basis": "手册 §6.3 硬规则命中两条：① 改动落在 public_frozen 面（domain/errors.py 的 __all__ 与 worker/errors.py 的公开符号集，均要求逐字不变）；② 要改的是**分层守护的判据本身**（test_layering_edges.py 的白名单收紧 + 两条用例重写），判据错一处即让 A153 的裁定失去执行点。R10-4 纠正措施①（输入含冻结面者一律 max）同样命中。",
+          "agent_id": "PENDING(派单后回填)"
+        },
+        {
+          "lane": "X",
+          "task": "GOVERNANCE",
+          "subtask": "FU-33 / D-041",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R12-lane-X-FU-33.md",
+          "critical": true,
+          "loop_cap": 2,
+          "write_set": [
+            "orchestrator/tasks/M3-P02.md",
+            "orchestrator/tasks/M5-P01.md",
+            "orchestrator/tasks/M5-03.md",
+            "tests/unit/test_task_cards_complete.py",
+            "tests/unit/test_task_cards.py",
+            "evidence/M0/FU-33/"
+          ],
+          "hard_deny": [
+            "orchestrator/state.json",
+            "orchestrator/defects/",
+            "orchestrator/handoff/",
+            "tests/unit/test_task_card_narrative.py",
+            "tests/unit/test_counts_freshness.py",
+            "src/",
+            "web/",
+            "scripts/",
+            "spec/",
+            "contracts/",
+            "docs/"
+          ],
+          "tier_basis": "手册 §6.3：产出物是**新守护的判据设计**（双向集合相等 + 台账三键对账 + tmp_path 正向对照），且三张卡要为 wave7/9/10 的关键路径任务（M5-P01、M5-03 均 critical=true）定义拆解表 —— §15.5「无拆解表不得 spawn」使卡的质量直接决定后续能否派单。C3（不确定性）= 3：需在 D-041、state.json 台账、两份 spec 与 26 张既有卡之间推断体例。故 max。",
+          "agent_id": "PENDING(派单后回填)"
+        }
+      ],
+      "concurrency_note": "两 lane 写集经编排器逐件比对**完全不相交**（W 全在 src/tests 的 errors+layering 面，X 全在 orchestrator/tasks + task_cards 守护面），故可并行（手册 §5：同 wave 内开发 lane <= 3）。两者共享同一工作树，故双方派单文均载「在飞污染警告 + 一律路径限定自验」（A161：复验方对在飞面禁写）。",
+      "counts_note": "本提交新增 1 个 .py（scripts/orch_harness.py）+ 3 个 .md（两份派单文 + D-042）：ruff 分母 225->229（py 81->82、md 144->147）、mypy 79->80、pytest 490 不变（无新增用例）。卡片三键（task_cards_on_disk/known_missing_cards）**本提交不动**，依 D-042 §6① 必须与 lane X 的三张新卡同批校正，否则会重演「错开半个提交」的腐化。",
+      "commit": "PENDING(本提交)"
+    },
+    "round12_self_corrections": [
+      {
+        "id": "R12-1",
+        "at": "2026-11-14T06:29:57+08:00",
+        "severity": "MAJOR",
+        "kind": "编排器写入通道的字符级静默损坏",
+        "what_was_wrong": "编排器用「宿主 PowerShell 单引号 here-string -> WriteAllText -> wsl python3 driver」通道写 Python 时，`except (UnicodeDecodeError, OSError):` 被写成 `except UnicodeDecodeError, OSError:`（括号丢失），这是 Python 3 语法错误。损坏是**静默**的：写入侧无任何报错，直到 py_compile 才暴露。更危险的是它一度骗过了工具链 —— ruff check 只报了另一个错（F821）、mypy 也给出了正常的类型错误而非语法错误，让人误以为文件可解析。",
+        "how_found": "编排器在 patch 链路里加了 py_compile，第 4 次 patch 后 rc=1 才暴露；随后用 ast.parse 定位到唯一一处损坏，并全文件扫描确认无其它同类损坏（LEFTOVER_BAD_EXCEPT=[]）。",
+        "correction": "① 立规：经本通道写入的 Python **禁用** `except (A, B):` 元组形式，一律拆成多个 `except` 子句（已按此改写 scripts/orch_harness.py 的 dangling_refs）。② 立规：每次写完 .py **必须**立刻 `ast.parse` 或 `py_compile` 自证语法，禁写完直接跑测试 —— 语法损坏会让此后所有测试结果完全不可信（绿是假绿、红是错红）。③ 该两条已原文写入 R12 两份派单文的 §5「写入通道铁律」，lane W / lane X 同受约束。",
+        "rule_added": "rule_write_channel_no_except_tuple + rule_ast_parse_after_every_py_write",
+        "related": "手册 §13.2 / §13.2.2（文件写入通道铁律）、A177②（heredoc 转义被吃 -> SyntaxError，同族）、R11-7③（写入通道可复制范式）"
+      },
+      {
+        "id": "R12-2",
+        "at": "2026-11-14T06:29:57+08:00",
+        "severity": "MAJOR",
+        "kind": "编排器 counts 刷新口径错误（D-042 的规则面）",
+        "what_was_wrong": "A101 / rule_counts_same_commit 的执行一直按「本次新增了哪几种**文件后缀**」来决定刷哪些 counts 键。R11-T 入库 6 张任务卡（.md），编排器据此刷了 ruff_formatted_files（因为 .md 在 ruff 分母内），却没有刷同批文件在**语义类别**上对应的 task_cards_on_disk / known_missing_cards，导致台账腐化 20/9（真值 26/3）跨 4 个提交未被发现。",
+        "how_found": "R12 接管自检时，编排器按 rule_no_trust_handoff_summary_assertions 实测 ls orchestrator/tasks/ 得 26，与台账 20 不符；进一步核对发现恒等式 20+9==29 在算术上成立、两个操作数却都错 —— 即「等式为真、代入值为假」，这类腐化能同时骗过人工目视与恒等式断言。立 D-042。",
+        "correction": "counts 刷新口径从「按后缀」升级为「**按语义类别**」，每轮提交前逐项过这张检查清单：新增/删除任务卡 -> 刷 task_cards_on_disk + known_missing_cards + task_card_identity；新增 .py/.md -> 刷 ruff_formatted_files + composition 三键（total/in_scope_py/in_scope_md）；新增测试 -> 刷 pytest_passed；新增 mypy 域 .py（src/tests/scripts）-> 刷 mypy_source_files；动契约 -> 刷 live_openapi_* 三键。历史值一律进 previous_values_R<N> 只加注不改写。",
+        "rule_added": "rule_counts_refresh_by_semantic_category（取代按后缀判断的隐式口径）",
+        "machine_guard": "D-042 §6② 由 lane X 落地 tests/unit/test_task_cards_complete.py 的台账三键对账，堵住「卡片三键无任何机器守护」这个让腐化静默存活一整轮的缺口。",
+        "related": "D-042、D-041、D-038、D-012/D-014；A101、A115；rule_counts_sampling_point（R6-3）、rule_no_hardcoded_symbol_counts（R8-1）"
+      }
+    ]
   },
   "acceptance": {
     "baseline_total": 35,
