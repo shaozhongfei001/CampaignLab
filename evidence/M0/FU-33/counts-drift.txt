@@ -1,0 +1,77 @@
+# FU-33 / D-042 evidence: ledger card-count three keys vs disk measurement
+# generated: 2026-11-14T07:13:08+08:00   HEAD: 51af733   branch: m0-framework
+# This lane has NO write access to orchestrator/** -- measurement only, no correction.
+# Per D-042 section 6-1 the orchestrator corrects these three keys to 29 / 0 / 29 in the SAME
+# commit as this lane's 3 new cards; otherwise 26+3 and 29+0 skew by half a commit and the
+# defect repeats.
+
+== 1. ledger current value vs disk measurement (AFTER this lane's 3 cards are on disk) ==
+
+key                          ledger   disk now   match
+--------------------------------------------------------
+task_cards_on_disk               20         29   False
+known_missing_cards               9          0   False
+task_total_denominator           29         29    True
+
+registered task keys (state.json -> tasks)   : 29
+task cards on disk (orchestrator/tasks/*.md) : 29
+missing (task, no card) : []
+orphan  (card, no task) : []
+
+== 2. drift decomposition (kept separate so the two causes are not conflated) ==
+
+  disk BEFORE this lane (26 pre-existing cards) : 26
+  cards added by this lane (FU-33)              : 3  = ['M3-P02', 'M5-03', 'M5-P01']
+  disk AFTER  this lane                         : 29
+
+  D-042 historical drift = disk_before(26) - ledger(20) = 6
+    -> matches the 6 wave3 slice cards committed by R11-T (M1-01/02/03, M2-01/02/03),
+       per D-042 section 1. This is the drift D-042 is about.
+  raw delta visible now  = disk_after(29) - ledger(20) = 9
+    = D-042 historical (6) + this lane's new cards (3).
+    NOTE: the second term is NOT ledger rot; it is this lane's legitimate delivery, which the
+    orchestrator absorbs in the same commit. Do not report 9 as the D-042 drift magnitude.
+
+  known_missing_cards drift = ledger(9) - measured_before(3) = 6
+    measured gap BEFORE this lane : ['M3-P02', 'M5-03', 'M5-P01']  (n=3)
+    measured gap AFTER  this lane : []  (n=0)
+
+== 3. the D-042 core finding, restated with this lane's own numbers ==
+
+  identity as recorded in the ledger : 20 + 9 == 29  ->  True
+  identity with the TRUE pre-lane operands : 26 + 3 == 29  ->  True
+  => the recorded identity is ARITHMETICALLY TRUE while BOTH OPERANDS ARE FALSE.
+     An identity-only check passes it; only a per-key comparison against disk catches it.
+     This is a stealthier rot form than an unbalanced equation (D-042 section 1).
+
+== 4. ledger's own verbatim annotations ==
+
+counts.task_cards_note_D042 (verbatim):
+  **已知失真，本提交刻意不校正**：task_cards_on_disk=20 / known_missing_cards=9 与磁盘实测 26 / 3 不符（D-042）。校正必须与 FU-33 的三张新卡同批完成（终值 29 / 0 / 29），故留待 lane X 的提交。在此之前，任何派单文**禁**引用这两个键的现值（手册 §15.5 / A115），一律以 `ls orchestrator/tasks/*.md | wc -l` 实测为准。
+
+counts.task_card_identity (verbatim):
+  task_cards_on_disk(20) + known_missing_cards(9) == task_total_denominator(29) 实测成立
+
+counts.previous_values_cards (history preserved, annotate-don't-rewrite discipline):
+  "task_cards_on_disk: 16（Round 4 快照）；known_missing_cards: 13（Round 4 快照）。按「历史值只加注不改写」保留于本字段。"
+
+== 5. expected post-correction values (written by the ORCHESTRATOR, not by this lane) ==
+
+  task_cards_on_disk     20 -> 29
+  known_missing_cards    9 -> 0
+  task_total_denominator 29 -> 29 (unchanged)
+  task_card_identity     -> '29 + 0 == 29 实测成立（R12 校正，D-042）'
+
+== 6. machine guard now covering these three keys (NEW in this lane; closes the D-042 gap) ==
+
+  Before this lane: tests/unit/test_counts_freshness.py was the ONLY counts guard and it covers
+  counts.ruff_formatted_files alone. The three card keys had NO machine guard at all, which is
+  why the rot survived 4 commits / 2 calendar days with 490 tests green (D-042 section 2-2).
+
+  Added: tests/unit/test_task_cards_complete.py::test_ledger_card_counts_match_disk_measurement
+    -> currently RED BY DESIGN: ledger still says 20/9 while disk says 29/0.
+    -> goes GREEN in the same commit as the orchestrator's correction (see commands.md).
+  Its positive control replays the historical corrupted values and proves they ARE caught:
+    -> test_positive_control_d042_ledger_drift_is_reported (raw output: positive-control.log PART 3)
+    -> that control also asserts the identity sub-check does NOT fire for 20/9/29, i.e. it proves
+       the per-key comparison is what catches D-042, not the identity.

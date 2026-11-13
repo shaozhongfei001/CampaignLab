@@ -1,0 +1,39 @@
+scanner: scripts/orch_harness.py::dangling_refs  (manual section 15.3)
+scanner regex (verbatim from source):
+    (?:evidence|orchestrator|docs|contracts|scripts)/[A-Za-z0-9._@/\-]+
+scanned suffixes: .md .json .py .txt .jsonl   (.log is NOT scanned)
+
+== dangling refs across every file this lane touched: 8 ==
+    evidence/M0/FU-33/commands.md -> docs/delivery/HANDOVER.md
+    evidence/M0/FU-33/commands.md -> evidence/monthly/M3-P02/
+    evidence/M0/FU-33/commands.md -> evidence/monthly/M5-P01/
+    evidence/M0/FU-33/commands.md -> orchestrator/defects/D-0
+    evidence/M0/FU-33/commands.md -> scripts/../.orch_scratch_nonexistent
+    orchestrator/tasks/M3-P02.md -> evidence/monthly/M3-P02/
+    orchestrator/tasks/M5-03.md -> docs/delivery/HANDOVER.md
+    orchestrator/tasks/M5-P01.md -> evidence/monthly/M5-P01/
+
+== scale reference: all 29 cards now on disk -> 159 dangling refs ==
+   pre-existing, from the 26 cards committed BEFORE this lane : 156
+   introduced by this lane's 3 new cards                      : 3
+        orchestrator/tasks/M3-P02.md -> evidence/monthly/M3-P02/
+        orchestrator/tasks/M5-03.md -> docs/delivery/HANDOVER.md
+        orchestrator/tasks/M5-P01.md -> evidence/monthly/M5-P01/
+
+== interpretation ==
+Each of this lane's danglers is a faithful, verbatim transcription of that card's own
+state.json -> tasks[<id>].scope literal, i.e. a FORWARD-LOOKING output landing point that
+by definition cannot exist before the task runs. The 26 pre-existing committed cards carry
+156 danglers of exactly this kind (future evidence dirs, future design files, defect globs),
+so scripts/orch_harness.py::run_commit must already be tolerating them via allow_dangling.
+This lane deliberately did NOT add any other kind of dangler:
+  - every AUTHORITY path cited (spec/**, contracts/openapi.json, contracts/sqlite-v1.sql,
+    docs/delivery/LONG-HORIZON-ORCHESTRATION.md, orchestrator/state.json, orchestrator/defects/
+    D-041.md + D-042.md + D-013.md + D-036.md + D-022.md, orchestrator/handoff/,
+    orchestrator/change-requests/, orchestrator/BLOCKERS.md, scripts/) was individually
+    verified to exist on disk -- see section G below;
+  - no card names a concrete slice file, because A179 deferred slicing to FU-34 (section G3/G4);
+  - the A178-forbidden monthly-AC filename is not reproduced in any card (section G1);
+  - glob forms are written so the scanner resolves them to an existing directory, e.g.
+    'orchestrator/defects/' followed by a separate 'DMR-<n>.md' token, which avoids minting
+    a dangler for a filename pattern that is not a real path.

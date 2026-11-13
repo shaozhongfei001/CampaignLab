@@ -1,0 +1,83 @@
+################################################################
+# FU-33 / D-041+D-042 positive-control evidence
+# generated: 2026-11-14T07:09:52+08:00   HEAD: 51af733
+# guard under test: tests/unit/test_task_cards_complete.py
+################################################################
+
+==== PART 1: pytest -v on the 9 positive-control cases (of 13 total in the guard) ====
+====           5 use tmp_path fake trees, 4 use fabricated ledger dicts              ====
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0 -- /home/szf/dev/CampaignLab/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 13 items / 4 deselected / 9 selected
+
+tests/unit/test_task_cards_complete.py::test_positive_control_extra_card_is_reported_as_orphan PASSED [ 11%]
+tests/unit/test_task_cards_complete.py::test_positive_control_missing_card_is_reported_as_missing PASSED [ 22%]
+tests/unit/test_task_cards_complete.py::test_positive_control_both_directions_at_once PASSED [ 33%]
+tests/unit/test_task_cards_complete.py::test_positive_control_empty_tree_is_not_silently_green PASSED [ 44%]
+tests/unit/test_task_cards_complete.py::test_positive_control_absent_dir_is_not_silently_green PASSED [ 55%]
+tests/unit/test_task_cards_complete.py::test_positive_control_d042_ledger_drift_is_reported PASSED [ 66%]
+tests/unit/test_task_cards_complete.py::test_positive_control_broken_identity_is_reported PASSED [ 77%]
+tests/unit/test_task_cards_complete.py::test_positive_control_consistent_ledger_passes PASSED [ 88%]
+tests/unit/test_task_cards_complete.py::test_positive_control_missing_ledger_key_is_reported PASSED [100%]
+
+======================= 9 passed, 4 deselected in 0.04s ========================
+rc=0
+
+==== PART 2: the judgment function's raw verdicts on FOUR fake-tree forms ====
+     (proves reconcile() is a pure function shared by the real tests and the controls;
+      the printed assertion text is exactly what the guard raises when it goes RED)
+real card count on disk now: 29
+
+--- FORM A: fake tree with ONE EXTRA card (M9-99) -> must report orphan ---
+  registered tasks : 29
+  cards on disk    : 30
+  missing (task, no card) : []
+  orphan  (card, no task) : ['M9-99']
+  RED text -> 磁盘有卡、台账无任务（孤儿卡）：['M9-99']。孤儿卡不进 waves、不被 deps引用、也不被 counts 计数，必须删卡或补登台账（台账写入权归编排器）
+
+--- FORM B: fake tree replaying the PRE-FU-33 state (26 cards / 29 tasks) -> must report missing ---
+  registered tasks : 29
+  cards on disk    : 26
+  missing (task, no card) : ['M3-P02', 'M5-03', 'M5-P01']
+  orphan  (card, no task) : []
+  RED text -> 台账有任务、磁盘无卡（D-041 形态）：['M3-P02', 'M5-03', 'M5-P01']。手册 §15.5「无拆解表不得 spawn」，这些任务在补卡前一律不可派单
+
+--- FORM C: EMPTY fake tree -> must report ALL registered tasks as missing ---
+  registered tasks : 29
+  cards on disk    : 0
+  missing (task, no card) : ['M0-01', 'M0-02', 'M0-03', 'M0-03b', 'M0-04', 'M0-P01', 'M1-01', 'M1-02', 'M1-03', 'M1-04', 'M1-P01', 'M2-01', 'M2-02', 'M2-03', 'M2-04', 'M3-01', 'M3-02', 'M3-03', 'M3-04', 'M3-P01', 'M3-P02', 'M4-01', 'M4-02', 'M4-03', 'M4-P01', 'M5-01', 'M5-02', 'M5-03', 'M5-P01']
+  orphan  (card, no task) : []
+  RED text -> 台账有任务、磁盘无卡（D-041 形态）：['M0-01', 'M0-02', 'M0-03', 'M0-03b', 'M0-04', 'M0-P01', 'M1-01', 'M1-02', 'M1-03', 'M1-04', 'M1-P01', 'M2-01', 'M2-02', 'M2-03', 'M2-04', 'M3-01', 'M3-02', 'M3-03', 'M3-04', 'M3-P01', 'M3-P02', 'M4-01', 'M4-02', 'M4-03', 'M4-P01', 'M5-01', 'M5-02', 'M5-03', 'M5-P01']。手册 §15.5「无拆解表不得 spawn」，这些任务在补卡前一律不可派单
+
+--- FORM D: fake tree directory ABSENT -> must not be silently green ---
+  registered tasks : 29
+  cards on disk    : 0
+  missing (task, no card) : ['M0-01', 'M0-02', 'M0-03', 'M0-03b', 'M0-04', 'M0-P01', 'M1-01', 'M1-02', 'M1-03', 'M1-04', 'M1-P01', 'M2-01', 'M2-02', 'M2-03', 'M2-04', 'M3-01', 'M3-02', 'M3-03', 'M3-04', 'M3-P01', 'M3-P02', 'M4-01', 'M4-02', 'M4-03', 'M4-P01', 'M5-01', 'M5-02', 'M5-03', 'M5-P01']
+  orphan  (card, no task) : []
+  RED text -> 台账有任务、磁盘无卡（D-041 形态）：['M0-01', 'M0-02', 'M0-03', 'M0-03b', 'M0-04', 'M0-P01', 'M1-01', 'M1-02', 'M1-03', 'M1-04', 'M1-P01', 'M2-01', 'M2-02', 'M2-03', 'M2-04', 'M3-01', 'M3-02', 'M3-03', 'M3-04', 'M3-P01', 'M3-P02', 'M4-01', 'M4-02', 'M4-03', 'M4-P01', 'M5-01', 'M5-02', 'M5-03', 'M5-P01']。手册 §15.5「无拆解表不得 spawn」，这些任务在补卡前一律不可派单
+rc=0
+
+==== PART 3: fabricated-ledger controls (D-042 replay) ====
+
+--- D-042 historical corruption (ledger 20/9/29 vs disk 26/3) ---
+  RED -> task_cards_on_disk=20 与磁盘实测卡数 26 不符（D-042：卡片变更未与本键同批刷新）
+  RED -> known_missing_cards=9 与实测缺口数 3 不符
+
+--- identity broken but operands match measurement (29/1/29) ---
+  RED -> 恒等式不成立：task_cards_on_disk(29) + known_missing_cards(1) != task_total_denominator(29)
+
+--- consistent ledger (29/0/29) -> must be GREEN ---
+  verdict: no violations (guard stays GREEN)
+
+--- ledger key absent -> must raise, never silently pass (A159) ---
+  RAISED AssertionError (correct): counts.known_missing_cards 必须是整数；实测 NoneType=None
+
+--- KEY POINT (D-042 section 1) ---
+  In the first case the identity 20 + 9 == 29 HOLDS arithmetically, so an
+  identity-only guard reports nothing. The per-key comparison above is what
+  catches it: both operands are false while the equation is true.
+rc=0

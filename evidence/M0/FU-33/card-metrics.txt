@@ -1,0 +1,43 @@
+# FU-33 card metrics -- caliber reused verbatim from tests/unit/test_task_card_narrative.py::_split
+# (no self-invented caliber: _split / _header_of / REQUIRED_TABLE_HEADER are imported from the read-only guard)
+# generated: 2026-11-14T07:11:57+08:00   HEAD: 51af733   branch: m0-framework
+# caps: HEAD_MAX_LINES=60  TAIL_MAX_LINES=40  TOTAL_MAX_LINES=200
+
+REQUIRED_TABLE_HEADER = '| 子任务 | 档位 | 预估 token | 产出 |'
+LEGACY_NO_TABLE       = ['M0-01', 'M0-P01']   (NOT touched by this lane)
+LEGACY_TAIL_ANNOTATED = ['M0-02', 'M0-03']   (NOT touched by this lane)
+LEGACY_CARDS (test_task_cards.py) = NOT touched by this lane; M5-03 deliberately NOT added to any exemption set
+CARD_MIN_COUNT        = 12
+
+card       head   <=60  tail   <=40  total  <=200  table  header_verbatim
+M3-P02       43   True    19   True     75   True  True   True
+M5-P01       40   True    20   True     70   True  True   True
+M5-03        37   True    18   True     61   True  True   True
+
+byte hygiene (repo rule: UTF-8 / no BOM / no CR / ends with LF):
+  M3-P02    bytes= 26706  BOM=False  CR=False  endsLF=True
+  M5-P01    bytes= 19965  BOM=False  CR=False  endsLF=True
+  M5-03     bytes= 11150  BOM=False  CR=False  endsLF=True
+
+REQUIRED_SECTIONS literal hits (tests/unit/test_task_cards.py:35 does a per-card substring check):
+  M3-P02    scope_allow=line31(x3)  scope_deny=line32(x1)  outputs=line11(x3)  子任务档位表=line2(x3)
+  M5-P01    scope_allow=line28(x1)  scope_deny=line2(x2)  outputs=line31(x1)  子任务档位表=line2(x3)
+  M5-03     scope_allow=line25(x2)  scope_deny=line26(x1)  outputs=line28(x1)  子任务档位表=line35(x2)
+
+M5-03 human_only_action occurrences (1-based line numbers):
+  count=10  lines=[1, 2, 6, 8, 30, 40, 41, 42, 43, 47]
+  explicit prohibition line(s): [8]
+  verbatim: - **禁把交付确认动作派给任何子智能体自证通过**：本卡每一个子任务都属 `human_only_action`，编排器**不得** spawn 任何 max／flash 子智能体来「代签」「代确认」「代验收」，也不得把本卡任一子任务并入其他 lane 顺带完成。
+
+M5-03 subtask table, tier + token columns (all data rows must be tier 'human'):
+  line  38 [HEADER] cols=4 tier='档位' tokens='预估 token'
+  line  39 [SEP   ] cols=4 tier='---' tokens='---'
+  line  40 [ROW   ] cols=4 tier='`human`' tokens='0k'
+  line  41 [ROW   ] cols=4 tier='`human`' tokens='0k'
+  line  42 [ROW   ] cols=4 tier='`human`' tokens='0k'
+  line  43 [ROW   ] cols=4 tier='`human`' tokens='0k'
+
+All three cards, subtask-table column count check (must be 4 everywhere):
+  M3-P02    table_lines=13 rows_with_wrong_colcount=0 tier_histogram={'`qwen3.8-max`': 3, '`qwen3.8-flash`': 8}
+  M5-P01    table_lines=10 rows_with_wrong_colcount=0 tier_histogram={'`qwen3.8-max`': 3, '`qwen3.8-flash`': 5}
+  M5-03     table_lines=6 rows_with_wrong_colcount=0 tier_histogram={'`human`': 4}

@@ -1,0 +1,57 @@
+# FU-33 / D-041 + D-042 -- diff stat for this lane's write set
+# generated: 2026-11-14T07:25:38+08:00   HEAD: 51af733   branch: m0-framework
+# This lane did NOT run git add / git commit (one-task-one-commit belongs to the orchestrator,
+# manual section 15.2). So the 3 cards + the new guard are still UNTRACKED and only the
+# KNOWN_MISSING edit shows up in git diff. Both views are given below.
+
+== 1. git diff --numstat (tracked modifications only) ==
+3	7	tests/unit/test_task_cards.py
+
+== 2. git status --porcelain over the write set (XY 2 cols + space, path from char 4) ==
+  [ M] tests/unit/test_task_cards.py
+  [??] evidence/M0/FU-33/
+  [??] orchestrator/tasks/M3-P02.md
+  [??] orchestrator/tasks/M5-03.md
+  [??] orchestrator/tasks/M5-P01.md
+  [??] tests/unit/test_task_cards_complete.py
+
+== 3. byte / line counts of every file this lane created or modified ==
+  path                                                      bytes    lines
+  orchestrator/tasks/M3-P02.md                              26706       74
+  orchestrator/tasks/M5-P01.md                              20324       69
+  orchestrator/tasks/M5-03.md                               11150       60
+  tests/unit/test_task_cards_complete.py                    14040      275
+  tests/unit/test_task_cards.py                              4037       89
+  evidence/M0/FU-33/commands.md                             27532      416
+  evidence/M0/FU-33/card-metrics.txt                         2896       43
+  evidence/M0/FU-33/counts-drift.txt                         4536       77
+  evidence/M0/FU-33/diff-stat.txt                            1541       27
+  evidence/M0/FU-33/positive-control.log                     5651       82
+  evidence/M0/FU-33/dangling-refs.log                        2583       39
+
+== 4. write-set conformance ==
+  allowed by handoff section 3:
+    orchestrator/tasks/M3-P02.md              created
+    orchestrator/tasks/M5-P01.md              created
+    orchestrator/tasks/M5-03.md               created
+    tests/unit/test_task_cards_complete.py    created (this lane's core deliverable)
+    tests/unit/test_task_cards.py             modified (KNOWN_MISSING -> frozenset() ONLY)
+    evidence/M0/FU-33/**                      created (this directory)
+
+  hard_deny paths actually touched (must be none):
+    ?? orchestrator/handoff/LANE-COMMON.md
+    ?? orchestrator/handoff/R13-lane-Y-M0-04-S2b-2.md
+    ?? orchestrator/handoff/R13-lane-Z-M2-01-S1.md
+    ?? orchestrator/handoff/round12-lane-W-return-raw.md
+    (nothing listed above == no hard_deny path was written)
+
+== 5. expected delta for the orchestrator's counts refresh (this lane does NOT write the ledger) ==
+  in-scope files added by this lane: 3 task cards (.md) + 1 guard (.py) + evidence files under
+  evidence/M0/FU-33/ (.md and .txt are inside ruff format's in-scope; .log is not).
+  The orchestrator measures the frozen index tree and refreshes counts in the same commit:
+    ruff_formatted_files  230 -> (measured by the orchestrator; this lane must not compute it)
+    mypy_source_files      80 -> 81 (exactly 1 new .py, verified by D1 in commands.md)
+    pytest_passed         490 -> (490 + 13 new tests, minus none; orchestrator re-measures)
+    task_cards_on_disk     20 -> 29   (D-042 correction)
+    known_missing_cards     9 -> 0    (D-042 correction)
+    task_total_denominator 29 -> 29   (unchanged)

@@ -25,13 +25,9 @@ CARD_DIR = REPO / "orchestrator" / "tasks"
 TASK_TOTAL_DENOMINATOR = 29
 
 # D-016 登记时的已知缺口（25 张，其中 14 张 critical=true）。补齐一张即须从此处删掉一个 id。
-KNOWN_MISSING: frozenset[str] = frozenset(
-    {
-        "M3-P02",
-        "M5-03",
-        "M5-P01",
-    }
-)
+# R12 / FU-33（D-041）：M3-P02、M5-P01、M5-03 三张卡已补齐，本集合按单调收敛纪律清空。
+# 全集双向对账改由 tests/unit/test_task_cards_complete.py 守护（含台账三键对账，D-042）。
+KNOWN_MISSING: frozenset[str] = frozenset()
 
 # 早于手册 15.5「子任务档位表」要求交付/执行的历史卡，不追溯补写。
 LEGACY_CARDS: frozenset[str] = frozenset({"M0-01", "M0-P01"})
