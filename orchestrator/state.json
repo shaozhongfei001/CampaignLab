@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T09:06:04+08:00",
+  "updated_at": "2026-11-13T09:41:17+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -378,7 +378,7 @@
         "over_cap": false,
         "over_cap_note": "max 档上限 200k；无计量值故不判越限，以客观量留痕",
         "returned_at": "2026-11-13T09:03:26+08:00",
-        "commit": "PENDING(提交C)",
+        "commit": "f457ec9",
         "outputs": [
           "src/campaignlab/config.py(279)",
           "src/campaignlab/clock.py(70)",
@@ -767,7 +767,7 @@
             "round": 5,
             "outputs": "config.py、clock.py、domain/{errors,ids,values}.py（**从 api/common.py 整块搬移，非复制**）、__main__.py、cli.py（含 doctor，闭合 gate7）、api/{app,deps,health}.py",
             "hard_rule": "搬移后 api/common.py 改为 from campaignlab.domain.errors import ... 再 re-export；严禁两处各存一份（ADR-005 §2.1）。纯机械操作，签名与语义零变化，由既有 110 个用例全绿守护。",
-            "commit": "PENDING(提交C)",
+            "commit": "f457ec9",
             "returned_at": "2026-11-13T09:03:26+08:00",
             "measured_outputs": "19 文件 / wc -l 合计 2976 / 116173 B（编排器逐个复核与自报全等，含 cli.py=337 而非早前交接摘要误记的 332）",
             "orchestrator_reverify": "编排器独立复验（禁采信自报）全部吻合：doctor rc=1->0（PASS=2 WARN=3 FAIL=0 DEGRADED）；pytest 166 passed（既有 110 一个不少 + 新增 56）；mypy 39 files；ruff check rc=0；ruff format 128 files；check_contracts 13-13；spec dirty=0；common.__all__ 51->51 逐字同序、set_diff=[]、decls_only_in_CUR=[]、定义形态命中 0、errors.__all__ 17/17 identity=True（搬移不是复制成立）；registry 20 码与 API.md 第 22-29 行第 2 列（以、分隔）逐字同序、双向差集空；deps 4 处真 NotImplementedError；19 文件 BOM/CR/缺尾换行违规 0"
@@ -777,10 +777,14 @@
             "tier": "qwen3.8-max",
             "effort": "high",
             "budget": "40k",
-            "status": "TODO",
+            "status": "IN_FLIGHT",
             "round": 5,
             "outputs": "infra/db/repositories.py（JobStore 为唯一写 jobs 表入口）、application/{session_service,workspace_service,health_service,idempotency,audit,worker}.py",
-            "hard_rule": "worker.py 的 heartbeat(job_id, *, now) 是唯一写 jobs.lease_until 的入口（A11）；不得重写已存在的 application/__init__.py，只在同目录新增文件（Q6）。"
+            "hard_rule": "worker.py 的 heartbeat(job_id, *, now) 是唯一写 jobs.lease_until 的入口（A11）；不得重写已存在的 application/__init__.py，只在同目录新增文件（Q6）。",
+            "round_v2": 6,
+            "round_v2_ref": "R5-3（S3c→S3d→S3b→S4→S5 全串行）",
+            "agent_id": "01a1d275-7c5b-7dc0-9ddf-677eef887e4a",
+            "in_flight_at": "2026-11-13T09:41:17+08:00"
           },
           {
             "id": "S3b",
@@ -789,14 +793,18 @@
             "status": "TODO",
             "round": 5,
             "outputs": "api/session.py、api/workspaces.py",
-            "hard_rule": "CR-002：listWorkspaces 无 status 形参，删除对应 422 INVALID_SCOPE 分支，不得写 issues[0].location=\"/query/status\" 的任何期望；getHealth 的 Health.status 合法不得误删（Q7）。"
+            "hard_rule": "CR-002：listWorkspaces 无 status 形参，删除对应 422 INVALID_SCOPE 分支，不得写 issues[0].location=\"/query/status\" 的任何期望；getHealth 的 Health.status 合法不得误删（Q7）。",
+            "round_v2": 7,
+            "round_v2_ref": "R5-3（S3c→S3d→S3b→S4→S5 全串行）"
           },
           {
             "id": "S4",
             "tier": "qwen3.8-flash",
             "budget": "20k",
             "status": "TODO",
-            "round": 6
+            "round": 6,
+            "round_v2": 8,
+            "round_v2_ref": "R5-3（S3c→S3d→S3b→S4→S5 全串行）"
           },
           {
             "id": "S5",
@@ -804,7 +812,9 @@
             "budget": "24k",
             "status": "TODO",
             "round": 6,
-            "outputs": "evidence/M0/M0-02/**、AC-001/AC-034/AC-035 取证、doctor gate transcript"
+            "outputs": "evidence/M0/M0-02/**、AC-001/AC-034/AC-035 取证、doctor gate transcript",
+            "round_v2": 8,
+            "round_v2_ref": "R5-3（S3c→S3d→S3b→S4→S5 全串行）"
           }
         ],
         "totals_v3": {
@@ -835,7 +845,8 @@
           "ruling": "S3c(R5 已交付) -> S3d(R6) -> S3b(R7) -> S4(R8) -> S5(R8/R9) 全串行；api/deps.py 自 R6 起纳入 S3d 写集（禁改已冻结签名与 Protocol 类名，只许填函数体与补 Protocol 成员）。Round 6 第二条 lane 改为 D-016 批次 4 补卡（flash，3 张 M4-P01/M5-01/M5-02），与 S3d 写集完全不相交（orchestrator/tasks/*.md vs src/campaignlab/**）且无任何依赖。M0-04/S2 前置仍为「S3c 与 S3d 均已交付并入库」，达成时点 R6 末",
           "generalized_criterion_PRE5": "并行派单前必须**实测**被依赖模块的成员面可用性：Protocol/ABC 是否为空、目标函数体是否 NotImplementedError / pass / raise NotImplemented；凡空端口或 NotImplemented 一律判**串行**。已写入 resume.dispatch_preconditions.items 的 PRE-5",
           "schedule_impact": "wave1 收尾再顺延一轮：原 R5-2 计划 {S3d ∥ S3b}(R6) -> {S4,S5}(R7)，现 S3d(R6) -> S3b(R7) -> S4(R8) -> S5(R8/R9)。wave2 最早开启时点由 Round 7 顺延至 Round 8"
-        }
+        },
+        "rounds_superseded_note": "【2026-11-13T09:41:17+08:00】原 round 字段（S3d=5/S3b=5/S4=6/S5=6）系 R5-2 时期的排布，已被 R5-3 全串行裁定取代：S3d=6、S3b=7、S4=8、S5=8（S5 视 S4 回收时点排 8 或 9）。按 A19 不改写原值，另立 round_v2 字段，引用轮次一律以 round_v2 为准。依据：api/deps.py 实测 SessionService/WorkspaceService 为空端口 + 4 处 raise NotImplementedError（PRE-5）。"
       }
     },
     "M0-03": {
@@ -1933,7 +1944,7 @@
         "file": "orchestrator/tasks/M4-02.md",
         "delivered_at": "2026-11-13T08:42:00+08:00",
         "by": "Locke(D-016 批次3, qwen3.8-flash)",
-        "commit": "PENDING(本提交)",
+        "commit": "71f9644",
         "head_tail_total": [
           43,
           25,
@@ -2004,7 +2015,7 @@
         "file": "orchestrator/tasks/M4-03.md",
         "delivered_at": "2026-11-13T08:42:00+08:00",
         "by": "Locke(D-016 批次3, qwen3.8-flash)",
-        "commit": "PENDING(本提交)",
+        "commit": "71f9644",
         "head_tail_total": [
           44,
           24,
@@ -2343,7 +2354,7 @@
         "file": "orchestrator/tasks/M1-P01.md",
         "delivered_at": "2026-11-13T08:42:00+08:00",
         "by": "Locke(D-016 批次3, qwen3.8-flash)",
-        "commit": "PENDING(本提交)",
+        "commit": "71f9644",
         "head_tail_total": [
           46,
           24,
@@ -2445,7 +2456,7 @@
         "file": "orchestrator/tasks/M3-P01.md",
         "delivered_at": "2026-11-13T08:42:00+08:00",
         "by": "Locke(D-016 批次3, qwen3.8-flash)",
-        "commit": "PENDING(本提交)",
+        "commit": "71f9644",
         "head_tail_total": [
           55,
           25,
@@ -3609,9 +3620,36 @@
       "4. 派 Round 5（4 lane 并行）：M0-02/S3c+S3d（max）∥ M0-02/S3b+S4+S5（flash ~44k）∥ M0-03/S6-S9（flash 批）∥ D-016 批次3（flash 4-5 张 + 预抽摘要）。M0-04/S2 因依赖 S3c+S3d 顺延至 Round 6",
       "5. 每 lane 回收后独立复验（禁采信自报）+ 分任务提交（一任务一提交、显式路径、commit -F、staged 集合断言）+ push",
       "6. wave2 出口复算 flash_share 两项护栏；若仍 <0.60 / >0.35，按手册 6.6 升级给项目负责人",
-      "7. 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**不得在 29 任务全部交付前停止**（用户死命令）"
+      "7. 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**不得在 29 任务全部交付前停止**（用户死命令）",
+      "【Round 6 2026-11-13T09:41:17+08:00】",
+      "① 本 predispatch 提交（批次4 素材 7 文件 + state.json）→ push",
+      "② spawn T lane：D-016 批次4（qwen3.8-flash，入口 D-016-batch4-rules.md，≤40k，loop<=2）",
+      "③ dispatch 记录提交（回填 agent_id + predispatch_commit 真实哈希 + in_flight 双 lane）→ push",
+      "④ wait_agent(Godel) 收 S3d → 编排器独立复验（pytest>=166/mypy rc0/ruff rc0/doctor rc0 且 worker WARN 消失/deps.py NotImplementedError=0/lease_until 只在 worker.py/jobs 读写只在 repositories.py/PROBLEM_CODES=20/check_contracts 13/spec+contracts dirty=0/app.py 纯追加）→ 写回 state → 提交 → push → close_agent",
+      "⑤ 收批次4 → 独立复验（真实 pytest 跑三守护 + 全量）→ 提交（3 卡 + test_task_cards.py + state 台账）→ push → close_agent",
+      "⑥ Round 7：S3b（flash 14k：api/session.py+api/workspaces.py，CR-002 无 status 参数，删 422 INVALID_SCOPE 分支）∥（写集实测不相交则）批次5 预抽 / M0-04-S2",
+      "⑦ 每次回收后程序化重算 flash_share（units=subtask_count or 1；dev=task.startswith('M')），wave2 出口复核两护栏，禁为凑配比降档",
+      "⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证；未全部完成不得停（用户死命令）"
     ],
-    "in_flight_agents": [],
+    "in_flight_agents": [
+      {
+        "agent_id": "01a1d275-7c5b-7dc0-9ddf-677eef887e4a",
+        "nickname": "Godel",
+        "lane": "S",
+        "task": "M0-02",
+        "subtask": "S3d",
+        "tier": "qwen3.8-max",
+        "reasoning_effort": "high",
+        "budget": "40k",
+        "loop_cap": 2,
+        "status": "IN_FLIGHT",
+        "dispatched_at": null,
+        "dispatched_at_note": "前序会话派出，未写回 state.json 即中断；无计量留痕，按纪律记 null（禁估算）。在飞事实由接管后 wait_agent(timeout=20s)→timed_out=true 实测证明。",
+        "verified_in_flight_at": "2026-11-13T09:41:17+08:00",
+        "write_scope": "src/campaignlab/**（含 api/deps.py、api/app.py、cli.py，A40 扩围；禁改已冻结签名）、tests/unit/<新增>、evidence/M0/M0-02/**",
+        "exit_condition": "doctor rc=0 且 WARN worker 项消失；api/deps.py 内 NotImplementedError 计数=0；lease_until 赋值只在 application/worker.py；jobs 表 INSERT/UPDATE 只在 repositories.py；既有 166 用例一个不少"
+      }
+    ],
     "dispatch_requirements": [
       "spawn 时 model 显式填 qwen3.8-max 或 qwen3.8-flash；fork_context=false",
       "子智能体不得 git commit/push，不得读 scope 外目录，不得 sudo",
@@ -4155,8 +4193,9 @@
           "ref": "orchestrator/tasks/M0-02.md（R5-2 追注）, state.json → tasks[M0-02].s3_split_ruling_v3.serial_ordering_correction",
           "allowed_under_owner_gate": true,
           "reason_allowed": "属编排器自我更正与治理留痕，非业务开发；用户偏好明载「错了当场更正留痕，禁 force-push、不改写历史」",
-          "commit": "PENDING(随 Round 5 派单记录提交)",
-          "evidence": "orchestrator/tasks/M0-02.md 卡尾 R5-2 追注（total 162→182 行，仍 <=200；head/表头未变）"
+          "commit": "b190830",
+          "evidence": "orchestrator/tasks/M0-02.md 卡尾 R5-2 追注（total 162→182 行，仍 <=200；head/表头未变）",
+          "commit_correction_note": "【接管更正 2026-11-13T09:41:17+08:00】占位原文写「随 Round 5 派单记录提交」（指 bacd736），实测有误：PRE-4 的两处证据（M0-02.md 的 R5-2 追注 +20 行、state.json 的 serial_ordering_correction）均随 **b190830** 入库，bacd736 只改 state.json(+123/-3) 且未回填本占位。故回填为 b190830。验证命令：git show --stat b190830；git log -S'serial_ordering_correction' -- orchestrator/state.json。属占位文字误标，非改写历史值；原占位文字在本条 from 字段留痕。"
         },
         {
           "id": "PRE-5",
@@ -4166,7 +4205,7 @@
           "ref": "orchestrator/handoff/M0-02-design.md §9.3, orchestrator/tasks/M0-02.md（R5-3 追注）, state.json → tasks[M0-02].s3_split_ruling_v3.serial_ordering_correction_R5_3",
           "allowed_under_owner_gate": true,
           "reason_allowed": "属编排器自我更正与派单纪律，非业务开发；用户偏好明载「错了当场更正留痕，禁 force-push、不改写历史」",
-          "commit": "PENDING(提交C)",
+          "commit": "f457ec9",
           "evidence": "api/deps.py 实测：SessionService/WorkspaceService 空端口、4 处 raise NotImplementedError"
         }
       ],
@@ -4201,12 +4240,258 @@
           "全量门禁实测：pytest 165 passed / mypy 39 files / ruff check rc=0 / ruff format 128 files（恒等式成立）/ check_contracts 13-13 / spec dirty=0 / 前端 7 files 104 tests",
           "M0-03/S6-S9 已交付入库 5d16d4d；D-016 批次3 四卡已入库 71f9644（磁盘卡 20 + 缺口 9 == 29）",
           "D-023 CLOSED、D-024 OPEN（处置口径已生效）、D-025 CLOSED；D-022 仍 pending_owner（暂按选项 A 推进，最迟 wave5 派单前裁定）",
-          "Round 5 三个并发槽即将全部 close_agent 释放（手册 §15.11）"
+          "Round 5 三个并发槽即将全部 close_agent 释放（手册 §15.11）",
+          "【2026-11-13T09:41:17+08:00 接管补录】批次4 素材（3 切片 + 4 分节 context）已由编排器独立重算指纹并校验 BOM/CR/尾换行，全部合规，随本 predispatch 提交入库",
+          "【2026-11-13T09:41:17+08:00 接管补录】Round 5 三并发槽经 close_agent 实证已释放；S lane(Godel/S3d) 在飞已补录 in_flight_agents（原为空，与事实不符，已更正留痕）"
         ],
         "blocking_for_round6": [
           "S3d 前置＝S3c 已入库（本提交满足）；S3d 写集含 api/deps.py（A40 扩围）",
           "D-016 批次 4 前置＝编排器先产出 batch4 context（按卡分节，corrective_action_next 第 ③ 条）+ 预生成切片；批量降到 3 张（M4-P01/M5-01/M5-02，均 critical/slack=0）"
-        ]
+        ],
+        "batch4_predispatch": {
+          "at": "2026-11-13T09:41:17+08:00",
+          "cards": [
+            "M4-P01",
+            "M5-01",
+            "M5-02"
+          ],
+          "why_3_not_4": "budget.guardrail_status.corrective_action_next 第①条：批次3 的 4 卡正文 96231 B（单卡 20-28 KB）是成本越限主因，批次4 起降到 2-3 张；三张均 critical=true/slack=0（M4-P01=wave8 串行首、M5-01=wave8 串行次、M5-02=wave9）",
+          "corrective_action_applied": [
+            "①每批降到 2-3 张卡",
+            "②卡正文生成量显式计入预算（cost_target ≤40k）",
+            "③context 分节交付（rules + 3 份按卡分节，lane 只读自己那节）",
+            "④沿用定点抽取配方与预生成切片（M4-P01 109729 B 整读必越限）"
+          ],
+          "cost_target": "<=40k token（批次1 181k/8卡 → 批次2 50k/4卡 → 批次3 越限 → 批次4 目标 ≤40k/3卡）",
+          "slices": [
+            {
+              "file": "orchestrator/handoff/M4-P01.slice.json",
+              "bytes": 109729,
+              "sha16": "73a9bcf1c483adbd",
+              "lines_split": 4796,
+              "wc_l": 4795,
+              "bom": false,
+              "cr": false,
+              "ends_nl": false,
+              "spec_version": "1.0.1",
+              "top_keys": [
+                "acceptance_rows",
+                "ddl",
+                "operations",
+                "pages",
+                "source",
+                "spec_version",
+                "truncated_schemas"
+              ],
+              "has_missing_key": false,
+              "truncated_schemas": [],
+              "ops": 8,
+              "pages": 4,
+              "acceptance_rows": 9,
+              "ddl": 9,
+              "openapi_src": {
+                "path": "contracts/openapi.json",
+                "bytes": 443309,
+                "sha16": "592571099d638251"
+              }
+            },
+            {
+              "file": "orchestrator/handoff/M5-01.slice.json",
+              "bytes": 3781,
+              "sha16": "87bfe2b0db49373d",
+              "lines_split": 151,
+              "wc_l": 150,
+              "bom": false,
+              "cr": false,
+              "ends_nl": false,
+              "spec_version": "1.0.1",
+              "top_keys": [
+                "acceptance_rows",
+                "operations",
+                "source",
+                "spec_version",
+                "truncated_schemas"
+              ],
+              "has_missing_key": false,
+              "truncated_schemas": [],
+              "ops": 1,
+              "pages": 0,
+              "acceptance_rows": 4,
+              "ddl": 0,
+              "openapi_src": {
+                "path": "contracts/openapi.json",
+                "bytes": 443309,
+                "sha16": "592571099d638251"
+              }
+            },
+            {
+              "file": "orchestrator/handoff/M5-02.slice.json",
+              "bytes": 14977,
+              "sha16": "4ed7f37be9e8039a",
+              "lines_split": 299,
+              "wc_l": 298,
+              "bom": false,
+              "cr": false,
+              "ends_nl": false,
+              "spec_version": "1.0.1",
+              "top_keys": [
+                "acceptance_rows",
+                "source",
+                "spec_version",
+                "truncated_schemas"
+              ],
+              "has_missing_key": false,
+              "truncated_schemas": [],
+              "ops": 0,
+              "pages": 0,
+              "acceptance_rows": 47,
+              "ddl": 0,
+              "openapi_src": {
+                "path": "contracts/openapi.json",
+                "bytes": 443309,
+                "sha16": "592571099d638251"
+              }
+            }
+          ],
+          "context_files": [
+            {
+              "file": "orchestrator/handoff/D-016-batch4-rules.md",
+              "bytes": 15112,
+              "sha16": "e90d9da8326881fb",
+              "lines_split": 194,
+              "wc_l": 193,
+              "bom": false,
+              "cr": false,
+              "ends_nl": true
+            },
+            {
+              "file": "orchestrator/handoff/D-016-batch4-M4-P01.md",
+              "bytes": 9853,
+              "sha16": "f3024978116b97df",
+              "lines_split": 114,
+              "wc_l": 113,
+              "bom": false,
+              "cr": false,
+              "ends_nl": true
+            },
+            {
+              "file": "orchestrator/handoff/D-016-batch4-M5-01.md",
+              "bytes": 7085,
+              "sha16": "e9b84ac5c45a5dc6",
+              "lines_split": 103,
+              "wc_l": 102,
+              "bom": false,
+              "cr": false,
+              "ends_nl": true
+            },
+            {
+              "file": "orchestrator/handoff/D-016-batch4-M5-02.md",
+              "bytes": 9254,
+              "sha16": "86a7adf05bf39b9e",
+              "lines_split": 154,
+              "wc_l": 153,
+              "bom": false,
+              "cr": false,
+              "ends_nl": true
+            }
+          ],
+          "known_missing_now": [
+            "M1-04",
+            "M2-04",
+            "M3-04",
+            "M3-P02",
+            "M4-P01",
+            "M5-01",
+            "M5-02",
+            "M5-03",
+            "M5-P01"
+          ],
+          "known_missing_after_batch4": [
+            "M1-04",
+            "M2-04",
+            "M3-04",
+            "M3-P02",
+            "M5-03",
+            "M5-P01"
+          ],
+          "identity_after": "磁盘卡 23 + KNOWN_MISSING 6 == 29（tasks 分母不变）",
+          "test_task_cards_edit": "仅删 KNOWN_MISSING 中 M4-P01/M5-01/M5-02 三行，git diff --numstat 必须为 '0\\t3'",
+          "entry_doc": "orchestrator/handoff/D-016-batch4-rules.md（唯一入口，194 行）"
+        },
+        "gates_run_at_predispatch": {
+          "policy": "S lane(Godel/M0-02-S3d) 在飞 → 编排器禁跑 pytest/mypy/ruff/uv（NOTE-10 假红）。本 predispatch 提交只用纯 python3 标准库 + 只读 git 校验；Python 工具链全表推迟到 S3d 与批次4 双双回收后由编排器统一实跑（禁采信自报）。",
+          "run": [
+            {
+              "id": "P1",
+              "cmd": "python3 json.load × 3 份批次4 切片",
+              "rc": 0,
+              "observed": "3/3 解析成功；spec_version 均 1.0.1；均无 missing 键（全命中）；truncated_schemas 均 []"
+            },
+            {
+              "id": "P2",
+              "cmd": "python3 hashlib.sha256 + os.path.getsize 独立重算",
+              "rc": 0,
+              "observed": "M4-P01 109729/73a9bcf1c483adbd、M5-01 3781/87bfe2b0db49373d、M5-02 14977/4ed7f37be9e8039a；与 rules.md §8 表逐字全等（编排器自算，未采信）"
+            },
+            {
+              "id": "P3",
+              "cmd": "python3 BOM/CR/尾换行校验 × 4 份批次4 context md",
+              "rc": 0,
+              "observed": "bom=False、cr=False、ends_nl=True（4/4）"
+            },
+            {
+              "id": "P4",
+              "cmd": "python3 卡片双向对账（磁盘 vs KNOWN_MISSING）",
+              "rc": 0,
+              "observed": "磁盘卡 20 + KNOWN_MISSING 9 == 29；批次4 交付 3 卡后应为 23 + 6 == 29"
+            },
+            {
+              "id": "P5",
+              "cmd": "git status --porcelain",
+              "rc": 0,
+              "observed": "?? 计 13 项，全部为批次4 素材（3 切片 + 4 context md），无其他 lane 残留"
+            },
+            {
+              "id": "P6",
+              "cmd": "git rev-list --left-right --count origin/m0-framework...HEAD",
+              "rc": 0,
+              "observed": "behind/ahead = 0/0（提交 C f457ec9 已推送，无未推送提交）"
+            },
+            {
+              "id": "P7",
+              "cmd": "close_agent × 3（Hilbert 01a1d222 / Pasteur 01a1d223 / Locke 01a1d225）",
+              "rc": 0,
+              "observed": "三次均返回 'agent ... not found' → Round 5 并发槽确已释放（手册 §15.11），本条为接管后实证而非采信交接摘要"
+            },
+            {
+              "id": "P8",
+              "cmd": "wait_agent([01a1d275-7c5b-7dc0-9ddf-677eef887e4a], timeout=20s)",
+              "rc": 0,
+              "observed": "timed_out=true、status={} → S3d 确在飞（句柄可达，与已关闭的三句柄返回 not found 形成对照）"
+            },
+            {
+              "id": "P9",
+              "cmd": "git diff --cached --name-only == 预期 8 路径 + 禁入前缀检查",
+              "rc": 0,
+              "observed": "staged 8/8 逐字相符；src/web/tests/spec/contracts/docs/evidence/orchestrator.tasks/orchestrator.defects 均未 stage"
+            },
+            {
+              "id": "P10",
+              "cmd": "git status --porcelain | 过滤 src/ 未跟踪项",
+              "rc": 0,
+              "observed": "S3d 在飞产物 7 个未跟踪文件（audit.py, health_service.py, idempotency.py, session_service.py, worker.py, workspace_service.py, repositories.py）保持未入库；该清单为移动快照，因 S3d 仍在写盘（首次采样 6 个，本次 7 个，新增 workspace_service.py）"
+            }
+          ],
+          "not_run_and_why": [
+            "pytest / mypy / ruff check / ruff format / uv run：S3d 独占 .venv 且正在改 src/campaignlab/**，此刻实跑必得假红或争用（NOTE-10）",
+            "check_contracts / doctor：同属 Python 工具链，一并推迟",
+            "npm/vitest/playwright：本提交不含前端改动，无需跑"
+          ],
+          "deferred_to": "S3d 回收提交 + 批次4 回收提交（两次独立复验，编排器亲自实跑全表）",
+          "measured_at": "2026-11-13T09:41:17+08:00"
+        },
+        "predispatch_commit": "PENDING(本条)",
+        "predispatch_commit_note": "本提交（批次4 素材 7 文件 + state.json）落库后，由下一条 dispatch 记录提交回填真实短哈希"
       }
     },
     "d004_d005_commit": "1f5912e",
@@ -4654,6 +4939,117 @@
           "wave2 (M0-04, M0-03b)": "最早 Round 7 开启"
         },
         "new_requirement": "沿用 Round 4 起的要求：派单提示词强制子智能体自报 token 估算，缺失记 null、禁估算填数。本轮另新增：因批次3 切片为批次2 的 3-6 倍，派单文写入「定点抽取配方」硬规则（禁 cat 整份切片、禁 json.load 后整体 print）。"
+      },
+      {
+        "at": "2026-11-13T09:41:17+08:00",
+        "wave": 1,
+        "round": 6,
+        "kind": "predispatch",
+        "mode": "parallel-2-lanes（S/M0-02-S3d qwen3.8-max ∥ T/D-016批次4 qwen3.8-flash）",
+        "takeover_note": "第 12 次接管：前序会话已派 S lane(Godel/S3d) 但未登记在飞、且批次4 素材未入库即因故中断。接管后按手册纪律先做 predispatch 治理提交，再派第 2 条 lane。未采信交接摘要，全部关键事实（HEAD、工作树、切片指纹、卡片对账、并发槽、在飞句柄）均由编排器从磁盘/句柄实测。",
+        "concurrency_slots_released_before_dispatch": [
+          {
+            "agent_id": "01a1d222-9a42-7801-8b1e-30e388f25081",
+            "nickname": "Hilbert",
+            "verified": "close_agent → not found"
+          },
+          {
+            "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
+            "nickname": "Pasteur",
+            "verified": "close_agent → not found"
+          },
+          {
+            "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+            "nickname": "Locke",
+            "verified": "close_agent → not found"
+          }
+        ],
+        "dispatched": [
+          {
+            "agent_id": "01a1d275-7c5b-7dc0-9ddf-677eef887e4a",
+            "nickname": "Godel",
+            "lane": "S",
+            "task": "M0-02",
+            "subtask": "S3d 应用服务与仓储实现（SessionService/WorkspaceService 实体化、Job 状态机、worker 租约、repositories 落 jobs 表读写、api/deps.py+api/app.py+cli.py 扩围）",
+            "tier": "qwen3.8-max",
+            "reasoning_effort": "high",
+            "est_tokens_planned": 40000,
+            "loop_cap": 2,
+            "dispatched_at": null,
+            "dispatched_at_note": "前序会话派出，无计量留痕，记 null（禁估算）",
+            "instance": "NEW（Round5 的 Hilbert 已关闭不得续用）",
+            "status_at_this_commit": "IN_FLIGHT（wait_agent timed_out 实测）"
+          }
+        ],
+        "pending_dispatch_this_round": [
+          {
+            "lane": "T",
+            "task": "D-016-batch4",
+            "nickname": "待 spawn 后回填",
+            "subtask": "补 3 张任务卡 M4-P01/M5-01/M5-02 + KNOWN_MISSING 9->6",
+            "tier": "qwen3.8-flash",
+            "est_tokens_planned": 40000,
+            "loop_cap": 2,
+            "entry_doc": "orchestrator/handoff/D-016-batch4-rules.md",
+            "note": "本 predispatch 提交推送后立即 spawn；agent_id 与 dispatch 记录随下一条提交回填（沿用 Round 5 的 predispatch_commit/dispatch_commit 两段式）"
+          }
+        ],
+        "write_scope_disjoint": true,
+        "disjoint_proof": "S lane(Godel) 只写 src/campaignlab/**（含 api/deps.py、api/app.py、cli.py、application/worker.py、infra/repositories.py）、tests/unit/<自己的新文件>、evidence/M0/M0-02/**；T lane(批次4) 只写 orchestrator/tasks/{M4-P01,M5-01,M5-02}.md（新建）与 tests/unit/test_task_cards.py（仅删 KNOWN_MISSING 3 行）。唯一潜在交叠 tests/unit/** 已按 Round 5 同一手法显式切分：T 只准改 test_task_cards.py 一个既有文件、S 只准新增自己的测试文件不得改既有测试。orchestrator/state.json、orchestrator/handoff/*.slice.json 与 git 写权限由编排器独占。",
+        "toolchain_isolation": "S lane 独占 .venv（uv/pytest/mypy/ruff），禁跑任何 npm/node/vite/vitest；T lane 禁跑全部构建/测试工具链，自检一律用系统 python3 标准库（NOTE-10 假红规避）。编排器在两 lane 任一在飞期间禁跑工具链，全表复跑推迟到双双回收后。",
+        "known_transient_red": "已告知 T lane：禁跑 pytest；若需自证守护逻辑，用纯 python3 复现 test_task_cards.py 的三条断言（缺口双向对账、分母 29、卡片格式 head<=60/tail<=40/total<=200/表头逐字四列/REQUIRED_SECTIONS）。已告知 S lane：tests/unit/test_task_cards.py 与 test_task_card_narrative.py 可能因 T lane 并发新建 3 卡/改 KNOWN_MISSING 而在全量 pytest 的瞬间报红，属并行 lane 归属、不计入 S3d 判定，且明令不得修改这两个文件。",
+        "adjudications_carried": [
+          "A5",
+          "A6",
+          "A7",
+          "A8",
+          "A9",
+          "A10",
+          "A11",
+          "A12",
+          "A13",
+          "A14",
+          "A15",
+          "A17",
+          "A19",
+          "A21",
+          "A24",
+          "A27",
+          "A28",
+          "A31",
+          "A36",
+          "A40",
+          "A42",
+          "A43",
+          "A44/Q5",
+          "A46/Q7",
+          "A47/Q8",
+          "A48/Q9",
+          "R5-1",
+          "R5-2",
+          "R5-3",
+          "PRE-4",
+          "PRE-5",
+          "CR-002/ADR-006",
+          "D-011",
+          "D-012",
+          "D-014",
+          "D-018",
+          "D-020",
+          "D-021",
+          "D-022(pending_owner，暂按选项A)"
+        ],
+        "not_dispatched_this_round": {
+          "M0-02/S3b": "R5-3 裁定串行于 S3d 之后（api/deps.py 的空端口须由 S3d 实体化，PRE-5 判据）→ Round 7",
+          "M0-02/S4": "依赖 S3b+S3c+S3d 全部入库（契约测试打真实路由）→ Round 8",
+          "M0-02/S5": "依赖 S4 → Round 8/9",
+          "M0-04/S2": "前置＝S3c 与 S3d 均已交付并入库；S3d 入库后即可与 S3b 并行（写集待实测）→ Round 7 候选",
+          "D-016 批次5": "M1-04/M2-04/M3-04 预抽，须待批次4 回收入库（避免同时改 test_task_cards.py）→ Round 7 候选",
+          "wave5 L1": "D-022 仍 pending_owner（最迟 wave5 派单前裁定）"
+        },
+        "predispatch_commit": "PENDING(本条)",
+        "batch4_predispatch_ref": "resume.dispatch_preconditions.round6.batch4_predispatch",
+        "gates_ref": "resume.dispatch_preconditions.round6.gates_run_at_predispatch"
       }
     ],
     "q_verify": {
@@ -5710,7 +6106,7 @@
       ],
       "slots_note": "手册 §15.11：派单前必须释放全部并发槽。Gauss(01a1d193) 与 Aquinas(01a1d194) 已于 Round 4 回收后关闭，本轮关闭余下两个",
       "predispatch_commit": "b190830",
-      "dispatch_commit": "PENDING(本条)"
+      "dispatch_commit": "bacd736"
     },
     "round5_returns": {
       "at": "2026-11-13T08:42:00+08:00",
@@ -5747,7 +6143,7 @@
           "nickname": "Pasteur",
           "tier": "qwen3.8-flash",
           "result": "PASS_WITH_TODO",
-          "commit": "PENDING(提交B)",
+          "commit": "5d16d4d",
           "tokens_self_reported": null,
           "tokens_note": "get_goal 返回 goal=null，无计量句柄；按纪律记 null，禁估算",
           "open_questions": 9,
@@ -5763,7 +6159,7 @@
           "result": "DONE",
           "progress_snapshot_at": "2026-11-13T08:42:00+08:00",
           "progress_snapshot": "编排器只读快照（未干预）：config.py 279 行、clock.py 70、domain/errors.py 264、domain/ids.py 63、domain/values.py 27、domain/__init__.py 14、__main__.py 40、cli.py 332、api/app.py 127、api/deps.py 120、api/health.py 40 均已落盘，api/common.py 已改为 752 行（搬移后 re-export），evidence/M0/M0-02/problem-code-registry.json + commands.md + migration-diff.md 已产出",
-          "commit": "PENDING(提交C)",
+          "commit": "f457ec9",
           "reverify": "吻合",
           "tokens_self_reported": null,
           "tokens_note": "子智能体 get_goal 返回 goal=null / remainingTokens=null，无计量句柄；按纪律记 null，禁估算。客观量：24 次工具调用、约 41k 工具返回 token、19 文件 / 2976 行 / 116173 B",
@@ -5865,7 +6261,130 @@
         "owner": "项目负责人",
         "source": "D-022 / pending_owner D-022-1"
       }
-    ]
+    ],
+    "commit_backfill_round6": {
+      "at": "2026-11-13T09:41:17+08:00",
+      "by": "接管会话（编排器）",
+      "count": 11,
+      "entries": [
+        {
+          "path": "$.budget.subtask_log[12].commit",
+          "from": "PENDING(提交C)",
+          "to": "f457ec9",
+          "verified_by": "git log -1 -- src/campaignlab/api/deps.py → f457ec9（S3c 产物所在提交）"
+        },
+        {
+          "path": "$.tasks.M0-02.s3_split_ruling_v3.slices[1].commit",
+          "from": "PENDING(提交C)",
+          "to": "f457ec9",
+          "verified_by": "git log -1 -- src/campaignlab/api/deps.py → f457ec9（S3c 产物所在提交）"
+        },
+        {
+          "path": "$.tasks.M4-02.card.commit",
+          "from": "PENDING(本提交)",
+          "to": "71f9644",
+          "verified_by": "git log -1 -- orchestrator/tasks/M4-02.md 与 tests/unit/test_task_cards.py → 71f9644"
+        },
+        {
+          "path": "$.tasks.M4-03.card.commit",
+          "from": "PENDING(本提交)",
+          "to": "71f9644",
+          "verified_by": "git log -1 -- orchestrator/tasks/M4-03.md 与 tests/unit/test_task_cards.py → 71f9644"
+        },
+        {
+          "path": "$.tasks.M1-P01.card.commit",
+          "from": "PENDING(本提交)",
+          "to": "71f9644",
+          "verified_by": "git log -1 -- orchestrator/tasks/M1-P01.md 与 tests/unit/test_task_cards.py → 71f9644"
+        },
+        {
+          "path": "$.tasks.M3-P01.card.commit",
+          "from": "PENDING(本提交)",
+          "to": "71f9644",
+          "verified_by": "git log -1 -- orchestrator/tasks/M3-P01.md 与 tests/unit/test_task_cards.py → 71f9644"
+        },
+        {
+          "path": "$.resume.dispatch_preconditions.items[3].commit (PRE-4)",
+          "from": "PENDING(随 Round 5 派单记录提交)",
+          "to": "b190830",
+          "verified_by": "git log -S'serial_ordering_correction' -- orchestrator/state.json → b190830；git show --stat b190830 含 orchestrator/tasks/M0-02.md +20 行（即 PRE-4 的 R5-2 追注）"
+        },
+        {
+          "path": "$.resume.dispatch_preconditions.items[4].commit (PRE-5)",
+          "from": "PENDING(提交C)",
+          "to": "f457ec9",
+          "verified_by": "git log -S'serial_ordering_correction_R5_3' -- orchestrator/state.json → 仅 f457ec9；git show --stat f457ec9 含 handoff/M0-02-design.md 与 tasks/M0-02.md"
+        },
+        {
+          "path": "$.resume.round5_predispatch.dispatch_commit",
+          "from": "PENDING(本条)",
+          "to": "bacd736",
+          "verified_by": "git log -1 --grep='Round 5 派单记录' → bacd736（只改 state.json，+123/-3，即在飞登记与派单记录）"
+        },
+        {
+          "path": "$.resume.round5_returns.lanes['F/M0-03-S6-S9'].commit",
+          "from": "PENDING(提交B)",
+          "to": "5d16d4d",
+          "verified_by": "git log -1 -- web/src/App.vue orchestrator/handoff/M0-03.slice.json → 5d16d4d"
+        },
+        {
+          "path": "$.resume.round5_returns.lanes['S/M0-02-S3c'].commit",
+          "from": "PENDING(提交C)",
+          "to": "f457ec9",
+          "verified_by": "git log -1 -- src/campaignlab/api/deps.py → f457ec9（S3c 产物所在提交）"
+        }
+      ],
+      "rule": "占位串 PENDING(...) 回填为真实短哈希，逐条以 git 实证归属；原占位文字保留在 entries[].from 字段（禁改写历史，A19）。回填 11 处后全库残留 PENDING( 共 14 行，逐项归因见 residual_pending_after。",
+      "residual_pending_check": "见 residual_pending_after",
+      "residual_pending_after": {
+        "total_lines": 14,
+        "breakdown": {
+          "self_referential_round6_predispatch_commit": 3,
+          "audit_from_fields": 11,
+          "rule_text_itself": 1
+        },
+        "self_referential_lines": [
+          4481,
+          5038,
+          6325
+        ],
+        "backfill_due": "2 处自指占位由下一条 dispatch 记录提交（Round 6 spawn 批次4 lane 之后）回填真实短哈希",
+        "checked_at": "2026-11-13T09:43:53+08:00",
+        "self_correction": "【接管自我更正】首次写为 total_lines=15 且列了不存在的 note_text 项；实测 grep 为 14 行（2 自指 + 11 from + 1 rule 文本），已据实更正。"
+      }
+    },
+    "round5_slots_closed": {
+      "verified_at": "2026-11-13T09:41:17+08:00",
+      "method": "接管后逐个 close_agent 实证（非采信交接摘要）",
+      "closed": [
+        {
+          "agent_id": "01a1d222-9a42-7801-8b1e-30e388f25081",
+          "nickname": "Hilbert",
+          "lane": "S",
+          "task": "M0-02",
+          "subtask": "S3c",
+          "close_agent_return": "not found"
+        },
+        {
+          "agent_id": "01a1d223-e9fa-7632-a8a5-2ebc0807ae2e",
+          "nickname": "Pasteur",
+          "lane": "F",
+          "task": "M0-03",
+          "subtask": "S6-S9",
+          "close_agent_return": "not found"
+        },
+        {
+          "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+          "nickname": "Locke",
+          "lane": "T",
+          "task": "D-016",
+          "subtask": "批次3",
+          "close_agent_return": "not found"
+        }
+      ],
+      "conclusion": "Round 5 三槽全部释放，Round 6 可用槽 >=2（手册 §15.11 满足）"
+    },
+    "in_flight_agents_note_round6": "接管更正：state.json 原 in_flight_agents=[] 与事实不符——S lane(Godel/S3d) 实际在飞。本条据 wait_agent 实测补录（原 note 保留不改写）。Round 6 采 2 lane 并行：S/S3d(max，已在飞) ∥ T/D-016批次4(flash，本提交后派)。"
   },
   "acceptance": {
     "baseline_total": 35,
