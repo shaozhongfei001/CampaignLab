@@ -19,6 +19,7 @@ import { http, httpKey } from "@/api/http";
 import { sessionStoreKey, useSession } from "@/composables/useSession";
 import { useWorkspaceScope, workspaceScopeKey } from "@/composables/useWorkspaceScope";
 import { useWorkspaces, workspacesStoreKey } from "@/composables/useWorkspaces";
+import { createAppRouter } from "@/router";
 
 const app = createApp(App);
 
@@ -29,4 +30,5 @@ app.provide(sessionStoreKey, useSession());
 app.provide(workspacesStoreKey, useWorkspaces());
 
 // S1 只保证挂载链路真实可用：vite build 与 vue-tsc 均以此为入口。
+app.use(createAppRouter());
 app.mount("#app");

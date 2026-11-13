@@ -1,0 +1,14 @@
+{
+  "probe_at": "2026-11-13T08:03:04+08:00",
+  "lane": "F3c (S6+S7+S8+S9)",
+  "playwright_cli": "Version 1.65.0",
+  "expected_browser_revisions": [["chromium", "1254"], ["chromium-headless-shell", "1254"]],
+  "cache_present": ["/home/szf/.cache/ms-playwright/chromium-1254", "/home/szf/.cache/ms-playwright/chromium_headless_shell-1254"],
+  "install_markers": ["DEPENDENCIES_VALIDATED", "INSTALLATION_COMPLETE"],
+  "browser_available": true,
+  "blk01_blocks_s9": false,
+  "tests_executed": "npx playwright test (12 tests: 6 x 2 projects, desktop-1440x900 + laptop-1024x768)",
+  "result": "12 passed",
+  "caveat": "后端 api/session.py 与 api/workspaces.py 属 S3b（Round 6）尚未落地，本 lane 禁联调；全部 /session /health /workspaces 由 page.route 合成夹具拦截（tests/e2e/fixtures/stubApi.ts）。因此这些用例证明的是前端层交互与呈现基线，不是端到端联调结论，不得据此宣称 AC-001 服务端链路通过。",
+  "cjk_font_probe": {"Noto Sans CJK SC faces": 2, "zh faces total": 37, "computed body font": "Inter, \"Noto Sans CJK SC\", \"Microsoft YaHei\", system-ui, sans-serif"}
+}

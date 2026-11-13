@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T08:40:50+08:00",
+  "updated_at": "2026-11-13T08:48:41+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -359,8 +359,8 @@
         ],
         "scope_violation": "NONE（本 lane 变更 = 4 新卡 + test_task_cards.py 删 4 行；其余 git status 条目逐条归因 S/F lane）",
         "value_added": "上报 34 项 U，其中 3 项经编排器独立复核后触发编排器自我更正（analysis_results.kind 臆断、切片 missing 键口径）与新证据并入 D-022（SNAPSHOT_SUPERSEDED）；未自行决定、未改 DDL、未发明 operationId",
-        "commit": "PENDING(提交A)",
-        "guard_tests_real_pytest": "rc=0 / 18 passed"
+        "commit": "71f9644",
+        "guard_tests_real_pytest": "rc=0 / 18 passed（编排器亲自实证）"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -3154,6 +3154,113 @@
       ],
       "self_correction": "第 3 节选项 B 原写「扩注册表 20→22」，因第 5 节并入第三个 code，正确值应为 20→23；上文字节不改写，以第 5 节末行为准（用户偏好：错了当场更正留痕、禁改写历史）",
       "amended_at": "2026-11-13T08:42:00+08:00"
+    },
+    {
+      "id": "D-023",
+      "task": "M0-03（契约切片生成面；波及所有引用 acceptance_rows 的派单文）",
+      "severity": "MEDIUM",
+      "status": "CLOSED",
+      "title": "M0-03.slice.json 缺 acceptance_rows 键：编排器生成切片时未传 --ac，而派单文把该键当必然存在项引用，致 F lane 无法按原文取 AC-001，被迫回落 pages.UI-01.meta.acceptance 二手来源",
+      "found_by": "F lane（Pasteur / qwen3.8-flash）回报 R4-Q4；编排器 Round 5 复验时实测确认",
+      "file": "orchestrator/defects/D-023.md",
+      "found_at": "2026-11-13T08:42:00+08:00",
+      "closed_at": "2026-11-13T08:48:41+08:00",
+      "measured": {
+        "slice_path": "orchestrator/handoff/M0-03.slice.json",
+        "old_sha16": "d0ebef26764e7f1c",
+        "old_bytes": 17203,
+        "new_sha16": "b19d38b8ce25fbd1",
+        "new_bytes": 17683,
+        "old_top_keys": [
+          "operations",
+          "pages",
+          "source",
+          "spec_version",
+          "truncated_schemas"
+        ],
+        "new_top_keys": [
+          "acceptance_rows",
+          "operations",
+          "pages",
+          "source",
+          "spec_version",
+          "truncated_schemas"
+        ],
+        "acceptance_rows_form": "{AC-id: [编号, 要求原文, 判据原文, 取证方式]} 字典",
+        "acceptance_rows_ids": [
+          "AC-001",
+          "AC-034"
+        ],
+        "recut_cmd_ac_arg": "--ac AC-001,AC-034",
+        "pure_increment_assert": "added_keys=['acceptance_rows']、removed_keys=[]；operations(9502B)/pages(1308B)/source(382B)/spec_version(7B)/truncated_schemas(2B) 五键规范化 JSON identical=True（编排器以 git show HEAD: 取旧版逐键比对实测）",
+        "bak": "/tmp/M0-03.slice.json.bak 实测存在；但权威可复核来源是 git 历史，不依赖 WSL /tmp"
+      },
+      "blocking": false,
+      "blocking_note": "不阻塞：F lane 已用二手来源正确交付且如实回报，未发明 AC 原文；重切为纯增量，ops/pages 逐字不变，S6-S9 产物无需返工",
+      "fix_detail": "以 --ac AC-001,AC-034 重切 M0-03.slice.json（17203B/d0ebef26764e7f1c -> 17683B/b19d38b8ce25fbd1），新增 acceptance_rows 一个顶层键，其余五键逐字不变",
+      "fix_scope": [
+        "orchestrator/handoff/M0-03.slice.json"
+      ],
+      "evidence": [
+        "orchestrator/defects/D-023.md",
+        "orchestrator/handoff/M0-03-design.md §11.5 第五节"
+      ],
+      "status_note": "CLOSED：本轮已修并入库（提交 B）",
+      "affected_tasks": [
+        "M0-03"
+      ],
+      "regression_guard": "派单文引用切片键前必须先打印该切片顶层 keys 实测清单，禁凭记忆写键名；PRE-3 断言口径 ('missing' not in slice) and slice['truncated_schemas']==[] 已入 resume.dispatch_requirements",
+      "orchestrator_self_correction": "本单根因在编排器侧（接口误用），非 lane 过错；F lane 的回落处置与如实回报均属正确行为，记为正面样本"
+    },
+    {
+      "id": "D-024",
+      "task": "M0-03（门禁记账面；波及所有 grep 型守卫与后续全部 lane 的门禁表口径）",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "title": "M0-03-design.md §11.3 G6 端口守卫为假绿：表头声明 cwd=web/，但命令用相对仓库根的通配 web/*.config.*，在 web/ 下通配不展开 -> grep 实测 rc=2（No such file or directory），被误记为 rc=1「无匹配」；仓库根实测 rc=0 命中 web/vite.config.ts:32",
+      "found_by": "编排器（O lane），Round 5 独立复验 F lane 门禁时实测发现（不采信 lane 自报 rc）",
+      "file": "orchestrator/defects/D-024.md",
+      "found_at": "2026-11-13T08:48:41+08:00",
+      "measured": {
+        "cwd_web_cmd": "grep -rn '300[012]' web/*.config.*",
+        "cwd_web_rc": 2,
+        "cwd_web_output": "grep: web/*.config.*: No such file or directory",
+        "cwd_root_cmd": "grep -rn '300[012]' web/*.config.*",
+        "cwd_root_rc": 0,
+        "cwd_root_hits": 1,
+        "cwd_root_hit_line": "web/vite.config.ts:32（NOTE-01 端口探测留痕注释：宿主 3000/3001/3002 实测 BUSY）",
+        "design_line": "orchestrator/handoff/M0-03-design.md:336（§11.3 G6，表头 327 行明写「门禁实测（web/ 下）」）",
+        "design_recorded_rc": 1,
+        "new_guard_G6a_cmd": "grep -rnE '^[[:space:]]*(port|target)[[:space:]]*:.*300[012]' web/*.config.*",
+        "new_guard_G6a_rc": 1,
+        "new_guard_G6b_cmd": "grep -rn '300[012]' web/*.config.*",
+        "new_guard_G6b_rc": 0,
+        "new_guard_G6b_hits": 1,
+        "rc_semantics": "0=有匹配；1=无匹配（守卫期望）；2=grep 自身错误（必须判红并修命令，禁记为 1）"
+      },
+      "blocking": false,
+      "blocking_note": "不阻塞交付：端口纪律的实质结论未被推翻（G6a 实测 rc=1，配置文件确无 3000/3001/3002 端口值；vite.config.ts:32 是注释留痕非配置值）。阻塞的是「该 rc 可作为证据」这一记账资格，已由重定义守卫解除",
+      "options": {
+        "A_adopted": "保留 vite.config.ts:32 注释（NOTE-01 证据，与 decisions.dev_proxy_target 交叉引用，删除即销毁证据），把守卫重定义为 G6a（意图精确，期望 rc=1）+ G6b（字面量白名单，期望恰命中该 1 行），并在 design §11.5 纯增量追注更正，历史行不改写",
+        "B_rejected": "改写 vite.config.ts:32 注释去掉 3000/3001/3002 字面量让原守卫真达标 rc=1 —— 已否决：会销毁端口探测事实留痕，且属为凑守卫而改证据，违反诚实清单原则"
+      },
+      "fix_scope": [
+        "orchestrator/handoff/M0-03-design.md §11.5（纯增量追注）",
+        "orchestrator/defects/D-024.md",
+        "state.json -> resume.dispatch_requirements / decisions.port_guard_redefinition"
+      ],
+      "evidence": [
+        "orchestrator/defects/D-024.md",
+        "orchestrator/handoff/M0-03-design.md §11.5 第一至三节",
+        "web/vite.config.ts:26-38"
+      ],
+      "status_note": "OPEN：处置口径已定并生效（G6a/G6b 本次实测 rc=1 / rc=0 命中 1 条），但 §11.3 历史行按「只加注不改写」保留，故本单不置 CLOSED，留作门禁记账口径的长期判例；后续 lane 一律按 §11.5 第三节四元组口径记账",
+      "affected_tasks": [
+        "M0-03",
+        "全部后续 lane（门禁表口径）"
+      ],
+      "regression_guard": "① 门禁表每行必须记 cwd+命令+rc+关键输出四元组，缺 cwd 视为无效证据；② rc=2 一律判红；③ 编排器复验时对一切「rc=1 无匹配」型守卫必须在仓库根亲自重跑，不采信自报 rc；④ G6b 命中条数>1 或命中行不是 web/vite.config.ts:32 即判红",
+      "orchestrator_self_correction": "本单根因亦含编排器责任：vite.config.ts:32 的 3000/3001/3002 字面量是编排器落地 /api proxy 时写入的，使 §9 G7 当年已清理过的守卫再次漂移，而编排器未在写入后重跑该守卫"
     }
   ],
   "change_requests": [
@@ -3419,7 +3526,8 @@
       "上下文包只给任务卡+切片+环境段；禁止整读 openapi.json(430KB) 与 bank-b.json(284KB)",
       "写多行文件一律用 here-string→base64→解码；禁 heredoc 承载代码；禁含 / 的 sed 模式串",
       "补卡 lane（D-016）必须以 orchestrator/handoff/D-016-batch2-context.md 为唯一 spec/手册入口；禁整读 spec/**、contracts/openapi.json(443309B)、docs/delivery/LONG-HORIZON-ORCHESTRATION.md(758 行)、orchestrator/state.json(183065B)；手册只读 §3.2(174-204)/§6.3(312-333)/§6.4(334-383)/§15.5(656-679)/§15.6(680-694)",
-      "PRE-3 断言口径（A18 更正）：判定切片新鲜且目标全命中须断言 ('missing' not in slice) and slice['truncated_schemas']==[]；禁断言 slice['missing']==[]（contract_slice.py 仅在有未命中目标时才写 missing 键，全命中时键不存在，断言会 KeyError）。守卫命令的 cwd 口径：一律在仓库根 /home/szf/dev/CampaignLab 执行（D-024 的教训：在 web/ 下跑 grep 'web/*.config.*' 通配不展开 -> rc=2 假绿）"
+      "PRE-3 断言口径（A18 更正）：判定切片新鲜且目标全命中须断言 ('missing' not in slice) and slice['truncated_schemas']==[]；禁断言 slice['missing']==[]（contract_slice.py 仅在有未命中目标时才写 missing 键，全命中时键不存在，断言会 KeyError）。守卫命令的 cwd 口径：一律在仓库根 /home/szf/dev/CampaignLab 执行（D-024 的教训：在 web/ 下跑 grep 'web/*.config.*' 通配不展开 -> rc=2 假绿）",
+      "门禁记账四元组与 rc 语义（D-024 的教训）：门禁表每行必须记 cwd + 命令 + rc + 关键输出四元组，缺 cwd 的行视为无效证据；rc 语义严格区分 0=有匹配 / 1=无匹配（守卫期望）/ 2=命令自身错误（必须判红并修命令，禁记为 1）；凡 grep 守卫使用相对路径通配（web/*、src/* 等），派单文与 design 表格必须同时写明 cwd，且一律在仓库根 /home/szf/dev/CampaignLab 执行。编排器复验时对一切「rc=1 无匹配」型守卫必须亲自重跑，不采信 lane 自报 rc。"
     ],
     "wave0_commit": "061c577d503f5f12b50af098d58d08bf9c8bcf6a",
     "persisted": {
@@ -3691,17 +3799,20 @@
         },
         "ruff_lint_scope_files": 18,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-13T08:40:50+08:00",
-        "counts_refresh_reason": "Round 5 回收（提交 A / T lane D-016 批次3）：编排器独立实测 task_cards_on_disk 16->20、known_missing_cards 13->9，恒等式 20+9==29 成立，KNOWN_MISSING 字面量与磁盘缺口双向对账相等、unregistered/recovered/orphans 均空。守护测试已用真实 pytest 实证：uv run --no-sync pytest -q tests/unit/test_task_cards.py tests/unit/test_task_card_narrative.py tests/unit/test_state_ledger.py -> rc=0 / 18 passed（非纯 python3 复现）。本提交不刷新 pytest/mypy/ruff 分母（属 S lane 产物，留提交 C），也不刷新前端分母（属 F lane，留提交 B）。",
+        "counts_refreshed_at": "2026-11-13T08:48:41+08:00",
+        "counts_refresh_reason": "Round 5 回收（提交 B / F lane M0-03 S6-S9）：编排器独立复跑前端门禁，frontend_vitest_files 4->7、frontend_vitest_passed 56->104（+3 files / +48 tests，0 skipped）；typecheck rc=0。同提交立 D-023（CLOSED）与 D-024（OPEN），并把 G6 端口守卫重定义为 G6a/G6b。本提交不刷新 pytest/mypy/ruff 分母（属 S lane 产物，留提交 C）。提交 A（71f9644）已刷新 task_cards_on_disk 16->20、known_missing_cards 13->9。",
         "live_openapi_bytes": 443309,
-        "frontend_vitest_passed": 56,
-        "frontend_vitest_files": 4,
+        "frontend_vitest_passed": 104,
+        "frontend_vitest_files": 7,
         "known_missing_cards": 9,
         "task_cards_on_disk": 20,
         "task_total_denominator": 29,
         "ruff_check_visible_files": 25,
         "task_card_identity": "task_cards_on_disk(20) + known_missing_cards(9) == task_total_denominator(29) 实测成立",
-        "previous_values_cards": "task_cards_on_disk: 16（Round 4 快照）；known_missing_cards: 13（Round 4 快照）。按「历史值只加注不改写」保留于本字段。"
+        "previous_values_cards": "task_cards_on_disk: 16（Round 4 快照）；known_missing_cards: 13（Round 4 快照）。按「历史值只加注不改写」保留于本字段。",
+        "frontend_vitest_measured_at": "2026-11-13T08:48:41+08:00",
+        "frontend_vitest_measured_by": "编排器独立复跑（非采信 F lane 自报）：cd web && npm run test -> rc=0 / Test Files 7 passed (7) / Tests 104 passed (104) / 0 skipped；npm run typecheck -> rc=0 无输出",
+        "frontend_vitest_previous_values": "frontend_vitest_passed=56、frontend_vitest_files=4（M0-03/S5 基线快照）。按「历史值只加注不改写」保留于本字段。"
       },
       "denominator_history": [
         {
@@ -4550,7 +4661,7 @@
           "M5-P01"
         ]
       },
-      "known_missing_in_guard": 17,
+      "known_missing_in_guard": 9,
       "batch2_predispatch": {
         "at": "2026-11-13T04:58:57+08:00",
         "batch": 2,
@@ -4599,7 +4710,7 @@
         "resolved_at": "2026-11-13T08:42:00+08:00",
         "resolution": "A14：四 op 全部归 M4-02，实现文件 src/campaignlab/api/exports.py（已同步进 tasks['M4-02'].scope）。M4-02.md 第 6 行逐个落定并附切片实测的 method+path"
       },
-      "updated_at": "2026-11-13T08:42:00+08:00",
+      "updated_at": "2026-11-13T08:48:41+08:00",
       "previous_batch2_snapshot": {
         "missing": 17,
         "missing_ids": [
@@ -4716,6 +4827,28 @@
         "agent": "Locke（01a1d225-439d-7840-8074-b4fcd3bd40fe，qwen3.8-flash）",
         "cost_breach": "目标 ≤45k，子智能体自陈越限（get_goal 无计量句柄故 tokens 记 null、禁估算）。其§8 归因：4 张卡正文落盘合计 96231 B（M3-P01 单卡 27981 B）+ context 全文一次读入；切片侧定点抽取纪律严格遵守（无一次整读 83-112 KB 切片）。纠正措施已记 budget.guardrail_status.corrective_action_next",
         "remaining_plan": "批次 4（Round 6/7）：M4-P01、M5-01、M5-02、M5-03（4 张均 critical=true/slack=0）；批次 5：M5-P01、M1-04、M2-04、M3-04、M3-P02（5 张）。批次 4 起把「卡正文生成量」计入预算并按 Locke 建议评估降到 2-3 卡/批"
+      },
+      "batch3": {
+        "batch": 3,
+        "dispatched_at": "2026-11-13T08:12:00+08:00",
+        "agent": "Locke（qwen3.8-flash）",
+        "agent_id": "01a1d225-439d-7840-8074-b4fcd3bd40fe",
+        "ids": [
+          "M4-02",
+          "M4-03",
+          "M3-P01",
+          "M1-P01"
+        ],
+        "expected_known_missing_after": "13 -> 9",
+        "status": "RETURNED_VERIFIED_OVER_CAP",
+        "returned_at": "2026-11-13T08:42:00+08:00",
+        "actual_known_missing_after": 9,
+        "commit": "71f9644",
+        "committed_at": "2026-11-13T08:48:41+08:00",
+        "guard_tests_real_pytest": "uv run --no-sync pytest -q tests/unit/test_task_cards.py tests/unit/test_task_card_narrative.py tests/unit/test_state_ledger.py -> rc=0 / 18 passed（编排器本轮亲自实证，非纯 python3 复现；此前 v10.py 的 KNOWN_MISSING 提取脚本有右括号匹配 bug 造成假红，已弃用该脚本，实测字面量确为 9 个正确 id）",
+        "over_cap": true,
+        "over_cap_note": "目标 ≤45k；子智能体 §8 自陈越限（4 卡正文 96231 B + context 全文一次读入）。tokens 记 null（get_goal 无计量句柄，禁估算）",
+        "key_note": "本键为补正：此前 card_gap 只有 batch3_predispatch（派单前置），缺回收态台账，现补齐与 batch1/batch2 同构的 batch3 条目"
       }
     },
     "cr002_merge": {
@@ -5474,7 +5607,7 @@
           "nickname": "Locke",
           "tier": "qwen3.8-flash",
           "result": "DONE",
-          "commit": "PENDING(本提交)",
+          "commit": "71f9644",
           "tokens_self_reported": null,
           "tokens_note": "子智能体 get_goal 返回 goal=null，无计量句柄；按纪律记 null，禁估算。但其§8 诚实偏差清单自陈「目标 ≤45k，实际越限」，故 over_cap=true",
           "over_cap": true,
@@ -5495,7 +5628,7 @@
           "nickname": "Pasteur",
           "tier": "qwen3.8-flash",
           "result": "PASS_WITH_TODO",
-          "commit": "PENDING(F lane 提交)",
+          "commit": "PENDING(提交B)",
           "tokens_self_reported": null,
           "tokens_note": "get_goal 返回 goal=null，无计量句柄；按纪律记 null，禁估算",
           "open_questions": 9,
@@ -6386,6 +6519,20 @@
       "issues_field": "MonthlyReview.issues[]，元素为 Issue={code,location,message,severity}",
       "missing_list_field": "Review.missing_requirements（Review 的既有必填字段）",
       "schema_evidence": "MonthlyReview 实测 13 个属性全 required 且 additionalProperties=false → 禁增删字段"
+    },
+    "port_guard_redefinition": {
+      "at": "2026-11-13T08:48:41+08:00",
+      "decided_by": "编排器（O lane）",
+      "trigger": "D-024：M0-03-design.md §11.3 G6 假绿（cwd 敏感 + 判据过宽）",
+      "ruling": "端口守卫自 §11.5 起重定义为两条，一律在仓库根执行：G6a = grep -rnE '^[[:space:]]*(port|target)[[:space:]]*:.*300[012]' web/*.config.*（期望 rc=1 无匹配）；G6b = grep -rn '300[012]' web/*.config.*（期望 rc=0 且恰好命中 1 条 = web/vite.config.ts:32 的 NOTE-01 留痕注释）",
+      "measured": {
+        "G6a_rc": 1,
+        "G6b_rc": 0,
+        "G6b_hits": 1,
+        "G6b_hit": "web/vite.config.ts:32"
+      },
+      "rejected_alternative": "改写/删除 vite.config.ts:32 的 3000/3001/3002 字面量以让原守卫达标 —— 否决：该行是宿主端口探测（3000/3001/3002 BUSY）的事实留痕，与 decisions.dev_proxy_target 交叉引用，删除即销毁证据；为凑守卫而改证据违反诚实清单原则",
+      "note": "NOTE-01 的纪律意图是「配置文件不得把 dev server / proxy 的端口值设为 3000/3001/3002」，而非「文件里不许出现这三个数字」；G6a 表达意图，G6b 保留字面量盘点并设白名单"
     }
   }
 }
