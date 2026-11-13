@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-13T12:31:47+08:00",
+  "updated_at": "2026-11-13T12:43:29+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -848,7 +848,7 @@
         "S4": "TODO",
         "S5": "TODO",
         "S3c": "DONE",
-        "S3d": "TODO"
+        "S3d": "DONE"
       },
       "s3_split_ruling": {
         "id": "R4-1",
@@ -1022,7 +1022,17 @@
         ],
         "s4_scope_narrowed_by_A84": "M0-02/S4（Round 8）产出收窄为 tests/api/**，不碰 api/app.py 与 api/jobs.py"
       },
-      "s3b_note": "S3b 于 2026-11-13T12:26:18+08:00 由 Lane A（Newton / qwen3.8-flash）交付并经编排器 9/9 独立复验通过；产出 api/session.py + api/workspaces.py（4 条 APIRoute：exchangeSession/getSession/listWorkspaces/createWorkspace）+ app.py 条件挂载 6 行 + tests/unit/test_s3b_routes.py（7 passed）。裁定 A94-A98 生效、立 D-030（MAJOR/CLOSED）。listWorkspaces 无 status 查询参数（CR-002/ADR-006 选项 B）。S4 收窄为 tests/api/**（A84），须以 declared_responses() 为权威（A95）、SameSite 大小写不敏感断言（A96）。"
+      "s3b_note": "S3b 于 2026-11-13T12:26:18+08:00 由 Lane A（Newton / qwen3.8-flash）交付并经编排器 9/9 独立复验通过；产出 api/session.py + api/workspaces.py（4 条 APIRoute：exchangeSession/getSession/listWorkspaces/createWorkspace）+ app.py 条件挂载 6 行 + tests/unit/test_s3b_routes.py（7 passed）。裁定 A94-A98 生效、立 D-030（MAJOR/CLOSED）。listWorkspaces 无 status 查询参数（CR-002/ADR-006 选项 B）。S4 收窄为 tests/api/**（A84），须以 declared_responses() 为权威（A95）、SameSite 大小写不敏感断言（A96）。",
+      "subtask_progress_evidence": {
+        "S1": "orchestrator/handoff/M0-02-design.md（117 行）",
+        "S2": "migrations/**（0001_initial_schema）+ evidence/M0/M0-02/migration-diff.md",
+        "S3a": "src/campaignlab/infra/db/paths.py 等公共冻结件（f457ec9）",
+        "S3b": "31908fa：api/session.py + api/workspaces.py + app.py 挂载 + tests/unit/test_s3b_routes.py",
+        "S3c": "f457ec9 feat(M0-02/S3c)：config/clock/domain/__main__/cli(含 doctor)/api{app,deps,health}",
+        "S3d": "46dca2b feat(M0-02/S3d)：application 服务与 repositories、api/deps.py 三端口实体化（14 文件）",
+        "S4": "TODO（Round 8 派 flash，写集收窄为 tests/api/**，依 A84/A95/A96）",
+        "S5": "TODO（证据：evidence/M0/M0-02/{ac.md,http/**} 尚缺，现有 commands.md/migration-diff.md/problem-code-registry.json）"
+      }
     },
     "M0-03": {
       "status": "IN_PROGRESS",
@@ -1092,13 +1102,13 @@
       "subtask_progress": {
         "S1": "DONE",
         "S2": "DONE",
-        "S3": "TODO",
-        "S4": "TODO",
-        "S5": "TODO",
-        "S6": "TODO",
-        "S7": "TODO",
-        "S8": "TODO",
-        "S9": "TODO",
+        "S3": "DONE",
+        "S4": "DONE",
+        "S5": "DONE",
+        "S6": "DONE",
+        "S7": "DONE",
+        "S8": "DONE",
+        "S9": "DONE",
         "S10": "TODO"
       },
       "design_doc": "orchestrator/handoff/M0-03-design.md",
@@ -1121,7 +1131,19 @@
         "web/tests/unit/shell/",
         "evidence/M0/ui/"
       ],
-      "scope_sync_note": "2026-11-13T06:55:00+08:00 按 A5「卡字面量为准」同步为 orchestrator/tasks/M0-03.md 第 19 行 scope_allow；原更窄列表保留于 scope_previous_narrower（历史值只加注不改写）。Archimedes 的 U-6 越界指控据此不成立。"
+      "scope_sync_note": "2026-11-13T06:55:00+08:00 按 A5「卡字面量为准」同步为 orchestrator/tasks/M0-03.md 第 19 行 scope_allow；原更窄列表保留于 scope_previous_narrower（历史值只加注不改写）。Archimedes 的 U-6 越界指控据此不成立。",
+      "subtask_progress_evidence": {
+        "S1": "f12dcf8 feat(web): M0-03/S1+S2（web/*.config.*、tsconfig、src/main.ts）",
+        "S2": "f12dcf8 + docs/design/token-mapping.md + orchestrator/handoff/M0-03-design.md",
+        "S3": "052a492（web/src/styles/tokens.css + 一致性守卫）+ evidence/M0/M0-03/S3-S4-commands.md",
+        "S4": "052a492（web/src/api/types.ts 由 OpenAPI 生成，diff 为空）+ 同一证据文件",
+        "S5": "9832fd1 feat(M0-03/S5) + evidence/M0/M0-03/S5-gate-transcript.txt",
+        "S6": "5d16d4d feat(M0-03/S6-S9)：web/src/pages/**（2 页）+ web/src/components/**（13 件）",
+        "S7": "5d16d4d：web/tests/**（11 文件）键盘基线参数化",
+        "S8": "5d16d4d：vitest 单测脚手架 + AC-001 断言 + 深链断言（framework/FRONTEND.md:12）",
+        "S9": "5d16d4d + evidence/M0/ui/{ui-01-desktop-1440x900.png,ui-01-laptop-1024x768.png,ui-01-visual-notes.md} + evidence/M0/M0-03/playwright-readiness.json",
+        "S10": "TODO：orchestrator/handoff/ 实测无 M0-03-public-components.md（ls 全量核对）；M0-03b 的 inputs 依赖该清单，故 S10 必须先于或与 M0-03b/S1 同轮交付"
+      }
     },
     "M0-03b": {
       "status": "TODO",
@@ -3975,6 +3997,91 @@
         "A96",
         "A98"
       ]
+    },
+    {
+      "id": "D-031",
+      "task": "编排器自身（卡片撰写口径）／M1-04／M2-04／M3-04／M4-03",
+      "severity": "MINOR",
+      "status": "CLOSED",
+      "title": "页面任务的卡内 AC 段落缺「本任务 primary」与「本页呈现的他人 primary（cross_ref）」分栏口径：26 个 UI 页中 5 页（UI-14/15/18/20/25）的 nav 组归属与 AC 交集不一致，非台账错误而是撰写口径缺失，会导致批次6（M3-P02/M5-P01）重犯 D-011 同型的 AC 归属抄错",
+      "found_by": "编排器本人（Round 8 predispatch 批次5 切片定标）",
+      "file": "orchestrator/defects/D-031.md",
+      "found_at": "2026-11-13T12:43:29+08:00",
+      "closed_at": "2026-11-13T12:43:29+08:00",
+      "blocking": false,
+      "blocking_note": "无代码与契约影响；批次5 派单文已内含裁定，T lane 直接照写",
+      "owner": "编排器（O lane）",
+      "responsibility": "编排器自身的卡片模板口径缺项（非任何 lane 失职）",
+      "measured": {
+        "conflicting_pages": [
+          "UI-14",
+          "UI-15",
+          "UI-18",
+          "UI-20",
+          "UI-25"
+        ],
+        "total_ui_pages": 26,
+        "primary_owner_self_consistent": true,
+        "waves_coverage": "29/29 全覆盖、无重复、无孤儿",
+        "root_cause": "tasks[*].acs 只登记主责或强相关 AC，而一个页面常同时呈现多条他人 primary 的 AC"
+      },
+      "fix_detail": "A107：页面归属以 nav 组 <-> scope 目录一致性为准，AC 交集只作 cross_ref 登记依据；5 处逐一裁定 A102-A106；批次5 三张卡的 AC 段落必须两栏撰写",
+      "fix_scope": [
+        "orchestrator/state.json"
+      ],
+      "followup": "FU-18（M4-03 卡追加 UI-25 注记，append-only，Round 9 flash 小片）",
+      "related_adjudications": [
+        "A102",
+        "A103",
+        "A104",
+        "A105",
+        "A106",
+        "A107"
+      ]
+    },
+    {
+      "id": "D-032",
+      "task": "编排器自身（台账新鲜度）／M0-02／M0-03",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "title": "台账失真：tasks[*].subtask_progress 与 tasks[*].gates[*].rc 未随提交回填 —— M0-02.S3d 已交付（46dca2b）仍记 TODO、M0-03.S3-S9 已交付（052a492/9832fd1/5d16d4d + evidence 齐备）仍记 TODO；129 条 gates 仅 22 条有 rc、56 处 AC 引用 0 条有 rc，导致进度百分比不可信且存在重复派发已完成子任务的风险",
+      "found_by": "编排器本人（回答项目负责人进度询问时，发现按 subtask_progress 算出 7/18 与按提交与产物实测 16/30 严重不符）",
+      "file": "orchestrator/defects/D-032.md",
+      "found_at": "2026-11-13T12:43:29+08:00",
+      "closed_at": "2026-11-13T12:43:29+08:00",
+      "blocking": false,
+      "blocking_note": "无代码影响；本提交内已回填 subtask_progress 并固化 A109 口径，机器守护转 FU-19",
+      "owner": "编排器（O lane）",
+      "responsibility": "编排器自身（提交纪律只钉了 counts 与缺陷单，未钉 subtask_progress / gates.rc）",
+      "measured": {
+        "subtask_progress_understated": 7,
+        "m0_02": "台账 5/8 -> 实测 6/8（S3d 已交付于 46dca2b）",
+        "m0_03": "台账 2/10 -> 实测 9/10（S3-S9 已交付，S10 确认未做：handoff 无 M0-03-public-components.md）",
+        "gates_total": 129,
+        "gates_with_rc": 22,
+        "ac_references": 56,
+        "ac_with_rc": 0,
+        "acceptance_denominator": 47,
+        "evidence_files_on_disk": 57,
+        "evidence_dirs": [
+          "evidence/M0/M0-01",
+          "evidence/M0/M0-02",
+          "evidence/M0/M0-03",
+          "evidence/M0/Q-VERIFY-M0-01",
+          "evidence/M0/summaries",
+          "evidence/M0/ui",
+          "evidence/monthly/M0-P01"
+        ]
+      },
+      "fix_detail": "① 回填 subtask_progress（M0-02.S3d=DONE；M0-03.S3-S9=DONE；S10 保持 TODO），每项附提交哈希或产物路径；② A109 固化 AC 取证回填口径（由拥有证据的子任务在交付时回填，未取证者写 evidence_status=NOT_YET_COLLECTED + deferred_to，禁裸 null）；③ FU-19 立机器守护 test_ledger_freshness.py",
+      "fix_scope": [
+        "orchestrator/state.json"
+      ],
+      "followup": "FU-19（新增 tests/unit/test_ledger_freshness.py：subtask_progress<->git log 对账、AC gate 禁裸 null、evidence 文件禁孤儿）",
+      "related_adjudications": [
+        "A101",
+        "A109"
+      ]
     }
   ],
   "change_requests": [
@@ -4487,7 +4594,7 @@
       "counts": {
         "pytest_passed": 213,
         "mypy_source_files": 49,
-        "ruff_formatted_files": 156,
+        "ruff_formatted_files": 158,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -4496,9 +4603,9 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 156,
+          "total": 158,
           "in_scope_py": 57,
-          "in_scope_md": 99,
+          "in_scope_md": 101,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
@@ -4506,7 +4613,7 @@
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
           "measured_after": "2026-11-13T11:34:54+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
-          "identity": "索引/在域 py+md 156 = py 57 + md 99；本次 +3 py = migration_head.py + test_migration_head_single_source.py + test_counts_freshness.py；md 不变（D-028.md 为 append-only 修改，已在册）",
+          "identity": "索引/在域 py+md 158 = py 57 + md 101；本次 +2 md = orchestrator/defects/D-031.md + D-032.md；三份 .slice.json 为 JSON，不在 ruff format 作用域（只纳管 .py 与 .md），故不计入分母",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
           "untracked_component": [
             "+1 md（orchestrator/handoff/M0-04-design.md，S lane Heisenberg / M0-04-S1 设计）",
@@ -4515,7 +4622,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "在飞中间态，非提交后终态。手册 15.10 双口径已互验（tracked md 两种数法均 70）。本提交只入库 docs/delivery/LONG-HORIZON-ORCHESTRATION.md（modified）与 orchestrator/state.json，**不夹带任何 lane 在飞产物**。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 153,
+          "prev_total": 156,
           "untracked_component_sum_check": "0 py + 3 md = 3，与 untracked_in_scope 实测 3 相等",
           "untracked_not_ignored_in_scope": 2,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -4740,8 +4847,8 @@
         "spec_dirty": 0,
         "note": "本字段自身写入后再次复跑 G7/G8/G10 与守护测试，结果见 commit 时的实测输出（本字段不递归记录自身写入后的复跑，避免无穷自指）。"
       },
-      "counts_refreshed_at": "2026-11-13T12:31:47+08:00",
-      "counts_refresh_reason": "Round 7 Lane C（FU-8+FU-14）入库后重采样：ruff_formatted_files 153->156（py 54->57 = migration_head.py + 两个守护；md 99 不变，D-028.md 为 append-only 修改）。采样点依 A101/rule_counts_same_commit：6 路径已 git add（索引 == 待提交树）、台账写入之后、commit 之前。契约面零变化（443309B / sha16 592571099d638251 / 80 operationId / 13 节点 / AC 47）；pytest/mypy 全表值待 Volta 回收后补测",
+      "counts_refreshed_at": "2026-11-13T12:43:29+08:00",
+      "counts_refresh_reason": "Round 8 predispatch 落盘后重采样：ruff_formatted_files 156->158（md 99->101 = D-031.md + D-032.md；py 57 不变）。三份批次5 切片为 .json，不入 ruff format 分母。采样点依 A101/rule_counts_same_commit（5 路径已 git add、台账写入之后、commit 之前）。pytest_passed 213 / mypy 49 仍未刷新：Volta（M0-04/S2）在飞，全表门禁缓跑；本提交只跑守护与路径限定门禁",
       "round6_s3d": {
         "at": "2026-11-13T10:49:12+08:00",
         "commit_scope": "M0-02/S3d（12 文件）",
@@ -7339,6 +7446,20 @@
         "item": "api 私有助手提升：session.py 的 JSON_MEDIA_TYPE / PROBLEM_STATUSES / declared_responses / validation_issues / parse_json_body / render_session_cookie 现被 workspaces.py import 复用（合规）。**若第三个 api 模块需要其中任一助手，必须提升到 api/common.py（append-only 豁免），禁第三份复制**。归 Round 8+ 独立 flash 小片（<=8k），触发点为 M0-04/S4 的 api/jobs.py",
         "owner": "编排器（Round 8+ 派单）",
         "source": "A98 / D-030"
+      },
+      {
+        "id": "FU-18",
+        "at": "2026-11-13T12:43:29+08:00",
+        "item": "M4-03 卡追加 UI-25（/w/:workspace_id/jobs）注记：按 A105 判归 M4-03，卡内登记 AC-029/AC-031 为页面侧 cross_ref（primary 分别 M0-04 / M5-01），append-only 不改写原文。归 Round 9 flash 小片（<=8k）",
+        "owner": "编排器（Round 9 派单）",
+        "source": "A105 / D-031"
+      },
+      {
+        "id": "FU-19",
+        "at": "2026-11-13T12:43:29+08:00",
+        "item": "新增守护 tests/unit/test_ledger_freshness.py：① 每个 subtask_progress==DONE 的子任务必须能在 git log 找到对应提交或在 state 里有 commit/evidence 字段；② 每条 AC-* gate 要么 rc!=null 且 evidence 非空，要么带 evidence_status=NOT_YET_COLLECTED + deferred_to（禁裸 null）；③ evidence/** 下已入库文件必须被至少一条 gate 或 subtask_progress_evidence 引用（防证据孤儿）。归 Round 8/9 独立 flash 小片（<=10k）",
+        "owner": "编排器（Round 8/9 派单）",
+        "source": "D-032 / A109"
       }
     ],
     "commit_backfill_round6": {
@@ -8043,6 +8164,78 @@
         "question": "counts 的采样时点如何固化，才能杜绝 R6-3 那类「门禁与采样早于台账/缺陷单落盘 -> 权威分母偏小 -> 下一条 lane 撞假 RED」？",
         "ruling": "**固化：counts 必须与新增文件在同一次提交内刷新**——采样点为「工作树 == 待提交树（新增文件已 git add）、台账写入之后、commit 之前」。否则 test_counts_freshness 会在**下一次**提交后判红。这是 rule_counts_sampling_point（R6-3）的推论，写入 gate_measurement_caliber.rule_counts_same_commit；派单文引用计数时一律指向 counts 现值、禁写死（D-012/D-014）。",
         "action_taken": "gate_measurement_caliber 新增 rule_counts_same_commit；本轮两次提交（Lane A / Lane C）均按此采样"
+      },
+      {
+        "id": "A102",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "Round 8 predispatch / D-031 歧义①（UI-20）",
+        "question": "UI-20 `/w/:workspace_id/estimate`（nav 组「仿真与验收」）：nav 指向 M2-04（pages/cases/），但 AC-024 的 cross_ref 点名 M3-04，且 M3-04.scope 只有 web/src/pages/review/。代码归属判给谁？",
+        "ruling": "**判归 M2-04**（页面目录 `web/src/pages/cases/estimate/`）。理由：nav 组 <-> scope 目录一致性是既有权威映射（nav_to_scope_dir：「仿真与验收」-> M2-04 pages/cases/），且判给 M3-04 需扩其 scope（D-008 同型缺项）。**AC-024 的归属不变**（primary 仍 M3-04）：M2-04 卡内登记 AC-024 为「本页呈现的他人 primary AC（cross_ref）」并注明「页面渲染证据由 M2-04 提供、AC-024 取证归属 M3-04」；M3-04 卡内同样登记并点名 M2-04。与 UI-14/UI-15 同规则处理，保持可复现性。",
+        "action_taken": "批次5 派单文写入；无需改 state.json 的 scope"
+      },
+      {
+        "id": "A103",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "Round 8 predispatch / D-031 歧义②（UI-18）",
+        "question": "UI-18 `/w/:workspace_id/diagnosis`（nav「策略复盘」）：AC-021/022/027 无一在 M3-04.acs（AC-027 primary=M4-02）。归属？",
+        "ruling": "**判归 M3-04**（nav 组与 scope 目录 `web/src/pages/review/` 一致，且无其他页面任务的 scope 覆盖 /diagnosis）。卡内登记 AC-021/AC-022/AC-027 为页面侧 cross_ref（primary 分别 M3-02/M3-02/M4-02），并注明页面证据由 M3-04 提供。",
+        "action_taken": "批次5 派单文写入"
+      },
+      {
+        "id": "A104",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "Round 8 predispatch / D-031 歧义③④（UI-14 / UI-15）",
+        "question": "UI-14 `/runs` 与 UI-15 `/runs/:run_id`（nav「仿真与验收」）：AC-013/029 与 AC-014/015/016/030 均不在 M2-04.acs。归属？",
+        "ruling": "**两页均判归 M2-04**（pages/cases/，nav 与 scope 一致）。卡内登记全部 6 条 AC 为页面侧 cross_ref（AC-029 primary=M0-04、AC-016 primary=M2-03、AC-030 属 M4-03、AC-013 primary=M2-02、AC-014/AC-015 primary=M2-02），并注明页面证据由 M2-04 提供。",
+        "action_taken": "批次5 派单文写入"
+      },
+      {
+        "id": "A105",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "Round 8 predispatch / D-031 歧义⑤（UI-25）",
+        "question": "UI-25 `/w/:workspace_id/jobs`（nav「作业与证据」）：AC-029/031 不在 M4-03.acs（其 acs 为 AC-025/028/030）。归属？",
+        "ruling": "**判归 M4-03**（scope 含 web/src/pages/evidence/，且无其他任务覆盖 /jobs）。M4-03 卡已在磁盘 -> 按「历史值只加注不改写」追加 UI-25 注记 + AC-029/AC-031 的 cross_ref 登记，转 **FU-18**（Round 9 flash 小片，append-only）。",
+        "action_taken": "FU-18 入库"
+      },
+      {
+        "id": "A106",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "Round 8 predispatch / UI-01",
+        "question": "UI-01 `/`（nav「入口」）列在歧义表内，是否需要动作？",
+        "ruling": "**无需动作**：已由 M0-03（S6-S9）交付并完成取证（evidence/M0/ui/ui-01-desktop-1440x900.png、ui-01-laptop-1024x768.png、ui-01-visual-notes.md）；列出仅为完整性。其 AC-001/AC-034 的 rc 回填按 A109 归 M0-02/S5 与 wave 出口 Q lane。",
+        "action_taken": "无"
+      },
+      {
+        "id": "A107",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "D-031 系统性口径",
+        "question": "页面任务的卡内 AC 段落应如何撰写，才能同时满足 D-011（AC 编号与措辞只引原文）与 acceptance.primary_owner.basis（页面呈现面一律记 cross_ref）？",
+        "ruling": "**两栏强制**：① 栏一「本任务 primary 的 AC」——只列 tasks[id].acs 中 primary == 本任务者，逐条引 ACCEPTANCE.md 原文行号；② 栏二「本页面呈现的他人 primary AC（cross_ref）」——列页面 AC 交集中 primary 属他人者，每条写明 primary 归属任务 + 「页面渲染证据由本任务提供、AC 取证归属 primary 任务」。禁把 cross_ref 抄成 primary（A28/FU-3/D-011 同型教训）。批次5 三张卡与批次6（M3-P02/M5-P01）一律照此。",
+        "action_taken": "写入批次5 派单文；D-031 CLOSED"
+      },
+      {
+        "id": "A108",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "M2-04 切片定标偏差",
+        "question": "批次5 计划里 M2-04 的 slice_cmd 为 `--depth 5`，实跑 rc=2 且 truncated_schemas=['CallbackEvent','CouponEvent']（工具依 D-020 拒写，禁静默截断）。M1-04 与 M3-04 在 depth=5 正常。如何处置？",
+        "ruling": "**M2-04 单独提到 `--depth 6`**：实跑 rc=0、227468 B、sha16 `ba5d30f35fe4b96c`、operations 26、acceptance_rows 4、truncated_schemas=[]、missing=[]。M1-04（166768 B / `065c6bac23b63991` / 18 op / 3 AC 行）与 M3-04（168868 B / `f8bf56f979c273ec` / 15 op / 3 AC 行）维持 depth=5。三份切片的 source.openapi 均为 443309 B / sha16 `592571099d638251`（与 counts.live_openapi_sha16 三方一致）。计划里的 depth=5 按「历史值只加注不改写」保留，本条即注记。",
+        "action_taken": "三份切片已生成并入库（本提交）"
+      },
+      {
+        "id": "A109",
+        "round": 8,
+        "at": "2026-11-13T12:43:29+08:00",
+        "source": "D-032 台账新鲜度",
+        "question": "AC 的 gates[*].rc 与 subtask_progress 由谁、在什么时点回填？",
+        "ruling": "**① subtask_progress**：编排器在**该子任务的交付提交内**回填（与 counts 同一提交，A101 同型），值必须附提交哈希或产物路径。**② AC 的 rc/evidence**：由**拥有该证据的子任务**在交付时回填（M0-02/S5、M0-04/S8 这类证据采集子任务，以及各页面任务的取证子任务）；wave 出口由 Q lane 复核汇总。**③ 禁裸 null**：未取证者必须写 `evidence_status: NOT_YET_COLLECTED` + `deferred_to: <任务/子任务>`，使 47 条 AC 的收敛可度量。**④ 机器守护转 FU-19**。",
+        "action_taken": "本提交回填 M0-02.S3d 与 M0-03.S3-S9；FU-19 入库"
       }
     ],
     "round7_predispatch": {
@@ -8538,7 +8731,50 @@
         "plan_correction_note": "R7-1：Lane C 原计划为 D-016 批次5，改派 FU-8+FU-14；批次5 顺延至 Round 8 predispatch（素材已在 d3f7671 备好）"
       }
     ],
-    "in_flight_agents_note_round7": "Round 7 三 lane：A(Newton/M0-02-S3b,flash) 已回收并于本提交入库；C(Franklin/FU-8+FU-14,flash) 已回收已复验，待下一次提交；B(Volta/M0-04-S2,max high) 仍在飞（工作树实测 infra/db/repositories.py +429、application/worker.py +18/-1 为其中间态，src/campaignlab/worker/ 尚未落盘）。在飞期间全表门禁缓跑，只做路径限定门禁 + 守护；三 lane 全提交后由编排器独占补跑全表并回填 self_check_gates_rc0。"
+    "in_flight_agents_note_round7": "Round 7 三 lane：A(Newton/M0-02-S3b,flash) 已回收并于本提交入库；C(Franklin/FU-8+FU-14,flash) 已回收已复验，待下一次提交；B(Volta/M0-04-S2,max high) 仍在飞（工作树实测 infra/db/repositories.py +429、application/worker.py +18/-1 为其中间态，src/campaignlab/worker/ 尚未落盘）。在飞期间全表门禁缓跑，只做路径限定门禁 + 守护；三 lane 全提交后由编排器独占补跑全表并回填 self_check_gates_rc0。",
+    "ledger_backfill_R8": {
+      "at": "2026-11-13T12:43:29+08:00",
+      "defect": "D-032",
+      "method": "逐子任务以 git log 提交主题 + evidence/ 与 handoff/ 产物存在性双向核对，禁凭记忆；S10 经 ls orchestrator/handoff/ 全量核对确认未做",
+      "changed": {
+        "M0-02.S3d": "TODO->DONE",
+        "M0-03.S3": "TODO->DONE",
+        "M0-03.S4": "TODO->DONE",
+        "M0-03.S5": "TODO->DONE",
+        "M0-03.S6": "TODO->DONE",
+        "M0-03.S7": "TODO->DONE",
+        "M0-03.S8": "TODO->DONE",
+        "M0-03.S9": "TODO->DONE"
+      },
+      "subtask_truth": {
+        "M0-02": "6/8",
+        "M0-03": "9/10",
+        "M0-04": "1/8（S1 DONE 于 0adf66e；S2 在飞 Volta）",
+        "M0-03b": "0/4"
+      },
+      "ac_backlog": {
+        "gates_total": 129,
+        "gates_with_rc": 22,
+        "ac_references": 56,
+        "ac_with_rc": 0,
+        "acceptance_denominator": 47,
+        "evidence_files_on_disk": 57
+      },
+      "policy": "A109",
+      "guard": "FU-19"
+    },
+    "round8_predispatch": {
+      "at": "2026-11-13T12:43:29+08:00",
+      "commit": "PENDING(本提交)",
+      "items": [
+        "① 批次5 三份切片生成并校验：M1-04（166768B/sha16 065c6bac23b63991/18 op/3 AC 行/depth 5）、M2-04（227468B/ba5d30f35fe4b96c/26 op/4 AC 行/**depth 6**，依 A108）、M3-04（168868B/f8bf56f979c273ec/15 op/3 AC 行/depth 5）；三份 truncated_schemas 均为 []、missing 均为 []、source.openapi 均 443309B/592571099d638251（与 counts 三方一致）",
+        "② 5 处页面歧义终裁 A102-A106 + 系统性口径 A107（两栏 AC 段落）+ 立 D-031（MINOR/CLOSED）",
+        "③ 台账失真 D-032（MAJOR/CLOSED）：回填 M0-02.S3d 与 M0-03.S3-S9（共 8 处），固化 A109 取证回填口径，立 FU-19 守护、FU-18（M4-03 卡 UI-25 注记）",
+        "④ 计划派 3 lane（与在飞 Volta 写集互斥）：T lane（flash）批次5 三张卡 + KNOWN_MISSING 6->3 ∥ S lane（flash）M0-02/S4（tests/api/**）∥ F lane（max）M0-03/S10 + M0-03b/S1（公共件清单与冻结边界，M0-03b 的 inputs 前置）"
+      ],
+      "in_flight": "Volta（M0-04/S2，qwen3.8-max high）；其写集 src/campaignlab/worker/**、infra/db/repositories.py、application/worker.py、tests/unit/test_worker_runner.py、tests/unit/test_job_repository_terminal.py、handoff/M0-04-design.md 与本轮三 lane 写集实测无交集",
+      "full_table_gates": "仍缓跑（Volta 在飞的假 RED 窗口）；本提交只跑路径限定门禁 + 守护，提交信息明写未跑与原因（rule_precommit_full_table）"
+    }
   },
   "acceptance": {
     "baseline_total": 35,
