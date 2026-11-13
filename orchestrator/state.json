@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 1,
-  "updated_at": "2026-11-14T00:58:54+08:00",
+  "updated_at": "2026-11-14T01:06:20+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1722,7 +1722,7 @@
       "branch": "m0-framework",
       "gates": [
         {
-          "id": "AC-005 至 AC-011 页面侧",
+          "id": "AC-005、AC-006、AC-007、AC-008、AC-009、AC-010、AC-011、AC-018、AC-020、AC-026、AC-029 页面侧（11 条枚举式，与切片 acceptance_rows 逐一对应；A126 gate 面口径 / A142·FU-23 枚举化，取代原范围式字面「AC-005 至 AC-011 页面侧」）",
           "rc": null,
           "evidence": ""
         },
@@ -1776,7 +1776,8 @@
           "evidence/M1/summaries/M1-04.md"
         ],
         "note": "依 A5「卡字面量为准」+ A128（U-2 终裁）把卡 scope_allow 的 D-008 补齐项同步进 state；原值保留、只追加，不改写（A19）"
-      }
+      },
+      "gate_literal_note_A142": "依 A142（FU-23 收口）：gates[0].id 由**范围式**改为**枚举式**，逐项对应本卡切片 `acceptance_rows`（11 条）。范围式的「至」字面会隐含未落切片的号，正是本卡 card-local U 项的成因（A126 已就 M2-04 裁过同型）。口径不变项：① gate 面 = **页面呈现的全量 AC**（cross_ref 语义），`acs` 仍为「主责或强相关」不扩（A126），acceptance.primary_owner 分母 47 未变动；② 原范围式字面按「历史值不改写、只加注」纪律（A19）保留于本条与卡尾追注。"
     },
     "M2-01": {
       "status": "TODO",
@@ -2236,7 +2237,7 @@
       "branch": "m0-framework",
       "gates": [
         {
-          "id": "AC-018 至 AC-024、AC-033 页面侧",
+          "id": "AC-008、AC-018、AC-019、AC-020、AC-021、AC-022、AC-023、AC-024、AC-025、AC-027、AC-033 页面侧（11 条枚举式，与切片 acceptance_rows 逐一对应；A126 gate 面口径 / A142·FU-23 枚举化，取代原范围式字面「AC-018 至 AC-024、AC-033 页面侧」）",
           "rc": null,
           "evidence": ""
         },
@@ -2289,7 +2290,8 @@
         "web/src/pages/review/monthly/",
         "web/src/features/monthly/"
       ],
-      "scope_deny_note_A130": "依 A130（U-5 终裁）：scope_allow `web/src/pages/review/` 与 M3-P02 写权面字面重叠，**deny 优先**。台账侧显式登记（禁只写卡内，否则视为未生效）。M3-P02 写权 = web/src/pages/review/monthly/ 与 web/src/features/monthly/（waves[7].L4）。"
+      "scope_deny_note_A130": "依 A130（U-5 终裁）：scope_allow `web/src/pages/review/` 与 M3-P02 写权面字面重叠，**deny 优先**。台账侧显式登记（禁只写卡内，否则视为未生效）。M3-P02 写权 = web/src/pages/review/monthly/ 与 web/src/features/monthly/（waves[7].L4）。",
+      "gate_literal_note_A142": "依 A142（FU-23 收口）：gates[0].id 由**范围式**改为**枚举式**，逐项对应本卡切片 `acceptance_rows`（11 条）。范围式的「至」字面会隐含未落切片的号，正是本卡 card-local U 项的成因（A126 已就 M2-04 裁过同型）。口径不变项：① gate 面 = **页面呈现的全量 AC**（cross_ref 语义），`acs` 仍为「主责或强相关」不扩（A126），acceptance.primary_owner 分母 47 未变动；② 原范围式字面按「历史值不改写、只加注」纪律（A19）保留于本条与卡尾追注。"
     },
     "M4-01": {
       "status": "TODO",
@@ -2437,7 +2439,7 @@
       "branch": "m0-framework",
       "gates": [
         {
-          "id": "AC-025 至 AC-028、AC-030 页面侧",
+          "id": "AC-017、AC-025、AC-026、AC-027、AC-028、AC-030、AC-031、AC-034 页面侧（8 条枚举式，与切片 acceptance_rows 逐一对应；A126 gate 面口径 / A142·FU-23 枚举化，取代原范围式字面「AC-025 至 AC-028、AC-030 页面侧」）",
           "rc": null,
           "evidence": ""
         },
@@ -2500,7 +2502,8 @@
       "scope_deny": [
         "web/src/pages/report/monthly/"
       ],
-      "scope_deny_note_A141": "依 A141（FU-24 终裁）+ A130 deny 优先规则：本卡 scope_allow `web/src/pages/report/` 字面包含 M4-P01 的写权面 `web/src/pages/report/monthly/` -> 显式登记排除。wave7（本卡）先于 wave8（M4-P01），无并发冲突，但登记后写权无歧义。月报页面（UI-21/22/24/26）的 DTO 消费面由本卡切片承载（22 op 已全覆盖 M4-P01 的 20 个页面引用 op，差集 0）。"
+      "scope_deny_note_A141": "依 A141（FU-24 终裁）+ A130 deny 优先规则：本卡 scope_allow `web/src/pages/report/` 字面包含 M4-P01 的写权面 `web/src/pages/report/monthly/` -> 显式登记排除。wave7（本卡）先于 wave8（M4-P01），无并发冲突，但登记后写权无歧义。月报页面（UI-21/22/24/26）的 DTO 消费面由本卡切片承载（22 op 已全覆盖 M4-P01 的 20 个页面引用 op，差集 0）。",
+      "gate_literal_note_A142": "依 A142（FU-23 收口）：gates[0].id 由**范围式**改为**枚举式**，逐项对应本卡切片 `acceptance_rows`（8 条）。范围式的「至」字面会隐含未落切片的号，正是本卡 card-local U 项的成因（A126 已就 M2-04 裁过同型）。口径不变项：① gate 面 = **页面呈现的全量 AC**（cross_ref 语义），`acs` 仍为「主责或强相关」不扩（A126），acceptance.primary_owner 分母 47 未变动；② 原范围式字面按「历史值不改写、只加注」纪律（A19）保留于本条与卡尾追注。 与本卡既有 `gate_literal_ruling_A28` 的关系：A28 的**实质裁定不变**（本卡对 AC-026／AC-027 不承担 primary 取证义务，只对 acs 登记的 AC-025／AC-028／AC-030 承担 cross_ref），本次只取代其「gates 历史值不改写」的处置方式 —— 因 D-036 重切后切片 acceptance_rows 已由 3 条变 8 条，范围式字面与新切片不再对应，枚举化是 A126 的必然推论。"
     },
     "M5-01": {
       "status": "TODO",
@@ -8394,12 +8397,15 @@
       {
         "id": "FU-23",
         "at": "2026-11-14T00:29:01+08:00",
-        "status": "PENDING",
+        "status": "DONE",
         "item": "M1-04／M3-04／M4-03 三卡 `tasks[*].gates[0].id` 的范围式字面（「AC-005 至 AC-011 页面侧」／「AC-018 至 AC-024、AC-033 页面侧」／「AC-025 至 AC-028、AC-030 页面侧」）按 A126 改为**枚举式**并与各自切片 `acceptance_rows`（11／11／8 条）逐一对应；同时同步卡内「逐字承接、禁改写」的 gate 原文引用（M4-03.md:22 型）与 card-local U 项（M1-04 U-3／M3-04 U-4／M4-03 U-4）的收口注记。",
         "owner": "编排器",
         "source": "D-036 / A126 / A127",
         "trigger": "**各卡派单前**（不得晚于 wave4 / wave6 / wave7 的对应派单动作）；三卡均 status=TODO，当前无在飞 lane，故不构成即时阻塞",
-        "why_deferred": "gate 字面被卡内逐字引用，改台账必须同批改卡文，属两文件耦合改动；本提交焦点是切片自洽性修复，避免一次提交混两类口径变更。"
+        "why_deferred": "gate 字面被卡内逐字引用，改台账必须同批改卡文，属两文件耦合改动；本提交焦点是切片自洽性修复，避免一次提交混两类口径变更。",
+        "ruling_id": "A142",
+        "closed_at": "2026-11-14T01:06:20+08:00",
+        "resolution": "三卡 gates[0].id 已改枚举式（11／11／8 条，与各自切片 acceptance_rows 逐一对应）；台账与卡文同批改毕（head 行定位替换、行数不变；tail 各 append-only 追注 1 条，U 项原文按 A19 一字未改）；card-local U 项 M1-04 U-3／M3-04 U-4／M4-03 U-4 一并收口，其「补号进 acs」与「gate 字面须收窄」的附带建议依 A126 均不采。"
       },
       {
         "id": "FU-24",
@@ -9593,6 +9599,23 @@
           "waves[7].L1 = [M4-02, M4-03]、waves[8] = [M4-P01, M5-01] serial -> M4-03 先于 M4-P01，无并发写冲突，但 scope 字面包含仍需 deny 登记以杜绝 M4-03 越界写 monthly/"
         ],
         "action_taken": "M4-P01 切片不动（sha16 73a9bcf1c483adbd 保持）；tasks[M4-03].scope_deny 追加 `web/src/pages/report/monthly/`（A130 规则）；M4-P01 派单文（wave8）须逐字引用 A141 说明「页面消费面 DTO 由 M4-03 切片承载、本卡禁扩 operations」。FU-24 -> ADJUDICATED。"
+      },
+      {
+        "id": "A142",
+        "round": 9,
+        "at": "2026-11-14T01:06:20+08:00",
+        "source": "编排器（Round 9：FU-23 收口 —— lane F 三卡 gate 字面枚举化）",
+        "question": "FU-23（D-036／A126／A127 遗留）：M1-04／M3-04／M4-03 三卡 `tasks[*].gates[0].id` 仍是范围式字面（「AC-005 至 AC-011 页面侧」／「AC-018 至 AC-024、AC-033 页面侧」／「AC-025 至 AC-028、AC-030 页面侧」），而 D-036 重切后各卡切片 `acceptance_rows` 已变为 11／11／8 条。是否在派单前改为枚举式？卡内存在「逐字承接、禁改写」的 gate 原文引用（M4-03.md:22 型），改台账必须同批改卡文。",
+        "ruling": "**在各卡派单前改为枚举式，并与切片 `acceptance_rows` 逐一对应**（A126 已就 M2-04 裁过同型，本条为其余三卡收口）。范围式的「至」字面会**隐含未落切片的号**，正是 M1-04 U-3／M3-04 U-4／M4-03 U-4 三项 card-local U 的共同成因；枚举化后 lane 无需再猜「字面范围到底覆盖哪些号」，且 gate 可被机械核验（与切片逐条对表）。口径不变项：① gate 面 = 页面呈现的全量 AC（cross_ref 语义），`acs` 保持「主责或强相关」**不扩**（A126），`acceptance.primary_owner` 分母 47 条不变；② 三卡 card-local U 项里「把缺号补进 acs」的附带建议**一律不采**（扩 acs 会污染 primary_owner 分母）；③ M4-03 U-4 的「否则该 gate 字面须收窄」亦不采（收窄会丢掉 UI-22／UI-23／UI-24 的真实呈现面）；④ 原范围式字面按「历史值不改写、只加注」（A19）保留在台账 note、卡 head 括注与卡尾追注里，**卡 tail 的 U 项原文一字未改**。M4-03 既有 `gate_literal_ruling_A28` 的**实质裁定继续有效**（对 AC-026／AC-027 不承担 primary 取证义务），仅其「gates 历史值不改写」的处置方式被本条取代。",
+        "evidence": [
+          "切片 acceptance_rows 机械实抽（可复跑）：M1-04 = 11 条（AC-005..AC-011 + AC-018/020/026/029）；M3-04 = 11 条（AC-008 + AC-018..AC-025 + AC-027/033）；M4-03 = 8 条（AC-017 + AC-025..AC-028 + AC-030/031/034）",
+          "三卡卡文自证吻合：M1-04.md:19「栏二（本页面呈现的他人 primary AC，共 **11 条**）」、M1-04.md:76 U-3「本卡按『栏二全列 **11 条**』撰写以覆盖字面范围」、M3-04.md:76 U-4 同型 -> 与重切后 11 条逐条吻合（A127 已引此旁证）",
+          "逐字引用锚点实测（行定位）：M1-04.md:25、M3-04.md:26、M4-03.md:22 三处均以反引号逐字承接 state.json 的 gate 原文（M4-03.md:22 更明写「逐字承接、**禁改写**」）-> 台账与卡文必须同批改，否则 lane 会读到两个不同的 gate 字面",
+          "**锚点唯一性实测**：M4-03 卡内该字面出现 **2 次**（head:22 逐字承接 + tail:75 的 U-4 历史原文），故本条采**行定位替换**而非全文替换，确保只改 head、tail 历史原文零改动（A19）；M1-04／M3-04 的 tail U 项用「」引号而非反引号，全文替换本已唯一，但仍统一走行定位以杜绝误伤",
+          "M2-04 先例实测：tasks[M2-04].gates[0].id 已是 15 条枚举式（A126 落地）-> 本条使四张 lane F 页面卡口径统一",
+          "卡文行数守护：三卡 head 行内替换（行数不变），tail 各 +1 行追注；实测 total 79／79／82 行，均在 test_task_card_narrative 的 head 60／tail 40／total 200 上限内"
+        ],
+        "action_taken": "tasks[M1-04/M3-04/M4-03].gates[0].id 改为 11／11／8 条枚举式；三卡各加 `gate_literal_note_A142`（M4-03 另含与 A28 的关系说明）；三卡 head 逐字引用同步行内替换（行数不变）；三卡 tail 各 append-only 追注 1 条收口说明，一并收口 M1-04 U-3＋U-4（引 A131）、M3-04 U-3（引 A129 采 (a)）＋U-4、M4-03 U-4。FU-23 -> DONE。"
       }
     ],
     "round7_predispatch": {
@@ -10953,6 +10976,28 @@
           "D-036",
           "FU-24",
           "R9-3"
+        ]
+      },
+      {
+        "at": "2026-11-14T01:06:20+08:00",
+        "item": "Round 9 批次B：FU-23 收口（A142）—— lane F 三卡 gate 字面枚举化，台账与卡文同批改",
+        "detail": [
+          "tasks[M1-04].gates[0].id：范围式 -> 11 条枚举式；tasks[M3-04]：-> 11 条；tasks[M4-03]：-> 8 条（逐项对应各自切片 acceptance_rows）",
+          "三卡各加 gate_literal_note_A142；M4-03 既有 gate_literal_ruling_A28 原文不改写，由新键说明「实质裁定有效、处置方式被取代」",
+          "卡文 head 行定位替换：M1-04.md:25、M3-04.md:26、M4-03.md:22（行数不变）；M4-03.md:22 另把「请见 U-4」改为「已由 A142／A126 收口」",
+          "卡文 tail append-only 各 +1 行收口追注；tail 的 U 项历史原文一字未改（A19）",
+          "自我更正：首版用全文替换，M4-03 因该字面在 head:22 与 tail:75 各出现一次被唯一性断言拦下（未产生任何半写，工作树当时干净）-> 改行定位替换后重跑"
+        ],
+        "accounting": "**不计入 budget.subtask_log**（依 accounting_rule_orch_self_served）",
+        "related": [
+          "A142",
+          "A126",
+          "A127",
+          "A129",
+          "A131",
+          "A19",
+          "D-036",
+          "FU-23"
         ]
       }
     ],
