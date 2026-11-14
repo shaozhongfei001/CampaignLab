@@ -1,0 +1,146 @@
+# R15 · M2-01/S2a 编排器自办入库 —— 原始命令与输出
+# 生成时点（UTC）：2026-11-14T17:55:30Z   HEAD：1d9bcb0
+# lane A1b（James / 01a1da6f-f30e-7181-a324-8f41da5ac537）因 429 Too Many Requests 消亡、
+# resume_agent 与 send_input 双双 429 ⇒ 回执丢失、lane 物理不可恢复。
+# 故本棒**无 lane 自报证据**；以下全部为编排器独立实测（rule_no_trust_handoff_summary_assertions）。
+# 注意：本日志生成期间刻意**不**在仓库工作树里落任何文件（先写 /tmp，收尾再入库），
+#       否则会自我污染 [1]/[4] 的「在树面 ⊆ ADD」断言（本轮第一次尝试即因此判红，已记为观测者效应）。
+
+===== [1] git rev-parse / status（PRE-12 前置：在树面必须恰为 S2a 的 ADD 集） =====
+$ git rev-parse --short HEAD
+1d9bcb0
+$ git status --porcelain=v1 -uall
+ M src/campaignlab/api/common.py
+ M tests/unit/test_domain_errors.py
+?? src/campaignlab/domain/activity/__init__.py
+?? src/campaignlab/domain/activity/bindings.py
+?? src/campaignlab/domain/activity/checks.py
+?? src/campaignlab/domain/activity/clauses.py
+?? src/campaignlab/domain/activity/diff.py
+?? src/campaignlab/domain/activity/digests.py
+?? src/campaignlab/domain/activity/states.py
+
+===== [2] numstat（modified tracked 两件） =====
+$ git diff --numstat -- src/campaignlab/api/common.py tests/unit/test_domain_errors.py
+401	0	src/campaignlab/api/common.py
+9	3	tests/unit/test_domain_errors.py
+
+===== [3] 九件 sha256 / 行数 / 字节（与 /tmp/park_a1b_R15/MANIFEST.json 逐条对账） =====
+db271880cd2042bd568b0728b256adae61593d2afb3f63dc2ba691320565bdef  src/campaignlab/domain/activity/__init__.py
+ac323b88213c32cff98fad0db72e542d40070dbdd7d1cea62d2717ffcb999930  src/campaignlab/domain/activity/bindings.py
+894392c861696dd02cddceaf483b2b70c8daa7c99513a5ba55eab3d52eb48e72  src/campaignlab/domain/activity/checks.py
+56eb85ffb5a070fc5f5b08f84dc71845bcce7f8d2f926f2943478c561e1628a2  src/campaignlab/domain/activity/clauses.py
+8f7ee7168fd2d40f882596dce699ad6277f8e59909bb8f3e598233cf130a191a  src/campaignlab/domain/activity/diff.py
+ca60c91c39f2f852996caa0b109fd74d07257052b3b57961bd2e4bfe6917b8c0  src/campaignlab/domain/activity/digests.py
+954c557fe84a39c9172d9e02e5f89c19232045340faf07c00845bad67fceb589  src/campaignlab/domain/activity/states.py
+31a84b00f02c33737afe5f6acdc9ae4f8860281cf728428cfe627f90138ddf4d  src/campaignlab/api/common.py
+e2f9fba56bf090c9f073f156889dcf5e9fdeea383c7450b07b07a09f1ccc3fa1  tests/unit/test_domain_errors.py
+   161   5676 src/campaignlab/domain/activity/__init__.py
+   197   8818 src/campaignlab/domain/activity/bindings.py
+  1134  45522 src/campaignlab/domain/activity/checks.py
+   261  11463 src/campaignlab/domain/activity/clauses.py
+   225   9395 src/campaignlab/domain/activity/diff.py
+    79   3959 src/campaignlab/domain/activity/digests.py
+   313  14428 src/campaignlab/domain/activity/states.py
+  1153  45039 src/campaignlab/api/common.py
+   189   7771 tests/unit/test_domain_errors.py
+  3712 152071 total
+--- 泊出清单 MANIFEST.json ---
+{
+ "src/campaignlab/domain/activity/__init__.py": "db271880cd2042bd568b0728b256adae61593d2afb3f63dc2ba691320565bdef",
+ "src/campaignlab/domain/activity/bindings.py": "ac323b88213c32cff98fad0db72e542d40070dbdd7d1cea62d2717ffcb999930",
+ "src/campaignlab/domain/activity/checks.py": "894392c861696dd02cddceaf483b2b70c8daa7c99513a5ba55eab3d52eb48e72",
+ "src/campaignlab/domain/activity/clauses.py": "56eb85ffb5a070fc5f5b08f84dc71845bcce7f8d2f926f2943478c561e1628a2",
+ "src/campaignlab/domain/activity/diff.py": "8f7ee7168fd2d40f882596dce699ad6277f8e59909bb8f3e598233cf130a191a",
+ "src/campaignlab/domain/activity/digests.py": "ca60c91c39f2f852996caa0b109fd74d07257052b3b57961bd2e4bfe6917b8c0",
+ "src/campaignlab/domain/activity/states.py": "954c557fe84a39c9172d9e02e5f89c19232045340faf07c00845bad67fceb589",
+ "orchestrator/defects/D-044.md": "6952f0afaf899e5d36b38b6bc5c7d0488bd1c79976e7e658f62c9529863c00d6",
+ "src/campaignlab/api/common.py": "31a84b00f02c33737afe5f6acdc9ae4f8860281cf728428cfe627f90138ddf4d",
+ "tests/unit/test_domain_errors.py": "e2f9fba56bf090c9f073f156889dcf5e9fdeea383c7450b07b07a09f1ccc3fa1"
+}
+
+===== [4] 独立复验脚本 r15_s2a_verify.py（在树面 + 符号面 + 分层 + 守护基线） =====
+--- git status -uall (9) ---
+     M src/campaignlab/api/common.py
+     M tests/unit/test_domain_errors.py
+    ?? src/campaignlab/domain/activity/__init__.py
+    ?? src/campaignlab/domain/activity/bindings.py
+    ?? src/campaignlab/domain/activity/checks.py
+    ?? src/campaignlab/domain/activity/clauses.py
+    ?? src/campaignlab/domain/activity/diff.py
+    ?? src/campaignlab/domain/activity/digests.py
+    ?? src/campaignlab/domain/activity/states.py
+PRE-12 PRECHECK OK: worktree face == S2a ADD set (9 paths)
+
+=== numstat vs HEAD（modified tracked） ===
+401	0	src/campaignlab/api/common.py
+9	3	tests/unit/test_domain_errors.py
+
+=== 新建件读数 ===
+NEW src/campaignlab/api/common.py                      lines=1153 bytes= 45039 sha12=31a84b00f02c
+NEW src/campaignlab/domain/activity/__init__.py        lines= 161 bytes=  5676 sha12=db271880cd20
+NEW src/campaignlab/domain/activity/bindings.py        lines= 197 bytes=  8818 sha12=ac323b88213c
+NEW src/campaignlab/domain/activity/checks.py          lines=1134 bytes= 45522 sha12=894392c86169
+NEW src/campaignlab/domain/activity/clauses.py         lines= 261 bytes= 11463 sha12=56eb85ffb5a0
+NEW src/campaignlab/domain/activity/diff.py            lines= 225 bytes=  9395 sha12=8f7ee7168fd2
+NEW src/campaignlab/domain/activity/digests.py         lines=  79 bytes=  3959 sha12=ca60c91c39f2
+MOD src/campaignlab/api/common.py                      lines=1153 bytes= 45039 sha12=31a84b00f02c
+MOD tests/unit/test_domain_errors.py                   lines= 189 bytes=  7771 sha12=e2f9fba56bf0
+
+=== 符号面 / 分层探针 ===
+ast __all__ len      = 78
+runtime __all__ len   = 78
+runtime set(__all__)  = 78
+unresolvable names    = []
+PROBLEM_CODES len     = 20
+DomainError subclasses= 14
+every subclass has code= True
+domain.activity 6 submodules import OK; __init__ exports = ['ACTIVITY_ISSUE_CODES', 'ACTIVITY_STATES', 'ACTIVITY_TERMINAL_STATES', 'ACTIVITY_TRANSITIONS', 'ALL_CLAUSE_KEYS', 'ActivityStatus', 'ActivityTransition', 'ActivityTransitionId'] ... total 55
+domain layering violations = ['src/campaignlab/domain/errors.py:36 -> campaignlab.api.common']
+
+=== 守护基线（tests/unit/test_domain_errors.py） ===
+............                                                             [100%]
+12 passed in 0.21s
+BASELINE rc=0
+
+===== [5] 守护变异探针 r15_s2a_mut.py（证明钉子有牙 + ruff/mypy 预检） =====
+ORIG sha256[:12] = 31a84b00f02c bytes = 45039
+PC0 baseline                rc=0  12 passed in 0.19s
+PC1 inject fake name        rc=1  1 failed, 11 passed in 0.18s  => RED (有牙)
+PC2 remove real Activity    rc=1  1 failed, 11 passed in 0.22s  => RED (有牙)
+PC3 byte-restore            rc=0  12 passed in 0.28s  sha12=31a84b00f02c
+MUTATION_PROBE_OK: 守护有牙（注入假名红 / 移除真名红 / 字节复原绿），工作树已还原为 lane 原件
+
+=== ruff format --check（本次 9 件） ===
+rc=0 9 files already formatted
+ruff check rc=0 All checks passed!
+states.py lines=313 bytes=14428 sha12=954c557fe84a
+
+=== mypy 全表预检 ===
+rc=0 Success: no issues found in 95 source files
+
+===== [6] 探针后工作树必须与探针前逐字节相同（api/common.py 双向复原） =====
+31a84b00f02c33737afe5f6acdc9ae4f8860281cf728428cfe627f90138ddf4d  src/campaignlab/api/common.py
+ M src/campaignlab/api/common.py
+ M tests/unit/test_domain_errors.py
+?? src/campaignlab/domain/activity/__init__.py
+?? src/campaignlab/domain/activity/bindings.py
+?? src/campaignlab/domain/activity/checks.py
+?? src/campaignlab/domain/activity/clauses.py
+?? src/campaignlab/domain/activity/diff.py
+?? src/campaignlab/domain/activity/digests.py
+?? src/campaignlab/domain/activity/states.py
+
+===== [7] 全表四门在**活动工作树**上的读数（冻结树读数见入库提交的 run_commit 报告） =====
+$ uv run --no-sync ruff format --check .
+275 files already formatted
+$ uv run --no-sync ruff check .
+All checks passed!
+$ uv run --no-sync mypy
+Success: no issues found in 95 source files
+$ uv run --no-sync pytest -q
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/starlette/testclient.py:518: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+615 passed, 6 warnings in 118.68s (0:01:58)

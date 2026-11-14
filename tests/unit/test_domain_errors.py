@@ -161,9 +161,15 @@ def test_common_py_contains_no_moved_definition() -> None:
 
 
 def test_common_public_surface_is_unchanged() -> None:
-    """搬移前后 ``__all__`` 必须逐字相同：51 项、全部可解析、20 码全在其中。"""
-    assert len(common.__all__) == 51
-    assert len(set(common.__all__)) == 51
+    """``api/common.py`` 公开面钉桩：``__all__`` 共 78 项、全部可解析、20 码全在其中。
+
+    78 是 **M2-01/S2a 追加 DTO 面之后的实测值**（51 → 78，净增 27）；依 A218 采用设计文档 §11.2
+    的「按新实取值更新」口径。按 D-012/D-014，引用计数必须给归因，故本行数字**只在公开面再次变更时**
+    才允许改动，且须同批过账。函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
+    「公开面任何增减都必须在本用例显式过账」—— D-044 修正了原名/原 docstring 与断言体自相矛盾之处。
+    """
+    assert len(common.__all__) == 78
+    assert len(set(common.__all__)) == 78
     for name in common.__all__:
         assert hasattr(common, name), f"__all__ 声明了但取不到：{name}"
     assert set(MOVED_PUBLIC) <= set(common.__all__)

@@ -35,6 +35,7 @@ import json
 import unicodedata
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Annotated, Any, Final, Literal
 
 from fastapi import FastAPI, Request, Response
@@ -46,6 +47,12 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 # R5-1：下列符号的**定义**已整块搬移至 ``domain/errors.py`` 与 ``domain/ids.py``
 # （ADR-005 §2.1 单一来源）；此处只 import 并 re-export，本文件不得再出现它们的定义。
 # 私有名一并 re-export（带 ``noqa: F401``）以保持 ``dir(common)`` 与搬移前逐字一致。
+from campaignlab.domain.activity.states import (
+    ActivityStatus,
+    RuleCheckState,
+    RuleState,
+    TemplateId,
+)
 from campaignlab.domain.errors import (
     _STATUS_BY_CODE,  # noqa: F401
     _STATUS_TO_CODE,  # noqa: F401
@@ -84,7 +91,23 @@ __all__ = [
     "UNSAFE_METHODS",
     "X_REQUEST_ID_HEADER",
     "AccessDenied",
+    "Activity",
+    "ActivityCreate",
+    "ActivityPage",
+    "ActivityStatus",
+    "ActivityUpdate",
+    "Binding",
+    "BoundaryCase",
+    "CallbackCaseInput",
+    "CallbackEvent",
+    "CallbackRule",
+    "CaseInput",
+    "Confirmation",
+    "CouponCaseInput",
+    "CouponEvent",
+    "CouponRule",
     "DomainError",
+    "FieldChange",
     "Health",
     "IdempotencyConflict",
     "InputTooLarge",
@@ -100,10 +123,21 @@ __all__ = [
     "Problem",
     "ResourceNotFound",
     "RevisionConflict",
+    "RuleCheck",
+    "RuleCheckState",
+    "RuleContent",
+    "RuleCreate",
+    "RuleDiff",
+    "RuleState",
+    "RuleUpdate",
+    "RuleVersion",
+    "RuleVersionPage",
     "Session",
     "SessionExchange",
     "SessionInvalid",
     "StateConflict",
+    "TemplateId",
+    "Term",
     "ValidationFailure",
     "Workspace",
     "WorkspaceCreate",
@@ -324,6 +358,373 @@ class Job(BaseModel):
     result_ref: ObjectRef | None
     problem: Problem | None
     retryable: StrictBool
+
+
+# ------------------------------------------- DTO（活契约 · M2-01 活动 / 绑定 / 规则版本 / 检查）
+
+# 体例与上面的 ``WorkspacePage`` / ``Job`` 完全同构（A91 纯追加、0 删除行）：一律
+# ``model_config = ConfigDict(extra="forbid")``、``StrictStr`` / ``StrictInt`` / ``StrictBool``、
+# 时刻用 ``AwareDatetime``、ID 型字段复用模块内私有别名 ``_IdStr``、版本号复用 ``RevisionInt``、
+# ``Issue`` / ``Problem`` / ``ObjectKind`` 一律复用既有定义（**禁第二份**）。
+# 四个取值别名（``ActivityStatus`` / ``RuleState`` / ``RuleCheckState`` / ``TemplateId``）
+# **定义在** ``domain/activity/states.py``，本文件只 import 后 re-export（design §11.2），
+# 使「契约改枚举 → 代码跟着改」的单一来源留在领域层。
+
+
+class Binding(BaseModel):
+    """活契约 ``Binding``：5 属性全必填、``additionalProperties: false``。
+
+    **没有 ``id``**：绑定的身份是 ``(strategy_id, source_version, valid_from)``（切片
+    ``ddl.activity_bindings`` 的主键去掉工作区与活动两列）；发明一个 ``id`` 会被
+    ``extra="forbid"`` 当场判红。``valid_from`` / ``valid_until`` 是 ``format=date``
+    （**日期**，非时刻）⇒ 用 ``date``，pydantic 会拒绝带时间的串；区间语义「起含止排」
+    与「同策略相交即拒」见 ``domain/activity/bindings.py``（design §3.4，裁定 A198）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    strategy_id: _IdStr
+    source_version: Annotated[StrictStr, Field(min_length=1, max_length=80)]
+    valid_from: date
+    valid_until: date
+    evidence_id: _IdStr
+
+
+class Activity(BaseModel):
+    """活契约 ``Activity``：12 属性全在 ``required`` 内（可空字段也必须显式出现）。
+
+    ``status`` 的取值集合来自 ``domain/activity/states.py::ActivityStatus``（＝契约 enum
+    ``["OPEN", "ARCHIVED"]``，与切片 ``ddl.activities`` 的 CHECK 逐字一致）。三个数组字段
+    的顺序由 design §7.4 冻结（``bindings`` 按起日→策略→源版本，两个 id 数组按创建时刻→id）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: _IdStr
+    revision: RevisionInt
+    created_at: AwareDatetime
+    name: Annotated[StrictStr, Field(min_length=1, max_length=120)]
+    bank_id: _IdStr | None
+    external_activity_id: _IdStr | None
+    description: Annotated[StrictStr, Field(min_length=0, max_length=1000)]
+    status: ActivityStatus
+    current_rule_id: _IdStr | None
+    bindings: Annotated[list[Binding], Field(max_length=1000)]
+    rule_ids: Annotated[list[_IdStr], Field(max_length=1000)]
+    receipt_ids: Annotated[list[_IdStr], Field(max_length=1000)]
+
+
+class ActivityPage(BaseModel):
+    """活契约 ``ActivityPage``：``items`` 0–100，``next_cursor`` 1–300 或 null。
+
+    与 ``WorkspacePage`` 同构（A91 的追加分节体例，design §2.1）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    items: Annotated[list[Activity], Field(max_length=100)]
+    next_cursor: Annotated[StrictStr, Field(min_length=1, max_length=300)] | None
+
+
+class ActivityCreate(BaseModel):
+    """活契约 ``ActivityCreate``：``required`` 实测只有 ``name``。
+
+    **没有** ``status`` / ``current_rule_id`` / 三个数组字段：新建一律 ``OPEN``、
+    ``revision=1``（design §3.1 的 ``A1``），数组由 service 组装。``bank_id`` 与
+    ``external_activity_id`` 创建后**不可改**（``ActivityUpdate`` 没有这两个字段），
+    故 design §6.4 的「同银行外部活动号重复」409 只可能在创建面触发。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: Annotated[StrictStr, Field(min_length=1, max_length=120)]
+    bank_id: _IdStr | None = None
+    external_activity_id: _IdStr | None = None
+    description: Annotated[StrictStr, Field(min_length=0, max_length=1000)] | None = None
+
+
+class ActivityUpdate(BaseModel):
+    """活契约 ``ActivityUpdate``：``required`` 实测为**空数组** ⇒ 空 PATCH 由 service 判 422。
+
+    四个字段全部可选，故 PATCH 语义**只能**靠 ``model_fields_set`` /
+    ``model_dump(exclude_unset=True)`` 判「给了没有」（design §6.4：``exclude_unset`` 而非
+    ``exclude_none`` —— 显式给 ``""`` 或 ``[]`` 是合法的「清空」意图）。
+    ``bindings`` 一旦出现在请求里就是**整体替换**，未出现则完全不动（design §3.4）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: Annotated[StrictStr, Field(min_length=1, max_length=120)] | None = None
+    description: Annotated[StrictStr, Field(min_length=0, max_length=1000)] | None = None
+    status: ActivityStatus | None = None
+    bindings: Annotated[list[Binding], Field(max_length=1000)] | None = None
+
+
+class CouponRule(BaseModel):
+    """活契约 ``CouponRule``：13 属性全必填；与 ``contracts/rule-set.schema.json`` 的
+    ``$defs.CouponRule`` 逐字同构。四个 ``const`` 字段落成 ``Literal``（判别式联合的判别键
+    就是 ``template``）；金额一律**分整数**（``domain/values.py::Cents`` 口径，禁 float）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1]
+    template: Literal["coupon_threshold"]
+    currency: Literal["CNY"]
+    zone: Literal["Asia/Shanghai"]
+    starts_at: AwareDatetime
+    ends_at: AwareDatetime
+    new_customer_days: Annotated[StrictInt, Field(ge=1, le=365)]
+    min_payment_fen: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    coupon_fen: Annotated[StrictInt, Field(ge=1, le=9000000000000)]
+    max_per_customer: Annotated[StrictInt, Field(ge=1, le=1000)]
+    budget_fen: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    stacking: Literal["ALLOW", "DENY_OTHER_APPLIED"]
+    refund_policy: Literal["KEEP", "RECOMPUTE_UNUSED"]
+
+
+class CallbackRule(BaseModel):
+    """活契约 ``CallbackRule``：6 属性全必填。
+
+    与 ``contracts/rule-set.schema.json`` 的 ``$defs.CallbackRule`` 逐字同构。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1]
+    template: Literal["callback_priority"]
+    zone: Literal["Asia/Shanghai"]
+    channel: Literal["remote"]
+    priority: Literal["ARRIVAL", "APPOINTMENT_FIRST"]
+    daily_cap: Annotated[StrictInt, Field(ge=1, le=20)]
+
+
+#: 活契约 ``RuleContent``＝``oneOf[CouponRule, CallbackRule]``，**无判别式字段声明**；
+#: 这里用 pydantic 的判别式联合落地（design §2.2）：``template`` 在两个分支上是不同 ``const``，
+#: 满足判别式要求，且能在**校验期**就给出 ``/content/template`` 级别的定位，
+#: 比 ``oneOf`` 的「两个分支都失败」报错更可复查。
+RuleContent = Annotated[CouponRule | CallbackRule, Field(discriminator="template")]
+
+
+class Term(BaseModel):
+    """活契约 ``Term``：5 属性全必填。
+
+    ``decision.minLength=0`` 是**契约事实**（允许空串），故「业务说明非空」只能由领域门禁
+    承担（design §4.3 的 G6），**禁改契约**。``status`` 是条款自己的 ``OPEN``/``CONFIRMED``，
+    与 ``RuleVersion.state``、``ActivityStatus`` 都不是同一个面。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    key: _IdStr
+    clause: Annotated[StrictStr, Field(min_length=1, max_length=1000)]
+    decision: Annotated[StrictStr, Field(min_length=0, max_length=1000)]
+    status: Literal["OPEN", "CONFIRMED"]
+    evidence_id: _IdStr | None
+
+
+class RuleVersion(BaseModel):
+    """活契约 ``RuleVersion``：13 属性全必填（可空的四个也必须显式出现）。
+
+    ``state`` 取值来自 ``domain/activity/states.py::RuleState``（``DRAFT``/``CONFIRMED``），
+    **与 ``JobState`` 同名不同物、禁复用**（design §2.2）。``digest`` 是 64 位小写 hex，
+    唯一算法在 ``domain/activity/digests.py::rule_digest``（design §4.6：``label`` 不进摘要）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: _IdStr
+    revision: RevisionInt
+    created_at: AwareDatetime
+    label: Annotated[StrictStr, Field(min_length=1, max_length=80)]
+    content: RuleContent
+    terms: Annotated[list[Term], Field(max_length=1000)]
+    source_rule_version: Annotated[StrictStr, Field(min_length=1, max_length=80)] | None
+    parent_rule_id: _IdStr | None
+    activity_id: _IdStr
+    state: RuleState
+    digest: Annotated[StrictStr, Field(min_length=64, max_length=64, pattern=r"^[0-9a-f]{64}$")]
+    confirmed_at: AwareDatetime | None
+    confirmation: Annotated[StrictStr, Field(min_length=0, max_length=1000)] | None
+
+
+class RuleVersionPage(BaseModel):
+    """活契约 ``RuleVersionPage``：``items`` 0–100，``next_cursor`` 1–300 或 null。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    items: Annotated[list[RuleVersion], Field(max_length=100)]
+    next_cursor: Annotated[StrictStr, Field(min_length=1, max_length=300)] | None
+
+
+class RuleCreate(BaseModel):
+    """活契约 ``RuleCreate``：``required`` 实测 = ``label`` / ``content`` / ``terms``。
+
+    ``parent_rule_id`` 缺省 ⇒ design §3.2 的 ``R1``（新草稿）；给了 ⇒ ``R4``
+    （以某 ``CONFIRMED`` 版本为父**新建草稿行**，源行一字不改）。血缘创建后不可改
+    （``RuleUpdate`` 没有 ``parent_rule_id`` / ``source_rule_version``）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    label: Annotated[StrictStr, Field(min_length=1, max_length=80)]
+    content: RuleContent
+    terms: Annotated[list[Term], Field(max_length=1000)]
+    source_rule_version: Annotated[StrictStr, Field(min_length=1, max_length=80)] | None = None
+    parent_rule_id: _IdStr | None = None
+
+
+class RuleUpdate(BaseModel):
+    """活契约 ``RuleUpdate``：``required`` 实测为空数组 ⇒ 空 PATCH 必须 422。
+
+    **没有** ``state`` 字段：客户端无法用 PATCH 改状态（design §4.4 的契约层保证）。
+    改已确认版本一律 409（``RULE_CONFIRMED_IMMUTABLE``），要改就以其为父版本新建草稿。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    label: Annotated[StrictStr, Field(min_length=1, max_length=80)] | None = None
+    content: RuleContent | None = None
+    terms: Annotated[list[Term], Field(max_length=1000)] | None = None
+
+
+class Confirmation(BaseModel):
+    """活契约 ``Confirmation``：``note`` 1–500 ＋ ``digest`` 64 位小写 hex。
+
+    ``note.minLength=1`` 允许单个空格 ⇒ 「存在警告时备注必须非空」由领域侧判
+    （``domain/activity/clauses.py::note_satisfies_warnings``，NFKC ＋ ``strip()``）。
+    ``digest`` 只用于**比对**、禁回显（design §4.2 第 6 条）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    note: NoteStr
+    digest: Annotated[StrictStr, Field(min_length=64, max_length=64, pattern=r"^[0-9a-f]{64}$")]
+
+
+class CouponEvent(BaseModel):
+    """活契约 ``CouponEvent``：7 属性全必填（与 ``contracts/case-input.schema.json`` 同源）。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    seq: Annotated[StrictInt, Field(ge=1, le=9007199254740991)]
+    event_id: _IdStr
+    kind: Literal["PAYMENT", "REFUND", "REDEEM"]
+    at: AwareDatetime
+    order_id: _IdStr
+    amount_fen: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    other_offer_applied: StrictBool
+
+
+class CouponCaseInput(BaseModel):
+    """活契约 ``CouponCaseInput``：7 属性全必填，``events`` 1–1000（**至少一条**）。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1]
+    template: Literal["coupon_threshold"]
+    customer_id: _IdStr
+    registered_at: AwareDatetime
+    initial_used: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    initial_budget_used_fen: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    events: Annotated[list[CouponEvent], Field(min_length=1, max_length=1000)]
+
+
+class CallbackEvent(BaseModel):
+    """活契约 ``CallbackEvent``：5 属性全必填（没有 ``kind`` / ``amount_fen``）。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    seq: Annotated[StrictInt, Field(ge=1, le=9007199254740991)]
+    event_id: _IdStr
+    at: AwareDatetime
+    strategy_id: _IdStr
+    appointment: StrictBool
+
+
+class CallbackCaseInput(BaseModel):
+    """活契约 ``CallbackCaseInput``：7 属性全必填。
+
+    ``day`` 是 ``format=date``（日期，非时刻）、``events`` 1–1000（至少一条）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1]
+    template: Literal["callback_priority"]
+    customer_id: _IdStr
+    day: date
+    channel: Literal["remote"]
+    used: Annotated[StrictInt, Field(ge=0, le=9000000000000)]
+    events: Annotated[list[CallbackEvent], Field(min_length=1, max_length=1000)]
+
+
+#: 活契约 ``CaseInput``＝``oneOf[CouponCaseInput, CallbackCaseInput]``，判别键同样是 ``template``。
+CaseInput = Annotated[CouponCaseInput | CallbackCaseInput, Field(discriminator="template")]
+
+
+class BoundaryCase(BaseModel):
+    """活契约 ``RuleCheck.properties.boundary_cases.items``（内联匿名对象，本文命名）。
+
+    4 属性全必填、``additionalProperties: false``，且**没有任何 verdict / expected / actual
+    字段** ⇒ 契约本身就不允许 ``checkRule`` 返回数值判定（裁定 A203：±1 的判定面归 M2-02）。
+    内容由 ``domain/activity/checks.py::boundary_cases_for`` 生成，**只读被检版本的 content**、
+    不读时钟，故同一规则版本重复调用产出逐字节相同的反例。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: _IdStr
+    label: Annotated[StrictStr, Field(min_length=1, max_length=120)]
+    input: CaseInput
+    verification: Annotated[StrictStr, Field(min_length=1, max_length=500)]
+
+
+class RuleCheck(BaseModel):
+    """活契约 ``RuleCheck``：5 属性全必填。
+
+    ⚠ ``state`` 是**检查结论**（``READY`` / ``NEEDS_CONFIRMATION``，判定式见
+    ``domain/activity/checks.py::check_state_of``），与 ``RuleVersion.state``
+    （``DRAFT``/``CONFIRMED``）、与 ``listRules`` 的 ``status`` **查询参数**是三个不同的面，
+    取值集合互不相同，禁互相赋值（design §5.2 的命名陷阱）。``rule_digest`` 是
+    ``rule_versions.digest`` 列值原样读出（service 侧还要现算一次并断言相等，design §5.2）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    rule_id: _IdStr
+    rule_digest: Annotated[
+        StrictStr, Field(min_length=64, max_length=64, pattern=r"^[0-9a-f]{64}$")
+    ]
+    state: RuleCheckState
+    issues: Annotated[list[Issue], Field(max_length=1000)]
+    boundary_cases: Annotated[list[BoundaryCase], Field(max_length=30)]
+
+
+class FieldChange(BaseModel):
+    """活契约 ``FieldChange``：3 属性全必填（``before`` / ``after`` 可 null 但必须出现）。
+
+    ``before`` / ``after`` 是**字符串化**取值（0–1000），不是任意 JSON ⇒ 渲染口径见
+    ``domain/activity/diff.py::render_scalar``（整数十进制、布尔 ``true``/``false``、
+    时刻 ISO、``None`` 保持 ``None``）。``path`` 只准是 design §6.5 冻结的四类（裁定 A201）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    path: Annotated[StrictStr, Field(min_length=1, max_length=500)]
+    before: Annotated[StrictStr, Field(min_length=0, max_length=1000)] | None
+    after: Annotated[StrictStr, Field(min_length=0, max_length=1000)] | None
+
+
+class RuleDiff(BaseModel):
+    """活契约 ``RuleDiff``：4 属性全必填（裁定 A201：409 没有 ``diff`` 字段，差异只在这里）。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    baseline_rule_id: _IdStr
+    candidate_rule_id: _IdStr
+    changes: Annotated[list[FieldChange], Field(max_length=1000)]
+    requires_rerun_case_ids: Annotated[list[_IdStr], Field(max_length=1000)]
 
 
 # -------------------------------------------------------------------------- 响应构造 helper
