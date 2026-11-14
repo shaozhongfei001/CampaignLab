@@ -1,0 +1,321 @@
+# R16 · M0-04/S4 入库取证 · 编排器独立复验日志
+# at=2026-11-15T04:24:49+08:00  HEAD(before)=2010d57  branch=m0-framework
+# 口径：禁采信 lane 自报（rule_no_trust_handoff_summary_assertions）；一切计数编排器实测。
+# 说明：本日志在**两条 lane 在飞**状态下采集（lane S4 已回执待入库、lane S2b-1 在写），
+#       故「活动工作树」读数含邻居半成品；入库读数一律以 run_commit 的**冻结索引树**为准
+#       （D-046 已于本批根治，冻结树的 Python 导入不再落到活动树）。
+
+== 0. 编排器独立复验探针（交付面逐件实测） ==
+$ uv run --no-sync python .orch_tmp/probe_s4_verify.py
+rc=0
+== HEAD / branch ==
+m0-framework 2010d57
+== numstat (worktree vs HEAD) ==
+44	0	orchestrator/handoff/M0-04-design.md
+3	0	src/campaignlab/api/app.py
+15	0	src/campaignlab/api/common.py
+175	0	src/campaignlab/api/deps.py
+830	0	src/campaignlab/infra/db/repositories.py
+24	1	tests/api/test_contract_declarations.py
+2	2	tests/unit/test_domain_errors.py
+14	2	tests/unit/test_s3b_routes.py
+== delivered file stats (lines, bytes, sha12) ==
+src/campaignlab/api/jobs.py  lines=371 bytes=16916 sha12=735d30baf0c4
+src/campaignlab/api/common.py  lines=1168 bytes=45605 sha12=836e7b3e8d3a
+src/campaignlab/api/app.py  lines=160 bytes=7253 sha12=110751903e4d
+tests/integration/jobs/test_jobs_router_s4.py  lines=683 bytes=26515 sha12=c3110b40b71d
+tests/unit/test_domain_errors.py  lines=189 bytes=7771 sha12=a933def6c4e5
+orchestrator/handoff/M0-04-design.md  lines=300 bytes=68556 sha12=5dd6360851b8
+evidence/M0/M0-04/s4-jobs-router.md  lines=35 bytes=7393 sha12=587aba1c3da9
+evidence/M0/M0-04/commands-s4.md  lines=102 bytes=9547 sha12=5d2d22eecc9e
+evidence/M0/M0-04/positive-control-s4.log  lines=64 bytes=8025 sha12=597355204386
+orchestrator/handoff/R15-lane-M0-04-S4.md  lines=213 bytes=21538 sha12=fe46f8c90934
+== jobs.py AST symbol face ==
+public: ['cancel_job', 'get_job', 'list_jobs', 'retry_job', 'router']
+private: ['__all__', '_job_page_response', '_job_response']
+classes: []
+expect public == router,list_jobs,get_job,cancel_job,retry_job : True
+expect private == _job_page_response,_job_response : False
+== jobs.py wall-clock / sleep literals (source text scan) ==
+hits: NONE
+== jobs.py imports ==
+['__future__', 'campaignlab.api.common', 'campaignlab.api.deps', 'campaignlab.api.session', 'campaignlab.application', 'campaignlab.application.idempotency', 'campaignlab.application.workspace_service', 'campaignlab.clock', 'campaignlab.config', 'campaignlab.domain.ids', 'campaignlab.infra.db.engine', 'campaignlab.infra.db.repositories', 'campaignlab.worker.deps', 'campaignlab.worker.service', 'collections.abc', 'fastapi', 'hashlib', 'json', 'typing']
+sql literal present: False
+== common.py __all__ / PROBLEM_CODES / JobPage ==
+rc 0 79 | 79 | True | 20
+DomainError subclasses rc 0 14
+== app.py mount face ==
+include_router lines: 4
+    app.include_router(health.router)
+    app.include_router(session_router)
+    app.include_router(workspaces_router)
+    app.include_router(jobs_router)
+openapi_url=None intact: True
+== design.md first 256 lines sha (frozen face) ==
+total lines: 300 first256 sha12: 5b76bcb33984
+HEAD lines: 256 HEAD full sha12: 5b76bcb33984
+first256 identical to HEAD full: True
+== test_domain_errors.py diff ==
+diff --git a/tests/unit/test_domain_errors.py b/tests/unit/test_domain_errors.py
+index 552c651..432b986 100644
+--- a/tests/unit/test_domain_errors.py
++++ b/tests/unit/test_domain_errors.py
+@@ -168,8 +168,8 @@ def test_common_public_surface_is_unchanged() -> None:
+     才允许改动，且须同批过账。函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
+     「公开面任何增减都必须在本用例显式过账」—— D-044 修正了原名/原 docstring 与断言体自相矛盾之处。
+     """
+-    assert len(common.__all__) == 78
+-    assert len(set(common.__all__)) == 78
++    assert len(common.__all__) == 79
++    assert len(set(common.__all__)) == 79
+     for name in common.__all__:
+         assert hasattr(common, name), f"__all__ 声明了但取不到：{name}"
+     assert set(MOVED_PUBLIC) <= set(common.__all__)
+== contracts untouched ==
+(no diff)
+openapi.json bytes 443309 sha12 592571099d63
+== collect-only new test file ==
+rc 0 34 tests collected in 0.30s
+== jobs-not-mounted sentinel still present? ==
+tests/api/test_contract_declarations.py:179:    ``test_jobs_router_is_not_mounted_by_s3c`` 位于 ``tests/unit/``（S4 的 deny 写集），
+tests/unit/test_api_app.py:51:def test_jobs_router_is_not_mounted_by_s3c(tmp_path: Path) -> None:
+grep: tests/api/__pycache__/test_contract_declarations.cpython-314-pytest-9.2.0.pyc: binary file matches
+grep: tests/unit/__pycache__/test_api_app.cpython-314-pytest-9.2.0.pyc: 
+
+
+
+== 1. 哨兵迁移（A226 / D-047）与阳性对照 ==
+$ PC-A 基线（迁移后应当全绿）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_s3b_routes.py tests/api/test_contract_declarations.py
+rc=0
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 passed, 1 warning in 1.40s
+
+$ PC-B 变异：把 jobs 的条件挂载改成无条件（应当红）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_s3b_routes.py
+rc=1
+E           assert '    if workspace_service is not None:\n        app.include_router(jobs_router)' in '"""应用工厂（M0-02 · S3c；design §6 ``api/app.py:create_app``）。\n\nA10 边界：本文件的 **CORS／中间件／异常处理装配属 S3c**；而 ``include_router(...\n    # M0-04/S4（A10 最小例外，≤3 行）：app.include_router(jobs.router)\n    app.include_router(jobs_router)\n    return app\n'
+
+tests/unit/test_s3b_routes.py:200: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+1 failed, 6 passed in 0.30s
+
+$ PC-C 变异：删掉互斥断言（denominator=0 断言仍在，故应由它兜住 -> 若全绿即守护无牙）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/api/test_contract_declarations.py
+rc=0
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+13 passed, 1 warning in 1.36s
+
+$ PC-D 复原后复跑（应当全绿）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_s3b_routes.py tests/api/test_contract_declarations.py
+rc=0
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 passed, 1 warning in 1.34s
+
+== STAGE A3：修 mypy BaseRoute.path + 用**能真撞路径**的主体变异重做 PC-C ==
+
+说明：A2 的 PC-C 之所以 rc=0（假绿），是因为 jobs.py 的 router 带 prefix=API_PREFIX，
+      注入 API_PREFIX + '/workspaces' 实际路径成了 /api/v1/api/v1/workspaces，撞不上。
+      本轮改为注入 '/workspaces'（由 prefix 补成 /api/v1/workspaces）⇒ 真撞。
+
+$ F1 mypy 单文件（应当干净）
+$ cmd=uv run --no-sync mypy tests/api/test_contract_declarations.py
+rc=0
+Success: no issues found in 1 source file
+
+$ F2 ruff format/check（迁移面）
+$ cmd=uv run --no-sync ruff format --check tests/api/test_contract_declarations.py tests/unit/test_s3b_routes.py
+rc=0
+2 files already formatted
+
+$ F3 ruff check（迁移面）
+$ cmd=uv run --no-sync ruff check tests/api/test_contract_declarations.py tests/unit/test_s3b_routes.py
+rc=0
+All checks passed!
+
+$ F4 jobs_paths 实取（必须是 4 条、且与 5 个 op 路径互斥）
+$ cmd=uv run --no-sync python -c from fastapi.routing import APIRoute;from campaignlab.api import jobs as j;p=sorted({str(r.path) for r in j.router.routes if isinstance(r,APIRoute)});print(len(p));[print(' ',x) for x in p]
+rc=0
+4
+  /api/v1/workspaces/{workspace_id}/jobs
+  /api/v1/workspaces/{workspace_id}/jobs/{job_id}
+  /api/v1/workspaces/{workspace_id}/jobs/{job_id}/cancel
+  /api/v1/workspaces/{workspace_id}/jobs/{job_id}/retry
+
+$ PC-C(真撞) 主体变异：jobs.py 注入 /workspaces 路由（**应当红 rc!=0**）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/api/test_contract_declarations.py
+rc=1
+tests/api/test_contract_declarations.py:167: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/api/test_contract_declarations.py::test_404_and_429_branches_are_unreachable_for_the_five_ops
+1 failed, 12 passed, 1 warning in 1.54s
+
+$ PC-C 判据：rc=1，期望 != 0 ⇒ 有牙 PASS
+
+$ PC-C 复原核验：jobs.py sha256[:12] 735d30baf0c4 -> 735d30baf0c4 字节级相等=True
+
+$ PC-D 复原后复跑（应当全绿）
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/api/test_contract_declarations.py tests/unit/test_s3b_routes.py tests/unit/test_api_app.py
+rc=0
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+26 passed, 1 warning in 1.42s
+
+$ E5 collect-only（用例数须与 HEAD 版一致：9+7=16 def）
+$ cmd=uv run --no-sync pytest -q --collect-only tests/api/test_contract_declarations.py tests/unit/test_s3b_routes.py
+rc=0
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 tests collected in 0.01s
+
+$ E6 git status 全量
+$ cmd=git status --porcelain -uall
+rc=0
+M orchestrator/handoff/M0-04-design.md
+ M src/campaignlab/api/app.py
+ M src/campaignlab/api/common.py
+ M src/campaignlab/api/deps.py
+ M src/campaignlab/infra/db/repositories.py
+ M tests/api/test_contract_declarations.py
+ M tests/unit/test_domain_errors.py
+ M tests/unit/test_s3b_routes.py
+?? evidence/M0/M0-04/commands-s4.md
+?? evidence/M0/M0-04/positive-control-s4.log
+?? evidence/M0/M0-04/s4-jobs-router.md
+?? orchestrator/handoff/R15-lane-M0-04-S4.md
+?? src/campaignlab/api/jobs.py
+?? src/campaignlab/application/activity_service.py
+?? tests/integration/jobs/test_jobs_router_s4.py
+?? tests/unit/test_s2b_activity_surface.py
+
+$ E7 git diff --numstat 全量
+$ cmd=git diff --numstat
+rc=0
+44	0	orchestrator/handoff/M0-04-design.md
+3	0	src/campaignlab/api/app.py
+15	0	src/campaignlab/api/common.py
+175	0	src/campaignlab/api/deps.py
+830	0	src/campaignlab/infra/db/repositories.py
+24	1	tests/api/test_contract_declarations.py
+2	2	tests/unit/test_domain_errors.py
+14	2	tests/unit/test_s3b_routes.py
+
+$ E8 迁移面 diff 原文
+$ cmd=git diff -- tests/api/test_contract_declarations.py tests/unit/test_s3b_routes.py
+rc=0
+diff --git a/tests/api/test_contract_declarations.py b/tests/api/test_contract_declarations.py
+index c184876..6d726cc 100644
+--- a/tests/api/test_contract_declarations.py
++++ b/tests/api/test_contract_declarations.py
+@@ -9,6 +9,14 @@
+ **断言不可达**本身，禁写会红的用例、禁 ``skip``/``xfail``。
+ jobs 相关（listJobs/getJob/cancelJob/retryJob 与 202 语义）**deferred_to M0-04/S4**
+ （A84：其实现尚未落地）。
++
++**R16 更新（A226 / D-047，append-only 注记，不改上文）**：M0-04/S4 已入库，``api/jobs.py`` 的
++4 个 operationId 已落地，并以 A10 最小例外（≤3 行）在 ``api/app.py`` 里**有条件**挂载
++（``if workspace_service is not None:``）。故上文 ``deferred_to`` 与 A84/A85 的「未挂载」前提
++自本提交起失效。本目录对 5 个 M0-02 op 的不可达取证**结论不变**，其前提已由「``api/jobs.py``
++不存在」这一文件级哨兵迁移为「jobs 路径面与 5 个 op 路径面互斥」这一结构级不变量。
++jobs 四 op 自身的声明面取证归 M0-04 的守护（``tests/integration/jobs/test_jobs_router_s4.py``），
++本目录不重复登记，以免出现第二真源（N5）。
+ """
+ 
+ from __future__ import annotations
+@@ -20,6 +28,7 @@ import pytest
+ from fastapi.routing import APIRoute
+ 
+ from campaignlab.api import health as health_api
++from campaignlab.api import jobs as jobs_api
+ from campaignlab.api import session as session_api
+ from campaignlab.api import workspaces as workspaces_api
+ from campaignlab.api.common import X_REQUEST_ID_HEADER, Health, Issue, Problem
+@@ -129,8 +138,17 @@ def test_404_and_429_branches_are_unreachable_for_the_five_ops(authed: Any) -> N
+ 
+     依据 Q2/Q3（作业 202/429 属 M0-04 的 op；``jobs`` 路由未挂载，A84/A85）与
+     ``declared_responses()`` 只做声明、不产生这些分支的事实。
++
++    **R16 迁移注记（A226 / D-047，编排器同批修正）**：M0-04/S4 已落地并有条件挂载
++    ``jobs.router``，上文「``jobs`` 路由未挂载」的前提自此失效。取证**结论不变**（这 5 个
++    M0-02 op 上 404 / 429 仍无触发面），但前提已由「``api/jobs.py`` 不存在」这一**文件级哨兵**
++    迁移为「jobs 路由路径面与本 5 个 op 路径面互斥」这一**结构级不变量**：后者不随文件是否存在
++    而失真。强度对账（R16 实测，禁口头声明）：给 ``api/jobs.py`` 注入一条与 5 个 op 同路径的路由，
++    本用例立即判红（阳性对照 PC-C）；``assert jobs_paths`` 的 ``denominator=0`` 断言只保证互斥断言
++    不退化成对空集的空断言，**不**能保证「删掉互斥断言即判红」—— 删断言不是判据有牙的证明，
++    主体变异才是（编排器初稿在此写了失真措辞，本批同批更正，记 R16-4）。
+     """
+-    assert not (REPO / "src/campaignlab/api/jobs.py").exists()
++    assert (REPO / "src/campaignlab/api/jobs.py").exists()
+     mounted_paths = {
+         str(route.path)
+         for module in (session_api, workspaces_api, health_api)
+@@ -142,6 +160,11 @@ def test_404_and_429_branches_are_unreachable_for_the_five_ops(authed: Any) -> N
+         f"{API_PREFIX}/workspaces",
+         f"{API_PREFIX}/health",
+     }
++    jobs_paths = {
++        str(route.path) for route in jobs_api.router.routes if isinstance(route, APIRoute)
++    }
++    assert jobs_paths, "denominator=0：jobs 路由无路径面 ⇒ 互斥断言会退化成空断言"
++    assert jobs_paths.isdisjoint(mounted_paths), sorted(jobs_paths & mounted_paths)
+     assert "JOB_CAPACITY" in PROBLEM_CODES
+     response = authed.get(f"{API_PREFIX}/workspaces")
+     assert response.status_code == 200
+diff --git a/tests/unit/test_s3b_routes.py b/tests/unit/test_s3b_routes.py
+index 786cdfc..3a0f843 100644
+--- a/tests/unit/test_s3b_routes.py
++++ b/tests/unit/test_s3b_routes.py
+@@ -181,19 +181,31 @@ def test_app_mounts_routers_only_when_services_injected(tmp_path: Path) -> None:
+ 
+ 
+ def test_app_py_contains_only_the_a85_mount_lines() -> None:
++    """A85 / A10 挂载面守护。
++
++    **R16 迁移注记（A226 / D-047，编排器同批修正）**：M0-04/S4 依 A10 最小例外（≤3 行）落地
++    ``app.include_router(jobs_router)`` 后，原判据「挂载行恰 3 条 **且** 不含 jobs」必然失真。
++    迁移为「挂载行恰 4 条，其中含 jobs 的恰 1 条，且 jobs 必须是与 workspaces **同形的条件挂载**」
++    —— 判据由「禁 jobs」升级为「jobs 只能以被授权的条件形态出现」，强度不降：多一条红、少一条红、
++    把 jobs 改成无条件挂载、删掉 ``import router as jobs_router``，四种形态均判红。
++    函数名沿用历史（A85 时代语义＝「只有那三条挂载行」），改名归 FU-52。
++    """
+     source = (_REPO / "src/campaignlab/api/app.py").read_text(encoding="utf-8")
+     pairs = (
+         "    if session_service is not None:\n        app.include_router(session_router)",
+         "    if workspace_service is not None:\n        app.include_router(workspaces_router)",
++        "    if workspace_service is not None:\n        app.include_router(jobs_router)",
+     )
+     for pair in pairs:
+         assert pair in source
+     assert "import router as session_router" in source
+     assert "import router as workspaces_router" in source
++    assert "import router as jobs_router" in source
+     mounted_lines = [
+         line for line in source.splitlines() if line.strip().startswith("app.include_router(")
+     ]
+-    assert len(mounted_lines) == 3
+-    assert not any("jobs" in line for line in mounted_lines)
++    assert len(mounted_lines) == 4
++    assert len([line for line in mounted_lines if "jobs" in line]) == 1
+     assert len([line for line in source.splitlines() if "session_router" in line]) <= 3
+     assert len([line for line in source.splitlines() if "workspaces_router" in line]) <= 3
++    assert len([line for line in source.splitlines() if "jobs_router" in line]) <= 3

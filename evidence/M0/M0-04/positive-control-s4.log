@@ -1,0 +1,64 @@
+[2026-11-14T19:18:39Z] ========================================================================
+[2026-11-14T19:18:39Z] PC1 JobPage 字段名改写 items->job_items
+[2026-11-14T19:18:39Z] file=src/campaignlab/api/common.py sha256(before)=836e7b3e8d3ae9201ed28caf238a241cf8eafc471c9900a9c363479c21cd4212
+[2026-11-14T19:18:39Z] mutation applied
+[2026-11-14T19:18:40Z] guard: 守护4 DTO 对齐 -> rc=1
+[2026-11-14T19:18:40Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_jobpage_matches_live_contract_schema | 1 failed, 33 deselected, 1 warning in 0.36s
+[2026-11-14T19:18:40Z] sha256(after-restore)=836e7b3e8d3ae9201ed28caf238a241cf8eafc471c9900a9c363479c21cd4212 match=True
+[2026-11-14T19:18:41Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.33s
+[2026-11-14T19:18:41Z] ========================================================================
+[2026-11-14T19:18:41Z] PC2 删 __all__ 里的 JobPage
+[2026-11-14T19:18:41Z] file=src/campaignlab/api/common.py sha256(before)=836e7b3e8d3ae9201ed28caf238a241cf8eafc471c9900a9c363479c21cd4212
+[2026-11-14T19:18:41Z] mutation applied
+[2026-11-14T19:18:41Z] guard: 守护3 __all__=79 -> rc=1
+[2026-11-14T19:18:41Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_common_all_is_79_with_jobpage_and_problem_codes_still_20 | 1 failed, 33 deselected, 1 warning in 0.34s
+[2026-11-14T19:18:41Z] sha256(after-restore)=836e7b3e8d3ae9201ed28caf238a241cf8eafc471c9900a9c363479c21cd4212 match=True
+[2026-11-14T19:18:42Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.33s
+[2026-11-14T19:18:42Z] ========================================================================
+[2026-11-14T19:18:42Z] PC3 摘除 jobs_router 挂载
+[2026-11-14T19:18:42Z] file=src/campaignlab/api/app.py sha256(before)=110751903e4d6f07b3b4f57fefcca9ad929915ec82db00389846b5e73d9da3c4
+[2026-11-14T19:18:42Z] mutation applied
+[2026-11-14T19:18:43Z] guard: 守护2 挂载 -> rc=1
+[2026-11-14T19:18:43Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_jobs_router_mounted_only_when_workspace_service_assembled | 1 failed, 33 deselected, 1 warning in 0.75s
+[2026-11-14T19:18:43Z] sha256(after-restore)=110751903e4d6f07b3b4f57fefcca9ad929915ec82db00389846b5e73d9da3c4 match=True
+[2026-11-14T19:18:45Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.78s
+[2026-11-14T19:18:45Z] ========================================================================
+[2026-11-14T19:18:45Z] PC4 去掉 listJobs 404 核验
+[2026-11-14T19:18:45Z] file=src/campaignlab/api/jobs.py sha256(before)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55
+[2026-11-14T19:18:45Z] mutation applied
+[2026-11-14T19:18:46Z] guard: listJobs 404（A220） -> rc=1
+[2026-11-14T19:18:46Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_list_jobs_404_for_absent_workspace | 1 failed, 33 deselected, 1 warning in 0.84s
+[2026-11-14T19:18:46Z] sha256(after-restore)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55 match=True
+[2026-11-14T19:18:47Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.72s
+[2026-11-14T19:18:47Z] ========================================================================
+[2026-11-14T19:18:47Z] PC5 BAD_CURSOR detail 改成第二句
+[2026-11-14T19:18:47Z] file=src/campaignlab/api/jobs.py sha256(before)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55
+[2026-11-14T19:18:47Z] mutation applied
+[2026-11-14T19:18:50Z] guard: BAD_CURSOR 同句 detail -> rc=1
+[2026-11-14T19:18:50Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_list_jobs_bad_cursor_matrix[broken] | 1 failed, 4 passed, 29 deselected, 1 warning in 2.51s
+[2026-11-14T19:18:50Z] sha256(after-restore)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55 match=True
+[2026-11-14T19:18:54Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 5 passed, 29 deselected, 1 warning in 2.60s
+[2026-11-14T19:18:54Z] ========================================================================
+[2026-11-14T19:18:54Z] PC6 jobs.py 嵌入墙钟字面量（注释）
+[2026-11-14T19:18:54Z] file=src/campaignlab/api/jobs.py sha256(before)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55
+[2026-11-14T19:18:54Z] mutation applied
+[2026-11-14T19:18:54Z] guard: D-045 源文本正则守护 -> rc=1
+[2026-11-14T19:18:54Z] guard tail: tests/unit/test_clock.py:76: AssertionError | =========================== short test summary info ============================ | FAILED tests/unit/test_clock.py::test_datetime_now_only_appears_in_clock_module | 1 failed, 7 passed in 0.03s
+[2026-11-14T19:18:54Z] sha256(after-restore)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55 match=True
+[2026-11-14T19:18:54Z] guard re-run -> rc=0: ........                                                                 [100%] | 8 passed in 0.02s
+[2026-11-14T19:18:54Z] ========================================================================
+[2026-11-14T19:18:54Z] PC7 cancelJob 缺 If-Match 从 428 改判 400
+[2026-11-14T19:18:54Z] file=src/campaignlab/api/jobs.py sha256(before)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55
+[2026-11-14T19:18:54Z] mutation applied
+[2026-11-14T19:18:55Z] guard: 428 哨兵 -> rc=1
+[2026-11-14T19:18:55Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_cancel_job_missing_if_match_is_428 | 1 failed, 33 deselected, 1 warning in 0.85s
+[2026-11-14T19:18:55Z] sha256(after-restore)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55 match=True
+[2026-11-14T19:18:56Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.86s
+[2026-11-14T19:18:56Z] ========================================================================
+[2026-11-14T19:18:56Z] PC8 retryJob 202 改成 200
+[2026-11-14T19:18:56Z] file=src/campaignlab/api/jobs.py sha256(before)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55
+[2026-11-14T19:18:56Z] mutation applied
+[2026-11-14T19:18:58Z] guard: 202 受理 -> rc=1
+[2026-11-14T19:18:58Z] guard tail: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | =========================== short test summary info ============================ | FAILED tests/integration/jobs/test_jobs_router_s4.py::test_retry_job_202_accepts_new_queued_job | 1 failed, 33 deselected, 1 warning in 0.87s
+[2026-11-14T19:18:58Z] sha256(after-restore)=735d30baf0c4cbfb15737a3c8bbb334f77d73999390a854048995795be6b3b55 match=True
+[2026-11-14T19:18:59Z] guard re-run -> rc=0: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html | 1 passed, 33 deselected, 1 warning in 0.83s

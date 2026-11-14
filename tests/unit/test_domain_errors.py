@@ -168,8 +168,8 @@ def test_common_public_surface_is_unchanged() -> None:
     才允许改动，且须同批过账。函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
     「公开面任何增减都必须在本用例显式过账」—— D-044 修正了原名/原 docstring 与断言体自相矛盾之处。
     """
-    assert len(common.__all__) == 78
-    assert len(set(common.__all__)) == 78
+    assert len(common.__all__) == 79
+    assert len(set(common.__all__)) == 79
     for name in common.__all__:
         assert hasattr(common, name), f"__all__ 声明了但取不到：{name}"
     assert set(MOVED_PUBLIC) <= set(common.__all__)

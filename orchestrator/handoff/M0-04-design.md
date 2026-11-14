@@ -254,3 +254,47 @@ append-only 豁免（形如 `JobRepository.list_page(conn, *, workspace_id, limi
 （已钉成守护），但那 6 条既有边按 LANE-COMMON §6「判据必须能在未改动的 HEAD 树上成立」
 被冻结成**基线集合**而非清零；是否要把「worker → api」上提为全仓分层守护的通用一面，
 归编排器立 followup 统一收口。
+## §9-S4 行 · S4 落地注记（S4 追加；D-011：历史文本只加注不改写）
+
+**交付面**：``api/jobs.py`` 新建（371 行；公开符号恰 ``router/list_jobs/get_job/cancel_job/retry_job``、
+私有符号恰 ``_job_page_response/_job_response``，§9-S4 行冻结面逐字兑现，守护 AST 钉住）＋
+``api/common.py`` **append-only** 追加 ``JobPage``（``deleted=0``、``__all__`` 78→79 运行期实测；
+插入位为 ``JobCapacity`` 之后的 RUF022 工具裁决位——「末尾追加」字面与全表 ``ruff check`` rc=0
+互斥，取工具口径，U 项上报待追认）＋ ``api/app.py`` 挂载 **+3/0 行**（§4① 候选 (b) 形态：
+``if workspace_service is not None: app.include_router(jobs_router)``，import 别名体例同
+session/workspaces 两处既有形）。守护落 ``tests/integration/jobs/test_jobs_router_s4.py``
+（34 例、自带 fixture、**未建 conftest.py**——S5 写集）。
+
+**§9-S2 行「留给 S4 的三件事」销账**：① ``items`` 行→DTO 唯一映射点 = ``job_from_row``，
+本层零复制；② ``str <-> payload`` 编解码与 ``query_digest``
+（``sha256(canonical_json({workspace_id,limit,q,status}))[:16]``）落 ``list_jobs``，
+绑定校验仍在 ``worker/service.py`` 未重复实现；③ ``listJobs`` 的工作区 404 由路由侧产生——
+``deps.WorkspaceService`` 端口无单条读取口，核验面 = ``list_workspaces`` 有界翻页枚举逐页比对
+``Workspace.id``，命中/穷尽二态、穷尽与「不存在」同码同 detail（无枚举 oracle）。
+
+**幂等信封（S2c 注记「归 S4」的落地形态）**：``cancelJob``/``retryJob`` 按
+「先幂等（peek 命中逐字节重放）→ 后 If-Match（缺 428、陈旧 412）」组装，
+PK(scope_key=workspace_id, actor_id, operation, idem_key)，只登记 2xx。
+落库 ``envelope_json`` 与响应回放共用**声明序** ``json.dumps``（非 canonical 排序），
+使 AC-029①「同键同请求两次响应含头逐字节相同」在 jobs 面真达成——M0-02
+createWorkspace 的同类键序漂移（其 U-2 注记在册）未在 jobs 面复制；信封形状
+``{status,headers,body}`` 与 ``idempotency_envelope`` 逐字兼容，``request_digest``
+复用 ``api.common`` 那一份。``retryJob`` 新鲜 202 按 §1 走 ``accepted_response``、
+重放走 ``replay_from_envelope``，守护用例钉两条路径正文逐字节相等。
+
+**实测口径追记**：① 本仓未知路径被全局处理器统一收敛为 404 Problem（与「工作区不存在」
+同码），故「挂载与否」的守护判据取**响应形状**（分页壳键存在性）而非状态码；
+② ``store.retry`` 的 ``enqueue_retry`` 对源行做守卫更新 ⇒ 源 revision 1→2（state 不变），
+与本文 §2「每次写 +1」自洽、与 S2c 注记「终态一字不变」的「一字」需在 FU 措辞上对齐
+（指 state/result/problem/lease，不含 revision），S4 守护按实测断言；
+③ 两条 A84/A85 时代前提哨兵（``tests/api/test_contract_declarations.py::test_404_and_429_
+branches_are_unreachable_for_the_five_ops`` 与 ``tests/unit/test_s3b_routes.py::
+test_app_py_contains_only_the_a85_mount_lines``）被 S4 落地**必然**打红、均在 S4 写权面外
+⇒ 未修，依 FU-11/FU-19 先例归编排器语义迁移。全表末态 647 passed / 2 failed（红因即上述两条）。
+
+**游标与墙钟**：``CURSOR_VERSION``/``BAD_CURSOR_DETAIL``/``CURSOR_QUERY_DIGEST_HEX``/
+``load_cursor_secret`` 全部 import 既有单点，0 第二个版本号、0 第二句 detail
+（阳性对照 PC5 钉死：改第二句即判红）；``jobs.py`` 墙钟禁串 0 处（含注释与 docstring，
+D-045 口径），428 可达性要求 ``if_match`` 声明为可空形参 + ``check_if_match``（U 项在册）。
+取证：``evidence/M0/M0-04/{s4-jobs-router.md, commands-s4.md, positive-control-s4.log}``，
+阳性对照 8/8（每条：注入变异 → 守护 rc≠0 → 字节复原 sha256 双向相等 → 复跑 rc=0）。

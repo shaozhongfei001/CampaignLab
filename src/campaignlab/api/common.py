@@ -116,6 +116,7 @@ __all__ = [
     "Issue",
     "Job",
     "JobCapacity",
+    "JobPage",
     "ObjectRef",
     "OriginDenied",
     "OriginHostGuard",
@@ -1151,3 +1152,17 @@ def install_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(RequestValidationError, _handle_validation_error)
     app.add_exception_handler(StarletteHTTPException, _handle_http_exception)
     app.add_exception_handler(Exception, _handle_unexpected)
+
+
+class JobPage(BaseModel):
+    """活契约 ``JobPage``（M0-04/S4 · A91 append-only）。
+
+    字段与 ``listJobs`` 200 schema 逐字段对齐：``items`` 0–100、``next_cursor``
+    1–300 或 null。体例与 ``WorkspacePage`` 完全同构（A91 纯追加、0 删除行；
+    ``items`` 元素复用既有 ``Job`` DTO，禁第二份行映射）。
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    items: Annotated[list[Job], Field(max_length=100)]
+    next_cursor: Annotated[StrictStr, Field(min_length=1, max_length=300)] | None

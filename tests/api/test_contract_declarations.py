@@ -9,6 +9,14 @@
 **断言不可达**本身，禁写会红的用例、禁 ``skip``/``xfail``。
 jobs 相关（listJobs/getJob/cancelJob/retryJob 与 202 语义）**deferred_to M0-04/S4**
 （A84：其实现尚未落地）。
+
+**R16 更新（A226 / D-047，append-only 注记，不改上文）**：M0-04/S4 已入库，``api/jobs.py`` 的
+4 个 operationId 已落地，并以 A10 最小例外（≤3 行）在 ``api/app.py`` 里**有条件**挂载
+（``if workspace_service is not None:``）。故上文 ``deferred_to`` 与 A84/A85 的「未挂载」前提
+自本提交起失效。本目录对 5 个 M0-02 op 的不可达取证**结论不变**，其前提已由「``api/jobs.py``
+不存在」这一文件级哨兵迁移为「jobs 路径面与 5 个 op 路径面互斥」这一结构级不变量。
+jobs 四 op 自身的声明面取证归 M0-04 的守护（``tests/integration/jobs/test_jobs_router_s4.py``），
+本目录不重复登记，以免出现第二真源（N5）。
 """
 
 from __future__ import annotations
@@ -20,6 +28,7 @@ import pytest
 from fastapi.routing import APIRoute
 
 from campaignlab.api import health as health_api
+from campaignlab.api import jobs as jobs_api
 from campaignlab.api import session as session_api
 from campaignlab.api import workspaces as workspaces_api
 from campaignlab.api.common import X_REQUEST_ID_HEADER, Health, Issue, Problem
@@ -129,8 +138,17 @@ def test_404_and_429_branches_are_unreachable_for_the_five_ops(authed: Any) -> N
 
     依据 Q2/Q3（作业 202/429 属 M0-04 的 op；``jobs`` 路由未挂载，A84/A85）与
     ``declared_responses()`` 只做声明、不产生这些分支的事实。
+
+    **R16 迁移注记（A226 / D-047，编排器同批修正）**：M0-04/S4 已落地并有条件挂载
+    ``jobs.router``，上文「``jobs`` 路由未挂载」的前提自此失效。取证**结论不变**（这 5 个
+    M0-02 op 上 404 / 429 仍无触发面），但前提已由「``api/jobs.py`` 不存在」这一**文件级哨兵**
+    迁移为「jobs 路由路径面与本 5 个 op 路径面互斥」这一**结构级不变量**：后者不随文件是否存在
+    而失真。强度对账（R16 实测，禁口头声明）：给 ``api/jobs.py`` 注入一条与 5 个 op 同路径的路由，
+    本用例立即判红（阳性对照 PC-C）；``assert jobs_paths`` 的 ``denominator=0`` 断言只保证互斥断言
+    不退化成对空集的空断言，**不**能保证「删掉互斥断言即判红」—— 删断言不是判据有牙的证明，
+    主体变异才是（编排器初稿在此写了失真措辞，本批同批更正，记 R16-4）。
     """
-    assert not (REPO / "src/campaignlab/api/jobs.py").exists()
+    assert (REPO / "src/campaignlab/api/jobs.py").exists()
     mounted_paths = {
         str(route.path)
         for module in (session_api, workspaces_api, health_api)
@@ -142,6 +160,11 @@ def test_404_and_429_branches_are_unreachable_for_the_five_ops(authed: Any) -> N
         f"{API_PREFIX}/workspaces",
         f"{API_PREFIX}/health",
     }
+    jobs_paths = {
+        str(route.path) for route in jobs_api.router.routes if isinstance(route, APIRoute)
+    }
+    assert jobs_paths, "denominator=0：jobs 路由无路径面 ⇒ 互斥断言会退化成空断言"
+    assert jobs_paths.isdisjoint(mounted_paths), sorted(jobs_paths & mounted_paths)
     assert "JOB_CAPACITY" in PROBLEM_CODES
     response = authed.get(f"{API_PREFIX}/workspaces")
     assert response.status_code == 200

@@ -34,6 +34,7 @@ from campaignlab.api.common import (
     request_id_of,
 )
 from campaignlab.api.deps import HealthService, SessionService, WorkspaceService
+from campaignlab.api.jobs import router as jobs_router
 from campaignlab.api.session import router as session_router
 from campaignlab.api.workspaces import router as workspaces_router
 from campaignlab.clock import Clock, SystemClock
@@ -154,4 +155,6 @@ def create_app(
     if workspace_service is not None:
         app.include_router(workspaces_router)
     # M0-04/S4（A10 最小例外，≤3 行）：app.include_router(jobs.router)
+    if workspace_service is not None:
+        app.include_router(jobs_router)
     return app

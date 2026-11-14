@@ -181,19 +181,31 @@ def test_app_mounts_routers_only_when_services_injected(tmp_path: Path) -> None:
 
 
 def test_app_py_contains_only_the_a85_mount_lines() -> None:
+    """A85 / A10 挂载面守护。
+
+    **R16 迁移注记（A226 / D-047，编排器同批修正）**：M0-04/S4 依 A10 最小例外（≤3 行）落地
+    ``app.include_router(jobs_router)`` 后，原判据「挂载行恰 3 条 **且** 不含 jobs」必然失真。
+    迁移为「挂载行恰 4 条，其中含 jobs 的恰 1 条，且 jobs 必须是与 workspaces **同形的条件挂载**」
+    —— 判据由「禁 jobs」升级为「jobs 只能以被授权的条件形态出现」，强度不降：多一条红、少一条红、
+    把 jobs 改成无条件挂载、删掉 ``import router as jobs_router``，四种形态均判红。
+    函数名沿用历史（A85 时代语义＝「只有那三条挂载行」），改名归 FU-52。
+    """
     source = (_REPO / "src/campaignlab/api/app.py").read_text(encoding="utf-8")
     pairs = (
         "    if session_service is not None:\n        app.include_router(session_router)",
         "    if workspace_service is not None:\n        app.include_router(workspaces_router)",
+        "    if workspace_service is not None:\n        app.include_router(jobs_router)",
     )
     for pair in pairs:
         assert pair in source
     assert "import router as session_router" in source
     assert "import router as workspaces_router" in source
+    assert "import router as jobs_router" in source
     mounted_lines = [
         line for line in source.splitlines() if line.strip().startswith("app.include_router(")
     ]
-    assert len(mounted_lines) == 3
-    assert not any("jobs" in line for line in mounted_lines)
+    assert len(mounted_lines) == 4
+    assert len([line for line in mounted_lines if "jobs" in line]) == 1
     assert len([line for line in source.splitlines() if "session_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "workspaces_router" in line]) <= 3
+    assert len([line for line in source.splitlines() if "jobs_router" in line]) <= 3
