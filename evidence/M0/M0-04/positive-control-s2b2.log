@@ -1,0 +1,750 @@
+# M0-04/S2b-2 正向对照原始日志（positive-control-s2b2）
+# 方法：对 write_set 内 4 个文件逐个施加**单点变异** -> 跑目标用例 -> 落原始输出
+#       -> 从 /tmp/s2b2-pristine 复原 -> sha256 双向核验（改前 == 复原后）-> 末尾复验绿
+# 变异条数：14（每条对准一条守护；变异后仍绿即判「该守护无牙」）
+
+## 0. 改前 sha256 快照
+  2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e  src/campaignlab/worker/integrity.py
+  1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4  src/campaignlab/worker/deps.py
+  1cef72d3092dec3315ea6b37e386666827c5cd8439022f3d255699c552a7874b  tests/unit/test_worker_integrity.py
+  f301ab090caee403d76432961560e9b37b72c53a5fd5337f968ba51851434330  tests/integration/jobs/test_worker_deps.py
+
+==============================================================================
+## M1-A156-去掉启动闸（不调 verify_same_filesystem）
+   目标文件: src/campaignlab/worker/deps.py
+   变异前:
+     -     writer = ArtifactWriter(resolve_data_dir(config))
+     -     writer.verify_same_filesystem()
+     -     return writer
+   变异后:
+     +     writer = ArtifactWriter(resolve_data_dir(config))
+     +     return writer
+   变异后文件 sha256: b7a87d838c79e112f808cfd4831f957c93e89b4b04eb26000707ecb957af706b
+   命令: uv run --no-sync pytest -q tests/integration/jobs/test_worker_deps.py -k artifact_writer or st_dev or rc2
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   |             and child.func.attr == "verify_same_filesystem"
+   |         ]
+   |         return_lines = [child.lineno for child in ast.walk(node) if isinstance(child, ast.Return)]
+   | >       assert len(verify_lines) == 1, f"必须恰好调用一次，实测 {verify_lines}"
+   | E       AssertionError: 必须恰好调用一次，实测 []
+   | E       assert 0 == 1
+   | E        +  where 0 = len([])
+   | 
+   | tests/integration/jobs/test_worker_deps.py:292: AssertionError
+   | ______________ test_st_dev_mismatch_config_error_maps_to_cli_rc2 _______________
+   | 
+   | config = AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-93/test_st_dev_mismatch_config_er...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15)
+   | data_dir = PosixPath('/tmp/pytest-of-szf/pytest-93/test_st_dev_mismatch_config_er0')
+   | monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7329878e2b10>
+   | capsys = <_pytest.capture.CaptureFixture object at 0x7329879ebe00>
+   | 
+   |     def test_st_dev_mismatch_config_error_maps_to_cli_rc2(
+   |         config: AppConfig,
+   |         data_dir: Path,
+   |         monkeypatch: pytest.MonkeyPatch,
+   |         capsys: pytest.CaptureFixture[str],
+   |     ) -> None:
+   |         """A156 点名要求的完整链：``st_dev`` 不符 → ``ConfigError`` → **CLI 面 rc=2**。
+   |     
+   |         第二环走 ``cli.cmd_serve`` 的**既有**映射（``except ConfigError → return 2``）。
+   |         ``cli.py`` 在本子任务硬禁内，故不改它、也不假装已经接好线：这里把
+   |         ``get_artifact_writer`` 真实抛出的那个异常对象喂给 ``cmd_serve`` 的配置解析入口，
+   |         证明「这一类异常在 serve 面上就是 rc=2」。启动路径真正调用
+   |         ``get_artifact_writer`` 的那一行属 FU-30／S4（``cli.py`` / ``api/app.py``），
+   |         已在回执里如实标注。
+   |         """
+   |         seen = _install_cross_device_stat(monkeypatch, results_root(data_dir))
+   |         try:
+   | >           with pytest.raises(ConfigError) as excinfo:
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | E           Failed: DID NOT RAISE ConfigError
+   | 
+   | tests/integration/jobs/test_worker_deps.py:314: Failed
+   | =========================== short test summary info ============================
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_artifact_writer_returns_a_writer_when_both_roots_share_one_device
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_artifact_writer_raises_config_error_when_st_dev_differs
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_artifact_writer_raises_config_error_on_a_real_second_filesystem
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_artifact_writer_calls_verify_same_filesystem_before_returning
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_st_dev_mismatch_config_error_maps_to_cli_rc2
+   | 5 failed, 1 passed, 12 deselected in 2.02s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M2-integrity-verify 恒返回空表（校验静默失效）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     for record in _artifact_records(conn):
+     -         found.extend(_check_record(record, root=root, resolved_root=resolved_root))
+   变异后:
+     + <整段删除>
+   变异后文件 sha256: b9f285672449181efb6e275772a2c4098205f27e4690e66dd6e3965b0faad4bb
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k verify_artifact_index
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | tests/unit/test_worker_integrity.py:441: AssertionError
+   | ______________ test_verify_artifact_index_reports_unreadable_file ______________
+   | 
+   | engine = Engine(sqlite:////tmp/pytest-of-szf/pytest-94/test_verify_artifact_index_rep4/state/campaignlab.db)
+   | data_dir = PosixPath('/tmp/pytest-of-szf/pytest-94/test_verify_artifact_index_rep4')
+   | monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x73085d269e00>
+   | 
+   |     def test_verify_artifact_index_reports_unreadable_file(
+   |         engine: Engine, data_dir: Path, monkeypatch: pytest.MonkeyPatch
+   |     ) -> None:
+   |         """安全兜底二：文件在但读不出来 ⇒ ``UNREADABLE``，而不是把异常抛给调用方。
+   |     
+   |         复核器的职责是**出具可定位的差异清单**；一个读不动的文件若让整个校核崩掉，
+   |         就正好丢掉了「缺件可定位」这条 AC-031 前提。用 monkeypatch 造 ``OSError``
+   |         而不是靠 ``chmod 000``：后者在 root 下不成立，会变成环境相关的假绿／假红。
+   |         """
+   |         records = _seed_three(engine, data_dir)
+   |         victim_path = data_dir.joinpath(*records[0].relative_path.split("/"))
+   |     
+   |         real_hash_file = hash_file
+   |         boom_calls: list[Path] = []
+   |     
+   |         def _boom(path: Path, **kwargs: object) -> tuple[str, int]:
+   |             if Path(path).resolve() == victim_path.resolve():
+   |                 boom_calls.append(Path(path))
+   |                 raise OSError(13, "Permission denied")
+   |             return real_hash_file(path)
+   |     
+   |         monkeypatch.setattr("campaignlab.worker.integrity.hash_file", _boom)
+   |         with connect(engine) as conn:
+   |             found = verify_artifact_index(conn, data_dir)
+   | >       assert _reasons(found) == [UNREADABLE]
+   | E       AssertionError: assert [] == ['UNREADABLE']
+   | E         
+   | E         Right contains one more item: 'UNREADABLE'
+   | E         Use -v to get more diff
+   | 
+   | tests/unit/test_worker_integrity.py:471: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_missing_file
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_sha256_mismatch
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_byte_size_mismatch
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_path_escape_without_hashing_outside
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_unreadable_file
+   | 5 failed, 2 passed, 12 deselected in 3.75s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M3-A157-自写第二份哈希实现（不复用 hash_file）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -         actual_sha256, actual_byte_size = hash_file(target)
+   变异后:
+     +         _h = __import__('hashlib').sha256(target.read_bytes())
+     +         actual_sha256, actual_byte_size = _h.hexdigest(), target.stat().st_size
+   变异后文件 sha256: 555c59701d7254994ca4d7422a6a5c36617a3d6638a962fc881d1adee528bca9
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k hash
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | E         PosixPath('/tmp/pytest-of-szf/pytest-95/test_hashing_goes_through_infr0/results/JOB_RESULT/ws-int-a/90/90fdfd42c05fc70d3326cbad4d63e72d5bacbbc3bca32ee5b842b6bc114db64d')
+   | E         PosixPath('/tmp/pytest-of-szf/pytest-95/test_hashing_goes_through_infr0/results/JOB_RESULT/ws-int-a/c6/c6cef794335dfe7c75e77c8e7843bb45331b4ee5ef819190badf5ac3268f8693')
+   | E         PosixPath('/tmp/pytest-of-szf/pytest-95/test_hashing_goes_through_infr0/results/JOB_RESULT/ws-int-b/76/7636fe3b44f62518f761c7b7520af3c9ecbc2bbc254398b0ebbe874146869c16')
+   | E         Use -v to get more diff
+   | 
+   | tests/unit/test_worker_integrity.py:507: AssertionError
+   | ___________ test_integrity_module_has_no_second_hash_implementation ____________
+   | 
+   |     def test_integrity_module_has_no_second_hash_implementation() -> None:
+   |         """A157 静态面：本模块**不含**第二份摘要实现。
+   |     
+   |         两条 AST 判据（禁正则扫源码文本）：① 必须有 ``from campaignlab.infra.artifacts
+   |         import ... hash_file``；② 全文不得 import ``hashlib``、不得出现 ``hexdigest`` 属性
+   |         访问。理由见 design §11-A157：两份实现必然在 chunk 边界／空文件处置上漂移，
+   |         而漂移的表现形式恰好是「校验静默失配」。
+   |         """
+   |         tree = ast.parse(MODULE_PATH.read_text(encoding="utf-8"), filename=str(MODULE_PATH))
+   |         imported_from_artifacts: set[str] = set()
+   |         imported_modules: set[str] = set()
+   |         for node in ast.walk(tree):
+   |             if isinstance(node, ast.ImportFrom) and node.module == "campaignlab.infra.artifacts":
+   |                 imported_from_artifacts.update(alias.name for alias in node.names)
+   |             elif isinstance(node, ast.Import):
+   |                 imported_modules.update(alias.name for alias in node.names)
+   |             elif isinstance(node, ast.ImportFrom) and node.module is not None:
+   |                 imported_modules.add(node.module)
+   |         assert "hash_file" in imported_from_artifacts, "必须复用写入侧的公共 hash_file（A157）"
+   |         assert "hashlib" not in imported_modules, "禁引入第二份摘要实现"
+   |         hexdigest_calls = [
+   |             node.lineno
+   |             for node in ast.walk(tree)
+   |             if isinstance(node, ast.Attribute) and node.attr == "hexdigest"
+   |         ]
+   | >       assert hexdigest_calls == [], f"禁自算摘要：{hexdigest_calls}"
+   | E       AssertionError: 禁自算摘要：[190]
+   | E       assert [190] == []
+   | E         
+   | E         Left contains one more item: 190
+   | E         Use -v to get more diff
+   | 
+   | tests/unit/test_worker_integrity.py:536: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_hashing_goes_through_infra_hash_file
+   | FAILED tests/unit/test_worker_integrity.py::test_integrity_module_has_no_second_hash_implementation
+   | 2 failed, 1 passed, 16 deselected in 1.25s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M4-resolve_data_dir-自拼路径（违 design §9 禁自拼）
+   目标文件: src/campaignlab/worker/deps.py
+   变异前:
+     -     if config is not None:
+     -         return config.data_dir
+   变异后:
+     +     if config is not None:
+     +         return config.data_dir / "results"
+   变异后文件 sha256: 17ba74e0ed4fb72be3eb6184dc122950587a22d70df6de3c1855a24d31195be6
+   命令: uv run --no-sync pytest -q tests/integration/jobs/test_worker_deps.py -k resolve_data_dir
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F.F                                                                      [100%]
+   | =================================== FAILURES ===================================
+   | ____________ test_resolve_data_dir_takes_the_config_value_verbatim _____________
+   | 
+   | config = AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15)
+   | 
+   |     def test_resolve_data_dir_takes_the_config_value_verbatim(config: AppConfig) -> None:
+   | >       assert resolve_data_dir(config) == config.data_dir
+   | E       AssertionError: assert PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th0/results') == PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th0')
+   | E        +  where PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th0/results') = resolve_data_dir(AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15))
+   | E        +  and   PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th0') = AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-96/test_resolve_data_dir_takes_th...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15).data_dir
+   | 
+   | tests/integration/jobs/test_worker_deps.py:351: AssertionError
+   | _______________ test_resolve_data_dir_never_self_assembles_paths _______________
+   | 
+   |     def test_resolve_data_dir_never_self_assembles_paths() -> None:
+   |         """design §9 点名「必须委托 ``infra.db.paths``／``AppConfig``，**禁自拼**」的静态守护。
+   |     
+   |         三条判据：函数体内不得有 ``/`` 路径拼接、不得调 ``joinpath``/``expanduser``/``resolve``/
+   |         ``mkdir``、不得出现数据目录子目录名字面量；且必须真的调到转发目标。
+   |         """
+   |         node = _function_node("resolve_data_dir")
+   |         for child in ast.walk(node):
+   |             if isinstance(child, ast.BinOp):
+   | >               assert not isinstance(child.op, ast.Div), "禁在 deps 里拼路径"
+   | E               AssertionError: 禁在 deps 里拼路径
+   | E               assert not True
+   | E                +  where True = isinstance(Div(), <class 'ast.Div'>)
+   | E                +    where Div() = BinOp(left=Attribute(value=Name(id='config', ctx=Load(...)), attr='data_dir', ctx=Load()), op=Div(), right=Constant(value='results', kind=None)).op
+   | E                +    and   <class 'ast.Div'> = ast.Div
+   | 
+   | tests/integration/jobs/test_worker_deps.py:377: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_resolve_data_dir_takes_the_config_value_verbatim
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_resolve_data_dir_never_self_assembles_paths
+   | 2 failed, 1 passed, 15 deselected in 0.71s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M5-worker 内就地写 SQL 字面量（违 A81 / design §4）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     workspaces = WorkspaceRepository().list_page(conn, limit=_WORKSPACE_ENUM_LIMIT)
+   变异后:
+     +     _ = "SELECT workspace_id FROM artifacts"
+     +     workspaces = WorkspaceRepository().list_page(conn, limit=_WORKSPACE_ENUM_LIMIT)
+   变异后文件 sha256: e66788853b0e1faa37cdbf0d64279ea54c491f49623cffbb92806282e4b31ac3
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py -k sql or dml
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | 
+   | tests/unit/test_worker_integrity.py:580: AssertionError
+   | ______________ test_worker_package_contains_no_table_dml_literals ______________
+   | 
+   |     def test_worker_package_contains_no_table_dml_literals() -> None:
+   |         """``worker/**`` 里出现的 SQL 文本**只有**三条事务控制语句（design §4 / A81）。
+   |     
+   |         只检查**非 docstring** 的字符串常量：说明性文字里当然会提到 UPDATE／SELECT，
+   |         那是在解释为什么本包不写它们。docstring 用 AST 精确识别（模块／类／函数体的首条
+   |         ``Expr(Constant(str))``）。
+   |         """
+   |         verbs = re.compile(r"\b(INSERT|UPDATE|DELETE|SELECT|CREATE|DROP|ALTER)\b", re.IGNORECASE)
+   |         allowed = {_BEGIN_IMMEDIATE, _COMMIT, _ROLLBACK}
+   |         offenders: list[str] = []
+   |         for path in sorted((SRC / "worker").rglob("*.py")):
+   |             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+   |             docstrings: set[int] = set()
+   |             for node in ast.walk(tree):
+   |                 if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+   |                     body = getattr(node, "body", [])
+   |                     if (
+   |                         body
+   |                         and isinstance(body[0], ast.Expr)
+   |                         and isinstance(body[0].value, ast.Constant)
+   |                         and isinstance(body[0].value.value, str)
+   |                     ):
+   |                         docstrings.add(id(body[0].value))
+   |             for node in ast.walk(tree):
+   |                 if isinstance(node, ast.Constant) and isinstance(node.value, str):
+   |                     if id(node) in docstrings or node.value in allowed:
+   |                         continue
+   |                     if verbs.search(node.value):
+   |                         offenders.append(f"{path.relative_to(REPO)}:{node.lineno} {node.value[:60]!r}")
+   | >       assert offenders == [], offenders
+   | E       AssertionError: ["src/campaignlab/worker/integrity.py:120 'SELECT workspace_id FROM artifacts'"]
+   | E       assert ["src/campaig...M artifacts'"] == []
+   | E         
+   | E         Left contains one more item: "src/campaignlab/worker/integrity.py:120 'SELECT workspace_id FROM artifacts'"
+   | E         Use -v to get more diff
+   | 
+   | tests/unit/test_job_repository_terminal.py:129: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_new_worker_modules_contain_no_sql_text[integrity]
+   | FAILED tests/unit/test_job_repository_terminal.py::test_worker_package_contains_no_table_dml_literals
+   | 2 failed, 3 passed, 38 deselected in 0.31s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M6-删掉 jobs 侧缺口披露（把未实现说成已覆盖）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     - ``RESULT_REF_DANGLING``）当前尚未产出**，
+   变异后:
+     + ``RESULT_REF_DANGLING``）已全部覆盖**，
+   变异后文件 sha256: e04c7eac9e36b6d50ce305ee21cec6622001b62c19c4b00c50deee7840bbe099
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k jobs_side
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | ___________ test_jobs_side_reasons_are_declared_but_not_yet_produced ___________
+   | 
+   |     def test_jobs_side_reasons_are_declared_but_not_yet_produced() -> None:
+   |         """``RESULT_JSON_*`` 两条 reason **只存在于声明处**，且缺口在 docstring 里显式披露。
+   |     
+   |         design §5:52 要求 ``verify_artifact_index`` 也核 ``jobs.result_json``（可解析 ＋
+   |         指向存在的制品）。枚举 ``jobs`` 行需要一条只读查询或一个仓储读侧访问器：前者被
+   |         ``test_worker_package_contains_no_table_dml_literals`` 判红（该文件在本子任务硬禁内），
+   |         后者所在的 ``infra/db/repositories.py`` 同样硬禁且现无此访问器。故这两条当前
+   |         **不可产出**，已按 A159 报 U 项而非自行发明判据。
+   |     
+   |         本用例的牙在于：将来谁真的实现了 jobs 侧（常量出现第二处引用），或谁把披露文字删了，
+   |         都会立刻判红 —— 防止「声明了七个 reason、实际只产五个」被后来者静默当作已全覆盖。
+   |         """
+   |         tree = ast.parse(MODULE_PATH.read_text(encoding="utf-8"), filename=str(MODULE_PATH))
+   |         for constant_name in ("RESULT_JSON_UNPARSEABLE", "RESULT_REF_DANGLING"):
+   |             uses = [
+   |                 node.lineno
+   |                 for node in ast.walk(tree)
+   |                 if isinstance(node, ast.Name) and node.id == constant_name
+   |             ]
+   |             assert len(uses) == 1, f"{constant_name} 只应在定义处出现一次，实测 {uses}"
+   |         doc = inspect.getdoc(verify_artifact_index) or ""
+   | >       assert "尚未产出" in doc, "缺口必须在 docstring 里显式披露，禁静默缩小覆盖面"
+   | E       AssertionError: 缺口必须在 docstring 里显式披露，禁静默缩小覆盖面
+   | E       assert '尚未产出' in '逐行核 ``artifacts`` 与落盘制品是否一致；``[]`` 即「数据库和制品摘要一致」。\n\n**已落地的判据（design §5:52 前三项）**：``artifacts.relative_path`` 的存在性、\n...ob_id>)``，即 id 指向**作业行**而非制品行，\n   故「指向存在的制品」在 M0-04 口径下恒不成立 —— 该判据到底核 ``jobs`` 还是核\n   ``artifacts`` 也需一并裁定（同一 U 项内）。'
+   | 
+   | tests/unit/test_worker_integrity.py:563: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_jobs_side_reasons_are_declared_but_not_yet_produced
+   | 1 failed, 18 deselected in 0.24s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M7-A169-静默返回 None 而不指名 S2c
+   目标文件: src/campaignlab/worker/deps.py
+   变异前:
+     -     except ModuleNotFoundError as exc:
+     -         raise RuntimeError(_SERVICE_MISSING) from exc
+   变异后:
+     +     except ModuleNotFoundError:
+     +         return None
+   变异后文件 sha256: c16195159c25ce0bfd1cea7d1d38634f92ebac78098f0d53cb7b8dd6278f3a42
+   命令: uv run --no-sync pytest -q tests/integration/jobs/test_worker_deps.py -k job_service
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F..                                                                      [100%]
+   | =================================== FAILURES ===================================
+   | __________ test_get_job_service_names_s2c_until_worker_service_lands ___________
+   | 
+   | config = AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-97/test_get_job_service_names_s2c...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15)
+   | 
+   |     def test_get_job_service_names_s2c_until_worker_service_lands(config: AppConfig) -> None:
+   |         """缺席时调用 ⇒ ``RuntimeError`` 且文本指名 S2c，**不**静默返回 ``None`` 或替身。"""
+   |         with pytest.raises(RuntimeError) as excinfo:
+   |             get_job_service(config=config)
+   |         message = str(excinfo.value)
+   |         assert "S2c" in message and SERVICE_MODULE in message
+   | >       assert excinfo.value.__cause__ is not None, "必须保留 ModuleNotFoundError 作为 __cause__"
+   | E       AssertionError: 必须保留 ModuleNotFoundError 作为 __cause__
+   | E       assert None is not None
+   | E        +  where None = RuntimeError('campaignlab.worker.service 里没有可调用的 JobService（A169：S2c 的交付符号）').__cause__
+   | E        +    where RuntimeError('campaignlab.worker.service 里没有可调用的 JobService（A169：S2c 的交付符号）') = <ExceptionInfo RuntimeError('campaignlab.worker.service 里没有可调用的 JobService（A169：S2c 的交付符号）') tblen=2>.value
+   | 
+   | tests/integration/jobs/test_worker_deps.py:461: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_job_service_names_s2c_until_worker_service_lands
+   | 1 failed, 2 passed, 15 deselected in 1.72s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M8-manifest_rows-枚举恒空（备份清单静默变空）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     for workspace in workspaces:
+   变异后:
+     +     for workspace in []:
+   变异后文件 sha256: 66f4783410b6115b7136a3078c3e316f787bfcedcf840a9b8b985d1a1ecc66ee
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k manifest
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   |     def test_manifest_rows_returns_every_artifact_row_sorted(engine: Engine, data_dir: Path) -> None:
+   |         """``manifest_rows`` 必须**逐行**给出全表制品，并按 ``(workspace_id, artifact_id)`` 排序。
+   |     
+   |         这条是 M8 正向对照暴露出来的缺口补件：原先只有「字段面」与「委托路径」两类静态断言，
+   |         把枚举整个改空（``for workspace in []``）也不会判红 —— 清单恒空对备份来说是灾难性的
+   |         静默失败（备份会认为「没有制品要复制」）。故这里钉住**行数等于制品数**与逐字段取值。
+   |         """
+   |         records = _seed_three(engine, data_dir)
+   |         with connect(engine) as conn:
+   |             rows = manifest_rows(conn)
+   |         # 分母断言：行数必须等于种下的制品数，防「枚举恒空」的假绿
+   | >       assert len(rows) == len(records) >= MIN_ROWS
+   | E       AssertionError: assert 0 == 3
+   | E        +  where 0 = len([])
+   | E        +  and   3 = len([ArtifactRecord(workspace_id='ws-int-a', id='art-a1', kind='JOB_RESULT', sha256='c6cef794335dfe7c75e77c8e7843bb45331b4...fdfd42c05fc70d3326cbad4d63e72d5bacbbc3bca32ee5b842b6bc114db64d', byte_size=48, created_at='2026-11-14T01:00:00+00:00')])
+   | 
+   | tests/unit/test_worker_integrity.py:290: AssertionError
+   | _________ test_manifest_rows_reads_the_index_only_never_the_filesystem _________
+   | 
+   | engine = Engine(sqlite:////tmp/pytest-of-szf/pytest-98/test_manifest_rows_reads_the_i0/state/campaignlab.db)
+   | data_dir = PosixPath('/tmp/pytest-of-szf/pytest-98/test_manifest_rows_reads_the_i0')
+   | 
+   |     def test_manifest_rows_reads_the_index_only_never_the_filesystem(
+   |         engine: Engine, data_dir: Path
+   |     ) -> None:
+   |         """清单只反映**索引声称**的值：删实物、改实物都不改清单（实测复核是 verify 的职责）。
+   |     
+   |         顺带把两者的分工钉住：同一状态下 ``verify_artifact_index`` 必须恰好报出这两处差异，
+   |         否则「清单」与「实物」就无法分开归因（OPERATIONS.md:20 的备份语义要求二者可对照）。
+   |         """
+   |         records = _seed_three(engine, data_dir)
+   |         data_dir.joinpath(*records[0].relative_path.split("/")).unlink()
+   |         data_dir.joinpath(*records[1].relative_path.split("/")).write_bytes(b"tampered")
+   |         with connect(engine) as conn:
+   |             rows = manifest_rows(conn)
+   | >       assert len(rows) == len(records)
+   | E       AssertionError: assert 0 == 3
+   | E        +  where 0 = len([])
+   | E        +  and   3 = len([ArtifactRecord(workspace_id='ws-int-a', id='art-a1', kind='JOB_RESULT', sha256='c6cef794335dfe7c75e77c8e7843bb45331b4...fdfd42c05fc70d3326cbad4d63e72d5bacbbc3bca32ee5b842b6bc114db64d', byte_size=48, created_at='2026-11-14T01:00:00+00:00')])
+   | 
+   | tests/unit/test_worker_integrity.py:320: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_manifest_rows_returns_every_artifact_row_sorted
+   | FAILED tests/unit/test_worker_integrity.py::test_manifest_rows_reads_the_index_only_never_the_filesystem
+   | 2 failed, 1 passed, 16 deselected in 1.35s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M9-A154-把「恰 1 行」的期望改成 2
+   目标文件: tests/integration/jobs/test_worker_deps.py
+   变异前:
+     -     assert _artifact_count(engine) == 1, "同一 (workspace_id,kind,sha256) 只准落 1 行"
+   变异后:
+     +     assert _artifact_count(engine) == 2, "变异：故意把期望改成 2"
+   变异后文件 sha256: e166362a86328f4c99c0db80c9c92464ed1b3b2045e4591a7f58d3447bb6714b
+   命令: uv run --no-sync pytest -q tests/integration/jobs/test_worker_deps.py -k option_a
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | __ test_a154_option_a_succeed_with_empty_artifacts_registers_exactly_one_row ___
+   | 
+   | config = AppConfig(host='127.0.0.1', port=8000, data_dir=PosixPath('/tmp/pytest-of-szf/pytest-99/test_a154_option_a_succeed_wit...='0.0.0', session_ttl_seconds=3600, token_ttl_seconds=60, max_json_body_bytes=1048576, worker_heartbeat_ttl_seconds=15)
+   | engine = Engine(sqlite:////tmp/pytest-of-szf/pytest-99/test_a154_option_a_succeed_wit0/state/campaignlab.db)
+   | clock = <campaignlab.clock.FixedClock object at 0x7765d123e230>
+   | 
+   |     def test_a154_option_a_succeed_with_empty_artifacts_registers_exactly_one_row(
+   |         config: AppConfig, engine: Engine, clock: FixedClock
+   |     ) -> None:
+   |         """接法 (a)：``commit()`` 在 ``BEGIN IMMEDIATE`` 内登记，随后 ``succeed(artifacts=())``。
+   |     
+   |         design §11-A154：制品行已由 ``commit()`` 在同一事务内登记，故 ``succeed`` 的
+   |         ``artifacts`` 必须是**空**的。断言 ``artifacts`` 表恰 1 行（design §11:157 的判据）。
+   |         """
+   |         target_store = get_job_store(config=config)
+   |         writer = get_artifact_writer(config=config)
+   |         lease = _running_job(target_store, clock)
+   |         with writer.begin(WS, lease.job_id, lease.attempt) as stage:
+   |             stage.write(PAYLOAD)
+   |             with short_transaction(engine) as conn:
+   |                 committed = writer.commit(
+   |                     conn,
+   |                     stage,
+   |                     workspace_id=WS,
+   |                     kind=ARTIFACT_KIND_JOB_RESULT,
+   |                     now=clock.now(),
+   |                 )
+   |         record = target_store.succeed(
+   |             lease,
+   |             result_ref=ObjectRef(kind="job", id=lease.job_id),
+   |             now=clock.now(),
+   |             artifacts=(),
+   |         )
+   |         assert record.state == "SUCCEEDED"
+   | >       assert _artifact_count(engine) == 2, "变异：故意把期望改成 2"
+   | E       AssertionError: 变异：故意把期望改成 2
+   | E       assert 1 == 2
+   | E        +  where 1 = _artifact_count(Engine(sqlite:////tmp/pytest-of-szf/pytest-99/test_a154_option_a_succeed_wit0/state/campaignlab.db))
+   | 
+   | tests/integration/jobs/test_worker_deps.py:528: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_a154_option_a_succeed_with_empty_artifacts_registers_exactly_one_row
+   | 1 failed, 17 deselected in 0.82s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: f301ab090caee403d76432961560e9b37b72c53a5fd5337f968ba51851434330
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M10-把 MISSING_FILE 移出 __all__（no_implicit_reexport 退导出）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     "MISSING_FILE",
+   变异后:
+     + <整段删除>
+   变异后文件 sha256: c31bbc20d9ebb1cae5416f7a3772b597b3b50d803a1ad450cb83aceb81b87ed6
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k reason_constants
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | ____________________ test_all_reason_constants_are_exported ____________________
+   | 
+   |     def test_all_reason_constants_are_exported() -> None:
+   |         """七个 reason 常量全部在 ``__all__`` 内（strict 开着 ``no_implicit_reexport``）。"""
+   |         for name in (
+   |             "BYTE_SIZE_MISMATCH",
+   |             "MISSING_FILE",
+   |             "PATH_ESCAPE",
+   |             "RESULT_JSON_UNPARSEABLE",
+   |             "RESULT_REF_DANGLING",
+   |             "SHA256_MISMATCH",
+   |             "UNREADABLE",
+   |         ):
+   | >           assert name in integrity.__all__, name
+   | E           AssertionError: MISSING_FILE
+   | E           assert 'MISSING_FILE' in ['BYTE_SIZE_MISMATCH', 'PATH_ESCAPE', 'RESULT_JSON_UNPARSEABLE', 'RESULT_REF_DANGLING', 'SHA256_MISMATCH', 'UNREADABLE', ...]
+   | E            +  where ['BYTE_SIZE_MISMATCH', 'PATH_ESCAPE', 'RESULT_JSON_UNPARSEABLE', 'RESULT_REF_DANGLING', 'SHA256_MISMATCH', 'UNREADABLE', ...] = integrity.__all__
+   | 
+   | tests/unit/test_worker_integrity.py:271: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_all_reason_constants_are_exported
+   | 1 failed, 18 deselected in 0.26s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M11-打乱 Discrepancy 字段序（违 design §5:52 五元组）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     actual_sha256: str | None
+     -     reason: str
+   变异后:
+     +     reason: str
+     +     actual_sha256: str | None
+   变异后文件 sha256: f8d853680f9c0263f761384f4afbb8ceff80fc818bd4142809a0ba019ba01bbf
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k discrepancy_leading_five
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | __________ test_discrepancy_leading_five_fields_are_the_design_tuple ___________
+   | 
+   |     def test_discrepancy_leading_five_fields_are_the_design_tuple() -> None:
+   |         """``Discrepancy`` 前五个字段逐字等于 design §5:52 的五元组（顺序也钉住）。"""
+   |         names = [field.name for field in dataclasses.fields(Discrepancy)]
+   | >       assert names[:5] == [
+   |             "workspace_id",
+   |             "artifact_id",
+   |             "relative_path",
+   |             "expected_sha256",
+   |             "actual_sha256",
+   |         ]
+   | E       AssertionError: assert ['workspace_i...56', 'reason'] == ['workspace_i...ctual_sha256']
+   | E         
+   | E         At index 4 diff: 'reason' != 'actual_sha256'
+   | E         Use -v to get more diff
+   | 
+   | tests/unit/test_worker_integrity.py:223: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_discrepancy_leading_five_fields_are_the_design_tuple
+   | 1 failed, 18 deselected in 0.26s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M12-改 verify_artifact_index 的返回注解（违冻结签名）
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     - def verify_artifact_index(conn: Connection, data_dir: Path) -> list[Discrepancy]:
+   变异后:
+     + def verify_artifact_index(conn: Connection, data_dir: Path) -> list[ManifestRow]:
+   变异后文件 sha256: 9a33424a4adb7f3bcfa5ab9de0b7dad8b7a5bbf9cbff7b9f6ddad2992487e2d5
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k frozen_signatures
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | ____________________ test_frozen_signatures_match_design_52 ____________________
+   | 
+   |     def test_frozen_signatures_match_design_52() -> None:
+   |         """design §5:52 的两个签名逐字钉住（``inspect`` 实取，禁写死推断值）。"""
+   | >       assert str(inspect.signature(verify_artifact_index)) == (
+   |             "(conn: 'Connection', data_dir: 'Path') -> 'list[Discrepancy]'"
+   |         )
+   | E       assert "(conn: 'Conn...ManifestRow]'" == "(conn: 'Conn...Discrepancy]'"
+   | E         
+   | E         Skipping 38 identical leading characters in diff, use -v to show
+   | E         -  -> 'list[Discrepancy]'
+   | E         +  -> 'list[ManifestRow]'
+   | 
+   | tests/unit/test_worker_integrity.py:214: AssertionError
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_frozen_signatures_match_design_52
+   | 1 failed, 18 deselected in 0.24s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M13-get_job_store 改接内存库（忽略 config.database_url）
+   目标文件: src/campaignlab/worker/deps.py
+   变异前:
+     -     runtime = build_database_runtime(database_url=config.database_url)
+   变异后:
+     +     runtime = build_database_runtime(database_url="sqlite://")
+   变异后文件 sha256: b9060e284035fda02ecaee6816265255dd12b380de42c554e26fea426eddf8d1
+   命令: uv run --no-sync pytest -q tests/integration/jobs/test_worker_deps.py -k get_job_store
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   |             input_json=canonical_json({"snapshot": "S-1"}),
+   |             input_digest=INPUT_DIGEST,
+   |             now=clock.now(),
+   |             job_id=JOB,
+   |         )
+   | 
+   | tests/integration/jobs/test_worker_deps.py:414: 
+   | _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+   | src/campaignlab/worker/store.py:566: in enqueue
+   |     self._jobs.insert(conn, job=record)
+   | src/campaignlab/infra/db/repositories.py:402: in insert
+   |     conn.execute(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1464: in execute
+   |     return meth(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+   |     return connection._execute_clauseelement(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1686: in _execute_clauseelement
+   |     ret = self._execute_context(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1891: in _execute_context
+   |     return self._exec_single_context(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2019: in _exec_single_context
+   |     self._handle_dbapi_exception(
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2381: in _handle_dbapi_exception
+   |     raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2000: in _exec_single_context
+   |     self.dialect.do_execute(
+   | _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+   | 
+   | self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x75db9f6982d0>
+   | cursor = <sqlite3.Cursor object at 0x75db9f6bb8c0>
+   | statement = 'INSERT INTO jobs (workspace_id, id, kind, state, attempt, progress, stage, retry_of, retryable, input_json, input_digest, revision, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+   | parameters = ('ws-dep', 'J-dep-1', 'COMPARE', 'QUEUED', 0, 0, ...)
+   | context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x75db9f699950>
+   | 
+   |     def do_execute(self, cursor, statement, parameters, context=None):
+   | >       cursor.execute(statement, parameters)
+   | E       sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: jobs
+   | E       [SQL: INSERT INTO jobs (workspace_id, id, kind, state, attempt, progress, stage, retry_of, retryable, input_json, input_digest, revision, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+   | E       [parameters: ('ws-dep', 'J-dep-1', 'COMPARE', 'QUEUED', 0, 0, 'QUEUED', None, 0, '{"snapshot":"S-1"}', '0000000000000000000000000000000000000000000000000000000000000000', 1, '2026-11-14T01:00:00+00:00')]
+   | E       (Background on this error at: https://sqlalche.me/e/20/e3q8)
+   | 
+   | .venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:964: OperationalError
+   | =========================== short test summary info ============================
+   | FAILED tests/integration/jobs/test_worker_deps.py::test_get_job_store_is_bound_to_the_configured_database
+   | 1 failed, 17 deselected in 0.82s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## M14-去掉 data_dir 绝对路径前置校验
+   目标文件: src/campaignlab/worker/integrity.py
+   变异前:
+     -     if not root.is_absolute():
+   变异后:
+     +     if not root.is_absolute() and False:
+   变异后文件 sha256: 87f72c4dd59ce92dbcba171c96bb5fc1a0e743a46bea3cb52591bce888ed1cae
+   命令: uv run --no-sync pytest -q tests/unit/test_worker_integrity.py -k relative_data_dir
+   rc=1   期望 rc!=0（守护必须有牙）
+   --- 原始输出（tail 45 行）---
+   | F                                                                        [100%]
+   | =================================== FAILURES ===================================
+   | _____________ test_verify_artifact_index_rejects_relative_data_dir _____________
+   | 
+   | engine = Engine(sqlite:////tmp/pytest-of-szf/pytest-101/test_verify_artifact_index_rej0/state/campaignlab.db)
+   | tmp_path = PosixPath('/tmp/pytest-of-szf/pytest-101/test_verify_artifact_index_rej0')
+   | 
+   |     def test_verify_artifact_index_rejects_relative_data_dir(engine: Engine, tmp_path: Path) -> None:
+   |         """``data_dir`` 必须是绝对路径（与 ``ArtifactWriter`` / ``sweep_unreferenced`` 同口径）。"""
+   | >       with connect(engine) as conn, pytest.raises(ValueError, match="绝对路径"):
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | E       Failed: DID NOT RAISE ValueError
+   | 
+   | tests/unit/test_worker_integrity.py:479: Failed
+   | =========================== short test summary info ============================
+   | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_rejects_relative_data_dir
+   | 1 failed, 18 deselected in 0.66s
+   --- 原始输出结束 ---
+   判定: RED（守护有牙）
+   复原后 sha256: 2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e
+   双向核验（改前 == 复原后）: PASS
+
+==============================================================================
+## 末. 复原后 sha256 复验 + 全量复跑
+  2434f4e42fa73deb40d6d12bfcc62015afe0bcfdc7e4867b8e94329213f24d3e  src/campaignlab/worker/integrity.py  match_before=True
+  1f2be9761afec23df91ca824b579ce5afd483a5192f864b75f222863bc5b3cd4  src/campaignlab/worker/deps.py  match_before=True
+  1cef72d3092dec3315ea6b37e386666827c5cd8439022f3d255699c552a7874b  tests/unit/test_worker_integrity.py  match_before=True
+  f301ab090caee403d76432961560e9b37b72c53a5fd5337f968ba51851434330  tests/integration/jobs/test_worker_deps.py  match_before=True
+  命令: uv run --no-sync pytest -q <7 个路径限定套件>
+  rc=0
+  | ........................................................................ [ 42%]
+  | ........................................................................ [ 85%]
+  | .........................                                                [100%]
+  | 169 passed in 36.55s
+
+## 结论：变异 14 条，制造出 RED 14 条，复原 sha256 双向核验全通过 = True
