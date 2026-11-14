@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-14T10:04:42+08:00",
+  "updated_at": "2026-11-14T11:17:38+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.587,
+    "flash_share_tasks": 0.5745,
     "flash_share_tokens": 0.6655,
     "phase_quotas": {
       "M0": 100,
@@ -1162,12 +1162,49 @@
         "returned_round": 13,
         "loop_rounds_used": 2,
         "commit": "70be045"
+      },
+      {
+        "task": "M0-04",
+        "subtask": "S2b-3（A204 新立）：补齐 design §5:52 的 ④⑤ 判据 —— integrity.py 增 RESULT_JSON_UNPARSEABLE / RESULT_REF_DANGLING（A205：核 jobs 行存在性，非制品）+ JobRepository.list_for_workspace 纯追加（A204，禁 list_all）+ 用例 19→30 + 5 条阳性对照 + design 文末追加裁定注记（前 52 行 sha 双向一致）",
+        "subtask_count": 1,
+        "tier": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "reasoning": "high",
+        "tokens": 46000,
+        "tokens_estimated": true,
+        "context_single_round": 46000,
+        "over_input_cap": true,
+        "over_cap": true,
+        "over_cap_caliber": "§5.1 单轮输入面：lane 自估峰值 ≈46k > max 40k（主因＝为遵守「禁写死符号面计数」而现场生成证据脚本，单个证据生成器 ≈8.5k token）。§15.5 累计计费面（A183）：lane 自估 ≈2.0M+，其中本棒增量 ≈46k、余为 S2b-2 及更早续接段；无计费表读数故记 estimated=true，按 A183(a) **不入 token 面分母**。两口径并列不抵销（R13-4）。如实上报不抹平。",
+        "attempt": 1,
+        "loop_rounds_used": 1,
+        "loop_cap": 2,
+        "result": "DONE",
+        "round": 14,
+        "returned_round": 14,
+        "nickname": "Mendel",
+        "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
+        "commit": "PENDING",
+        "u_items_raised": [
+          "U-1",
+          "U-2",
+          "U-3",
+          "U-4"
+        ],
+        "u_items_ruled": {
+          "U-1": "A211",
+          "U-2": "A212",
+          "U-3": "A213",
+          "U-4": "A214"
+        },
+        "positive_controls": "5/5 变异 rc≠0（1/4/8/7/2 failed），5/5 复原 sha256==快照，ALL_RESTORED_IDENTICAL=True，终验 93 passed rc=0",
+        "orchestrator_reverification": "编排器独立复测（禁采信 lane 自报）：4 个改动件 sha256 与 checkpoint 快照逐字一致；design 前 52 行 sha256 双向 a5e38074…；repositories.py numstat 22/0 且 `def list_all`=0；integrity.py __all__=17；收集数 HEAD 冻结树 19 / 工作树 30；全表冻结收集 539→550，GIT_ENV_IGNORES 静态收集 16+5=21 ⇒ pytest_passed 571。"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
     "dispatched_not_yet_returned": 0,
-    "flash_share_dev_lanes": 0.3333,
+    "flash_share_dev_lanes": 0.32,
     "flash_share_口径": {
       "all_lanes": "19/31=0.6129",
       "dev_lanes_only_excl_Q": "4/15=0.2667",
@@ -1184,19 +1221,19 @@
         "recomputed_at": "2026-11-13T10:49:12+08:00"
       }
     },
-    "flash_share_recomputed_at": "2026-11-14T09:49:02+08:00",
+    "flash_share_recomputed_at": "2026-11-14T11:17:38+08:00",
     "flash_share_detail": {
-      "subtask_entries": 36,
-      "subtask_units_total": 46,
+      "subtask_entries": 37,
+      "subtask_units_total": 47,
       "subtask_units_flash": 27,
       "token_entries_known": 10,
-      "token_entries_null": 26,
+      "token_entries_null": 27,
       "tokens_known_total": 1190000,
       "tokens_known_flash": 792000,
-      "dev_lane_units_total": 24,
+      "dev_lane_units_total": 25,
       "dev_lane_units_flash": 8,
       "recomputed_by": "程序化重算（subtask_log 全量求和，units=subtask_count or 1；flash=tier_used==qwen3.8-flash；dev=task.startswith(M)；tokens 仅计非 null，禁手填禁估算）",
-      "recomputed_at": "2026-11-14T09:49:02+08:00",
+      "recomputed_at": "2026-11-14T11:17:38+08:00",
       "over_cap_entries": [
         {
           "task": "M0-03",
@@ -1373,15 +1410,16 @@
         "dev_lane_units_flash": 8,
         "recomputed_at": "2026-11-14T09:33:03+08:00"
       },
-      "recompute_reason_R13Y": "R13-Y：追加 lane Y（Mendel / M0-04·S2b-2，**max 档**）后按 R10-2 同批重算。units_total 45→46、units_flash 保持 27 ⇒ flash_share_tasks 0.6→0.587，护栏① **跌破 0.60**（tasks_target_met=false）。这是连续两棒 max（M2-01/S1 设计冻结件 + M0-04/S2b-2 关键路径件）的必然结果，两者都命中手册 §6.3 的强制 max 清单（公共冻结件 / 关键路径 / 跨模块设计），属「设计先行」形态而非降档失控。**回升路径已排定且可核**：M0-04 的 S4/S5/S6/S8（4 棒）与 M2-01 的 S3–S7（5 棒）+ S2b-3 之后的 flash 量产件，合计 ≥10 棒 flash（依 remaining_sequence_R12 与 M2-01-design.md §11 档位表）⇒ 若全部按档落地，units_flash 27→37 / units_total 46→56 = **0.6607**，护栏① 回到达标区。tokens 面：本条 estimated:true 按 A183 不入分母 ⇒ tokens_known_* 与 flash_share_tokens 不变（0.6655，护栏② 仍未达标）。dev_lane 面：M0-04 属 M* ⇒ dev 分母 +1（23→24），flash 分子不变（8）。"
+      "recompute_reason_R13Y": "R13-Y：追加 lane Y（Mendel / M0-04·S2b-2，**max 档**）后按 R10-2 同批重算。units_total 45→46、units_flash 保持 27 ⇒ flash_share_tasks 0.6→0.587，护栏① **跌破 0.60**（tasks_target_met=false）。这是连续两棒 max（M2-01/S1 设计冻结件 + M0-04/S2b-2 关键路径件）的必然结果，两者都命中手册 §6.3 的强制 max 清单（公共冻结件 / 关键路径 / 跨模块设计），属「设计先行」形态而非降档失控。**回升路径已排定且可核**：M0-04 的 S4/S5/S6/S8（4 棒）与 M2-01 的 S3–S7（5 棒）+ S2b-3 之后的 flash 量产件，合计 ≥10 棒 flash（依 remaining_sequence_R12 与 M2-01-design.md §11 档位表）⇒ 若全部按档落地，units_flash 27→37 / units_total 46→56 = **0.6607**，护栏① 回到达标区。tokens 面：本条 estimated:true 按 A183 不入分母 ⇒ tokens_known_* 与 flash_share_tokens 不变（0.6655，护栏② 仍未达标）。dev_lane 面：M0-04 属 M* ⇒ dev 分母 +1（23→24），flash 分子不变（8）。",
+      "note_R14Y": "第 37 条（M0-04/S2b-3，max，tokens=46000 但 estimated=true ⇒ 不入 token 面分母）入账后：units 46→47（flash 27 不变）⇒ flash_share_tasks 0.5870→0.5745；token 面保持 0.6655（known 10 条 / 1190000，flash 792000）；dev_lane 24→25（flash 8 不变）⇒ 0.3333→0.32。护栏①② 双双未达标，归因＝设计/契约/并发阶段 max 密集，属**时序性**破口而非档位分配错误；回升路径＝M0-04 的 S4/S5/S6/S8 + M2-01 的 S3–S7 共 9 个已排定 flash 件（入账后 36/56=0.6429）。禁补造 flash 工作凑配比（C10）。"
     },
     "guardrail_status": {
       "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
-      "actual_tasks": 0.587,
+      "actual_tasks": 0.5745,
       "actual_tokens": 0.6655,
       "tasks_target_met": false,
       "tokens_target_met": false,
-      "verdict": "护栏① flash_share_tasks 已达标（0.6129 >= 0.60）；护栏② flash_share_tokens 未达标（0.441 > 0.35）。如实上报不粉饰，历史诊断与纠正措施保留于 diagnosis / corrective_action / round4_update。 || R13-Z 追加（append-only）：flash_share_tasks 0.6136→0.6（lane Z 是 max 档，只增分母）⇒ 护栏① 仍达标但**余量归零**；下一条 max 档（lane Y/S2b-2）入账即跌破，回升依赖已排定的 flash 量产件（M0-04 S4/S5/S6/S8、M2-01 S3–S7）。flash_share_tokens 保持 0.6655（estimated 条目按 A183 不入分母），护栏② 仍未达标，如实上报不粉饰。 || R13-Y 追加（append-only）：护栏① 由达标转**未达标**（0.6→0.587），归因与回升路径见 breach_note_R13Y；护栏② 保持 0.6655 未达标（estimated 不入分母）。",
+      "verdict": "护栏① flash_share_tasks 已达标（0.6129 >= 0.60）；护栏② flash_share_tokens 未达标（0.441 > 0.35）。如实上报不粉饰，历史诊断与纠正措施保留于 diagnosis / corrective_action / round4_update。 || R13-Z 追加（append-only）：flash_share_tasks 0.6136→0.6（lane Z 是 max 档，只增分母）⇒ 护栏① 仍达标但**余量归零**；下一条 max 档（lane Y/S2b-2）入账即跌破，回升依赖已排定的 flash 量产件（M0-04 S4/S5/S6/S8、M2-01 S3–S7）。flash_share_tokens 保持 0.6655（estimated 条目按 A183 不入分母），护栏② 仍未达标，如实上报不粉饰。 || R13-Y 追加（append-only）：护栏① 由达标转**未达标**（0.6→0.587），归因与回升路径见 breach_note_R13Y；护栏② 保持 0.6655 未达标（estimated 不入分母）。 || R14-Y 追加（append-only，原文不改写）：S2b-3 为 max 档，只增分母 ⇒ 护栏① 0.5870→0.5745（仍未达标）；护栏② 保持 0.6655（estimated 条目按 A183 不入分母）。如实上报不粉饰。",
       "diagnosis": "① 子任务占比 44.4% < 60%：M0 阶段是环境与公共件奠基，手册 6.3 硬规则把 OpenAPI/DDL/状态机/公共冻结件变更全部强制 max，max 子任务天然偏多，属「设计先行」的必然形态而非降档失控；② token 占比 43.6% > 35%：主因是两条 flash 越限（Dirac 181k = 3.02×、Goodall 83k = 1.38×），合计 264k；若剔除越限部分，flash token 占比为 19.5%，说明护栏失效的直接原因是**单批任务过大**，不是档位选错。",
       "corrective_action": "批次 2/3 补卡降批至每批 4–5 张并**预抽 spec 摘要**（Dirac 自估可压到 35–45k/批）；wave3 起 D lane 的量产型子任务（参数化枚举、样板铺开、证据采集）严格按 6.3 强制 flash 清单派 flash，以程序级占比在 wave3–wave5 回升；护栏检查点仍为 wave2 出口（原 guardrail_checkpoint 不变）。  【2026-11-13T04:58:57+08:00 落地证据】批次 2 已按纠正措施执行：批量 8→4 张（M3-01/M3-02/M3-03/M4-01，全部 critical/slack=0），并预抽 orchestrator/handoff/D-016-batch2-context.md（16828B/198 行）作为唯一 spec 入口 + 预生成 4 份契约切片，手册由整读 758 行收窄为 5 段约 142 行；本批目标 ≤45k（批次1 实测 181k）。 另：M0-02/S3 因 ADR-005 §2.4 拆为 S3a(max 32k)/S3b(flash 14k)，flash 子任务占比 3/6=50% <60% —— 照实记账不凑配比，回补计划见 tasks[M0-02].s3_split_ruling.totals_v2.recovery_plan。",
       "checkpoint": "wave2 出口复算；若仍未达标，按手册 6.6「达 120% 暂停非关键路径任务并汇报」升级给项目负责人",
@@ -2221,7 +2259,7 @@
       "subtask_progress": {
         "S1": "DONE",
         "S2": "DONE",
-        "S2b": "IN_PROGRESS(S2b-1 DONE @R11-V / FU-29 CLOSED @R12-W，A153 反向边已消除 / S2b-2 现可派单，同一 max lane 续接)",
+        "S2b": "DONE（S2b-1 DONE @R11-V / FU-29 CLOSED @R12-W / S2b-2 DONE_WITH_GAP @R13-Y / S2b-3 DONE @R14-Y ⇒ §5:52 的 ①②③④⑤ 判据全部落地）",
         "S3": "DONE",
         "S4": "TODO",
         "S5": "TODO",
@@ -2230,7 +2268,7 @@
         "S8": "TODO",
         "S2c": "TODO",
         "S2b-2": "DONE_WITH_GAP",
-        "S2b-3": "TODO"
+        "S2b-3": "DONE"
       },
       "subtask_progress_evidence": {
         "S1": "0adf66e docs(M0-04/S1)：orchestrator/handoff/M0-04-design.md",
@@ -2307,7 +2345,16 @@
         "S6（flash，12k）：tests/integration/jobs/{test_lease(6),test_artifact(6)}.py —— 依赖 S5 的 conftest，S5→S6 串行",
         "S8（flash，9k）：evidence/M0/M0-04/** + evidence/M0/summaries/M0-04.md（≤30 行）；AC-031 只写「写入侧前提已交付 + 判定归 M5-01」，禁写 PASS/FAIL"
       ],
-      "remaining_sequence_note_R13": "本键 = R12 序列前插入 S2b-3 后的**完整**余量序列（S2b-2 已交付故不再列）。档位面：S2b-3/S2c = max（A168 串行链禁档位置换）；S4/S5/S6/S8 = flash（依 remaining_sequence_R12 原文）。S4 另带 A208 的 cli.py ≤3 行豁免与 A91 的 JobPage append-only 义务。"
+      "remaining_sequence_note_R13": "本键 = R12 序列前插入 S2b-3 后的**完整**余量序列（S2b-2 已交付故不再列）。档位面：S2b-3/S2c = max（A168 串行链禁档位置换）；S4/S5/S6/S8 = flash（依 remaining_sequence_R12 原文）。S4 另带 A208 的 cli.py ≤3 行豁免与 A91 的 JobPage append-only 义务。",
+      "subtask_progress_note_R14Y": "S2b-3 判 DONE：design §5:52 的 ④ RESULT_JSON_UNPARSEABLE 与 ⑤ RESULT_REF_DANGLING（A205：核 jobs 行存在性，非制品行）已落地并复验；JobRepository.list_for_workspace 纯追加（A204，22/0，def list_all=0）；用例收集 19→30（要求 ≥24）；5 条阳性对照全红且字节级复原（ALL_RESTORED_IDENTICAL=True）。四项 U 已由 A211–A214 裁定。**M0-04 仍禁判 DONE、wave3 仍禁开闸**：S2c 未做，且 M0-04 是 21 个 TODO 任务的唯一解锁点。repositories.py 的 append-only 锁随本提交释放，下一顺位 M2-01/S2b。",
+      "remaining_sequence_R14": [
+        "S2c（**max**，A169 新立）：创建 worker/service.py（JobService.__init__ 必须接受 store 关键字，A206）+ JobStore.list_jobs 对 store.py 纯追加（A169：既有 12 方法签名/函数体/SQL 文本一字不改，deleted=0）；**同一次提交内**删除 deps.py:55 的 # type: ignore[import-not-found]（A207），否则 strict 的 warn_unused_ignores 会把全表 mypy 判红",
+        "S4（**flash**）：api/jobs.py{router,list_jobs,get_job,cancel_job,retry_job} 按 S1 签名逐 operationId 铺开；JobPage 对 api/common.py 纯追加（A91）；cli.py ≤3 行调用 get_artifact_writer()（A208 豁免）；api/app.py ≤3 行挂载（与 M2-01/S2b 争用，M0-04 优先）",
+        "S5（**flash**）：tests/integration/jobs/** 状态机参数化展开（9 条迁移 × 取消 × 重试，幂等键同请求/异请求 409）",
+        "S6（**flash**）：tests/integration/jobs/** 租约与制品争用枚举（双执行者、失效 token、模拟中断、提交失败复用摘要）",
+        "S8（**flash**）：AC-029 负例 + AC-031 写入侧证据采集与回执归档"
+      ],
+      "remaining_sequence_note_R14": "本键 = R13 序列扣除已闭合的 S2b-3 后的完整余量。档位面：S2c = max（A168 链禁档位置换，但原 lane 已随主机重启消亡 ⇒ 以新 max lane 承接，禁降档）；S4/S5/S6/S8 = flash（卡片档位表）。S4 另带 A208 的 cli.py ≤3 行豁免与 A91 的 JobPage append-only 义务，并与 M2-01/S2b 在 api/app.py 上争用（裁定：M0-04/S4 先，M2-01 的挂载拆成独立微步骤串行）。"
     },
     "M1-01": {
       "status": "TODO",
@@ -6029,7 +6076,7 @@
         "loop_cap": 2,
         "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
         "nickname": "Mendel",
-        "status": "in_flight",
+        "status": "RETURNED_LANDED",
         "dispatch_mode": "send_input（A168：同一 max lane 续接，禁关槽、禁档位置换）",
         "dispatched_at": "2026-11-14T10:04:42+08:00",
         "write_set": [
@@ -6039,7 +6086,12 @@
           "evidence/M0/M0-04/",
           "orchestrator/handoff/M0-04-design.md（仅文末追加 A205 注记）"
         ],
-        "next_serial": "S2c → S4/S5/S6/S8（flash）"
+        "next_serial": "S2c → S4/S5/S6/S8（flash）",
+        "returned_at": "2026-11-14T11:17:38+08:00",
+        "result": "DONE",
+        "landing_commit": "PENDING",
+        "slot_closed": true,
+        "slot_closed_reason": "主机重启在即；A168 的禁关槽在进程消亡后客观不可满足（见 resume.round14_lane_Y_return.lane_closed_reason）"
       },
       {
         "lane": "A1",
@@ -6579,9 +6631,9 @@
         "expected": 0
       },
       "counts": {
-        "pytest_passed": 560,
+        "pytest_passed": 571,
         "mypy_source_files": 86,
-        "ruff_formatted_files": 256,
+        "ruff_formatted_files": 258,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -6590,15 +6642,15 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 256,
+          "total": 258,
           "in_scope_py": 88,
-          "in_scope_md": 168,
+          "in_scope_md": 170,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-14T10:04:42+08:00",
+          "measured_after": "2026-11-14T11:17:38+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
           "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。 || R12 追加（append-only，不改上文）：待提交树 tracked 229（py 82 + md 147），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 229 于冻结索引树上成立；本次新增 scripts/orch_harness.py（编排器提交工装，1 py）+ 两份 R12 派单文 + D-042（3 md）。 || R12-W 追加（append-only，不改上文）：待提交树 tracked 230（py 82 + md 148），恒等式 tracked(py+md) + untracked(lane X 在飞件，不计入分母) == ruff format --check 报数 230 于**冻结索引树**上成立（R11-3）。本次新增 evidence/M0/FU-29/commands.md（1 md）；同目录的 positive-control.log / symbols.txt / diff-stat.txt 三个非 py/md 后缀**不入分母**；4 个 .py 均为**修改**既有文件，故 py 分母 82 不变、mypy 80 不变、pytest 490 不变（test_layering_edges.py 用例数 8→8）。 || R13 追加（append-only，不改上文）：待提交树 tracked 234（py 82 + md 152），恒等式 tracked(py+md) + untracked(lane X/Y/Z 在飞件，不计入分母) == ruff format --check 报数 234 于**冻结索引树**上成立（R11-3）。本次新增 4 件 .md（1 份公共纪律段 + 2 份派单文 + 1 份原始回执归档），零 .py，故 mypy 80 / pytest 490 不变。 || R13-X 追加（append-only，不改上文）：待提交树 tracked 240（py 83 + md 157），恒等式 tracked(py+md) + untracked(lane Y/Z 在飞件，不计入分母) == ruff format --check 报数 240 于**冻结索引树**上成立（R11-3）。本次新增 5 md（3 卡 + commands.md + lane X 原始回执归档）+ 1 py（tests/unit/test_task_cards_complete.py）；evidence/M0/FU-33/ 下另 4 个 .txt/.log 后缀不在 ruff 作用域，其中两个 .log 因 .gitignore:18 的 !evidence/**/*.log 反排除规则而**会**入库（lane X 实测的口径事实，编排器用 git check-ignore -v 独立复核吻合）。 || R13-V 追加（append-only，不改上文）：待提交树 tracked 245（py 84 + md 161），恒等式 tracked(py+md) + untracked(lane Y/Z 在飞件，不计入分母) == ruff format --check 报数 245 于**冻结索引树**上成立（R11-3）。本次新增 1 py + 4 md。 || R13-Z 追加（append-only，不改上文）：待提交树 tracked 247（py 84 + md 163），恒等式 tracked(py+md) + untracked(lane Y 在飞 7 件，不计入分母) == ruff format --check 报数 247 于**冻结索引树**上成立（R11-3）。本次新增 M2-01 设计冻结件 + lane Z 回执归档件（2 md）。 || R13-Y 追加（append-only，不改上文）：待提交树 tracked 255（py 88 + md 167），恒等式 tracked(py+md) + untracked(0，本提交把 lane Y 的全部在飞件入库) == ruff format --check 报数 255 于**冻结索引树**上成立（R11-3）。本提交后工作树 == HEAD（无在飞件），故该值同时是工作树全表真值。 || R14 追加（append-only，不改上文）：待提交树 tracked 256（py 88 + md 168），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 256 于冻结索引树上成立（R11-3）。本次只新增 1 份 M2-01/S2a 派单文（1 md）。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
@@ -6817,8 +6869,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-14T10:04:42+08:00",
-        "counts_refresh_reason": "R14 派单前上下文入库：只新增 1 件 in-scope .md（R14-lane-A1-M2-01-S2a.md，136 行 / 12093 B，入库前单独实测 ruff format --check rc=0）。ruff 分母 255→256（md 167→168、py 88 不变）；mypy 86 不变、pytest 560 不变（零 .py、零测试）。",
+        "counts_refreshed_at": "2026-11-14T11:17:38+08:00",
+        "counts_refresh_reason": "M0-04/S2b-3 入库：新增 2 件 in-scope .md（evidence/M0/M0-04/s2b3-integrity-jobs.md 247 行 / 19120 B、commands-s2b3.md 67 行 / 6005 B；第三件取证为 .log 不计入 ruff 作用域）⇒ in_scope_md 168→170、ruff_formatted_files 256→258（in_scope_py 88 不变，本棒新增 .py=0）。mypy 86 不变（无新 .py 进 mypy 域）。pytest_passed 560→571：tests/unit/test_worker_integrity.py 收集 19→30（+11），全表冻结收集 539→550，GIT_ENV_IGNORES 静态收集 16+5=21 ⇒ 550+21=571。三项均由编排器在提交前实测预测，并经 run_commit 的冻结树实测对账。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -6959,7 +7011,8 @@
           "counts_refreshed_at": "2026-11-14T06:29:57+08:00"
         },
         "previous_values_last": {
-          "ruff_formatted_files": 255
+          "ruff_formatted_files": 256,
+          "pytest_passed": 560
         },
         "previous_values_R13": {
           "ruff_formatted_files": 230,
@@ -10605,6 +10658,14 @@
         "status": "PENDING",
         "priority": "low",
         "window": "非关键路径（与 FU-39 同批）"
+      },
+      {
+        "id": "FU-42",
+        "open": "PENDING",
+        "what": "在 orchestrator/handoff/R13-lane-Y-M0-04-S2b-3.md **文末追加**纠正注记（原文依 D-011 不改写）：说明其 §3 存在「删 warning 占位块」与「禁删改既有 19 条用例」的互斥指令，已由 A211 裁定为保留翻转、并由 R14-4 记为编排器 authored 缺陷；同时把 PRE-6（派单前反查断言对象）写进 orchestrator/handoff/LANE-COMMON.md，与 FU-39③ 同批落地。",
+        "owner": "编排器（非关键路径窗口）",
+        "source": "R14-4 / A211",
+        "created_at": "2026-11-14T11:17:38+08:00"
       }
     ],
     "commit_backfill_round6": {
@@ -12778,6 +12839,42 @@
         "question": "design §11 把 S2 定义为 §11.1（domain/activity/**）+ §11.2（api/common.py 与 test_domain_errors.py 的写权缺口）+ §11.3（application/、infra/db/repositories.py、api/deps.py、api/app.py）。但 §11.3 要给 repositories.py 纯追加 3 个仓储（约 20 个方法），而 A204 刚把该文件的 append-only 额度判给 M0-04/S2b-3（在飞）。S2 是否整棒派发？",
         "ruling": "**拆分为 S2a 与 S2b，S2a 立即派发、S2b 等 M0-04/S2b-3 入库后派发。** ① S2a = §11.1 + §11.2（domain/activity/ 的 states/digests/clauses/bindings/checks/diff + __init__；api/common.py 纯追加 4 个 re-export 别名与全部新 DTO；tests/unit/test_domain_errors.py 只抬 len(common.__all__) 的数字字面量）。② S2b = §11.3（application/activity_service.py 新建、repositories.py 纯追加 ActivityRepository/ActivityBindingRepository/RuleVersionRepository、api/deps.py 追加两个 Protocol 与两个提供器、api/app.py ≤6 行挂载）。③ 拆分依据＝写集不相交（PRE-4/PRE-5）与 A196 ① 的时序禁令：同一文件禁两个 lane 同窗追加。④ S2a **不依赖** repositories.py（纯领域层 + DTO 面，禁 SQL、禁开事务、禁 import campaignlab.api），故可立即开工，拆分不引入等待。⑤ 档位：S2a/S2b 均 max（§6.3：状态机、ETag/摘要语义、事务边界、跨层装配），S3–S7 仍全 flash（卡片档位表不变）。⑥ 记账：S2a/S2b 各记 1 个 max 单位（分母比合并时 +1），如实记账不凑配比（M0-02/S3a-S3b 先例）。",
         "action_taken": "tasks['M2-01'].subtask_split_A210 登记拆分；派单文 orchestrator/handoff/R14-lane-A1-M2-01-S2a.md （本提交入库）§1 明写「§11.3 本棒禁做，已拆为 S2b」；S2b 的派单前置条件 = M0-04/S2b-3 已入库（编排器在 S2b-3 落地提交后立刻发 S2b 派单文）。"
+      },
+      {
+        "id": "A211",
+        "round": 14,
+        "at": "2026-11-14T11:17:38+08:00",
+        "source": "lane Y（Mendel）回执 U-1：派单文 §3 自相矛盾（令删 warning 占位块，又令禁删改既有 19 条用例）",
+        "question": "既有绊线用例 test_jobs_side_reasons_are_declared_but_not_yet_produced 断言「warning 文本存在 + 两个 reason 常量各只出现一次（=尚未产出）」，而本棒被要求删除该 warning 块并真正产出 ④⑤。翻转该用例（改名 ..._and_now_produced 并取反断言）是否可接受？候选 (a) 保留翻转 / (b) 回退翻转并保留占位块。",
+        "ruling": "**(a) 保留翻转。** 该用例 docstring 自述即「jobs 侧落地即触发的绊线」，其设计意图就是强制在落地时做一次显式承认；改名 + 取反正是该承认动作本身。回退翻转就必须保留一个与已实现事实矛盾的 `.. warning::` 占位块＝让文档说谎。覆盖面只增不减（收集数 19→30），翻转后仍断言同一组事实（改为正向）。",
+        "action_taken": "接受 lane 所选 (a)；派单文矛盾归因为编排器 authored 缺陷，记 R14-4；原文依 D-011 不改写，另立 FU-42 在 R13-lane-Y-M0-04-S2b-3.md 文末追加纠正注记。"
+      },
+      {
+        "id": "A212",
+        "round": 14,
+        "at": "2026-11-14T11:17:38+08:00",
+        "source": "lane Y 回执 U-2：A205 要求「同一 reason 用 detail 区分子形态」，但 Discrepancy 8 字段已冻结且无 detail 槽",
+        "question": "子形态指针放哪？候选 (a) 由既有 relative_path 承载（零字段变更）/ (b) 新增 detail 字段。",
+        "ruling": "**(a) 由 relative_path 承载**（取值 POINTER_*，语义＝「被核对象在哪」）。(b) 会破坏 Discrepancy 的 8 字段冻结与前 5 字段元组逐字不变式（有守护钉死），代价远大于收益。",
+        "action_taken": "接受 (a)。义务：语义重载必须在 design 文末注记写明（本棒已随 38 行追加落地）；若 S2c 或后续出现真正的「同一对象多种 detail」需求，走 CR-003 而非再次重载 relative_path。"
+      },
+      {
+        "id": "A213",
+        "round": 14,
+        "at": "2026-11-14T11:17:38+08:00",
+        "source": "lane Y 回执 U-3：worker/integrity.py 的 __all__ 由 11 扩到 17（新增 5×POINTER_* + RESULT_REF_KIND）",
+        "question": "A205 说「只扩 reason 两项」，导出面扩张是否越界？候选 (a) 保留导出 / (b) 降为模块私有 _POINTER_*（__all__ 冻结在 11）。",
+        "ruling": "**(a) 保留导出。** A205 的约束按「reason 集合不增第三项」理解，实测 reason 常量 7→7（0 增 0 删）已满足；POINTER_* 与 RESULT_REF_KIND 不是 reason 而是 detail 指针常量，导出它们是为了让守护与调用方引用常量而非字面量（消除魔法字符串）。**17 即本模块 __all__ 的新现值**，后续 lane 禁「恢复」为 11。",
+        "action_taken": "接受 (a)。与 FU-39② 无冲突：FU-39 要守的是 api/common.py 的 __all__==51（另一模块）。"
+      },
+      {
+        "id": "A214",
+        "round": 14,
+        "at": "2026-11-14T11:17:38+08:00",
+        "source": "lane Y 回执 U-4：LANE-COMMON 铁律「禁写 orchestrator/**」与派单文「在 M0-04-design.md 文末追加一节」直接冲突",
+        "question": "lane 按「specific grant 覆盖 general ban」执行了追加，是否认可？候选 (a) 认可窄口径豁免 / (b) 把注记迁到 evidence 下、design 回退 HEAD 态。",
+        "ruling": "**(a) 认可，并成文化为规则**：LANE-COMMON 对 orchestrator/** 的禁令是**默认值**，派单文可授予「单文件 + 仅文末追加 + numstat deleted=0」的窄豁免，且该豁免必须显式出现在 lane 的 write_set 中（本棒 write_set 确有此条）。实证：numstat 38/0，design 前 52 行 sha256 双向一致 ⇒ append-only 得证，未越界。",
+        "action_taken": "接受 (a)。义务：把上述成文规则并入 FU-39③（补 orchestrator/handoff/LANE-COMMON.md 的通用约束段）同批落地，避免两次触碰同一文件。"
       }
     ],
     "round7_predispatch": {
@@ -14816,6 +14913,23 @@
         "landed_in_commit": "R11U2",
         "landed_at": "2026-11-14T05:25:28+08:00",
         "landed_note": "A173 已随本提交入库（件二 FU-32 的终裁）→ 前向引用闭合。登记条目**保留不删**（append-only 精神：留痕可追溯），仅追加 landed_* 三键。"
+      },
+      "evidence/M0/M0-04/ac.md": {
+        "referenced_in": "orchestrator/handoff/M0-04-design.md 的 :68 与 :91（S1 设计冻结件原文，非本棒追加）",
+        "registered_at": "2026-11-14T11:17:38+08:00",
+        "registered_by": "R14 入库 S2b-3 时被悬空引用门强制发现并登记（R14-5）",
+        "rule": "dangling-reference sweep stays strict; an id may only be whitelisted here if it is actually referenced now and lands in a named later commit of the same lane",
+        "lands_in": "M0-04/S8（flash）：AC-029 给判定＋依据＋证据指针；AC-031 只写「写入侧前提已交付＋判定归 M5-01」，禁写 PASS/FAIL",
+        "allow_dangling_scope": "仅在 M0-04/S8 入库前的提交中豁免；S8 入库即闭合（追加 landed_* 三键，条目保留不删，同 A173 先例）"
+      },
+      "evidence/M0/summaries/M0-04.md": {
+        "referenced_in": "orchestrator/handoff/M0-04-design.md 的 :91（S1 设计冻结件原文）",
+        "registered_at": "2026-11-14T11:17:38+08:00",
+        "registered_by": "R14 入库 S2b-3 时被悬空引用门强制发现并登记（R14-5）",
+        "rule": "同上（A173 先例：strict sweep ＋ 具名后续提交闭合）",
+        "lands_in": "M0-04/S8（flash）：≤30 行的任务级摘要",
+        "allow_dangling_scope": "仅在 M0-04/S8 入库前的提交中豁免；S8 入库即闭合",
+        "note": "父目录 evidence/M0/summaries/ 实测已存在（其它任务已产出摘要），缺的只是 M0-04.md 一件"
       }
     },
     "in_flight_agents_note_round11u2": "R11-U2（2026-11-14T05:25:28+08:00）：Franklin（lane U）两件均已入库 → 退役。在飞仅剩 1 条：V/Lorentz = M0-04/S2b-1【关键路径】，已回报全绿待编排器入库（R11-V）。开发配额余 2/3、QA 配额仍空置 1/1 → wave3 可派单窗口已打开（6 张切片前置在 R11-T 已解除；但 FU-29 必须先闭合，见 A168 次序）。",
@@ -15521,6 +15635,30 @@
         "correction": "不立缺陷单（非缺陷）。R12-1 的**操作面**保留（写出的 .py 一律先 ast.parse 再跑），但补上解释器口径：**一切 AST/语法探针必须用 uv run --no-sync python（3.14.10），禁用系统 python3（3.12.3）**。R12-1 的因果表述（「通道把 except (A, B) 损坏成 except A, B」）判为**误诊**，原文依 D-011 保留不改写，由本条注记。",
         "prevention": "立规 rule_probes_must_use_pinned_interpreter：任何语法/AST/导入类探针与门禁一律通过 `uv run --no-sync` 走项目钉死的解释器；派单文的自验段禁出现裸 `python3`。已写进 R14-lane-A1-M2-01-S2a.md §4 的 ★R14-1 段（本提交入库）；LANE-COMMON 与 S2b-3 派单文的对应注记并入 FU-39 同批窗口（禁为此单独开一轮）。另：不打断在飞的 lane Y —— 其派单文的操作性指令（先 ast.parse、门禁一律 uv run）本身正确，打断的代价高于假红代价；若其回执报出该假红，届时按本条澄清。",
         "rule_added": "rule_probes_must_use_pinned_interpreter"
+      },
+      {
+        "id": "R14-4",
+        "at": "2026-11-14T11:17:38+08:00",
+        "severity": "MINOR",
+        "owner": "编排器",
+        "rule_violated": "派单文必须内部自洽（禁同时下达互斥指令）；与 R14-1 同源（判据/指令必须自洽，禁制造无解局面）",
+        "fact": "R13-lane-Y-M0-04-S2b-3.md §3 同时要求「删除 integrity.py 的 `.. warning::` 占位块」与「禁删改既有 19 条用例」，而既有绊线用例 test_jobs_side_reasons_are_declared_but_not_yet_produced 的断言对象正是该占位块的存在性 ⇒ 逻辑无解，lane 只能自行择一并上报 U-1。",
+        "impact": "未造成返工（lane 同轮择 (a) 并完整取证，用 1/2 轮，非 STALLED），但把裁定成本外溢给 lane，并多消耗一次 U 项往返。",
+        "correction": "以 A211 追认 lane 的选择 (a)；派单文原文依 D-011 不改写，另立 FU-42 在其文末追加纠正注记。",
+        "prevention": "派单文写入「禁改既有 X 条」这类全局禁令前，必须先对**本棒将被删除/修改的每个具体对象**反查其断言方（哪些用例/守护断言了它），把冲突在派单前消解为显式豁免清单，而不是留给 lane 现场裁。",
+        "rule_added": "resume.dispatch_preconditions_note_R14"
+      },
+      {
+        "id": "R14-5",
+        "at": "2026-11-14T11:17:38+08:00",
+        "severity": "MINOR",
+        "owner": "编排器",
+        "rule_violated": "手册 §15.3 禁悬空引用 ＋ forward_reference_registry 的 A173 规则（前向引用必须登记且由具名后续提交闭合）",
+        "fact": "R14 入库 S2b-3 时，悬空引用门拦下 orchestrator/handoff/M0-04-design.md 的两处引用：evidence/M0/M0-04/ac.md（:68 与 :91）与 evidence/M0/summaries/M0-04.md（:91）。经 git show HEAD: 复核，两处**均为 S1 设计冻结件原文**（HEAD 版各命中 1 次；HEAD 170 行 / 工作树 208 行），**不在**本棒追加的 38 行（171–208）内 ⇒ 属此前提交遗留的**未登记前向引用**；而当时 forward_reference_registry 只有 A173 一条。",
+        "impact": "首次提交被原子回滚（HEAD 仍 a05ef28、台账已还原，harness _rollback 生效）⇒ 零数据损坏；但暴露出 design 冻结件最初入库时未把指向未来交付件的 evidence/** 路径登记为前向引用，导致该文件此后**每次被重新 add 都会拦下无关提交**，把成本转嫁给下游（正是本次形态）。",
+        "correction": "两处引用已按 A173 先例登记进 resume.forward_reference_registry（键＝被引用路径），注明 lands_in = M0-04/S8 与豁免作用域；本提交以 allow_dangling **精确**豁免这两条（只此两条，不放宽扫描）。",
+        "prevention": "设计冻结件（*-design.md）在 S1 入库的**同一批**，必须把其中所有指向未来交付件的 evidence/** 路径登记进 forward_reference_registry。续跑时对 M2-01-design.md（1322 行）应主动做一次同样的前向引用普查，以免它在 M2-01/S2a 入库时重演本次拦停。",
+        "rule_added": "resume.forward_reference_registry（新增两条路径键）＋ 本条 prevention（S1 同批登记义务）"
       }
     ],
     "round14_predispatch": {
@@ -15596,7 +15734,51 @@
         }
       ],
       "slot_note": "并发上限 3，本批用 2（Y 续接 + A1 新起），第 3 槽**留白**。留白依据＝实测依赖面：21 个 TODO 任务中只有 M2-01 的 deps 已满足（M0-02 DONE），其余全部被 M0-04 或 M2-01 链挡住（M1-01 dep M0-04；M2-02 dep M2-01+M0-04；M1-02 dep M1-01 …）。故无可派独立件，空槽留白优于派废单。"
-    }
+    },
+    "round14_lane_Y_return": {
+      "at": "2026-11-14T11:17:38+08:00",
+      "lane": "Y",
+      "nickname": "Mendel",
+      "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
+      "task": "M0-04",
+      "subtask": "S2b-3（A204 新立）",
+      "tier": "qwen3.8-max",
+      "round": 14,
+      "returned_round": 14,
+      "result": "DONE",
+      "loop_rounds_used": 1,
+      "loop_cap": 2,
+      "stalled": false,
+      "deliverables": [
+        "src/campaignlab/worker/integrity.py（172/31，sha[:12]=3f04ddd2466c，__all__ 11→17）",
+        "src/campaignlab/infra/db/repositories.py（22/0 纯追加，sha[:12]=33590e99c580，def list_all=0）",
+        "tests/unit/test_worker_integrity.py（392/13，收集 19→30）",
+        "orchestrator/handoff/M0-04-design.md（38/0 文末追加，前 52 行 sha 双向 a5e38074…）",
+        "evidence/M0/M0-04/s2b3-integrity-jobs.md（19120 B，b5c41b901813）",
+        "evidence/M0/M0-04/commands-s2b3.md（6005 B，dda66eaced6b）",
+        "evidence/M0/M0-04/positive-control-s2b3.log（14334 B，d1c0364d7f07）"
+      ],
+      "u_items": {
+        "U-1": "A211",
+        "U-2": "A212",
+        "U-3": "A213",
+        "U-4": "A214"
+      },
+      "tokens": 46000,
+      "tokens_estimated": true,
+      "tokens_note": "§5.1 单轮 ≈46k（over 40k）；§15.5 累计 ≈2.0M+（over 200k，A183 口径）。均如实记录，estimated=true 故不入 token 面分母。",
+      "context_single_round": 46000,
+      "over_input_cap": true,
+      "over_cap": true,
+      "over_cap_caliber": "两口径并列不抵销（R13-4）；无计费表读数故为估算，按 A183(a) 记 estimated=true。",
+      "commit": "PENDING",
+      "next_subtask": "S2c（max，A169 新立：worker/service.py + JobStore.list_jobs 纯追加）",
+      "in_flight_contamination": 0,
+      "orchestrator_reverification": "全部关键数值由编排器独立复测（见 budget.subtask_log 第 37 条的 orchestrator_reverification）：sha256 四件一致、design 前 52 行双向一致、list_all=0、__all__=17、收集数 19→30、全表冻结收集 539→550 + env_ignores 21 ⇒ pytest_passed 571。",
+      "lane_closed": true,
+      "lane_closed_reason": "主机重启在即 + 本子任务已 DONE 入库。A168 的「同一 max lane 串行复用、禁关槽」在此**客观不可满足**（进程随重启消亡），属环境强制而非违规；续跑须以新 lane 承接 S2c，档位仍为 qwen3.8-max（禁降档），并把 s2c_obligations_R13 全量交给新 lane。该例外已在 checkpoint 件 §5 与本键同时入账。"
+    },
+    "dispatch_preconditions_note_R14": "R14-4 新增的派单前置检查项（PRE-6）：凡派单文含「禁删改既有 N 条用例/守护」类全局禁令，必须同批列出「本棒预期会触碰的既有断言对象」及其豁免依据；若某对象的断言与本棒目标逻辑互斥，必须在派单前就地裁定（给 A 编号），禁外溢为 lane 的 U 项。"
   },
   "acceptance": {
     "baseline_total": 35,

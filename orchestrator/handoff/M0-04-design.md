@@ -168,3 +168,41 @@
   编排器追加（归 FU-30，非 S2b）：`scripts/doctor.sh` 与 `python -m campaignlab doctor` 应把「`tmp/jobs` 与 `results` 同盘」列为检查项，
   使该闸在**部署期**即可见，而非只在作业提交期炸；本轮实测 G14=`RESULT: HEALTHY`、G14b=`PASS=3 WARN=2 FAIL=0 RESULT=DEGRADED`
   均未覆盖此项。M0-04 的 S7 实测为 `tests/unit/test_job_dto.py`（卡内档位表），不含 doctor 面，故不得挂在 S7 上。
+---
+
+## §5:52 判据④⑤ 裁定注记（A205 · S2b-3 追加；D-011：历史文本只加注不改写）
+
+> 本节是**追加注记**，第 52 行原文（AC-031 写入侧前提）**一字未改**（见本节末的自证）。
+> 追加理由：原文写「`jobs.result_json` 可解析且指向存在的制品」，而 A155① 已把 M0-04 的
+> `result_ref` 冻结为 `ObjectRef(kind="job", id=<job_id>)` —— id 指向**作业行**，不指向制品行。
+> 编排器实测：`ArtifactRecord` 只有 `workspace_id/id/kind/sha256/relative_path/byte_size/created_at`
+> 七列（**无任何 job 关联列**），且 `infra/artifacts.py::relative_path_for(kind, workspace_id, sha256)`
+> 由 (kind, workspace_id, sha256) 决定路径、**不内嵌 job id** ⇒ 制品侧与作业侧**不存在**逐作业的精确链接。
+
+**判据 ⑤（裁定）**：落地口径 = **该 `result_ref` 指向的 `jobs` 行在同工作区内存在**；不存在即报
+`Discrepancy(reason="RESULT_REF_DANGLING")`。**不**核「制品表里有没有对应行」——那只能退化成
+「该工作区至少有 1 条 `JOB_RESULT` 制品」的**工作区级弱判据**，对「无制品的作业」（失败／取消／
+不产制品的 kind）会**假红**，且不是逐作业判据 ⇒ 判为自毁判据，否决。给 `artifacts` 加 job 关联列
+属 DDL 变更（归 M0-02 首迁 + CR），**不在** M0-04 范围。同工作区限定是硬的：`jobs` 主键是
+`(workspace_id, id)`，跨工作区同号是两个不同对象。
+
+**判据 ④（裁定）**：`jobs.result_json` 必须能 `json.loads` **且**形状符合 A155①/A89 冻结的 ref 形态
+（`api.common.ObjectRef`：`extra="forbid"` ＋ `kind` 的 Literal 枚举 ＋ `id` 的 `RESOURCE_ID_PATTERN`）。
+两者任一不成立 ⇒ `RESULT_JSON_UNPARSEABLE`。三个失败子形态（JSON 语法错／不是对象／不合 `ObjectRef`
+形状或 `kind` 非 `job`）**共用同一 reason**，**禁新增第三个 reason**；子形态由 `worker/integrity.py`
+的五个 `POINTER_*` 位置指针区分。**只核** `result_json IS NOT NULL` 的行（DDL 的双条件 CHECK
+`(state='SUCCEEDED')=(result_json IS NOT NULL)`，该列可空）。形状校验**复用写入侧同一个模型**
+`ObjectRef.model_validate`，不自写第二份形状口径（与 A157「同口径复核」同理）。
+
+**枚举口径（A204）**：`JobRepository.list_for_workspace(conn, workspace_id) -> list[JobRecord]` 依
+A82 的 append-only 豁免**纯追加**（`infra/db/repositories.py`，`git diff --numstat` = 22 add / **0 del**），
+逐字对齐 `ArtifactRepository.list_for_workspace` 的体例、复用既有行→记录转换 `_job_of`（禁新写转换器）。
+**禁** `list_all` 全表无界枚举：枚举形状必须与制品侧一致 —— `WorkspaceRepository.list_page` 有界枚举
+工作区 → 逐工作区取行，触顶即抛错拒绝出具结论（对「用来证明没有缺件」的函数，静默漏行比抛错严重）。
+
+**`Discrepancy` 的 8 字段与前 5 元组逐字不变**（本行原文的冻结面）；`jobs` 侧按位复用槽位：
+`artifact_id` ← 被核对象主键（`jobs.id`）｜`relative_path` ← 被核字段的位置指针（即 A205 所说的
+`detail`，因 8 字段里没有 `detail` 槽位）｜`expected_sha256` ← 空串｜`actual_sha256` ← `None`（未做哈希）｜
+`expected_byte_size` / `actual_byte_size` ← `None`。落地实现见 `worker/integrity.py::_check_job`，
+守护见 `tests/unit/test_worker_integrity.py`（S2b-3 后 30 条），取证见
+`evidence/M0/M0-04/s2b3-integrity-jobs.md`。

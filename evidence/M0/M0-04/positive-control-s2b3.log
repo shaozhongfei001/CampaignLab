@@ -1,0 +1,216 @@
+==============================================================================
+positive-control-s2b3.log  ·  CampaignLab M0-04/S2b-3  ·  lane Y (R14)
+==============================================================================
+生成时间(容器时钟): 2026-11-14T02:30:47+00:00
+REPO                : /home/szf/dev/CampaignLab
+branch / HEAD       : m0-framework / a05ef28
+命令通道            : uv run --no-sync pytest -q <path-scoped>（cwd=REPO）
+
+[A] 正向对照前的基线快照（工作树当前版本 = S2b-3 已落地版本）
+  src/campaignlab/worker/integrity.py
+    sha256[:12]=3f04ddd2466c  bytes=21824  lines=412
+    sha256(full)=3f04ddd2466c4912a4361e3be8f5d4a11dae57225fa9b4b6ffda800a02fec8d1
+  src/campaignlab/infra/db/repositories.py
+    sha256[:12]=33590e99c580  bytes=47226  lines=1054
+    sha256(full)=33590e99c580e3b78307990628f1d1ea38ffa41fa73d95e379aa30e0ec544038
+  tests/unit/test_worker_integrity.py
+    sha256[:12]=101ecbdc7b3b  bytes=42866  lines=975
+    sha256(full)=101ecbdc7b3b3821b44463ed0fbf2fc247d0100f819f04ec9dc3a9e617854014
+
+[B] 基线绿（同一路径限定集合，未做任何变异）
+  pytest rc=0
+  ---- output tail ----
+  | ........................................................................ [ 77%]
+  | .....................                                                    [100%]
+  | 93 passed in 28.04s
+  ==> baseline rc=0 (expect 0)
+
+------------------------------------------------------------------------------
+PC-1 · 判据④ 的 JSON 语法错分支被摘掉（except ValueError -> return []）
+  target file : src/campaignlab/worker/integrity.py
+  pytest set  : tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py tests/unit/test_layering_edges.py tests/integration/jobs/
+  mutated src/campaignlab/worker/integrity.py: anchor unique(1), replaced; AST reparse OK
+  mutated sha256[:12]=5f7684c9b221 (was 3f04ddd2466c)
+  pytest rc=1
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  ---- output tail ----
+  | _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+  | 
+  | found = []
+  | 
+  |     def _only(found: list[Discrepancy]) -> Discrepancy:
+  | >       assert len(found) == 1, f"期望恰好 1 条差异，实测 {found}"
+  | E       AssertionError: 期望恰好 1 条差异，实测 []
+  | E       assert 0 == 1
+  | E        +  where 0 = len([])
+  | 
+  | tests/unit/test_worker_integrity.py:756: AssertionError
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  | 1 failed, 92 passed in 31.97s
+  ==> mutated rc=1 (expect != 0)
+  restored sha256[:12]=3f04ddd2466c  full=3f04ddd2466c4912a4361e3be8f5d4a11dae57225fa9b4b6ffda800a02fec8d1
+  双向核验 before==after : True
+
+------------------------------------------------------------------------------
+PC-2 · 判据⑤ 的悬空分支被摘掉（ref.id not in job_ids -> return []）
+  target file : src/campaignlab/worker/integrity.py
+  pytest set  : tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py tests/unit/test_layering_edges.py tests/integration/jobs/
+  mutated src/campaignlab/worker/integrity.py: anchor unique(1), replaced; AST reparse OK
+  mutated sha256[:12]=65fcb3646f3f (was 3f04ddd2466c)
+  pytest rc=1
+  FAILED tests/unit/test_worker_integrity.py::test_jobs_side_reasons_are_declared_and_now_produced
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  ---- output tail ----
+  | 
+  |     def _only(found: list[Discrepancy]) -> Discrepancy:
+  | >       assert len(found) == 1, f"期望恰好 1 条差异，实测 {found}"
+  | E       AssertionError: 期望恰好 1 条差异，实测 []
+  | E       assert 0 == 1
+  | E        +  where 0 = len([])
+  | 
+  | tests/unit/test_worker_integrity.py:756: AssertionError
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_worker_integrity.py::test_jobs_side_reasons_are_declared_and_now_produced
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  | FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  | FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  | 4 failed, 89 passed in 26.56s
+  ==> mutated rc=1 (expect != 0)
+  restored sha256[:12]=3f04ddd2466c  full=3f04ddd2466c4912a4361e3be8f5d4a11dae57225fa9b4b6ffda800a02fec8d1
+  双向核验 before==after : True
+
+------------------------------------------------------------------------------
+PC-3 · A204 追加面丢掉工作区限定（list_for_workspace 去掉 WHERE workspace_id）
+  target file : src/campaignlab/infra/db/repositories.py
+  pytest set  : tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py tests/unit/test_layering_edges.py tests/integration/jobs/
+  mutated src/campaignlab/infra/db/repositories.py: anchor unique(1), replaced; AST reparse OK
+  mutated sha256[:12]=c6b7752a8049 (was 33590e99c580)
+  pytest rc=1
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_payload_is_not_an_object
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_objectref_shape_violation
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_ref_kind_is_not_job
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  FAILED tests/unit/test_worker_integrity.py::test_job_repository_list_for_workspace_is_workspace_scoped_and_ordered
+  ---- output tail ----
+  | E         Left contains one more item: 'J-a-late'
+  | E         Use -v to get more diff
+  | 
+  | tests/unit/test_worker_integrity.py:971: AssertionError
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_payload_is_not_an_object
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_objectref_shape_violation
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_ref_kind_is_not_job
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  | FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  | FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  | FAILED tests/unit/test_worker_integrity.py::test_job_repository_list_for_workspace_is_workspace_scoped_and_ordered
+  | 8 failed, 85 passed in 27.15s
+  ==> mutated rc=1 (expect != 0)
+  restored sha256[:12]=33590e99c580  full=33590e99c580e3b78307990628f1d1ea38ffa41fa73d95e379aa30e0ec544038
+  双向核验 before==after : True
+
+------------------------------------------------------------------------------
+PC-4 · _check_job 整体空转（首行 return []，④⑤ 全部失语）
+  target file : src/campaignlab/worker/integrity.py
+  pytest set  : tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py tests/unit/test_layering_edges.py tests/integration/jobs/
+  mutated src/campaignlab/worker/integrity.py: anchor unique(1), replaced; AST reparse OK
+  mutated sha256[:12]=89ce88cac7fc (was 3f04ddd2466c)
+  pytest rc=1
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_payload_is_not_an_object
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_objectref_shape_violation
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_ref_kind_is_not_job
+  FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  ---- output tail ----
+  | E       AssertionError: 期望恰好 1 条差异，实测 []
+  | E       assert 0 == 1
+  | E        +  where 0 = len([])
+  | 
+  | tests/unit/test_worker_integrity.py:756: AssertionError
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_payload_is_not_an_object
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_on_objectref_shape_violation
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_json_unparseable_when_ref_kind_is_not_job
+  | FAILED tests/unit/test_worker_integrity.py::test_verify_artifact_index_reports_result_ref_dangling
+  | FAILED tests/unit/test_worker_integrity.py::test_result_ref_dangling_is_scoped_to_the_same_workspace
+  | FAILED tests/unit/test_worker_integrity.py::test_jobs_side_discrepancy_slots_follow_the_documented_convention
+  | 7 failed, 86 passed in 28.32s
+  ==> mutated rc=1 (expect != 0)
+  restored sha256[:12]=3f04ddd2466c  full=3f04ddd2466c4912a4361e3be8f5d4a11dae57225fa9b4b6ffda800a02fec8d1
+  双向核验 before==after : True
+
+------------------------------------------------------------------------------
+PC-5 · 往 integrity.py 塞只读 SELECT 字面量（验证 A204 未被用来开后门）
+  target file : src/campaignlab/worker/integrity.py
+  pytest set  : tests/unit/test_worker_integrity.py tests/unit/test_job_repository_terminal.py tests/unit/test_layering_edges.py tests/integration/jobs/
+  mutated src/campaignlab/worker/integrity.py: anchor unique(1), replaced; AST reparse OK
+  mutated sha256[:12]=90e9524575ac (was 3f04ddd2466c)
+  pytest rc=1
+  FAILED tests/unit/test_worker_integrity.py::test_new_worker_modules_contain_no_sql_text[integrity]
+  FAILED tests/unit/test_job_repository_terminal.py::test_worker_package_contains_no_table_dml_literals
+  ---- output tail ----
+  |                     if verbs.search(node.value):
+  |                         offenders.append(f"{path.relative_to(REPO)}:{node.lineno} {node.value[:60]!r}")
+  | >       assert offenders == [], offenders
+  | E       AssertionError: ["src/campaignlab/worker/integrity.py:103 'SELECT id FROM jobs WHERE workspace_id = :workspace_id'"]
+  | E       assert ["src/campaig...orkspace_id'"] == []
+  | E         
+  | E         Left contains one more item: "src/campaignlab/worker/integrity.py:103 'SELECT id FROM jobs WHERE workspace_id = :workspace_id'"
+  | E         Use -v to get more diff
+  | 
+  | tests/unit/test_job_repository_terminal.py:129: AssertionError
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_worker_integrity.py::test_new_worker_modules_contain_no_sql_text[integrity]
+  | FAILED tests/unit/test_job_repository_terminal.py::test_worker_package_contains_no_table_dml_literals
+  | 2 failed, 91 passed in 27.27s
+  ==> mutated rc=1 (expect != 0)
+  [PC-5 追加] 冻结守护单跑 tests/unit/test_job_repository_terminal.py::test_worker_package_contains_no_table_dml_literals
+    rc=1
+    | E         Use -v to get more diff
+    | 
+    | tests/unit/test_job_repository_terminal.py:129: AssertionError
+    | =========================== short test summary info ============================
+    | FAILED tests/unit/test_job_repository_terminal.py::test_worker_package_contains_no_table_dml_literals
+    | 1 failed in 0.30s
+    ==> frozen-guard rc=1 (expect != 0)
+  restored sha256[:12]=3f04ddd2466c  full=3f04ddd2466c4912a4361e3be8f5d4a11dae57225fa9b4b6ffda800a02fec8d1
+  双向核验 before==after : True
+
+==============================================================================
+[C] 复原后全量复验（路径限定，必须全绿）
+  pytest rc=0
+  ---- output tail ----
+  | ........................................................................ [ 77%]
+  | .....................                                                    [100%]
+  | 93 passed in 27.51s
+  ==> final rc=0 (expect 0)
+
+[D] 复原后 sha256 终值（与 [A] 逐字比对）
+  src/campaignlab/worker/integrity.py: sha256[:12]=3f04ddd2466c match_snapshot=True
+  src/campaignlab/infra/db/repositories.py: sha256[:12]=33590e99c580 match_snapshot=True
+  tests/unit/test_worker_integrity.py: sha256[:12]=101ecbdc7b3b match_snapshot=True
+  ALL_RESTORED_IDENTICAL=True
+
+[E] git status --porcelain（必须仍只有 4 条 M，无新增未跟踪文件）
+M orchestrator/handoff/M0-04-design.md
+ M src/campaignlab/infra/db/repositories.py
+ M src/campaignlab/worker/integrity.py
+ M tests/unit/test_worker_integrity.py
+?? evidence/M0/M0-04/positive-control-s2b3.log
+
+[F] git diff --numstat HEAD（变异不得留下任何残留行数变化）
+38	0	orchestrator/handoff/M0-04-design.md
+22	0	src/campaignlab/infra/db/repositories.py
+172	31	src/campaignlab/worker/integrity.py
+392	13	tests/unit/test_worker_integrity.py
+

@@ -452,6 +452,28 @@ class JobRepository:
         ).mappings()
         return [_job_of(row) for row in rows]
 
+    def list_for_workspace(self, conn: Connection, workspace_id: str) -> list[JobRecord]:
+        """某工作区的全部 ``jobs`` 行（A204 依 A82 的 append-only 豁免**纯追加**的只读面）。
+
+        逐字对齐同文件 ``ArtifactRepository.list_for_workspace`` 的体例：同样的 ``conn``
+        位置参数、同样的 ``workspace_id`` 位置参数、同样返回 ``list[Record]``、同样只读、
+        同样复用既有行→记录转换 ``_job_of``（**禁**新写第二个转换器，也**禁**改
+        ``job_from_row``）。``ORDER BY created_at, id`` 与制品侧同口径：让「同一库状态
+        ⇒ 同一顺序」成立，复核与清单都必须可复现，禁依赖 SQL 的自然返回序。
+
+        刻意**不**提供 ``list_all``：全表无界枚举会让调用方（``worker/integrity.py``）的
+        耗时与内存随库线性膨胀，且丢掉「按工作区定位」的能力。调用方先用
+        ``WorkspaceRepository.list_page`` 有界枚举工作区，再逐工作区调本方法。
+        """
+        rows = conn.execute(
+            text(
+                f"SELECT {_JOB_COLUMNS} FROM jobs WHERE workspace_id = :workspace_id "
+                "ORDER BY created_at, id"
+            ),
+            {"workspace_id": workspace_id},
+        ).mappings()
+        return [_job_of(row) for row in rows]
+
     def touch_lease(
         self, conn: Connection, *, job_id: str, lease_token: str, lease_deadline: str
     ) -> int:

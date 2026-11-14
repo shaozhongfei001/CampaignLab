@@ -28,27 +28,39 @@ import hashlib
 import inspect
 import sqlite3
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Final
 
 import pytest
 from sqlalchemy import Engine
 
+from campaignlab.api.common import canonical_json
 from campaignlab.infra.artifacts import (
     ARTIFACT_KIND_JOB_RESULT,
     hash_file,
     relative_path_for,
 )
 from campaignlab.infra.db.engine import connect, make_engine
-from campaignlab.infra.db.repositories import ArtifactRecord, ArtifactRepository
+from campaignlab.infra.db.repositories import (
+    ArtifactRecord,
+    ArtifactRepository,
+    JobRecord,
+    JobRepository,
+)
 from campaignlab.worker import integrity
 from campaignlab.worker.integrity import (
     BYTE_SIZE_MISMATCH,
     MISSING_FILE,
     PATH_ESCAPE,
+    POINTER_RESULT_JSON,
+    POINTER_RESULT_JSON_OBJECT,
+    POINTER_RESULT_REF_ID,
+    POINTER_RESULT_REF_KIND,
+    POINTER_RESULT_REF_SHAPE,
     RESULT_JSON_UNPARSEABLE,
     RESULT_REF_DANGLING,
+    RESULT_REF_KIND,
     SHA256_MISMATCH,
     UNREADABLE,
     Discrepancy,
@@ -56,6 +68,7 @@ from campaignlab.worker.integrity import (
     manifest_rows,
     verify_artifact_index,
 )
+from campaignlab.worker.states import STAGE_CLAIMED, STAGE_QUEUED
 
 REPO: Final = Path(__file__).resolve().parents[2]
 DDL: Final = REPO / "contracts" / "sqlite-v1.sql"
@@ -539,17 +552,23 @@ def test_integrity_module_has_no_second_hash_implementation() -> None:
 # ============================================================ ③b jobs 侧缺口的显式钉住
 
 
-def test_jobs_side_reasons_are_declared_but_not_yet_produced() -> None:
-    """``RESULT_JSON_*`` 两条 reason **只存在于声明处**，且缺口在 docstring 里显式披露。
+def test_jobs_side_reasons_are_declared_and_now_produced() -> None:
+    """**S2b-3 翻转的绊线**（原名 ``..._are_declared_but_not_yet_produced``）。
 
-    design §5:52 要求 ``verify_artifact_index`` 也核 ``jobs.result_json``（可解析 ＋
-    指向存在的制品）。枚举 ``jobs`` 行需要一条只读查询或一个仓储读侧访问器：前者被
-    ``test_worker_package_contains_no_table_dml_literals`` 判红（该文件在本子任务硬禁内），
-    后者所在的 ``infra/db/repositories.py`` 同样硬禁且现无此访问器。故这两条当前
-    **不可产出**，已按 A159 报 U 项而非自行发明判据。
+    S2b-2 交这条用例时 ④⑤ 判据**不可产出**（枚举 ``jobs`` 行需要的只读查询被
+    ``test_worker_package_contains_no_table_dml_literals`` 判红、``JobRepository`` 也没有
+    读侧枚举访问器，两处都在当时的硬禁内），故它把「缺口」本身钉住：常量各只出现一次
+    ＋ docstring 必须写「尚未产出」。它的 docstring 明写了绊线语义 ——「将来谁真的实现了
+    jobs 侧（常量出现第二处引用），或谁把披露文字删了，都会立刻判红」。
 
-    本用例的牙在于：将来谁真的实现了 jobs 侧（常量出现第二处引用），或谁把披露文字删了，
-    都会立刻判红 —— 防止「声明了七个 reason、实际只产五个」被后来者静默当作已全覆盖。
+    S2b-3 依 **A204**（A82 的 append-only 豁免，纯追加 ``JobRepository.list_for_workspace``）
+    与 **A205**（④⑤ 的精确判据）把缺口补齐，绊线**按设计触发**，故在此翻转为「已落地」形态：
+    两条 reason 必须**既被声明也被使用**，且 docstring 不得再声称未产出。牙没有变钝 ——
+    方向反了而已：谁把 ④⑤ 的实现删回去（常量退回只出现一次），这条立刻判红。
+
+    这是本 lane 唯一改动的既有 S2b-2 用例，已按 A159 报 U 项／诚实偏差：派单文 §3 同时
+    要求「删掉 ``.. warning::`` 占位」与「禁删改既有 19 条用例」，两条命令对本用例互斥
+    （它断言的正是那段占位文字与「常量只出现一次」），无法同时满足。用例总数只增不减。
     """
     tree = ast.parse(MODULE_PATH.read_text(encoding="utf-8"), filename=str(MODULE_PATH))
     for constant_name in ("RESULT_JSON_UNPARSEABLE", "RESULT_REF_DANGLING"):
@@ -558,10 +577,11 @@ def test_jobs_side_reasons_are_declared_but_not_yet_produced() -> None:
             for node in ast.walk(tree)
             if isinstance(node, ast.Name) and node.id == constant_name
         ]
-        assert len(uses) == 1, f"{constant_name} 只应在定义处出现一次，实测 {uses}"
+        assert len(uses) >= 2, f"{constant_name} 必须既声明又被使用（④⑤ 已落地），实测 {uses}"
     doc = inspect.getdoc(verify_artifact_index) or ""
-    assert "尚未产出" in doc, "缺口必须在 docstring 里显式披露，禁静默缩小覆盖面"
+    assert "尚未产出" not in doc, "④⑤ 已落地，禁继续声称未产出（那会让覆盖面被高估）"
     assert RESULT_JSON_UNPARSEABLE in doc and RESULT_REF_DANGLING in doc
+    assert "五项判据全部落地" in doc, "docstring 必须登记五项判据齐备"
 
 
 # ======================================================================= ④ 零 SQL 文本
@@ -594,3 +614,362 @@ def test_artifact_enumeration_delegates_to_repositories() -> None:
         if isinstance(node, ast.Attribute) and node.attr in {"list_page", "list_for_workspace"}
     }
     assert called == {"list_page", "list_for_workspace"}, called
+
+
+# ================================================ ⑤ S2b-3：``jobs`` 侧 ④⑤ 判据（A204 / A205）
+
+JOB_KIND: Final = "COMPARE"
+INPUT_DIGEST: Final = "0" * 64
+LEASE_SPAN: Final = timedelta(hours=1)
+#: ④⑤ 组的分母下限：至少三个工作区各一行作业，防「枚举扫空导致全绿」。
+MIN_JOBS: Final = 3
+
+
+def _ref_json(job_id: str) -> str:
+    """A155① 冻结的 ``result_ref`` 形状（canonical JSON，键序稳定、无多余空白）。
+
+    即 ``ObjectRef(kind="job", id=<job_id>)`` 的 JSON 对象 —— 写入侧 ``store.succeed``
+    就是用 ``canonical_json(result_ref.model_dump(mode="json"))`` 落库的（A73），故复核侧
+    按同一形状解。
+    """
+    return canonical_json({"kind": RESULT_REF_KIND, "id": job_id})
+
+
+def _enqueue(engine: Engine, *, workspace_id: str, job_id: str, created_at: datetime) -> None:
+    """入队一条 QUEUED 作业（``result_json`` 为 NULL，A205 要求这类行**不核**）。"""
+    with connect(engine) as conn:
+        JobRepository().insert(
+            conn,
+            job=JobRecord(
+                workspace_id=workspace_id,
+                id=job_id,
+                kind=JOB_KIND,
+                state="QUEUED",
+                attempt=0,
+                progress=0,
+                stage=STAGE_QUEUED,
+                lease_token=None,
+                lease_deadline=None,
+                retry_of=None,
+                retryable=False,
+                input_json=canonical_json({"snapshot": "S-1"}),
+                input_digest=INPUT_DIGEST,
+                result_json=None,
+                problem_json=None,
+                revision=1,
+                created_at=created_at.isoformat(),
+            ),
+        )
+        conn.commit()
+
+
+def _put_succeeded_job(
+    engine: Engine,
+    *,
+    workspace_id: str,
+    job_id: str,
+    result_json: str,
+    created_at: datetime = T0,
+) -> JobRecord:
+    """走**真实写路径**（``insert`` → ``claim_next`` → ``mark_succeeded``）造一条 SUCCEEDED 作业。
+
+    刻意不用裸 SQL：下面这些坏形态里，除「JSON 语法错」以外**全都能被 DDL 的
+    ``CHECK(json_valid(result_json))`` 放过**，所以必须证明复核器抓得住「DDL 允许写入、
+    但语义已坏」的数据 —— 那才是 ④ 的真实威胁面（语法错那一支另见
+    ``_inject_invalid_result_json``）。
+    """
+    repo = JobRepository()
+    lease_token = f"lt-{job_id}"
+    with connect(engine) as conn:
+        repo.insert(
+            conn,
+            job=JobRecord(
+                workspace_id=workspace_id,
+                id=job_id,
+                kind=JOB_KIND,
+                state="QUEUED",
+                attempt=0,
+                progress=0,
+                stage=STAGE_QUEUED,
+                lease_token=None,
+                lease_deadline=None,
+                retry_of=None,
+                retryable=False,
+                input_json=canonical_json({"snapshot": "S-1"}),
+                input_digest=INPUT_DIGEST,
+                result_json=None,
+                problem_json=None,
+                revision=1,
+                created_at=created_at.isoformat(),
+            ),
+        )
+        claimed = repo.claim_next(
+            conn,
+            workspace_id=workspace_id,
+            lease_token=lease_token,
+            lease_deadline=(created_at + LEASE_SPAN).isoformat(),
+            stage=STAGE_CLAIMED,
+        )
+        assert claimed is not None and claimed.id == job_id, "前置条件：必须认领到刚入队那条"
+        moved = repo.mark_succeeded(
+            conn,
+            workspace_id=workspace_id,
+            job_id=claimed.id,
+            attempt=claimed.attempt,
+            lease_token=lease_token,
+            result_json=result_json,
+        )
+        assert moved == 1, "前置条件：终态写入必须生效（rowcount==1）"
+        conn.commit()
+        return claimed
+
+
+def _inject_invalid_result_json(
+    data_dir: Path, *, workspace_id: str, job_id: str, result_json: str
+) -> None:
+    """绕过 DDL 的 ``json_valid`` CHECK 直写坏行（只用于「JSON 语法错」这一支）。
+
+    ``jobs.result_json`` 带 ``CHECK(result_json IS NULL OR json_valid(result_json))``，
+    常规写入路径**造不出**真·非法 JSON。这恰好说明 ④ 的「语法错」子形态是**纵深防御**：
+    它针对的是绕过 CHECK 的来源（还原的旧备份、外部工具直写、从更宽松的旧 schema 迁移）。
+    故用 SQLite 的 ``PRAGMA ignore_check_constraints`` 显式造出这种坏行。探针库在
+    ``tmp_path`` 下（``engine`` fixture 建的），**不碰工作树**。
+    """
+    db = data_dir / "state" / "campaignlab.db"
+    assert db.is_file(), f"前置条件：探针库必须已由 engine fixture 建好：{db}"
+    raw = sqlite3.connect(db)
+    try:
+        raw.execute("PRAGMA ignore_check_constraints=ON")
+        raw.execute(
+            "INSERT INTO jobs (workspace_id, id, kind, state, attempt, progress, stage, "
+            "retryable, input_json, input_digest, revision, created_at, result_json) "
+            "VALUES (?, ?, ?, 'SUCCEEDED', 1, 100, 'DONE', 0, '{}', ?, 1, ?, ?)",
+            (workspace_id, job_id, JOB_KIND, INPUT_DIGEST, T0.isoformat(), result_json),
+        )
+        raw.commit()
+    finally:
+        raw.execute("PRAGMA ignore_check_constraints=OFF")
+        raw.close()
+
+
+def _only(found: list[Discrepancy]) -> Discrepancy:
+    assert len(found) == 1, f"期望恰好 1 条差异，实测 {found}"
+    return found[0]
+
+
+def test_verify_artifact_index_is_empty_when_a_succeeded_job_self_ref_is_consistent(
+    engine: Engine, data_dir: Path
+) -> None:
+    """④⑤ 的**绿路径**：合法 ``result_json`` ＋ ref 指向自己（A155① 的真实形状）⇒ 无差异。"""
+    _put_succeeded_job(engine, workspace_id=WS_A, job_id="J-ok-1", result_json=_ref_json("J-ok-1"))
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_B,
+        job_id="J-ok-2",
+        result_json=_ref_json("J-ok-2"),
+        created_at=T0 + timedelta(minutes=1),
+    )
+    with connect(engine) as conn:
+        assert verify_artifact_index(conn, data_dir) == []
+
+
+def test_verify_artifact_index_reports_result_json_unparseable_on_invalid_json(
+    engine: Engine, data_dir: Path
+) -> None:
+    """④-子形态 1：``result_json`` 连 JSON 都不是 ⇒ ``RESULT_JSON_UNPARSEABLE``。"""
+    _inject_invalid_result_json(
+        data_dir, workspace_id=WS_A, job_id="J-bad-json", result_json="{not json"
+    )
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert item.reason == RESULT_JSON_UNPARSEABLE
+    assert item.relative_path == POINTER_RESULT_JSON
+    assert item.workspace_id == WS_A
+    assert item.artifact_id == "J-bad-json"
+
+
+def test_verify_artifact_index_reports_result_json_unparseable_when_payload_is_not_an_object(
+    engine: Engine, data_dir: Path
+) -> None:
+    """④-子形态 2：JSON 合法但**不是对象**（数组）⇒ 同一 reason，指针区分。
+
+    ``[1,2]`` 能通过 DDL 的 ``json_valid``，所以这是「写路径放行、语义已坏」的真实形态。
+    """
+    _put_succeeded_job(engine, workspace_id=WS_A, job_id="J-arr", result_json="[1,2]")
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert item.reason == RESULT_JSON_UNPARSEABLE
+    assert item.relative_path == POINTER_RESULT_JSON_OBJECT
+
+
+def test_verify_artifact_index_reports_result_json_unparseable_on_objectref_shape_violation(
+    engine: Engine, data_dir: Path
+) -> None:
+    """④-子形态 3：对象但不合 ``ObjectRef`` 形状（多一个键，``extra="forbid"``）⇒ 判红。
+
+    比 ``job_from_row`` 的构造式严：构造式会**静默忽略**多出来的键，``model_validate`` 不会。
+    """
+    bad = canonical_json({"kind": RESULT_REF_KIND, "id": "J-shape", "surplus": "boom"})
+    _put_succeeded_job(engine, workspace_id=WS_A, job_id="J-shape", result_json=bad)
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert item.reason == RESULT_JSON_UNPARSEABLE
+    assert item.relative_path == POINTER_RESULT_REF_SHAPE
+
+
+def test_verify_artifact_index_reports_result_json_unparseable_when_ref_kind_is_not_job(
+    engine: Engine, data_dir: Path
+) -> None:
+    """④-子形态 4：形状合法但 ``kind`` 非 ``job``（违 A155① 的冻结形状）⇒ 同一 reason。"""
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_A,
+        job_id="J-kind",
+        result_json=canonical_json({"kind": "snapshot", "id": "S-1"}),
+    )
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert item.reason == RESULT_JSON_UNPARSEABLE
+    assert item.relative_path == POINTER_RESULT_REF_KIND
+
+
+def test_verify_artifact_index_reports_result_ref_dangling(engine: Engine, data_dir: Path) -> None:
+    """⑤：ref 指向的作业行在同工作区内**不存在** ⇒ ``RESULT_REF_DANGLING``。"""
+    _put_succeeded_job(
+        engine, workspace_id=WS_A, job_id="J-here", result_json=_ref_json("J-never-existed")
+    )
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert item.reason == RESULT_REF_DANGLING
+    assert item.relative_path == POINTER_RESULT_REF_ID
+    assert item.artifact_id == "J-here"
+
+
+def test_result_ref_dangling_is_scoped_to_the_same_workspace(
+    engine: Engine, data_dir: Path
+) -> None:
+    """⑤ 的存在性**只在同工作区内**查：跨工作区同号不得算「存在」。
+
+    ``jobs`` 主键是 ``(workspace_id, id)``，故 ``WS_B`` 的作业指向 ``WS_A`` 的 id 时，
+    在 ``WS_B`` 内那一行并不存在 —— 必须判悬空。这条同时钉住 A204 新增访问器的
+    ``WHERE workspace_id = :workspace_id``：谓词一旦被去掉，本用例立刻转红（串号）。
+    """
+    _put_succeeded_job(
+        engine, workspace_id=WS_A, job_id="J-shared", result_json=_ref_json("J-shared")
+    )
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_B,
+        job_id="J-cross",
+        result_json=_ref_json("J-shared"),
+        created_at=T0 + timedelta(minutes=1),
+    )
+    with connect(engine) as conn:
+        found = verify_artifact_index(conn, data_dir)
+    assert [(i.workspace_id, i.artifact_id, i.reason) for i in found] == [
+        (WS_B, "J-cross", RESULT_REF_DANGLING)
+    ], f"WS_A 的自指作业必须干净，只有 WS_B 的跨区引用该判悬空：{found}"
+
+
+def test_jobs_with_null_result_json_are_skipped(engine: Engine, data_dir: Path) -> None:
+    """A205：**只核** ``result_json IS NOT NULL`` 的行 —— QUEUED 作业不得被误报。"""
+    _enqueue(engine, workspace_id=WS_A, job_id="J-queued", created_at=T0)
+    _enqueue(engine, workspace_id=WS_B, job_id="J-queued-2", created_at=T0 + timedelta(minutes=1))
+    with connect(engine) as conn:
+        assert verify_artifact_index(conn, data_dir) == []
+
+
+def test_jobs_side_discrepancy_slots_follow_the_documented_convention(
+    engine: Engine, data_dir: Path
+) -> None:
+    """A205 的硬约束：8 字段与前 5 元组**逐字不变**，``jobs`` 侧按位复用槽位。
+
+    钉住 ``_job_discrepancy`` docstring 里写死的槽位口径，防后来者把作业 id 塞进别的字段
+    或给 ``expected_sha256`` 编一个假摘要 —— 那会让「制品侧差异」与「作业侧差异」混形。
+    """
+    _put_succeeded_job(engine, workspace_id=WS_A, job_id="J-slot", result_json=_ref_json("J-ghost"))
+    with connect(engine) as conn:
+        item = _only(verify_artifact_index(conn, data_dir))
+    assert [f.name for f in dataclasses.fields(Discrepancy)] == [
+        "workspace_id",
+        "artifact_id",
+        "relative_path",
+        "expected_sha256",
+        "actual_sha256",
+        "reason",
+        "expected_byte_size",
+        "actual_byte_size",
+    ], "8 字段面必须逐字不变（design §5:52 / A205）"
+    assert item.workspace_id == WS_A
+    assert item.artifact_id == "J-slot", "artifact_id 槽位承载被核对象主键 = jobs.id"
+    assert item.relative_path == POINTER_RESULT_REF_ID, "relative_path 槽位承载 detail 指针"
+    assert item.expected_sha256 == "", "jobs 侧无摘要期望值"
+    assert item.actual_sha256 is None, "没做任何哈希"
+    assert item.expected_byte_size is None and item.actual_byte_size is None
+
+
+def test_job_enumeration_delegates_to_repositories() -> None:
+    """A204 的枚举口径钉住：``jobs`` 侧也只准走仓储面，禁就地写查询、禁 ``list_all``。"""
+    tree = ast.parse(MODULE_PATH.read_text(encoding="utf-8"), filename=str(MODULE_PATH))
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == "campaignlab.infra.db.repositories":
+            imported.update(alias.name for alias in node.names)
+    assert {
+        "ArtifactRecord",
+        "ArtifactRepository",
+        "JobRecord",
+        "JobRepository",
+        "WorkspaceRepository",
+    } <= imported, sorted(imported)
+    called = {
+        node.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and node.attr in {"list_page", "list_for_workspace"}
+    }
+    assert called == {"list_page", "list_for_workspace"}, called
+    banned = {
+        node.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and node.attr in {"list_all", "execute", "executescript"}
+    }
+    assert banned == set(), f"禁全表无界枚举／禁就地执行 SQL：{sorted(banned)}"
+
+
+def test_job_repository_list_for_workspace_is_workspace_scoped_and_ordered(
+    engine: Engine,
+) -> None:
+    """A204 新增访问器的行为面：**只出本工作区**、按 ``(created_at, id)`` 稳定排序。
+
+    这是「WHERE 谓词被去掉就会红」的直接守护（正向对照第 3 条），也钉住排序可复现 ——
+    复核与清单都要求「同一库状态 ⇒ 同一顺序」，禁依赖 SQL 的自然返回序。
+    """
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_A,
+        job_id="J-a-late",
+        result_json=_ref_json("J-a-late"),
+        created_at=T0 + timedelta(minutes=2),
+    )
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_A,
+        job_id="J-a-early",
+        result_json=_ref_json("J-a-early"),
+        created_at=T0 + timedelta(minutes=1),
+    )
+    _put_succeeded_job(
+        engine,
+        workspace_id=WS_B,
+        job_id="J-b-only",
+        result_json=_ref_json("J-b-only"),
+        created_at=T0,
+    )
+    with connect(engine) as conn:
+        rows_a = JobRepository().list_for_workspace(conn, WS_A)
+        rows_b = JobRepository().list_for_workspace(conn, WS_B)
+    assert [r.id for r in rows_a] == ["J-a-early", "J-a-late"], "按 created_at, id 排序"
+    assert {r.workspace_id for r in rows_a} == {WS_A}, "禁串到别的工作区"
+    assert [r.id for r in rows_b] == ["J-b-only"]
+    assert len(rows_a) + len(rows_b) >= MIN_JOBS, "前置条件：分母不足，用例会假绿"
+    assert rows_a[0].result_json == _ref_json("J-a-early"), "result_json 必须原样透出（④⑤ 的输入）"
