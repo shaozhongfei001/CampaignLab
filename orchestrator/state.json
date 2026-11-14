@@ -1455,7 +1455,7 @@
         "over_cap": true,
         "over_input_cap": true,
         "over_cap_caliber": "max 档单轮输入上限 40k → 自报 ≈115k；累计上限 200k → 自报 ≈3.4M。未降档、未重派，如实报 over_cap（D-044 / R14-Y 先例）。",
-        "commit": null,
+        "commit": "a0ee343",
         "commit_note": "sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R16_S2b1）。",
         "deliverable": "activity_service.py 1999 行（__all__ 26 名逐字对撞 §11.3）；repositories.py +830/0（__all__ 10→16）；api/deps.py +175/0（__all__ 9→13、私有函数恰 1）；3 个新守护 47 例；design §14（+74/0）；D-048；编排器取证两件",
         "by_orchestrator_same_batch": "test_job_repository_terminal.py 前提哨兵迁移（56/13 · A231 · D-047 同族第三例）＋ design §14.1/§14.2/§14.3 追记 ＋ D-048 立单 ＋ FU-54 新立 ＋ PRE-18 新立 ＋ R16-9 自纠",
@@ -1473,7 +1473,9 @@
           "FU-54"
         ],
         "verified_by_orchestrator": true,
-        "why_now": "M0-04/S4 已于 c39b17e 入库 ⇒ api/app.py 锁释放，S2b-1 的写集（activity_service/repositories/deps/tests）与 S4 的写集已无争用；且 M2-01 的 S3–S7 全部依赖本棒的端口面 ⇒ 关键路径。"
+        "why_now": "M0-04/S4 已于 c39b17e 入库 ⇒ api/app.py 锁释放，S2b-1 的写集（activity_service/repositories/deps/tests）与 S4 的写集已无争用；且 M2-01 的 S3–S7 全部依赖本棒的端口面 ⇒ 关键路径。",
+        "commit_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
+        "commit_backfilled_at": "2026-11-15T06:17:55+08:00"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -3427,17 +3429,18 @@
       },
       "subtask_progress_note_R16": "R16 时点：S1 / S2a / S2b-1 = DONE，剩 S2b-2 → S3 → S4 → S5 → S6 → S7。S2b-2 的前置（M0-04/S4 入库）已满足，Round 17 可与 M0-04/S5 并行（写集不相交：app.py vs tests/integration/jobs/conftest.py）。禁混淆：M2-01 的 S2b-* 与 M0-04 的 S2b-* 是**不同任务的不同子任务**（编号同形，沿 R16 既有注记）。S6 必须逐字携带 FU-54（并发确认下 current_rule_id 的取值行为）与 design §3.2 的 SQL 原文，禁让 lane 再猜一次口径。",
       "commit_s2b1_R16": {
-        "sha": null,
-        "full": null,
+        "sha": "a0ee343",
+        "full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
         "tag": "R16-landS2b1",
-        "note": "append-only 新键（沿 commit_s2a_R15 / M0-04.commit_s4_R16 体例），禁改写既有 commit 字段（其记录的是更早子任务的入库 sha）。sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R16_S2b1），禁写猜测值。"
+        "note": "append-only 新键（沿 commit_s2a_R15 / M0-04.commit_s4_R16 体例），禁改写既有 commit 字段（其记录的是更早子任务的入库 sha）。sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R16_S2b1），禁写猜测值。",
+        "backfilled_at": "2026-11-15T06:17:55+08:00"
       },
       "s2b1_delivered_R16": {
         "at": "2026-11-15T06:10:47+08:00",
         "round": 16,
         "commit_tag": "R16-landS2b1",
-        "commit": null,
-        "commit_full": null,
+        "commit": "a0ee343",
+        "commit_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
         "commit_note": "sha 由后续纯台账提交回填，禁写猜测值",
         "lane": "S2b-1",
         "nickname": "Hooke",
@@ -3448,7 +3451,8 @@
         "face": "见 resume.round16_lane_S2b1_return.face（新建 4 件 / 修改 2 件 / 编排器同批 4 件 / 硬禁面零改动）",
         "gates_frozen_tree": "见 counts（ruff 290 / mypy 101 / pytest 699 / in-scope 103 py + 187 md）；冻结索引树实测（R11-3 ＋ D-046 frozen_env），run_commit 逐条对账 expect_counts，不符即回滚",
         "evidence": "evidence/M0/ORCHESTRATOR/r16-m2-01-s2b1-landing/{00-index.md, commands-and-outputs.log}",
-        "verified_by_orchestrator": true
+        "verified_by_orchestrator": true,
+        "commit_backfilled_at": "2026-11-15T06:17:55+08:00"
       },
       "s2b2_unblocked_R16": {
         "at": "2026-11-15T06:10:47+08:00",
@@ -6936,7 +6940,8 @@
       "⑧ M0-04 剩余 S5→S6→S8（全 flash）；**全链闭合前禁判 M0-04 DONE、禁开 wave3**（它是 21 个 TODO 任务的唯一解锁点，见 tasks.M0-04.subtask_progress_note_R15）；",
       "⑨ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。",
       "【R16 回填 c39b17e】① c39b17e 已回填五处目标、commit_backfill_pending_R16_S4 → DONE；② close_agent(S4) 已执行；③ 下一步＝终裁 lane S2b-1 的 U-1/U-2/U-3（A231–A233），由编排器同批迁移 test_job_repository_terminal.py 的__all__ 前提哨兵（D-047 同族**第三例**，A226 选项 b 先例），再入库 tag R16-landS2b1；④ 其后派 Round 17：M0-04/S5（flash）∥ M2-01/S2b-2（max），写集不相交可并行，派单前必过 PRE-13/14/15/16/17。",
-      "【R16 入库 S2b-1（tag R16-landS2b1）】① 11 件交付面已入库，四门以冻结索引树实测为准（290/101/699，in-scope 103 py + 187 md），expect_counts 逐条对账通过；② U-1/U-2/U-3 已由 A231/A232/A233 同批闭合，D-048 立单、FU-54 新立、FU-52/FU-53 扩展、PRE-18 新立、R16-9 自纠如实入账；③ 8 条悬空引用逐条登记 allow_dangling（PRE-17 实扫 + 集合相等断言），M2-01/S7 入库时自动消解；④ close_agent(01a1db55-3aec-7093-9f55-785932c63478) 释放并发槽（手册 §15.11）；⑤ 下一次**纯台账提交**回填本提交 sha（resume.commit_backfill_pending_R16_S2b1 的 6 项目标，含 R16-8 体例的入库后 sha 双录）；⑥ 其后派 Round 17：M0-04/S5（flash，tests/integration/jobs/conftest.py 9 个 fixture ＋ 状态机矩阵）∥ M2-01/S2b-2（max，api/app.py ≤6 行挂载两个 service；锁已释放），写集不相交可并行；派单前必过 PRE-13（先 predispatch 提交再 spawn、spawn 后立即回填 agent_id）/ PRE-14（硬禁面必须列「预期红清单」）/ PRE-15（冻结面读数由脚本实测并贴命令原文）/ PRE-16（驱动分片 ≤8KB）/ PRE-17（悬空实扫）/ PRE-18（对照先过 AST 语义断言）＋ R16-6（派单文瘦身，但判据原文与 SQL 原文不豁免）；⑦ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3（它是 21 个 TODO 任务的唯一解锁点）；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。"
+      "【R16 入库 S2b-1（tag R16-landS2b1）】① 11 件交付面已入库，四门以冻结索引树实测为准（290/101/699，in-scope 103 py + 187 md），expect_counts 逐条对账通过；② U-1/U-2/U-3 已由 A231/A232/A233 同批闭合，D-048 立单、FU-54 新立、FU-52/FU-53 扩展、PRE-18 新立、R16-9 自纠如实入账；③ 8 条悬空引用逐条登记 allow_dangling（PRE-17 实扫 + 集合相等断言），M2-01/S7 入库时自动消解；④ close_agent(01a1db55-3aec-7093-9f55-785932c63478) 释放并发槽（手册 §15.11）；⑤ 下一次**纯台账提交**回填本提交 sha（resume.commit_backfill_pending_R16_S2b1 的 6 项目标，含 R16-8 体例的入库后 sha 双录）；⑥ 其后派 Round 17：M0-04/S5（flash，tests/integration/jobs/conftest.py 9 个 fixture ＋ 状态机矩阵）∥ M2-01/S2b-2（max，api/app.py ≤6 行挂载两个 service；锁已释放），写集不相交可并行；派单前必过 PRE-13（先 predispatch 提交再 spawn、spawn 后立即回填 agent_id）/ PRE-14（硬禁面必须列「预期红清单」）/ PRE-15（冻结面读数由脚本实测并贴命令原文）/ PRE-16（驱动分片 ≤8KB）/ PRE-17（悬空实扫）/ PRE-18（对照先过 AST 语义断言）＋ R16-6（派单文瘦身，但判据原文与 SQL 原文不豁免）；⑦ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3（它是 21 个 TODO 任务的唯一解锁点）；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。",
+      "【R16 回填 a0ee343】① a0ee343 已回填六处目标、commit_backfill_pending_R16_S2b1 → DONE，本批 normalize_file 零命中 ⇒ 11/11 件入库前后 sha 逐件相等（差异数 0，如实登记）；② close_agent(01a1db55-3aec-7093-9f55-785932c63478 / Hooke) 已执行、并发槽已释放，在飞计数 = 0；③ 下一步＝派 Round 17：M0-04/S5（qwen3.8-flash，tests/integration/jobs/conftest.py 9 个 fixture ＋ 作业状态机矩阵）∥ M2-01/S2b-2（qwen3.8-max，api/app.py ≤6 行挂载 activity_service/rule_service，锁已释放）—— 写集不相交可并行；④ 派单必过 PRE-13（先 predispatch 提交派单文＋台账 dispatch 记录，再 spawn，spawn 后立即以纯台账提交回填 agent_id）、PRE-14（硬禁面必须列「本棒落地后预期会打红的既有哨兵」并注明不属其写集）、PRE-15（冻结面读数由脚本实测并贴命令原文）、PRE-16（驱动分片 ≤8KB 后拼接剥 BOM）、PRE-17（悬空引用由驱动在 add_paths 全集实扫）、PRE-18（每条阳性对照先过 AST/运行期语义断言再跑判据）＋ R16-6（派单文瘦身，但判据原文与 SQL 原文不豁免）；⑤ M2-01/S6 派单文必须逐字携带 FU-54 与 design §3.2 的 set_current_rule SQL 原文（禁让 lane 再猜一次口径）；⑥ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3（它是 21 个 TODO 任务的唯一解锁点）；⑦ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。"
     ],
     "in_flight_agents": [
       {
@@ -7102,8 +7107,11 @@
         "tier_used": "qwen3.8-max",
         "landing_tag": "R16-landS2b1",
         "landing_note": "回执已收、编排器独立复验 24/24 PASS，本提交（tag R16-landS2b1）入库；landing_commit 留 None，sha 由下一次纯台账提交回填。",
-        "landing_commit": null,
-        "commit_backfill_pending": "resume.commit_backfill_pending_R16_S2b1"
+        "landing_commit": "a0ee343",
+        "commit_backfill_pending": "resume.commit_backfill_pending_R16_S2b1",
+        "landing_commit_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
+        "slot_closed_at": "2026-11-15T06:17:55+08:00",
+        "slot_closed_note": "close_agent(01a1db55-3aec-7093-9f55-785932c63478) 已执行、返回 previous_status.completed（RESULT: PARTIAL 全文），并发槽已释放（手册 §15.11：每轮派单前必须显式释放）。身份以 agent_id 为唯一键（A216）。"
       }
     ],
     "dispatch_requirements": [
@@ -17700,7 +17708,7 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": null,
+        "head": "a0ee343",
         "head_before": "fe9e4ce",
         "head_note": "本提交（tag R16-landS2b1）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R16_S2b1）；禁写猜测值。",
         "ruff_formatted_files": 290,
@@ -17711,7 +17719,11 @@
         "as_of": "2026-11-15T06:10:47+08:00",
         "commit_tag": "R16-landS2b1",
         "in_flight_note": "本提交时**无在飞 lane**（dispatched_not_yet_returned 1→0）。Round 17 计划并行派发 M0-04/S5（flash，tests/integration/jobs/conftest.py ＋ 状态机矩阵）与 M2-01/S2b-2（max，api/app.py ≤6 行）—— 两者写集不相交、可并行；派单文里的四门基线一律引用本键 current（290/101/699），并在编排器于其在飞期间自办入库时同批更新本键（A223）。",
-        "caliber_note": "冻结索引树口径（R11-3 ＋ D-046 的 frozen_env 导入隔离）；活动树读数只作归因不入账。"
+        "caliber_note": "冻结索引树口径（R11-3 ＋ D-046 的 frozen_env 导入隔离）；活动树读数只作归因不入账。",
+        "head_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
+        "head_backfilled_at": "2026-11-15T06:17:55+08:00",
+        "head_backfill_note": "由 R16-backfill-S2b1 纯台账提交回填；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。",
+        "pure_ledger_note": "本回填提交（tag R16-backfill-S2b1）**只动 orchestrator/state.json、零交付件改动** ⇒ 四门读数与 a0ee343 完全相同（ruff 290 / mypy 101 / pytest 699 / in-scope 103 py + 187 md）；state.json 是 .json，既不入 ruff 的 py+md 作用域、也不入 mypy 的 src/tests/scripts 域 ⇒ 三个分母不变。该「读数相同」由 run_commit 的冻结索引树实测承担（expect_counts 逐条对账，不符即回滚），不是断言。"
       },
       "history": [
         {
@@ -17824,7 +17836,7 @@
           "head_backfill_note": "由 R16-backfill-S4 纯台账提交回填；回填前断言本键为 None。"
         },
         {
-          "head": null,
+          "head": "a0ee343",
           "head_before": "fe9e4ce",
           "head_note": "本提交（tag R16-landS2b1）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R16_S2b1）；禁写猜测值。",
           "at": "2026-11-15T06:10:47+08:00",
@@ -17850,7 +17862,10 @@
             "caliber_note": "冻结索引树口径（R11-3）；活动树读数 281 / 97~98 / 646 passed+3 failed 只作归因，不入账（归因详见取证索引 §2 末段）。",
             "head_full": "c39b17e1c87daeaf906d43ba43ddaca3caff9de9",
             "head_backfilled_at": "2026-11-15T05:25:09+08:00"
-          }
+          },
+          "head_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
+          "head_backfilled_at": "2026-11-15T06:17:55+08:00",
+          "head_backfill_note": "由 R16-backfill-S2b1 纯台账提交回填；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。"
         }
       ]
     },
@@ -18361,12 +18376,123 @@
       "preconditions_raised": [
         "PRE-18"
       ],
-      "commit": null,
-      "landing_commit": null,
+      "commit": "a0ee343",
+      "landing_commit": "a0ee343",
       "commit_note": "run_commit 的 mutate_ledger 在 git commit 之前执行，本棒入库当时无法得知自己的 sha ⇒ 一律留 None，由下一次**纯台账提交**回填（resume.commit_backfill_pending_R16_S2b1）；禁写猜测值。",
       "landing_tag": "R16-landS2b1",
       "landed_at": "2026-11-15T06:10:47+08:00",
-      "verified_by_orchestrator": true
+      "verified_by_orchestrator": true,
+      "commit_full": "a0ee343fde3d604fb78e57c992fbd0ea397f66ac",
+      "commit_backfilled_at": "2026-11-15T06:17:55+08:00",
+      "post_commit_sha256_normalization": {
+        "measured_at": "2026-11-15T06:17:55+08:00",
+        "measured_by": "编排器脚本 .orch_tmp/post_sha.py 在入库后逐件复测（sha256[:12] / 字节 / 行数 / 尾换行形态），非采信任何自报",
+        "rule": "scripts/orch_harness.py:157 normalize_file 的规则是「缺尾换行则补一个」，**从不折叠** \\n\\n；run_commit 第 1 步只在实际发生修正时才写 notes 的 normalized= 项。",
+        "this_batch": "本批 normalize_file **零命中**（a0ee343 的 run_commit notes = [ledger_mutated, frozen_pytest=678 git_env_ignores_collect=21, post_status_lines=0]，无 normalized= 项） ⇒ 11/11 件的**入库后** sha256[:12] 与取证索引 §1 记录的**入库前**实测值逐件相等，差异数 = **0**。与 R16-8（S4 批 4 件 TRAILING_NL_ADDED、pre/post 相差 1 字节）不同：本批 lane 与编排器产出的文本件在写入时就已带单个尾换行 ⇒ 无字节变动。",
+        "files": [
+          {
+            "path": "src/campaignlab/application/activity_service.py",
+            "pre_commit_sha12": "21425228694b",
+            "post_commit_sha12": "21425228694b",
+            "identical": true,
+            "bytes": 88950,
+            "lines": 1999,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "src/campaignlab/infra/db/repositories.py",
+            "pre_commit_sha12": "23437663c59e",
+            "post_commit_sha12": "23437663c59e",
+            "identical": true,
+            "bytes": 82850,
+            "lines": 1884,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "src/campaignlab/api/deps.py",
+            "pre_commit_sha12": "ed1075a86447",
+            "post_commit_sha12": "ed1075a86447",
+            "identical": true,
+            "bytes": 13524,
+            "lines": 346,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "tests/unit/test_s2b_activity_surface.py",
+            "pre_commit_sha12": "a64e4e8eb52a",
+            "post_commit_sha12": "a64e4e8eb52a",
+            "identical": true,
+            "bytes": 24342,
+            "lines": 605,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "tests/unit/test_s2b_activity_repositories.py",
+            "pre_commit_sha12": "e57e7467d6be",
+            "post_commit_sha12": "e57e7467d6be",
+            "identical": true,
+            "bytes": 28889,
+            "lines": 682,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "tests/unit/test_s2b_activity_service.py",
+            "pre_commit_sha12": "d99a137c498e",
+            "post_commit_sha12": "d99a137c498e",
+            "identical": true,
+            "bytes": 48080,
+            "lines": 1163,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "tests/unit/test_job_repository_terminal.py",
+            "pre_commit_sha12": "794271b41609",
+            "post_commit_sha12": "794271b41609",
+            "identical": true,
+            "bytes": 34134,
+            "lines": 819,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "orchestrator/handoff/M2-01-design.md",
+            "pre_commit_sha12": "2d39feaac2d1",
+            "post_commit_sha12": "2d39feaac2d1",
+            "identical": true,
+            "bytes": 153979,
+            "lines": 1396,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "orchestrator/defects/D-048.md",
+            "pre_commit_sha12": "46df6b26bb47",
+            "post_commit_sha12": "46df6b26bb47",
+            "identical": true,
+            "bytes": 5154,
+            "lines": 61,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "evidence/M0/ORCHESTRATOR/r16-m2-01-s2b1-landing/00-index.md",
+            "pre_commit_sha12": "bb483b557400",
+            "post_commit_sha12": "bb483b557400",
+            "identical": true,
+            "bytes": 15056,
+            "lines": 125,
+            "trailing_nl": "single(\\n)"
+          },
+          {
+            "path": "evidence/M0/ORCHESTRATOR/r16-m2-01-s2b1-landing/commands-and-outputs.log",
+            "pre_commit_sha12": "3d1fb4582839",
+            "post_commit_sha12": "3d1fb4582839",
+            "identical": true,
+            "bytes": 14904,
+            "lines": 206,
+            "trailing_nl": "double(\\n\\n)"
+          }
+        ],
+        "diff_count": 0,
+        "note": "取证索引 §1 表覆盖 9 件交付面；本表额外含索引自身与其命令日志共 11 件（本批 staged 全集，orchestrator/state.json 除外 —— 它是台账本身，回填前后必然变化，不属交付面）。"
+      }
     },
     "commit_backfill_pending_R16_S2b1": {
       "created_at": "2026-11-15T06:10:47+08:00",
@@ -18379,7 +18505,10 @@
         "tasks['M2-01'].commit_s2b1_R16.sha/.full 与 .s2b1_delivered_R16.commit/.commit_full ← 本提交 sha",
         "R16-8 体例：复测 11 件**入库后** sha256[:12] 并与取证索引 §1 的入库前值逐件比对，凡 normalize_file 造成差异者双录 pre/post 于 resume.round16_lane_S2b1_return.post_commit_sha256_normalization（含尾换行形态断言：单个 \\n 结尾、禁 \\n\\n）"
       ],
-      "status": "PENDING"
+      "status": "DONE",
+      "backfilled_at": "2026-11-15T06:17:55+08:00",
+      "backfilled_commit": "a0ee343",
+      "backfill_detail": "六处目标已核销（回填前逐条断言为 None/PENDING，禁重复写入、禁写猜测值）：① resume.baseline_authoritative.current.head 与 .history[-1].head ← a0ee343（全 sha a0ee343fde3d604fb78e57c992fbd0ea397f66ac）；② resume.in_flight_agents[lane=S2b-1].landing_commit ← a0ee343（并登记 slot_closed_at：close_agent(01a1db55-3aec-7093-9f55-785932c63478) 已释放并发槽，手册 §15.11）；③ resume.round16_lane_S2b1_return.commit/.landing_commit ← a0ee343；④ budget.subtask_log 的 S2b-1 条目（agent_id 唯一命中）.commit/.commit_full ← a0ee343；⑤ tasks['M2-01'].commit_s2b1_R16.sha/.full 与 .s2b1_delivered_R16.commit/.commit_full ← a0ee343；⑥ 按 R16-8 体例复测 11 件的入库后 sha256[:12]/字节/行数/尾换行形态，双录于 resume.round16_lane_S2b1_return.post_commit_sha256_normalization —— 本批 normalize_file 零命中 ⇒ **11/11 件 pre == post、差异数 0**（与 S4 批的 4 件 TRAILING_NL_ADDED 不同，如实登记零差异而非省略该项）。本提交只动 orchestrator/state.json、零交付件改动 ⇒ 四门读数与 a0ee343 完全相同（ruff 290 / mypy 101 / pytest 699 / in-scope 103 py + 187 md），由 run_commit 的冻结索引树实测逐条对账。"
     }
   },
   "acceptance": {
