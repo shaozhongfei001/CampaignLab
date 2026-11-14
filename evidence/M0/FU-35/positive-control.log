@@ -1,0 +1,51 @@
+=== R13 lane V FU-35 positive controls (final) ===
+target: tests/unit/test_orch_harness.py
+sha256(before controls):
+5d53415657a13b89987801b638581ce8479e81717cc994dc131775a002f08ff9  tests/unit/test_orch_harness.py
+
+=== (a) TARGETS copy + ghost symbol -> coverage guard must be RED ===
+31:        "ghost_symbol_not_covered",
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_every_target_symbol_is_covered ______________________
+
+    def test_every_target_symbol_is_covered() -> None:
+        """覆盖分母守护（派单文 §3）：TARGETS 钉死 12 个符号，逐个必须在 test_ 函数体内出现。
+    
+        正向对照（a）：往 TARGETS 的 tmp 副本里塞一个未覆盖符号名，本守护必须红。
+        """
+        assert len(TARGETS) == 13  # 分母钉死，防 TARGETS 被清空导致 vacuous green
+        src = Path(__file__).resolve().read_text(encoding="utf-8")
+        bodies = _test_body_text(src)
+        assert bodies, "未扫到任何 test_ 函数体（glob 扫空类陷阱）"
+        for name in sorted(TARGETS):
+>           assert name in bodies, f"符号 {name} 在任何 test_ 函数体内都未出现"
+E           AssertionError: 符号 ghost_symbol_not_covered 在任何 test_ 函数体内都未出现
+E           assert 'ghost_symbol_not_covered' in '    assert h.in_scope("docs/x.md") is True\n    assert h.in_scope("src/a.py") is True\n    assert h.in_scope("web/x.m...st_ 函数体（glob 扫空类陷阱）"\n    for name in sorted(TARGETS):\n        assert name in bodies, f"符号 {name} 在任何 test_ 函数体内都未出现"'
+
+/tmp/tmp.NYvqsoDGKN/test_orch_harness.py:368: AssertionError
+=========================== short test summary info ============================
+FAILED ../../../../tmp/tmp.NYvqsoDGKN/test_orch_harness.py::test_every_target_symbol_is_covered
+1 failed, 19 deselected in 0.06s
+control_a_rc=1
+
+=== (b) Proc rc=0 but pattern not found -> _judge must be ok=False ===
+GateResult: GateResult(name='demo', rc=0, ok=False, detail='rc=0 text_ok=False forbid_hit=[]', tail='all quiet')
+(b) OK: judged ok=False
+control_b_rc=0
+
+=== (c) untracked file no owner -> classify_untracked outside ===
+attributed: {}
+outside: ['web/stray.md']
+(c) OK: stray file landed in outside
+control_c_rc=0
+
+=== test file body untouched: sha256 verify after controls ===
+5d53415657a13b89987801b638581ce8479e81717cc994dc131775a002f08ff9  tests/unit/test_orch_harness.py
+tests/unit/test_orch_harness.py: OK
+sha_verify_rc=0
+
+=== final re-run: all green after controls ===
+....................                                                     [100%]
+20 passed in 0.03s
+final_pytest_rc=0
