@@ -10,6 +10,11 @@ resume.gate_measurement_caliber）：
 * rule_no_trust_handoff_summary_assertions：一切计数实测，禁写死。
 * GIT_ENV_IGNORES：两个守护断言「repo-root == HEAD 树」，在冻结树里必然红，
   故从冻结 pytest 排除，改用真实工作树的 ``--collect-only`` 静态计数补回。
+* D-046 根治（R16）：冻结树为省掉重建 venv 的开销而软链 ``.venv``，但 editable 安装的
+  ``_editable_impl_campaignlab.pth`` 写死了**活动仓库 src 的绝对路径**，于是冻结树上
+  ``import campaignlab`` 会解析到活动工作树（门禁读数＝「冻结测试 ＋ 活动源码」的杂交）。
+  故凡在冻结树里跑工具链，一律经 ``frozen_env()`` 把冻结树的 ``src`` 钉进
+  ``PYTHONPATH`` / ``MYPYPATH`` 夺回解析权。有了它，PRE-12 的「泊出在飞件」不再是前置条件。
 """
 
 from __future__ import annotations
@@ -75,8 +80,39 @@ class CommitReport:
 # --------------------------------------------------------------------------- 底层执行
 
 
-def sh(args: Sequence[str], cwd: Path = REPO) -> Proc:
-    """跑命令并取回 rc/out/err。禁接管道（rule_rc：rc 必须由被测命令本身产生）。"""
+def frozen_env(tree: Path) -> dict[str, str]:
+    """D-046 根治：让冻结树上的 Python 导入解析到**冻结树自己的 src**。
+
+    ``frozen_tree()`` 为省掉每次重建 venv 的数十秒开销而软链 ``.venv``，但 editable 安装的
+    ``_editable_impl_campaignlab.pth`` 内容是**活动仓库 src 的绝对路径**，会在 site 初始化阶段
+    被追加进 ``sys.path`` ⇒ 在冻结树里 ``import campaignlab`` 解析到活动工作树，门禁读数成了
+    「冻结测试 ＋ 活动源码」的杂交（D-046：既产假红，也产假绿，后者在无人值守长程里是静默腐化）。
+
+    ``PYTHONPATH`` 的条目在 ``sys.path`` 中**先于** site 阶段追加的 ``.pth`` 路径，故把冻结树的
+    ``src`` 放进 ``PYTHONPATH`` 即可在不重建 venv 的前提下夺回解析权。实测（2026-11-15，活动树
+    含在飞 lane 的 ``infra/db/repositories.py`` +826/0 作为天然阳性对照）：
+
+    * 不加 ⇒ ``tests/unit/test_job_repository_terminal.py`` = **1 failed, 23 passed**
+      （``test_repositories_module_all_is_unchanged`` 被活动树的新名打红）；
+    * 加了 ⇒ **24 passed**。
+
+    ``MYPYPATH`` 同批给定：``pyproject.toml`` 的 ``mypy_path = "src"`` 相对 cwd 本就指向冻结树，
+    这里再显式钉一次，防 follow-import 落回活动树。
+
+    对 ``tree == REPO`` 的调用（真实工作树口径）本函数**恒等**：返回值与 ``.pth`` 里的绝对路径
+    相同，不改变任何既有行为。
+    """
+    src = str(tree / "src")
+    return {"PYTHONPATH": src, "MYPYPATH": src}
+
+
+def sh(args: Sequence[str], cwd: Path = REPO, env: Mapping[str, str] | None = None) -> Proc:
+    """跑命令并取回 rc/out/err。禁接管道（rule_rc：rc 必须由被测命令本身产生）。
+
+    ``env`` 非空时以 ``os.environ`` 为底做**浅覆盖**（不改 ``os.environ`` 本身），
+    供 D-046 的冻结树导入隔离用（见 ``frozen_env``）。
+    """
+    environ = {**os.environ, **env} if env else None
     p = subprocess.run(
         list(args),
         cwd=str(cwd),
@@ -85,6 +121,7 @@ def sh(args: Sequence[str], cwd: Path = REPO) -> Proc:
         encoding="utf-8",
         errors="replace",
         check=False,
+        env=environ,
     )
     return Proc(p.returncode, p.stdout, p.stderr)
 
@@ -197,7 +234,12 @@ def classify_untracked(
 
 
 def frozen_tree(scratch: Path) -> Path:
-    """把**当前索引**导出到仓库外 scratch，并软链 .venv/.git 以便原地跑工具链。"""
+    """把**当前索引**导出到仓库外 scratch，并软链 .venv/.git 以便原地跑工具链。
+
+    ⚠ 软链 ``.venv`` 会把 editable ``.pth`` 里**活动仓库 src 的绝对路径**一并带进来（D-046）。
+    隔离由调用侧负责：``run_gates`` / ``count_git_env_ignores`` / ``predict_pytest`` 一律
+    经 ``frozen_env(tree)`` 把冻结树的 ``src`` 钉进 ``PYTHONPATH`` / ``MYPYPATH``。
+    """
     if scratch.exists():
         shutil.rmtree(scratch)
     scratch.mkdir(parents=True)
@@ -229,25 +271,26 @@ def run_gates(
     want_mypy: bool = True,
     want_ruff: bool = True,
 ) -> dict[str, GateResult]:
-    """在冻结树上跑四门。全部双判（rc + 文本）。"""
+    """在冻结树上跑四门。全部双判（rc + 文本）＋ 全部经 ``frozen_env`` 隔离导入（D-046）。"""
     g: dict[str, GateResult] = {}
+    env = frozen_env(tree)
     if want_ruff:
         g["ruff_format"] = _judge(
             "ruff_format",
-            sh((*_UV, "ruff", "format", "--check", "."), cwd=tree),
+            sh((*_UV, "ruff", "format", "--check", "."), cwd=tree, env=env),
             r"\d+ files? already formatted",
             ("would be reformatted",),
         )
         g["ruff_check"] = _judge(
             "ruff_check",
-            sh((*_UV, "ruff", "check", "."), cwd=tree),
+            sh((*_UV, "ruff", "check", "."), cwd=tree, env=env),
             r"All checks passed",
             ("Found ", "error["),
         )
     if want_mypy:
         g["mypy"] = _judge(
             "mypy",
-            sh((*_UV, "mypy"), cwd=tree),
+            sh((*_UV, "mypy"), cwd=tree, env=env),
             r"Success: no issues found in (\d+) source files",
             ("error:", "errors prevented further checking"),
         )
@@ -256,7 +299,10 @@ def run_gates(
         for rel in GIT_ENV_IGNORES:
             args += ["--ignore", rel]
         g["pytest_frozen"] = _judge(
-            "pytest_frozen", sh(tuple(args), cwd=tree), r"\d+ passed", ("failed", "error")
+            "pytest_frozen",
+            sh(tuple(args), cwd=tree, env=env),
+            r"\d+ passed",
+            ("failed", "error"),
         )
     return g
 
@@ -278,7 +324,7 @@ def count_git_env_ignores(tree: Path | None = None) -> int:
     for rel in GIT_ENV_IGNORES:
         if not (root / rel).exists():
             continue
-        p = sh((*_UV, "pytest", "-q", "--collect-only", rel), cwd=root)
+        p = sh((*_UV, "pytest", "-q", "--collect-only", rel), cwd=root, env=frozen_env(root))
         m = re.search(r"(\d+) tests? collected", p.out + p.err)
         if m is None:
             m = re.search(r"collected (\d+)", p.out + p.err)
@@ -362,7 +408,7 @@ def predict_pytest(new_test_files: Sequence[str], tree: Path | None = None) -> i
     for rel in new_test_files:
         if not (root / rel).exists():
             continue
-        p = sh((*_UV, "pytest", "-q", "--collect-only", rel), cwd=root)
+        p = sh((*_UV, "pytest", "-q", "--collect-only", rel), cwd=root, env=frozen_env(root))
         m = re.search(r"(\d+) tests? collected", p.out + p.err) or re.search(
             r"collected (\d+)", p.out + p.err
         )

@@ -365,3 +365,70 @@ def test_every_target_symbol_is_covered() -> None:
     assert bodies, "未扫到任何 test_ 函数体（glob 扫空类陷阱）"
     for name in sorted(TARGETS):
         assert name in bodies, f"符号 {name} 在任何 test_ 函数体内都未出现"
+
+
+# ------------------------------------------- D-046：冻结树导入隔离（R16 根治的回归守护）
+
+
+def test_frozen_env_pins_pythonpath_and_mypypath_to_tree_src(tmp_path: Path) -> None:
+    """``frozen_env`` 必须把**冻结树自己的** src 钉进 PYTHONPATH / MYPYPATH。
+
+    这是 D-046 的根治点：editable ``.pth`` 写死了活动仓库 src 的绝对路径，
+    只有 PYTHONPATH 先于 site 阶段入 ``sys.path`` 才能夺回解析权。
+    第二断言钉住「对真实工作树恒等」——本函数不得改变 REPO 口径的既有行为。
+    """
+    env = h.frozen_env(tmp_path)
+    assert env == {"PYTHONPATH": str(tmp_path / "src"), "MYPYPATH": str(tmp_path / "src")}
+    assert sorted(env) == ["MYPYPATH", "PYTHONPATH"]
+    assert h.frozen_env(h.REPO)["PYTHONPATH"] == str(h.REPO / "src")
+
+
+def test_run_gates_passes_frozen_env_to_every_gate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """四门**逐门**必须带 ``env=frozen_env(tree)``；少一门即红（防 D-046 回归）。
+
+    阳性对照（本用例自身的牙）：把 ``run_gates`` 里任意一处的 ``env=env`` 去掉，
+    下方 ``all(... env == want)`` 立即判红；把 ``frozen_env`` 改成返回空 dict 同样判红。
+    纯 monkeypatch，不起子进程、不跑工具链（守本文件「纯单元测试」纪律）。
+    """
+    calls: list[tuple[tuple[str, ...], Any, Any]] = []
+
+    def fake_sh(args: Any, cwd: Any = None, env: Any = None) -> Any:
+        calls.append((tuple(args), cwd, env))
+        return h.Proc(0, "1 passed", "")
+
+    monkeypatch.setattr(h, "sh", fake_sh)
+    tree = tmp_path / "tree"
+    (tree / "src").mkdir(parents=True)
+    gates = h.run_gates(tree)
+    assert sorted(gates) == ["mypy", "pytest_frozen", "ruff_check", "ruff_format"]
+    assert len(calls) == 4, f"四门应各调一次 sh，实测 {len(calls)}"
+    want = {"PYTHONPATH": str(tree / "src"), "MYPYPATH": str(tree / "src")}
+    for args, cwd, env in calls:
+        assert cwd == tree, args
+        assert env == want, args
+
+
+def test_count_git_env_ignores_passes_frozen_env(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """静态收集补回分母时同样必须隔离导入，否则收集数也可能来自活动树（D-046 同型）。"""
+    seen: list[tuple[Any, Any]] = []
+
+    def fake_sh(args: Any, cwd: Any = None, env: Any = None) -> Any:
+        seen.append((cwd, env))
+        return h.Proc(0, "2 tests collected", "")
+
+    monkeypatch.setattr(h, "sh", fake_sh)
+    tree = tmp_path / "tree"
+    (tree / "src").mkdir(parents=True)
+    for rel in h.GIT_ENV_IGNORES:
+        target = tree / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("", encoding="utf-8")
+    total = h.count_git_env_ignores(tree)
+    assert total == 2 * len(h.GIT_ENV_IGNORES)
+    want = {"PYTHONPATH": str(tree / "src"), "MYPYPATH": str(tree / "src")}
+    assert seen, "collect-only 一次都没调"
+    assert all(cwd == tree and env == want for cwd, env in seen)

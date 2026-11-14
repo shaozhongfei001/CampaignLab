@@ -1,0 +1,140 @@
+== R16 / D-046 根治取证 ==
+
+at=2026-11-15T03:53:10+08:00
+
+HEAD=234a3f5 branch=m0-framework
+
+活动工作树污染面（天然阳性对照样本）：
+
+$ git diff --numstat (active worktree)
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=git diff --numstat
+rc=0
+3	0	src/campaignlab/api/app.py
+15	0	src/campaignlab/api/common.py
+175	0	src/campaignlab/api/deps.py
+826	0	src/campaignlab/infra/db/repositories.py
+2	2	tests/unit/test_domain_errors.py
+67	0	tests/unit/test_orch_harness.py
+
+$ git status --porcelain -uall
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=git status --porcelain -uall
+rc=0
+?? evidence/M0/M0-04/positive-control-s4.log
+?? evidence/M0/M0-04/s4-jobs-router.md
+?? orchestrator/handoff/R15-lane-M0-04-S4.md
+?? src/campaignlab/api/jobs.py
+?? src/campaignlab/application/activity_service.py
+?? tests/integration/jobs/test_jobs_router_s4.py
+
+
+frozen_tree -> /tmp/orch_d046_evtree
+
+
+== A. 修复前口径（不带 env；复现 D-046 的杂交） ==
+
+$ A1 import 解析
+$ cwd=/tmp/orch_d046_evtree
+$ env=None
+$ cmd=uv run --no-sync python -c import campaignlab.infra.db.repositories as r; print(r.__file__)
+rc=0
+/home/szf/dev/CampaignLab/src/campaignlab/infra/db/repositories.py
+
+$ A2 哨兵用例
+$ cwd=/tmp/orch_d046_evtree
+$ env=None
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py
+rc=1
+E         Use -v to get more diff
+
+tests/unit/test_job_repository_terminal.py:175: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+1 failed, 23 passed in 5.19s
+
+
+== B. 修复后口径（env=frozen_env(tree)） ==
+
+$ B1 import 解析
+$ cwd=/tmp/orch_d046_evtree
+$ env={'PYTHONPATH': '/tmp/orch_d046_evtree/src', 'MYPYPATH': '/tmp/orch_d046_evtree/src'}
+$ cmd=uv run --no-sync python -c import campaignlab.infra.db.repositories as r; print(r.__file__)
+rc=0
+/tmp/orch_d046_evtree/src/campaignlab/infra/db/repositories.py
+
+$ B2 哨兵用例
+$ cwd=/tmp/orch_d046_evtree
+$ env={'PYTHONPATH': '/tmp/orch_d046_evtree/src', 'MYPYPATH': '/tmp/orch_d046_evtree/src'}
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py
+rc=0
+........................                                                 [100%]
+24 passed in 5.51s
+
+
+== C. frozen_env 对真实工作树恒等（无行为变更） ==
+
+frozen_env(REPO)={'PYTHONPATH': '/home/szf/dev/CampaignLab/src', 'MYPYPATH': '/home/szf/dev/CampaignLab/src'}
+
+$ C1 .pth 内容
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=cat .venv/lib/python3.14/site-packages/_editable_impl_campaignlab.pth
+rc=0
+/home/szf/dev/CampaignLab/src
+
+
+== D. 工装修改面的门禁（活动工作树，路径限定） ==
+
+$ D1 ruff format --check
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=uv run --no-sync ruff format --check scripts/orch_harness.py tests/unit/test_orch_harness.py
+rc=0
+2 files already formatted
+
+$ D2 ruff check
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=uv run --no-sync ruff check scripts/orch_harness.py tests/unit/test_orch_harness.py
+rc=0
+All checks passed!
+
+$ D3 pytest 工装单测
+$ cwd=/home/szf/dev/CampaignLab
+$ env=None
+$ cmd=uv run --no-sync pytest -q -p no:randomly tests/unit/test_orch_harness.py
+rc=0
+.......................                                                  [100%]
+23 passed in 0.04s
+
+== E. 采集时点的完整在树面（未截断；上文 A 段受 tail -6 截断，以本段为准） ==
+ M orchestrator/defects/D-046.md
+ M orchestrator/handoff/M0-04-design.md
+ M scripts/orch_harness.py
+ M src/campaignlab/api/app.py
+ M src/campaignlab/api/common.py
+ M src/campaignlab/api/deps.py
+ M src/campaignlab/infra/db/repositories.py
+ M tests/unit/test_domain_errors.py
+ M tests/unit/test_orch_harness.py
+?? evidence/M0/M0-04/commands-s4.md
+?? evidence/M0/M0-04/positive-control-s4.log
+?? evidence/M0/M0-04/s4-jobs-router.md
+?? orchestrator/handoff/R15-lane-M0-04-S4.md
+?? src/campaignlab/api/jobs.py
+?? src/campaignlab/application/activity_service.py
+?? tests/integration/jobs/test_jobs_router_s4.py
+
+---
+43	0	orchestrator/defects/D-046.md
+44	0	orchestrator/handoff/M0-04-design.md
+56	10	scripts/orch_harness.py
+3	0	src/campaignlab/api/app.py
+15	0	src/campaignlab/api/common.py
+175	0	src/campaignlab/api/deps.py
+830	0	src/campaignlab/infra/db/repositories.py
+2	2	tests/unit/test_domain_errors.py
+67	0	tests/unit/test_orch_harness.py
