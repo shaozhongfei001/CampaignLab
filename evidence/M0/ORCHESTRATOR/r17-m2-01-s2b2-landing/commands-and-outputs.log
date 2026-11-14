@@ -1,0 +1,184 @@
+# R17 · M2-01/S2b-2 入库取证 —— 命令原文与输出
+# 口径：一切读数由编排器在本机实测（rule_no_trust_handoff_summary_assertions）；lane 自报仅作对照。
+# generated_at: 2026-11-15T07:21:20+08:00
+# HEAD_before: 641551c  (full 641551ccd4dc6d30eac7ee2bb05e1485ac2f89ee)
+# branch: m0-framework
+
+## A. 仓库状态（入库前）
+$ git rev-parse --abbrev-ref HEAD; git log --oneline -3; git status --porcelain=v1 -uall
+m0-framework
+641551c chore(R17-backfill-agentid): 纯台账回填 predispatch 提交 sha 054ef90 ＋ PRE-13 第三步回填两条 lane 的 agent_id（S5=Kierkegaard · S2b-2=Mendel，status PREDISPATCHED→IN_FLIGHT）
+054ef90 chore(R17-predispatch): 派出 Round 17 两条并行 lane（M0-04/S5 ＋ M2-01/S2b-2，均 qwen3.8-flash）· 派单文与 dispatch 记录**先于 spawn** 入库（PRE-13）· 终裁 A234 把 S2b-2 由 max/high 降为 flash/medium（依实测复杂度，非为凑配比）
+dd09aa2 chore(R16-backfill-sha): 纯台账回填 M2-01/S2b-1 的 commit sha a0ee343 ＋ 如实登记本批 normalize_file 零命中（11/11 件入库前后 sha 逐件相等，差异数 0）
+ M src/campaignlab/api/app.py
+?? evidence/M0/ORCHESTRATOR/r17-m2-01-s2b2-landing/commands-and-outputs.log
+?? tests/integration/jobs/conftest.py
+?? tests/integration/jobs/test_idempotency.py
+?? tests/integration/jobs/test_jobs_api.py
+?? tests/integration/jobs/test_state_machine.py
+?? tests/unit/test_s2b2_app_injection.py
+
+## B. 交付面逐件实测（行 / 字节 / sha256 全量）
+$ wc -l -c src/campaignlab/api/app.py tests/unit/test_s2b2_app_injection.py
+  172  7576 src/campaignlab/api/app.py
+  363 14545 tests/unit/test_s2b2_app_injection.py
+  535 22121 total
+$ sha256sum src/campaignlab/api/app.py tests/unit/test_s2b2_app_injection.py
+f039722660bbba904c989625065394d1e030e5297c74f4ccc2ef2352d4c3bf8c  src/campaignlab/api/app.py
+fadf666b810db4839a67ca49a2cf7f035f0af0ef55b8d7029fa5332ace0c5904  tests/unit/test_s2b2_app_injection.py
+
+$ git diff --numstat HEAD -- src/campaignlab/api/app.py
+14	2	src/campaignlab/api/app.py
+
+$ git diff -U0 HEAD -- src/campaignlab/api/app.py    # 全文：+14 / -2 的逐行原文（用于确认被删的恰是授权两行）
+diff --git a/src/campaignlab/api/app.py b/src/campaignlab/api/app.py
+index 13816f7..b34ac6f 100644
+--- a/src/campaignlab/api/app.py
++++ b/src/campaignlab/api/app.py
+@@ -36 +36,7 @@ from campaignlab.api.common import (
+-from campaignlab.api.deps import HealthService, SessionService, WorkspaceService
++from campaignlab.api.deps import (
++    ActivityService,
++    HealthService,
++    RuleService,
++    SessionService,
++    WorkspaceService,
++)
+@@ -95,0 +102,2 @@ def create_app(
++    activity_service: ActivityService | None = None,
++    rule_service: RuleService | None = None,
+@@ -99 +107 @@ def create_app(
+-    六个参数全部**可注入**（配置／时钟／回环白名单／三个用例服务），因此测试能确定性地
++    八个参数全部**可注入**（配置／时钟／回环白名单／五个用例服务），因此测试能确定性地
+@@ -135,0 +144,4 @@ def create_app(
++    if activity_service is not None:
++        app.state.activity_service = activity_service
++    if rule_service is not None:
++        app.state.rule_service = rule_service
+
+## C. 硬禁面 / 冻结面 sha256（对撞派单文 §5 冻结值）
+$ sha256sum <6 frozen faces>
+ed1075a86447e5a4808e19835c4dc49d44d8c3709811fd5d8a64b3be4c26d471  src/campaignlab/api/deps.py
+21425228694ba2aeab979e6215e00bd4420f6326fff19ba1ad1a49ec6eeb50d8  src/campaignlab/application/activity_service.py
+b0122388342abe6e61798d61229c8aaa54e80f15175c6f56e9a8a0452f09b266  tests/unit/test_s3b_routes.py
+a97c32a6375679050b6cd5a63943db3308d48795af9a58d50ae893579d42708e  tests/unit/test_api_app.py
+dca0657b8b18f3f555191f08a6237967eaeef47f0047aeb944b07284d00fd762  tests/unit/test_s3d_application.py
+592571099d63825188446e33d297befa8911554a77782b9318a34e328b33aec1  contracts/openapi.json
+$ git diff --numstat HEAD -- contracts/openapi.json   # 空 == 未改
+openapi_numstat=[]
+$ git diff --numstat HEAD -- <banned faces>   # 逐件空 == 未改
+  src/campaignlab/api/common.py -> []
+  src/campaignlab/api/jobs.py -> []
+  src/campaignlab/worker/service.py -> []
+  src/campaignlab/worker/deps.py -> []
+  pyproject.toml -> []
+  scripts/orch_harness.py -> []
+  orchestrator/handoff/M2-01-design.md -> []
+  orchestrator/handoff/R17-lane-M2-01-S2b-2.md -> []
+
+## D. 编排器独立复验（49 项对撞，脚本 .orch_tmp/v_s2b2_fix.py）
+$ python3 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/v_s2b2_fix.py 2>&1 | tee /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/out_v_s2b2_fix.txt
+==============================================================================
+PASS app.py sha12
+PASS app.py bytes
+PASS app.py lines
+PASS new test sha12
+PASS new test bytes
+PASS new test lines
+PASS app.py numstat
+PASS deleted lines only the 2 authorized
+PASS deleted count
+PASS frozen src/campaignlab/api/deps.py
+PASS frozen src/campaignlab/application/activity_service.py
+PASS frozen tests/unit/test_s3b_routes.py
+PASS frozen tests/unit/test_api_app.py
+PASS frozen tests/unit/test_s3d_application.py
+PASS openapi.json untouched
+PASS openapi sha12 (fixed from bogus [:16] vs 12-char literal)
+PASS banned untouched src/campaignlab/api/common.py
+PASS banned untouched src/campaignlab/api/jobs.py
+PASS banned untouched src/campaignlab/worker/service.py
+PASS banned untouched src/campaignlab/worker/deps.py
+PASS banned untouched pyproject.toml
+PASS banned untouched scripts/orch_harness.py
+PASS dirty == mine + S5 neighbour
+PASS posonly+args
+PASS kwonly ordered
+PASS kw defaults all None
+PASS app.__all__ xor 4 == empty
+PASS include_router call sites == 4
+PASS include_router source lines == 4
+PASS jobs mount exactly 1
+PASS no activities/rules import
+PASS add_middleware == 2
+PASS install_error_handlers after both add_middleware
+PASS openapi/docs/redoc None present
+PASS app.state assignment lines == 8
+PASS ALLOWED_METHODS verbatim
+PASS ALLOWED_HEADERS verbatim
+PASS get_activity_service reads activity_service
+PASS get_rule_service reads rule_service
+PASS conditional assembly covers both
+PASS assembly identity param==state==value
+PASS new guard collects 9
+PASS 9 test functions
+PASS new test no time.sleep
+PASS new test no time.monotonic()
+PASS new test no datetime.now()
+PASS new test no utcnow
+PASS new test no type: ignore
+PASS app.py no new type: ignore
+==============================================================================
+TOTAL 49 · PASS 49 · FAIL 0
+test names: ['test_g1_signature_is_the_frozen_injection_surface', 'test_g2_both_new_services_are_attached_by_identity', 'test_g3_bare_app_assembles_neither_new_slot', 'test_g4_the_two_new_slots_are_independent', 'test_g5_existing_assembly_and_openapi_face_untouched', 'test_g6_mount_and_middleware_surface_unchanged', 'test_g7_public_surface_and_cors_constants_unchanged', 'test_g8_provider_keys_match_and_health_chain_works', 'test_g9_unassembled_services_still_yield_500_problem']
+
+## D-1. 验证器缺陷自纠（宁报勿藏）
+上一版验证器 .orch_tmp/v_s2b2.py 的第 58-59 行把 hexdigest()[:16] 与 12 位字面量 592571099d63 比较，
+长度口径不匹配 ⇒ 该项恒判 FAIL，而 got 位又硬编码为 'x'，掩盖了真因。原判 FAIL 1 项即此。
+旁证：同批 'openapi.json untouched'（git diff --numstat 为空）PASS ⇒ 文件相对 HEAD 零改动。
+修正：取 hexdigest()[:12] 对撞，并把实测值填入 got 位（脚本另存 v_s2b2_fix.py，原脚本保留不删以留痕）。
+$ diff -u <(sed -n 56,60p v_s2b2.py) <(sed -n 56,60p v_s2b2_fix.py)
+--- /dev/fd/63	2026-11-15 07:21:20.355846208 +0800
++++ /dev/fd/62	2026-11-15 07:21:20.355846208 +0800
+@@ -1,5 +1,5 @@
+ ck("openapi.json untouched",
+    h.git_out("diff", "--numstat", "HEAD", "--", "contracts/openapi.json").strip() == "", "changed", "")
+-ck("openapi sha16", hashlib.sha256((REPO / "contracts/openapi.json").read_bytes()).hexdigest()[:16]
+-   == "592571099d63", "x", "592571099d63")
++_oapi = hashlib.sha256((REPO / "contracts/openapi.json").read_bytes()).hexdigest()
++ck("openapi sha12 (fixed from bogus [:16] vs 12-char literal)", _oapi[:12] == "592571099d63", _oapi[:12], "592571099d63")
+ for rel in ("src/campaignlab/api/common.py", "src/campaignlab/api/jobs.py",
+
+## E. 新守护件可收集用例数（--collect-only 实测，禁采信回执的 9）
+$ uv run --no-sync python -m pytest tests/unit/test_s2b2_app_injection.py --collect-only -q | tail -4
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 tests collected in 0.33s
+
+## F. 未跟踪件归属面（A144(c)）与在飞邻居
+$ git ls-files --others --exclude-standard
+evidence/M0/ORCHESTRATOR/r17-m2-01-s2b2-landing/commands-and-outputs.log
+tests/integration/jobs/conftest.py
+tests/integration/jobs/test_idempotency.py
+tests/integration/jobs/test_jobs_api.py
+tests/integration/jobs/test_state_machine.py
+tests/unit/test_s2b2_app_injection.py
+说明：lane S5（M0-04/S5 · Kierkegaard）此刻仍在飞，其写集前缀 tests/integration/jobs/ 由 owner_map 归属；
+本次入库的四门一律跑在**冻结索引树**上（git checkout-index 导出 + frozen_env 钉 PYTHONPATH/MYPYPATH，D-046 根治），
+故在飞件既不入分母也不判红。
+
+## G. 四门口径
+lane 自报（仅对照，不作判据）：ruff check rc=0 / ruff format --check 293 files / mypy 102 source files / pytest 708 passed。
+权威读数＝run_commit 在冻结索引树上的实测，且必须与本驱动 EXPECT 逐条相等，否则 git reset + 台账 checkout 回滚、拒绝提交。
+EXPECT（含本取证 2 件 .md）：ruff_formatted_files=295 / mypy_source_files=102 / pytest_passed=708 / in_scope_py=104 / in_scope_md=191。
+实测读数入库后写进 resume.self_check_gates_rc0.counts（顶层 3 项 + composition 2 项），禁在本文写死。
+
+## H. flash_share 口径反向复算（先证可复现，再算新值）
+$ python3 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/insp3.py | sed -n '/recompute(now)/,+2p'
+== recompute(now) == {"subtask_entries": 42, "subtask_units_total": 52, "subtask_units_flash": 28, "token_entries_known": 10, "token_entries_null": 32, "tokens_known_total": 1190000, "tokens_known_flash": 792000, "dev_lane_units_total": 30, "dev_lane_units_flash": 9}
+   derived tasks=0.5385 tokens=0.6655 dev=0.3000
+== ledger budget shares == 0.5385 0.6655 0.3
+结论：以现值 43 条 subtask_log 反向重算得 tasks=0.5385 / tokens=0.6655 / dev=0.3000，与账本三项逐位相等 ⇒ 口径可复现。
+本棒入库后（+1 条 flash、tokens=null+estimated 不入分母）预期 tasks=29/53=0.5472、dev=10/31=0.3226、tokens 保持 0.6655。
+两项护栏仍未达标（tasks<0.60、tokens>0.35），如实上报不粉饰、不为凑配比降档。

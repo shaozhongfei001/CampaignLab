@@ -33,7 +33,13 @@ from campaignlab.api.common import (
     problem_response,
     request_id_of,
 )
-from campaignlab.api.deps import HealthService, SessionService, WorkspaceService
+from campaignlab.api.deps import (
+    ActivityService,
+    HealthService,
+    RuleService,
+    SessionService,
+    WorkspaceService,
+)
 from campaignlab.api.jobs import router as jobs_router
 from campaignlab.api.session import router as session_router
 from campaignlab.api.workspaces import router as workspaces_router
@@ -93,10 +99,12 @@ def create_app(
     session_service: SessionService | None = None,
     health_service: HealthService | None = None,
     workspace_service: WorkspaceService | None = None,
+    activity_service: ActivityService | None = None,
+    rule_service: RuleService | None = None,
 ) -> FastAPI:
     """构造 FastAPI 应用。
 
-    六个参数全部**可注入**（配置／时钟／回环白名单／三个用例服务），因此测试能确定性地
+    八个参数全部**可注入**（配置／时钟／回环白名单／五个用例服务），因此测试能确定性地
     触发小 TTL、413 与 403 分支，而不必改进程环境或 sleep（ADR-005 §2.3）。
 
     后三个参数是 **S3d 的纯追加式扩围**：既有三个参数的语义与默认行为一字未改，
@@ -133,6 +141,10 @@ def create_app(
         app.state.health_service = health_service
     if workspace_service is not None:
         app.state.workspace_service = workspace_service
+    if activity_service is not None:
+        app.state.activity_service = activity_service
+    if rule_service is not None:
+        app.state.rule_service = rule_service
 
     # 添加顺序即嵌套顺序（后加者在外层）：guard 最内 → CORS → request_id 最外。
     # 故 CORS 预检 OPTIONS 不会先被回环守卫拦下，而每个响应都带 X-Request-Id。
