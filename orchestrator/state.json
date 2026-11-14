@@ -6970,7 +6970,8 @@
       "【R16 回填 c39b17e】① c39b17e 已回填五处目标、commit_backfill_pending_R16_S4 → DONE；② close_agent(S4) 已执行；③ 下一步＝终裁 lane S2b-1 的 U-1/U-2/U-3（A231–A233），由编排器同批迁移 test_job_repository_terminal.py 的__all__ 前提哨兵（D-047 同族**第三例**，A226 选项 b 先例），再入库 tag R16-landS2b1；④ 其后派 Round 17：M0-04/S5（flash）∥ M2-01/S2b-2（max），写集不相交可并行，派单前必过 PRE-13/14/15/16/17。",
       "【R16 入库 S2b-1（tag R16-landS2b1）】① 11 件交付面已入库，四门以冻结索引树实测为准（290/101/699，in-scope 103 py + 187 md），expect_counts 逐条对账通过；② U-1/U-2/U-3 已由 A231/A232/A233 同批闭合，D-048 立单、FU-54 新立、FU-52/FU-53 扩展、PRE-18 新立、R16-9 自纠如实入账；③ 8 条悬空引用逐条登记 allow_dangling（PRE-17 实扫 + 集合相等断言），M2-01/S7 入库时自动消解；④ close_agent(01a1db55-3aec-7093-9f55-785932c63478) 释放并发槽（手册 §15.11）；⑤ 下一次**纯台账提交**回填本提交 sha（resume.commit_backfill_pending_R16_S2b1 的 6 项目标，含 R16-8 体例的入库后 sha 双录）；⑥ 其后派 Round 17：M0-04/S5（flash，tests/integration/jobs/conftest.py 9 个 fixture ＋ 状态机矩阵）∥ M2-01/S2b-2（max，api/app.py ≤6 行挂载两个 service；锁已释放），写集不相交可并行；派单前必过 PRE-13（先 predispatch 提交再 spawn、spawn 后立即回填 agent_id）/ PRE-14（硬禁面必须列「预期红清单」）/ PRE-15（冻结面读数由脚本实测并贴命令原文）/ PRE-16（驱动分片 ≤8KB）/ PRE-17（悬空实扫）/ PRE-18（对照先过 AST 语义断言）＋ R16-6（派单文瘦身，但判据原文与 SQL 原文不豁免）；⑦ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3（它是 21 个 TODO 任务的唯一解锁点）；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。",
       "【R16 回填 a0ee343】① a0ee343 已回填六处目标、commit_backfill_pending_R16_S2b1 → DONE，本批 normalize_file 零命中 ⇒ 11/11 件入库前后 sha 逐件相等（差异数 0，如实登记）；② close_agent(01a1db55-3aec-7093-9f55-785932c63478 / Hooke) 已执行、并发槽已释放，在飞计数 = 0；③ 下一步＝派 Round 17：M0-04/S5（qwen3.8-flash，tests/integration/jobs/conftest.py 9 个 fixture ＋ 作业状态机矩阵）∥ M2-01/S2b-2（qwen3.8-max，api/app.py ≤6 行挂载 activity_service/rule_service，锁已释放）—— 写集不相交可并行；④ 派单必过 PRE-13（先 predispatch 提交派单文＋台账 dispatch 记录，再 spawn，spawn 后立即以纯台账提交回填 agent_id）、PRE-14（硬禁面必须列「本棒落地后预期会打红的既有哨兵」并注明不属其写集）、PRE-15（冻结面读数由脚本实测并贴命令原文）、PRE-16（驱动分片 ≤8KB 后拼接剥 BOM）、PRE-17（悬空引用由驱动在 add_paths 全集实扫）、PRE-18（每条阳性对照先过 AST/运行期语义断言再跑判据）＋ R16-6（派单文瘦身，但判据原文与 SQL 原文不豁免）；⑤ M2-01/S6 派单文必须逐字携带 FU-54 与 design §3.2 的 set_current_rule SQL 原文（禁让 lane 再猜一次口径）；⑥ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3（它是 21 个 TODO 任务的唯一解锁点）；⑦ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。",
-      "【R17 predispatch】① 两份派单文已入库（S5 与 S2b-2），基线按**含派单文自身**的口径下发（292/101/699，103 py + 189 md），从源头消除 R15-3 那类继承数字失真；② **A234** 已终裁：S2b-2 由 A217 的 max/high 降为 flash/medium，依据实测复杂度（端口面已在 a0ee343 落地、目标形态已逐字冻结、判据面已被既有守护覆盖），附升档回路，配比副作用如实登记；③ 下一步＝spawn 两条 lane（写集不相交可真并行），spawn 后**立即**以纯台账提交回填 sha 与 agent_id（PRE-13 第三步）；④ 回收时禁采信自报，逐条独立复验；⑤ S6 必须等 S5 入库后再派（同目录双主写，N4），且 S6 的派单文须逐字携带 FU-54 与 design §3.2 的 set_current_rule SQL 原文；⑥ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3；⑦ wave3 开闸前完成 FU-53（哨兵登记表 ＋ 派单文自动生成「预期红清单」，已建议 P2→P1）；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。"
+      "【R17 predispatch】① 两份派单文已入库（S5 与 S2b-2），基线按**含派单文自身**的口径下发（292/101/699，103 py + 189 md），从源头消除 R15-3 那类继承数字失真；② **A234** 已终裁：S2b-2 由 A217 的 max/high 降为 flash/medium，依据实测复杂度（端口面已在 a0ee343 落地、目标形态已逐字冻结、判据面已被既有守护覆盖），附升档回路，配比副作用如实登记；③ 下一步＝spawn 两条 lane（写集不相交可真并行），spawn 后**立即**以纯台账提交回填 sha 与 agent_id（PRE-13 第三步）；④ 回收时禁采信自报，逐条独立复验；⑤ S6 必须等 S5 入库后再派（同目录双主写，N4），且 S6 的派单文须逐字携带 FU-54 与 design §3.2 的 set_current_rule SQL 原文；⑥ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3；⑦ wave3 开闸前完成 FU-53（哨兵登记表 ＋ 派单文自动生成「预期红清单」，已建议 P2→P1）；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。",
+      "【R17 回填 054ef90 ＋ agent_id】① PRE-13 三步已按序完成：predispatch 提交（054ef90）→ spawn 两条 lane → 本纯台账提交回填 sha 与 agent_id/nickname/brief_sha256_12；② 在飞：S5=Kierkegaard（01a1dc3e-86e5-73f3-8786-003d10ada510，M0-04/S5，flash/medium，loop 2，critical=true）∥ S2b-2=Mendel（01a1dc3f-4619-7492-8be3-0cb3078c3e8a，M2-01/S2b-2，flash/medium（A234），loop 2）；③ 等回执期间**编排器不碰两条 lane 的写集**（PRE-11 / A161：复验方对在飞面禁写），可自办的只有与两者写集不相交的治理件；④ 回收时禁采信自报，逐条独立复验（含 agent_id↔lane 的磁盘写集面二次验证，若发现映射反了以磁盘面为准并如实登记自纠）；⑤ 入库顺序按回执先后，后入库者必须传 untracked_owner_map 把先入库者的写集从在飞面摘掉、并把对方的在飞件归属登记；⑥ S6 必须等 S5 入库后再派（同目录双主写，N4）；⑦ M0-04 全链 S5→S6→S8 闭合前禁判 DONE、禁开 wave3；⑧ 循环直至 29 任务全交付、11 波全闭合、47 条 AC 全取证。**未全部完成不得停**（用户死命令）。"
     ],
     "in_flight_agents": [
       {
@@ -7150,20 +7151,24 @@
         "tier_used": null,
         "reasoning": "medium",
         "brief": "orchestrator/handoff/R17-lane-M0-04-S5.md",
-        "brief_sha256_12": null,
+        "brief_sha256_12": "dcb4b7d55a5c",
         "critical": true,
         "slack": 0,
         "loop_cap": 2,
-        "agent_id": null,
-        "nickname": null,
-        "status": "PREDISPATCHED",
+        "agent_id": "01a1dc3e-86e5-73f3-8786-003d10ada510",
+        "nickname": "Kierkegaard",
+        "status": "IN_FLIGHT",
         "write_set": [
           "tests/integration/jobs/conftest.py（新建）",
           "tests/integration/jobs/test_state_machine.py（新建）",
           "tests/integration/jobs/test_idempotency.py（新建）",
           "tests/integration/jobs/test_jobs_api.py（新建）"
         ],
-        "tier_basis": "design §9-S5 原文冻结为 qwen3.8-flash（14k），未升降档。"
+        "tier_basis": "design §9-S5 原文冻结为 qwen3.8-flash（14k），未升降档。",
+        "dispatched_at": "2026-11-15T06:51:37+08:00",
+        "mapping_basis": "spawn_agent 的返回值按调用顺序对应：本轮第一个 spawn 调用的消息体是 lane S5 的派单指令（首行「你是 CampaignLab 项目的开发子智能体 **lane S5**（任务 M0-04 / 子任务 S5）」、指向派单文 R17-lane-M0-04-S5.md 并给出其 sha256[:12]=dcb4b7d55a5c），该调用返回 agent_id=01a1dc3e-86e5-73f3-8786-003d10ada510 / nickname=Kierkegaard；第二个调用（lane S2b-2）返回 01a1dc3f-... / Mendel。**并将以磁盘写集面二次验证**：S5 的写集是 tests/integration/jobs/ 下 4 个新建件、S2b-2 的写集是 api/app.py 修改 ＋ tests/unit/test_s2b2_app_injection.py 新建，两者路径前缀零交叉，回收时对撞即可确证（若发现映射反了，按 A216 以磁盘面为准并在台账如实登记自纠）。",
+        "spawned_after_predispatch": true,
+        "spawned_after_predispatch_note": "PRE-13 合规：派单文与 dispatch 记录先于 spawn 入库（054ef90），spawn 之后立即以本纯台账提交回填 agent_id。"
       },
       {
         "lane": "S2b-2",
@@ -7173,18 +7178,22 @@
         "tier_used": null,
         "reasoning": "medium",
         "brief": "orchestrator/handoff/R17-lane-M2-01-S2b-2.md",
-        "brief_sha256_12": null,
+        "brief_sha256_12": "8ed952a4974a",
         "critical": false,
         "slack": 3,
         "loop_cap": 2,
-        "agent_id": null,
-        "nickname": null,
-        "status": "PREDISPATCHED",
+        "agent_id": "01a1dc3f-4619-7492-8be3-0cb3078c3e8a",
+        "nickname": "Mendel",
+        "status": "IN_FLIGHT",
         "write_set": [
           "src/campaignlab/api/app.py（修改 · numstat 上限 added<=16 / deleted<=2）",
           "tests/unit/test_s2b2_app_injection.py（新建）"
         ],
-        "tier_basis": "**A234 降档**（A217 原冻结 max/high）：依据实测复杂度，非为凑配比；详见 round17_adjudications。"
+        "tier_basis": "**A234 降档**（A217 原冻结 max/high）：依据实测复杂度，非为凑配比；详见 round17_adjudications。",
+        "dispatched_at": "2026-11-15T06:51:37+08:00",
+        "mapping_basis": "同上：本轮第二个 spawn 调用的消息体是 lane S2b-2 的派单指令（首行「你是 CampaignLab 项目的开发子智能体 **lane S2b-2**（任务 M2-01 / 子任务 S2b-2）」、含 A234 降档说明与升档回路、指向派单文 R17-lane-M2-01-S2b-2.md 并给出其 sha256[:12]=8ed952a4974a），返回 agent_id=01a1dc3f-4619-7492-8be3-0cb3078c3e8a / nickname=Mendel。磁盘写集面二次验证同上（两条 lane 写集路径前缀零交叉）。",
+        "spawned_after_predispatch": true,
+        "spawned_after_predispatch_note": "PRE-13 合规：派单文与 dispatch 记录先于 spawn 入库（054ef90），spawn 之后立即以本纯台账提交回填 agent_id。"
       }
     ],
     "dispatch_requirements": [
@@ -9898,9 +9907,10 @@
         "critical": true,
         "brief": "orchestrator/handoff/R17-lane-M0-04-S5.md",
         "note": "design §9-S5 冻结为 flash，未升降档",
-        "agent_id": null,
-        "nickname": null,
-        "agent_id_backfill_pending": "resume.commit_backfill_pending_R17（PRE-13 第三步）"
+        "agent_id": "01a1dc3e-86e5-73f3-8786-003d10ada510",
+        "nickname": "Kierkegaard",
+        "brief_sha256_12": "dcb4b7d55a5c",
+        "agent_id_backfilled_at": "2026-11-15T06:51:37+08:00"
       },
       {
         "at": "2026-11-15T06:44:12+08:00",
@@ -9914,9 +9924,10 @@
         "critical": false,
         "brief": "orchestrator/handoff/R17-lane-M2-01-S2b-2.md",
         "note": "**A234 降档**（A217 原冻结 max/high）：依据实测复杂度（端口面已在 a0ee343 落地、目标形态已逐字冻结），非为凑配比；附升档回路（派单文 §0.1/§8⑥）",
-        "agent_id": null,
-        "nickname": null,
-        "agent_id_backfill_pending": "resume.commit_backfill_pending_R17（PRE-13 第三步）"
+        "agent_id": "01a1dc3f-4619-7492-8be3-0cb3078c3e8a",
+        "nickname": "Mendel",
+        "brief_sha256_12": "8ed952a4974a",
+        "agent_id_backfilled_at": "2026-11-15T06:51:37+08:00"
       }
     ],
     "q_verify": {
@@ -17846,7 +17857,7 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": null,
+        "head": "054ef90",
         "head_before": "dd09aa2",
         "head_note": "本提交（tag R17-predispatch）的 sha 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R17）；禁写猜测值。",
         "ruff_formatted_files": 292,
@@ -17857,7 +17868,10 @@
         "as_of": "2026-11-15T06:44:12+08:00",
         "commit_tag": "R17-predispatch",
         "in_flight_note": "本提交后有**两条 lane 在飞**：S5（M0-04 · flash · tests/integration/jobs/** 只新建 4 件）与 S2b-2（M2-01 · flash（A234）· src/campaignlab/api/app.py ＋ tests/unit/test_s2b2_app_injection.py）。写集不相交（disjoint_proof 见 round17_predispatch）。编排器在其在飞期间自办入库时：① 门禁读数只来自**冻结索引树**（D-046 的 frozen_env 已根治导入泄漏）；② 在飞件以 untracked_owner_map 按写集前缀归属登记（A144(c)，PRE-12 已降级为可选）；③ 同批更新本键（A223）。",
-        "caliber_note": "冻结索引树口径（R11-3 ＋ D-046 frozen_env）；活动树读数只作归因不入账。"
+        "caliber_note": "冻结索引树口径（R11-3 ＋ D-046 frozen_env）；活动树读数只作归因不入账。",
+        "head_full": "054ef90c01d6d7d616e3e4be553071f54351dd22",
+        "head_backfilled_at": "2026-11-15T06:51:37+08:00",
+        "head_backfill_note": "由 R17-backfill-agentid 纯台账提交回填（PRE-13 第三步：spawn 之后立即回填 sha 与 agent_id）；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。"
       },
       "history": [
         {
@@ -18002,7 +18016,7 @@
           "head_backfill_note": "由 R16-backfill-S2b1 纯台账提交回填；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。"
         },
         {
-          "head": null,
+          "head": "054ef90",
           "head_before": "dd09aa2",
           "head_note": "本提交（tag R17-predispatch）的 sha 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R17）；禁写猜测值。",
           "at": "2026-11-15T06:44:12+08:00",
@@ -18030,7 +18044,10 @@
             "head_backfilled_at": "2026-11-15T06:17:55+08:00",
             "head_backfill_note": "由 R16-backfill-S2b1 纯台账提交回填；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。",
             "pure_ledger_note": "本回填提交（tag R16-backfill-S2b1）**只动 orchestrator/state.json、零交付件改动** ⇒ 四门读数与 a0ee343 完全相同（ruff 290 / mypy 101 / pytest 699 / in-scope 103 py + 187 md）；state.json 是 .json，既不入 ruff 的 py+md 作用域、也不入 mypy 的 src/tests/scripts 域 ⇒ 三个分母不变。该「读数相同」由 run_commit 的冻结索引树实测承担（expect_counts 逐条对账，不符即回滚），不是断言。"
-          }
+          },
+          "head_full": "054ef90c01d6d7d616e3e4be553071f54351dd22",
+          "head_backfilled_at": "2026-11-15T06:51:37+08:00",
+          "head_backfill_note": "由 R17-backfill-agentid 纯台账提交回填（PRE-13 第三步：spawn 之后立即回填 sha 与 agent_id）；回填前断言本键为 None（幂等守护，禁重复写入、禁写猜测值）。"
         }
       ]
     },
@@ -18693,11 +18710,11 @@
       "at": "2026-11-15T06:44:12+08:00",
       "round": 17,
       "wave": 2,
-      "mode": "正常派单（PRE-13 第一步：本提交＝派单文 ＋ 台账 dispatch 记录入库；第二步＝spawn；第三步＝spawn 后立即以纯台账提交回填 agent_id/nickname/brief_sha256_12）。**不是** R16-1 那种补登（backfill）—— 上一实例的失序已按 PRE-13 纠正。",
+      "mode": "正常派单（PRE-13 第一步：本提交＝派单文 ＋ 台账 dispatch 记录入库；第二步＝spawn；第三步＝spawn 后立即以纯台账提交回填 agent_id/nickname/brief_sha256_12）。**不是** R16-1 那种补登（backfill）—— 上一实例的失序已按 PRE-13 纠正。 || 回填注记（append-only，原文不改写）：本 predispatch 提交的 sha = 054ef90（全 054ef90c01d6d7d616e3e4be553071f54351dd22），已于 spawn 之后由 tag R17-backfill-agentid 的纯台账提交回填；两条 lane 的 agent_id/nickname/brief_sha256_12 同批回填，status 由 PREDISPATCHED 翻 IN_FLIGHT。PRE-13 三步（先入库派单上下文 → spawn → 立即回填）本轮回配执行，未重演 R16-1 的失序。",
       "as_of_head_before": "dd09aa2",
       "branch": "m0-framework",
       "baseline_at_dispatch": {
-        "head": null,
+        "head": "054ef90",
         "head_note": "本提交（tag R17-predispatch）的 sha 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R17）；禁写猜测值。其 parent = dd09aa2。",
         "head_before": "dd09aa2",
         "ruff_formatted_files": 292,
@@ -18706,7 +18723,9 @@
         "in_scope_py": 103,
         "in_scope_md": 189,
         "note": "两份派单文 §5 已按**含派单文自身**的口径下发基线（292 / 101 / 699，103 py + 189 md），并显式写明「若测得 290 说明 checkout 到了 predispatch 之前」⇒ 从源头消除 R15-3 那类「继承数字失真」（当时派单文写的是派单时点快照，lane 上工时编排器已自办入库 ⇒ 数字对不上）。",
-        "measured_by": "脚本 .orch_tmp/measure_r17.py（命令原文已贴进两份派单文 §5，PRE-15）"
+        "measured_by": "脚本 .orch_tmp/measure_r17.py（命令原文已贴进两份派单文 §5，PRE-15）",
+        "head_full": "054ef90c01d6d7d616e3e4be553071f54351dd22",
+        "head_backfilled_at": "2026-11-15T06:51:37+08:00"
       },
       "lanes": [
         {
@@ -18717,20 +18736,22 @@
           "tier_used": null,
           "reasoning": "medium",
           "brief": "orchestrator/handoff/R17-lane-M0-04-S5.md",
-          "brief_sha256_12": null,
+          "brief_sha256_12": "dcb4b7d55a5c",
           "critical": true,
           "slack": 0,
           "loop_cap": 2,
-          "agent_id": null,
-          "nickname": null,
-          "status": "PREDISPATCHED",
+          "agent_id": "01a1dc3e-86e5-73f3-8786-003d10ada510",
+          "nickname": "Kierkegaard",
+          "status": "IN_FLIGHT",
           "write_set": [
             "tests/integration/jobs/conftest.py（新建）",
             "tests/integration/jobs/test_state_machine.py（新建）",
             "tests/integration/jobs/test_idempotency.py（新建）",
             "tests/integration/jobs/test_jobs_api.py（新建）"
           ],
-          "tier_basis": "design §9-S5 原文冻结为 qwen3.8-flash（14k），未升降档。"
+          "tier_basis": "design §9-S5 原文冻结为 qwen3.8-flash（14k），未升降档。",
+          "dispatched_at": "2026-11-15T06:51:37+08:00",
+          "mapping_basis": "spawn_agent 的返回值按调用顺序对应：本轮第一个 spawn 调用的消息体是 lane S5 的派单指令（首行「你是 CampaignLab 项目的开发子智能体 **lane S5**（任务 M0-04 / 子任务 S5）」、指向派单文 R17-lane-M0-04-S5.md 并给出其 sha256[:12]=dcb4b7d55a5c），该调用返回 agent_id=01a1dc3e-86e5-73f3-8786-003d10ada510 / nickname=Kierkegaard；第二个调用（lane S2b-2）返回 01a1dc3f-... / Mendel。**并将以磁盘写集面二次验证**：S5 的写集是 tests/integration/jobs/ 下 4 个新建件、S2b-2 的写集是 api/app.py 修改 ＋ tests/unit/test_s2b2_app_injection.py 新建，两者路径前缀零交叉，回收时对撞即可确证（若发现映射反了，按 A216 以磁盘面为准并在台账如实登记自纠）。"
         },
         {
           "lane": "S2b-2",
@@ -18740,18 +18761,20 @@
           "tier_used": null,
           "reasoning": "medium",
           "brief": "orchestrator/handoff/R17-lane-M2-01-S2b-2.md",
-          "brief_sha256_12": null,
+          "brief_sha256_12": "8ed952a4974a",
           "critical": false,
           "slack": 3,
           "loop_cap": 2,
-          "agent_id": null,
-          "nickname": null,
-          "status": "PREDISPATCHED",
+          "agent_id": "01a1dc3f-4619-7492-8be3-0cb3078c3e8a",
+          "nickname": "Mendel",
+          "status": "IN_FLIGHT",
           "write_set": [
             "src/campaignlab/api/app.py（修改 · numstat 上限 added<=16 / deleted<=2）",
             "tests/unit/test_s2b2_app_injection.py（新建）"
           ],
-          "tier_basis": "**A234 降档**（A217 原冻结 max/high）：依据实测复杂度，非为凑配比；详见 round17_adjudications。"
+          "tier_basis": "**A234 降档**（A217 原冻结 max/high）：依据实测复杂度，非为凑配比；详见 round17_adjudications。",
+          "dispatched_at": "2026-11-15T06:51:37+08:00",
+          "mapping_basis": "同上：本轮第二个 spawn 调用的消息体是 lane S2b-2 的派单指令（首行「你是 CampaignLab 项目的开发子智能体 **lane S2b-2**（任务 M2-01 / 子任务 S2b-2）」、含 A234 降档说明与升档回路、指向派单文 R17-lane-M2-01-S2b-2.md 并给出其 sha256[:12]=8ed952a4974a），返回 agent_id=01a1dc3f-4619-7492-8be3-0cb3078c3e8a / nickname=Mendel。磁盘写集面二次验证同上（两条 lane 写集路径前缀零交叉）。"
         }
       ],
       "slot_note": "并发 3 槽：本轮占 2（S5、S2b-2）。第 3 槽**刻意留白** —— wave3 的 21 个 TODO 任务全部阻塞在 M0-04 全链闭合（tasks.M0-04.subtask_progress_note_R15 原文），M2-01 的 S3–S7 阻塞在 S2b-2；本轮之外可派的只有编排器自办件（FU-50/FU-52/FU-53），而 FU-52 需要重做全部阳性对照、FU-53 的哨兵登记表最好在 wave3 开闸前一次做全 ⇒ 均排在 M0-04 全链闭合之后，不与开发棒抢槽。",
@@ -18779,8 +18802,12 @@
         "resume.dispatch_log 末两条的 .agent_id / .nickname / .agent_id_backfilled_at",
         "本键自身 status PENDING→DONE ＋ backfilled_commit"
       ],
-      "status": "PENDING"
-    }
+      "status": "DONE",
+      "backfilled_at": "2026-11-15T06:51:37+08:00",
+      "backfilled_commit": "054ef90",
+      "backfill_detail": "五类目标已核销（回填前逐条断言为 None/PENDING，禁重复写入、禁写猜测值）：① resume.baseline_authoritative.current.head/.head_full 与 .history[-1].head/.head_full ← 054ef90（全 054ef90c01d6d7d616e3e4be553071f54351dd22）；② resume.round17_predispatch.baseline_at_dispatch.head/.head_full ← 054ef90（并在 .mode 追加回填注记，原文不改写）；③ resume.in_flight_agents[lane=S5|S2b-2] 的 agent_id/nickname/brief_sha256_12/dispatched_at 回填、status PREDISPATCHED→IN_FLIGHT、mapping_basis 登记（S5=01a1dc3e-86e5-73f3-8786-003d10ada510/Kierkegaard，S2b-2=01a1dc3f-4619-7492-8be3-0cb3078c3e8a/Mendel）；round17_predispatch.lanes 同步；④ resume.dispatch_log 末两条的 agent_id/nickname/brief_sha256_12/agent_id_backfilled_at 回填；⑤ 本键 status PENDING→DONE。派单文 sha256[:12] 由驱动**实测**复核（S5=dcb4b7d55a5c / 20999 B，S2b-2=8ed952a4974a / 22878 B），与 predispatch 提交时的读数逐字相符 ⇒ 派单文入库后未被改动。本提交**只动 orchestrator/state.json、零编排器侧交付件改动**（preflight 逐行核 git status：非在飞 lane 写集内的改动一律判红）⇒ 四门读数与 054ef90 完全相同（ruff 292 / mypy 101 / pytest 699 / in-scope 103 py + 189 md），由 run_commit 的冻结索引树实测逐条对账。"
+    },
+    "in_flight_agents_note_round17": "Round 17 两条 lane 在飞（S5/Kierkegaard = M0-04/S5，S2b-2/Mendel = M2-01/S2b-2），写集不相交（round17_predispatch.disjoint_proof）。本提交（tag R17-backfill-agentid）在两条 lane 在飞期间完成，故 run_commit 传入 untracked_owner_map 按写集前缀归属未跟踪件（A144(c)）：S5 → tests/integration/jobs/；S2b-2 → src/campaignlab/api/app.py 与 tests/unit/test_s2b2_app_injection.py。归不上的未跟踪 in-scope 件即越界，run_commit 会 git reset ＋ checkout 台账回滚并拒绝提交。**不泊出在飞件**（PRE-12 已降级为可选：D-046 的 frozen_env 根治后，门禁读数只来自冻结索引树，泊出＝摧毁 lane 产出，客观不可用）。编排器自身在本提交内**零交付件改动**，preflight 逐行核过 git status。"
   },
   "acceptance": {
     "baseline_total": 35,
