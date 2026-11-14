@@ -40,14 +40,20 @@ from sqlalchemy.engine import RowMapping
 from campaignlab.api.common import Job, JobKind, JobState, ObjectRef, Problem, Workspace
 
 __all__ = [
+    "ActivityBindingRepository",
+    "ActivityRecord",
+    "ActivityRepository",
     "ArtifactRecord",
     "ArtifactRepository",
     "AuditRecord",
     "AuditRepository",
+    "BindingRecord",
     "IdempotencyRecord",
     "IdempotencyRepository",
     "JobRecord",
     "JobRepository",
+    "RuleVersionRecord",
+    "RuleVersionRepository",
     "WorkspaceRepository",
     "job_from_row",
 ]
@@ -60,6 +66,26 @@ _JOB_COLUMNS: Final = (
     "workspace_id, id, kind, state, attempt, progress, stage, lease_token, lease_until, "
     "retry_of, retryable, input_json, input_digest, result_json, problem_json, "
     "revision, created_at"
+)
+
+#: ``activities`` 的列序（M2-01 · S2b-1；design §2.4，与 ``contracts/sqlite-v1.sql`` 同源）。
+_ACTIVITY_COLUMNS: Final = (
+    "workspace_id, id, name, bank_id, external_activity_id, description, "
+    "status, current_rule_id, revision, created_at"
+)
+
+#: ``activity_bindings`` 的列序。``Binding`` DTO 没有自己的 ``id``（design §2.4），
+#: 主键是 ``(workspace_id, activity_id, strategy_id, source_version, valid_from)`` 五列复合。
+_BINDING_COLUMNS: Final = (
+    "workspace_id, activity_id, strategy_id, source_version, valid_from, valid_until, evidence_id"
+)
+
+#: ``rule_versions`` 的列序。``content_json`` / ``terms_json`` 存的是
+#: ``api/common.py::canonical_json`` 的规范化文本（design §2.4「JSON 列的存法」）。
+_RULE_VERSION_COLUMNS: Final = (
+    "workspace_id, id, activity_id, parent_rule_id, label, template, "
+    "source_rule_version, state, revision, content_json, terms_json, digest, "
+    "created_at, confirmed_at, confirmation"
 )
 
 
@@ -156,6 +182,72 @@ class JobRecord:
     created_at: str
 
 
+@dataclass(frozen=True, slots=True)
+class ActivityRecord:
+    """``activities`` 行（表结构镜像）。
+
+    刻意**不是** ``Activity`` DTO：DTO 的 ``bindings`` / ``rule_ids`` / ``receipt_ids``
+    三个数组字段来自三张从表（design §7.4），必须由 application 层批量取回后组装，
+    仓储层只忠实镜像本表的列。时刻列一律存 ``str``（体例＝``JobRecord``），
+    由调用方 ``datetime.fromisoformat`` 还原，避免持久层与 DTO 各持一份格式化口径。
+    """
+
+    workspace_id: str
+    id: str
+    name: str
+    bank_id: str | None
+    external_activity_id: str | None
+    description: str
+    status: str
+    current_rule_id: str | None
+    revision: int
+    created_at: str
+
+
+@dataclass(frozen=True, slots=True)
+class BindingRecord:
+    """``activity_bindings`` 行（表结构镜像）。
+
+    ``valid_from`` / ``valid_until`` 是 ``format=date`` 的**日期**文本（design §2.1），
+    区间语义「起含止排」由 ``domain/activity/bindings.py`` 判定，本层只搬运文本。
+    """
+
+    workspace_id: str
+    activity_id: str
+    strategy_id: str
+    source_version: str
+    valid_from: str
+    valid_until: str
+    evidence_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuleVersionRecord:
+    """``rule_versions`` 行（表结构镜像）。
+
+    ``template`` 是 ``content_json.template`` 的冗余列，写入时由 service 从
+    ``content.template`` 取（design §2.4，禁由客户端第二处给）。
+    DDL 的双条件 CHECK ``(state='CONFIRMED')=(confirmed_at IS NOT NULL AND confirmation
+    IS NOT NULL)`` 由 ``confirm`` 的唯一写路径保证：只有那一条 UPDATE 会同时置三列。
+    """
+
+    workspace_id: str
+    id: str
+    activity_id: str
+    parent_rule_id: str | None
+    label: str
+    template: str
+    source_rule_version: str | None
+    state: str
+    revision: int
+    content_json: str
+    terms_json: str
+    digest: str
+    created_at: str
+    confirmed_at: str | None
+    confirmation: str | None
+
+
 def _workspace_of(row: RowMapping) -> Workspace:
     return Workspace(
         id=str(row["id"]),
@@ -215,6 +307,60 @@ def _job_of(row: RowMapping) -> JobRecord:
         problem_json=None if problem_json is None else str(problem_json),
         revision=int(row["revision"]),
         created_at=str(row["created_at"]),
+    )
+
+
+def _activity_of(row: RowMapping) -> ActivityRecord:
+    bank_id = row["bank_id"]
+    external = row["external_activity_id"]
+    current_rule_id = row["current_rule_id"]
+    return ActivityRecord(
+        workspace_id=str(row["workspace_id"]),
+        id=str(row["id"]),
+        name=str(row["name"]),
+        bank_id=None if bank_id is None else str(bank_id),
+        external_activity_id=None if external is None else str(external),
+        description=str(row["description"]),
+        status=str(row["status"]),
+        current_rule_id=None if current_rule_id is None else str(current_rule_id),
+        revision=int(row["revision"]),
+        created_at=str(row["created_at"]),
+    )
+
+
+def _binding_of(row: RowMapping) -> BindingRecord:
+    return BindingRecord(
+        workspace_id=str(row["workspace_id"]),
+        activity_id=str(row["activity_id"]),
+        strategy_id=str(row["strategy_id"]),
+        source_version=str(row["source_version"]),
+        valid_from=str(row["valid_from"]),
+        valid_until=str(row["valid_until"]),
+        evidence_id=str(row["evidence_id"]),
+    )
+
+
+def _rule_version_of(row: RowMapping) -> RuleVersionRecord:
+    parent_rule_id = row["parent_rule_id"]
+    source_rule_version = row["source_rule_version"]
+    confirmed_at = row["confirmed_at"]
+    confirmation = row["confirmation"]
+    return RuleVersionRecord(
+        workspace_id=str(row["workspace_id"]),
+        id=str(row["id"]),
+        activity_id=str(row["activity_id"]),
+        parent_rule_id=None if parent_rule_id is None else str(parent_rule_id),
+        label=str(row["label"]),
+        template=str(row["template"]),
+        source_rule_version=None if source_rule_version is None else str(source_rule_version),
+        state=str(row["state"]),
+        revision=int(row["revision"]),
+        content_json=str(row["content_json"]),
+        terms_json=str(row["terms_json"]),
+        digest=str(row["digest"]),
+        created_at=str(row["created_at"]),
+        confirmed_at=None if confirmed_at is None else str(confirmed_at),
+        confirmation=None if confirmation is None else str(confirmation),
     )
 
 
@@ -1052,3 +1198,687 @@ class AuditRepository:
                 "digest": record.digest,
             },
         )
+
+
+# ------------------------------------------------------------------------------------ activities
+
+
+class ActivityRepository:
+    """``activities`` 表读写 ＋ 两个只读的从表 ID 投影（M2-01 · S2b-1）。
+
+    口径与 ``WorkspaceRepository`` / ``JobRepository`` 完全一致：
+
+    1. **不持有连接**、**不自开事务**（design §7.1：事务边界归 application 层）；
+    2. **不在本层翻译领域错**（``worker/store.py`` docstring 的既有分工）：所有 UPDATE
+       一律返回 ``int(rowcount)``，由 ``application/activity_service.py`` 判 0 并翻成
+       409 ``STATE_CONFLICT`` / 412 ``REVISION_CONFLICT``；
+    3. **写谓词镜像 design §3 的 ``guard`` 列**：``update_fields`` 承载 A2/A3 的
+       ``status='OPEN' AND revision=:revision``。镜像是给测试逐条对照用的，
+       运行期只信 ``rowcount``（``domain/activity/states.py`` 的同一裁定）。
+
+    ``set_current_rule`` 是 R3 的**联动**写（design §3.2 末条），不属于
+    ``ACTIVITY_TRANSITIONS`` 的任何一行，故其谓词逐字照 design §3.2 给出的
+    ``WHERE workspace_id=:ws AND id=:activity_id``，不带 ``revision`` 镜像。
+    ``list_receipt_ids`` 只读 ``receipts``（M2-03 的写面）、``list_rule_ids`` 只读
+    ``rule_versions``，两者都按 design §7.4 批量取，**禁 N+1**。
+    """
+
+    def insert(self, conn: Connection, *, record: ActivityRecord) -> None:
+        """A1 的写点：新建行初值 ``status='OPEN', revision=1``（DDL 无默认值）。"""
+        conn.execute(
+            text(
+                "INSERT INTO activities "
+                "(workspace_id, id, name, bank_id, external_activity_id, description, "
+                "status, current_rule_id, revision, created_at) "
+                "VALUES (:workspace_id, :id, :name, :bank_id, :external_activity_id, "
+                ":description, :status, :current_rule_id, :revision, :created_at)"
+            ),
+            {
+                "workspace_id": record.workspace_id,
+                "id": record.id,
+                "name": record.name,
+                "bank_id": record.bank_id,
+                "external_activity_id": record.external_activity_id,
+                "description": record.description,
+                "status": record.status,
+                "current_rule_id": record.current_rule_id,
+                "revision": record.revision,
+                "created_at": record.created_at,
+            },
+        )
+
+    def get(
+        self, conn: Connection, *, workspace_id: str, activity_id: str
+    ) -> ActivityRecord | None:
+        """按主键取一行。工作区隔离靠 ``workspace_id`` 进谓词：越区与不存在同样返回 ``None``。"""
+        row = (
+            conn.execute(
+                text(
+                    f"SELECT {_ACTIVITY_COLUMNS} FROM activities "
+                    "WHERE workspace_id = :ws AND id = :id"
+                ),
+                {"ws": workspace_id, "id": activity_id},
+            )
+            .mappings()
+            .first()
+        )
+        return None if row is None else _activity_of(row)
+
+    def list_page(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        limit: int,
+        after: tuple[str, str] | None = None,
+        q: str | None = None,
+        statuses: list[str] | None = None,
+    ) -> list[ActivityRecord]:
+        """取一页（最多 ``limit`` 行）；``after`` 是上一页末行的 ``(created_at, id)``。
+
+        - 排序 / 键集谓词与 ``WorkspaceRepository.list_page`` 逐字同口径（design §1.1）；
+        - ``statuses`` 是已过白名单的状态集（``ACTIVITY_STATES`` 实取），下推成
+          ``status IN (…)``：状态是**列**上的等值筛选，下推不会漏行；
+        - ``q`` 对 ``name`` 与 ``external_activity_id`` 做 NFKC ＋ casefold 子串匹配
+          （design §1.1），与既有实现同样**不**下推 SQL LIMIT——过滤在 Python 侧，
+          先 LIMIT 会切掉本应命中的后续行；SQLite 的 ``lower()`` 是 ASCII-only，
+          会把全角／大小写混排的命中悄悄漏掉。
+        """
+        if limit < 1:
+            raise ValueError(f"limit 必须 >= 1：{limit}")
+        where = ["workspace_id = :ws"]
+        params: dict[str, Any] = {"ws": workspace_id}
+        if statuses:
+            marks = []
+            for index, value in enumerate(statuses):
+                mark = f"st{index}"
+                marks.append(f":{mark}")
+                params[mark] = value
+            where.append("status IN (" + ", ".join(marks) + ")")
+        if after is not None:
+            where.append("(created_at < :k0 OR (created_at = :k0 AND id > :k1))")
+            params["k0"], params["k1"] = after
+        sql = (
+            f"SELECT {_ACTIVITY_COLUMNS} FROM activities WHERE "
+            + " AND ".join(where)
+            + " ORDER BY created_at DESC, id ASC"
+        )
+        needle = _fold(q) if q else None
+        if needle is None:
+            sql += " LIMIT :limit"
+            params["limit"] = limit
+        rows: Iterator[RowMapping] = iter(conn.execute(text(sql), params).mappings())
+        page: list[ActivityRecord] = []
+        for row in rows:
+            if needle is not None:
+                external = row["external_activity_id"]
+                name_hit = needle in _fold(str(row["name"]))
+                external_hit = external is not None and needle in _fold(str(external))
+                if not name_hit and not external_hit:
+                    continue
+            page.append(_activity_of(row))
+            if len(page) >= limit:
+                break
+        return page
+
+    def update_fields(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        revision: int,
+        name: str | None = None,
+        description: str | None = None,
+        status: str | None = None,
+    ) -> int:
+        """A2 / A3 的唯一写点：只 SET 调用方给出的列，并一律 ``revision = revision + 1``。
+
+        design §3.1 末条：每次被接受的 ``updateActivity`` 都 bump ``revision``（含「值未变」
+        的幂等赋值）——``revision`` 是并发控制号而非内容号，做「无变化则不 bump」的优化
+        会让客户端手里的 ETag 在两次相同 PATCH 后仍然有效，412 语义随之失效。
+
+        谓词 ``status='OPEN' AND revision=:revision`` 是 design §3.1 A2/A3 的 ``guard`` 镜像：
+        已归档行与旧 ``revision`` 一律 ``rowcount == 0``，**禁**先 SELECT 后 UPDATE 的裸检查。
+
+        三列全为 ``None`` 是**合法**调用，不报错：design §3.4 把 ``bindings`` 冻结为
+        「出现即整体替换」，而它不在 ``activities`` 行上（在 ``activity_bindings``），故
+        「只改绑定」的 PATCH 到达本写点时 SET 列为空，仍需 bump ``revision``（A3 行的
+        ``UPDATE … revision=revision+1`` 原文未要求必须有内容列）。真正的空 PATCH
+        （``model_fields_set`` 为空）由 service 先判 422 ``EMPTY_PATCH``，不会走到这里。
+        """
+        sets: list[str] = []
+        params: dict[str, Any] = {"ws": workspace_id, "id": activity_id, "revision": revision}
+        if name is not None:
+            sets.append("name = :name")
+            params["name"] = name
+        if description is not None:
+            sets.append("description = :description")
+            params["description"] = description
+        if status is not None:
+            sets.append("status = :status")
+            params["status"] = status
+        sets.append("revision = revision + 1")
+        result = conn.execute(
+            text(
+                "UPDATE activities SET "
+                + ", ".join(sets)
+                + " WHERE workspace_id = :ws AND id = :id "
+                "AND status = 'OPEN' AND revision = :revision"
+            ),
+            params,
+        )
+        return int(result.rowcount or 0)
+
+    def find_by_external(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        bank_id: str,
+        external_activity_id: str,
+    ) -> ActivityRecord | None:
+        """design §6.4「同银行外部活动号重复」的显式查重（AC-002「明确定位」）。
+
+        只在 ``bank_id`` 与 ``external_activity_id`` **两者都非空**时才由 service 调用：
+        SQLite 的 ``UNIQUE`` 索引里 NULL 互不相等，任一为 NULL 的活动永不触发该冲突
+        （design §6.4 的 NULL 语义陷阱）。返回整行而不是布尔，因为 409 的
+        ``issues[1].message`` 要带**既有活动 ID**才算「明确定位」。
+        """
+        row = (
+            conn.execute(
+                text(
+                    f"SELECT {_ACTIVITY_COLUMNS} FROM activities "
+                    "WHERE workspace_id = :ws AND bank_id = :bank_id "
+                    "AND external_activity_id = :ext"
+                ),
+                {"ws": workspace_id, "bank_id": bank_id, "ext": external_activity_id},
+            )
+            .mappings()
+            .first()
+        )
+        return None if row is None else _activity_of(row)
+
+    def set_current_rule(
+        self, conn: Connection, *, workspace_id: str, activity_id: str, rule_id: str
+    ) -> int:
+        """R3 的联动写：``activities.current_rule_id`` 指向刚确认的版本并 bump ``revision``。
+
+        design §3.2 末条（冻结）：确认规则会使**活动自身**的 ETag 变化。
+        谓词逐字照 design §3.2 给出的形态，不带 ``revision`` 镜像——本 UPDATE 不是
+        ``ACTIVITY_TRANSITIONS`` 的任何一行，它只是 R3 事务里的第二张表。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE activities SET current_rule_id = :rule_id, revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id"
+            ),
+            {"ws": workspace_id, "id": activity_id, "rule_id": rule_id},
+        )
+        return int(result.rowcount or 0)
+
+    def list_receipt_ids(
+        self, conn: Connection, *, workspace_id: str, activity_ids: list[str]
+    ) -> dict[str, list[str]]:
+        """``Activity.receipt_ids`` 的批量投影（design §7.4；``receipts`` 本卡**只读**）。
+
+        一次 ``IN (…)`` 查询覆盖整页活动，Python 侧按 ``activity_id`` 分组回填 ⇒ 无 N+1。
+        ``receipts`` 归 M2-03 写、当前可能整表为空，故每个入参活动都预置空数组，
+        禁假设「至少一行」。顺序固定 ``created_at ASC, id ASC``。
+        """
+        grouped: dict[str, list[str]] = {activity_id: [] for activity_id in activity_ids}
+        if not activity_ids:
+            return grouped
+        marks = []
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, activity_id in enumerate(activity_ids):
+            mark = f"a{index}"
+            marks.append(f":{mark}")
+            params[mark] = activity_id
+        rows = conn.execute(
+            text(
+                "SELECT activity_id, id FROM receipts "
+                "WHERE workspace_id = :ws AND activity_id IN ("
+                + ", ".join(marks)
+                + ") ORDER BY created_at ASC, id ASC"
+            ),
+            params,
+        ).mappings()
+        for row in rows:
+            key = str(row["activity_id"])
+            if key in grouped:
+                grouped[key].append(str(row["id"]))
+        return grouped
+
+    def list_rule_ids(
+        self, conn: Connection, *, workspace_id: str, activity_ids: list[str]
+    ) -> dict[str, list[str]]:
+        """``Activity.rule_ids`` 的批量投影（design §7.4）。顺序 ``created_at ASC, id ASC``。"""
+        grouped: dict[str, list[str]] = {activity_id: [] for activity_id in activity_ids}
+        if not activity_ids:
+            return grouped
+        marks = []
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, activity_id in enumerate(activity_ids):
+            mark = f"a{index}"
+            marks.append(f":{mark}")
+            params[mark] = activity_id
+        rows = conn.execute(
+            text(
+                "SELECT activity_id, id FROM rule_versions "
+                "WHERE workspace_id = :ws AND activity_id IN ("
+                + ", ".join(marks)
+                + ") ORDER BY created_at ASC, id ASC"
+            ),
+            params,
+        ).mappings()
+        for row in rows:
+            key = str(row["activity_id"])
+            if key in grouped:
+                grouped[key].append(str(row["id"]))
+        return grouped
+
+
+# --------------------------------------------------------------------------- activity_bindings
+
+
+class ActivityBindingRepository:
+    """``activity_bindings`` 表读写 ＋ ``evidence`` 表的**只读**存在性投影。
+
+    ``evidence`` 表本卡不写（``registerEvidence`` 归 M1-03，design §3.4 末条）；这里只提供
+    「这批 ``evidence_id`` 里哪些已登记」的一次性批量查询，供
+    ``domain/activity/bindings.py::validate_bindings`` 与
+    ``clauses.py::evaluate_clause_gate`` 的 ``registered_evidence_ids`` 入参使用。
+
+    ``replace_set`` 是 design §3.4 冻结的 PATCH 语义：``ActivityUpdate.bindings`` 一旦出现在
+    请求里就是**整体替换**（同事务 DELETE 后按数组顺序 INSERT），未出现则完全不动。
+    区间代数（起含止排、相交即拒、重复键、证据未登记）全部由领域层判，本层不重复判——
+    否则「同一事实两处各存一份」会让两侧的口径漂移无从发现。
+    """
+
+    def replace_set(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        bindings: list[BindingRecord],
+    ) -> None:
+        """整体替换某活动的绑定集合（design §3.4）。空数组＝清空（AC-202 的合法意图）。"""
+        conn.execute(
+            text("DELETE FROM activity_bindings WHERE workspace_id = :ws AND activity_id = :aid"),
+            {"ws": workspace_id, "aid": activity_id},
+        )
+        for record in bindings:
+            conn.execute(
+                text(
+                    "INSERT INTO activity_bindings "
+                    "(workspace_id, activity_id, strategy_id, source_version, "
+                    "valid_from, valid_until, evidence_id) "
+                    "VALUES (:workspace_id, :activity_id, :strategy_id, :source_version, "
+                    ":valid_from, :valid_until, :evidence_id)"
+                ),
+                {
+                    "workspace_id": record.workspace_id,
+                    "activity_id": record.activity_id,
+                    "strategy_id": record.strategy_id,
+                    "source_version": record.source_version,
+                    "valid_from": record.valid_from,
+                    "valid_until": record.valid_until,
+                    "evidence_id": record.evidence_id,
+                },
+            )
+
+    def list_for_activity(
+        self, conn: Connection, *, workspace_id: str, activity_id: str
+    ) -> list[BindingRecord]:
+        """单个活动的绑定集合，顺序固定 ``valid_from ASC, strategy_id ASC, source_version ASC``。"""
+        rows = conn.execute(
+            text(
+                f"SELECT {_BINDING_COLUMNS} FROM activity_bindings "
+                "WHERE workspace_id = :ws AND activity_id = :aid "
+                "ORDER BY valid_from ASC, strategy_id ASC, source_version ASC"
+            ),
+            {"ws": workspace_id, "aid": activity_id},
+        ).mappings()
+        return [_binding_of(row) for row in rows]
+
+    def list_for_activities(
+        self, conn: Connection, *, workspace_id: str, activity_ids: list[str]
+    ) -> dict[str, list[BindingRecord]]:
+        """一页活动的绑定集合，**一次** ``IN (…)`` 查询（design §7.4「禁 N+1」）。
+
+        ``getActivity`` 也走本方法（页大小 1），禁为单对象另写第二套查询。
+        每个入参活动都预置空数组，故「无绑定活动在关联视图可见」（AC-002）不需要调用方判空键。
+        组内顺序与 ``list_for_activity`` 逐字相同。
+        """
+        grouped: dict[str, list[BindingRecord]] = {activity_id: [] for activity_id in activity_ids}
+        if not activity_ids:
+            return grouped
+        marks = []
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, activity_id in enumerate(activity_ids):
+            mark = f"a{index}"
+            marks.append(f":{mark}")
+            params[mark] = activity_id
+        rows = conn.execute(
+            text(
+                f"SELECT {_BINDING_COLUMNS} FROM activity_bindings "
+                "WHERE workspace_id = :ws AND activity_id IN ("
+                + ", ".join(marks)
+                + ") ORDER BY valid_from ASC, strategy_id ASC, source_version ASC"
+            ),
+            params,
+        ).mappings()
+        for row in rows:
+            key = str(row["activity_id"])
+            if key in grouped:
+                grouped[key].append(_binding_of(row))
+        return grouped
+
+    def evidence_exists(
+        self, conn: Connection, *, workspace_id: str, evidence_ids: list[str]
+    ) -> set[str]:
+        """只读 ``evidence`` 表：返回入参里**已登记**的那些 ``id``（design §3.4 末条）。
+
+        返回「已登记子集」而不是布尔，是为了让一次查询同时服务绑定面与条款面
+        （两者的 ``registered_evidence_ids`` 是同一个集合），避免各查一遍造成 N+1。
+        名字沿用 design §11.3 给定的 ``evidence_exists``；语义是批量存在性投影。
+        """
+        if not evidence_ids:
+            return set()
+        marks = []
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, evidence_id in enumerate(evidence_ids):
+            mark = f"e{index}"
+            marks.append(f":{mark}")
+            params[mark] = evidence_id
+        rows = conn.execute(
+            text(
+                "SELECT id FROM evidence WHERE workspace_id = :ws AND id IN ("
+                + ", ".join(marks)
+                + ")"
+            ),
+            params,
+        ).mappings()
+        return {str(row["id"]) for row in rows}
+
+
+# ---------------------------------------------------------------------------- rule_versions
+
+
+class RuleVersionRepository:
+    """``rule_versions`` 表读写 ＋ ``cases`` 表的**只读**重跑投影。
+
+    两条写谓词镜像 design §3.2 的 ``guard`` 列（运行期只信 ``rowcount``）：
+
+    - ``update_draft``（R2）：``state='DRAFT' AND revision=:revision``
+      ⇒ 「试编辑已确认版本」物理上 ``rowcount == 0``（AC-003）；
+    - ``confirm``（R3）：``state='DRAFT' AND revision=:revision AND digest=:digest``
+      ⇒ 摘要漂移与重复确认都落在 ``rowcount == 0`` 上，**禁**先 SELECT 后 UPDATE 的裸检查。
+
+    ``template`` 列是 ``content_json.template`` 的冗余（design §2.4），由 service 从
+    ``content.template`` 取后随 ``insert`` 一并写入，本层不做第二处推导。
+    """
+
+    def insert(self, conn: Connection, *, record: RuleVersionRecord) -> None:
+        """R1 / R4 的写点：新草稿一律 ``state='DRAFT', revision=1``，确认双列为 NULL。"""
+        conn.execute(
+            text(
+                "INSERT INTO rule_versions "
+                "(workspace_id, id, activity_id, parent_rule_id, label, template, "
+                "source_rule_version, state, revision, content_json, terms_json, digest, "
+                "created_at, confirmed_at, confirmation) "
+                "VALUES (:workspace_id, :id, :activity_id, :parent_rule_id, :label, :template, "
+                ":source_rule_version, :state, :revision, :content_json, :terms_json, :digest, "
+                ":created_at, :confirmed_at, :confirmation)"
+            ),
+            {
+                "workspace_id": record.workspace_id,
+                "id": record.id,
+                "activity_id": record.activity_id,
+                "parent_rule_id": record.parent_rule_id,
+                "label": record.label,
+                "template": record.template,
+                "source_rule_version": record.source_rule_version,
+                "state": record.state,
+                "revision": record.revision,
+                "content_json": record.content_json,
+                "terms_json": record.terms_json,
+                "digest": record.digest,
+                "created_at": record.created_at,
+                "confirmed_at": record.confirmed_at,
+                "confirmation": record.confirmation,
+            },
+        )
+
+    def get(self, conn: Connection, *, workspace_id: str, rule_id: str) -> RuleVersionRecord | None:
+        """按主键取一行；越区与不存在同样返回 ``None``（404 禁枚举，design §6.4）。"""
+        row = (
+            conn.execute(
+                text(
+                    f"SELECT {_RULE_VERSION_COLUMNS} FROM rule_versions "
+                    "WHERE workspace_id = :ws AND id = :id"
+                ),
+                {"ws": workspace_id, "id": rule_id},
+            )
+            .mappings()
+            .first()
+        )
+        return None if row is None else _rule_version_of(row)
+
+    def list_page(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        limit: int,
+        after: tuple[str, str] | None = None,
+        q: str | None = None,
+        states: list[str] | None = None,
+    ) -> list[RuleVersionRecord]:
+        """``listRules`` 的一页（design §1.5）。
+
+        ⚠ 形参名是 ``statuses`` 语义的 ``states``：契约把查询参数叫 ``status``，
+        被过滤的列却是 ``rule_versions.state``（ADR-006 §4.7 点名的命名错位之一），
+        本层按**列名**取 ``states``，路由／service 负责把 ``status`` 参数值搬进来。
+        ``q`` 对 ``label`` 与 ``source_rule_version`` 做 NFKC ＋ casefold 子串匹配。
+        可用索引＝切片 ``ddl.rule_versions__indexes`` 的 ``rules_activity``（含 ``created_at``）。
+        """
+        if limit < 1:
+            raise ValueError(f"limit 必须 >= 1：{limit}")
+        where = ["workspace_id = :ws", "activity_id = :aid"]
+        params: dict[str, Any] = {"ws": workspace_id, "aid": activity_id}
+        if states:
+            marks = []
+            for index, value in enumerate(states):
+                mark = f"st{index}"
+                marks.append(f":{mark}")
+                params[mark] = value
+            where.append("state IN (" + ", ".join(marks) + ")")
+        if after is not None:
+            where.append("(created_at < :k0 OR (created_at = :k0 AND id > :k1))")
+            params["k0"], params["k1"] = after
+        sql = (
+            f"SELECT {_RULE_VERSION_COLUMNS} FROM rule_versions WHERE "
+            + " AND ".join(where)
+            + " ORDER BY created_at DESC, id ASC"
+        )
+        needle = _fold(q) if q else None
+        if needle is None:
+            sql += " LIMIT :limit"
+            params["limit"] = limit
+        rows: Iterator[RowMapping] = iter(conn.execute(text(sql), params).mappings())
+        page: list[RuleVersionRecord] = []
+        for row in rows:
+            if needle is not None:
+                source = row["source_rule_version"]
+                label_hit = needle in _fold(str(row["label"]))
+                source_hit = source is not None and needle in _fold(str(source))
+                if not label_hit and not source_hit:
+                    continue
+            page.append(_rule_version_of(row))
+            if len(page) >= limit:
+                break
+        return page
+
+    def update_draft(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        rule_id: str,
+        revision: int,
+        label: str | None = None,
+        content_json: str | None = None,
+        terms_json: str | None = None,
+        digest: str | None = None,
+    ) -> int:
+        """R2 的唯一写点：只 SET 调用方给出的列，并一律 ``revision = revision + 1``。
+
+        ``digest`` 是可给的：只改 ``label`` 时**不**给（label 不进摘要，design §4.6），
+        改 ``content`` / ``terms`` 时由 service 重算后一并给。这样「摘要只随内容变」
+        在写点上就是结构性的，而不是靠调用方记得。
+        """
+        sets: list[str] = []
+        params: dict[str, Any] = {"ws": workspace_id, "id": rule_id, "revision": revision}
+        if label is not None:
+            sets.append("label = :label")
+            params["label"] = label
+        if content_json is not None:
+            sets.append("content_json = :content_json")
+            params["content_json"] = content_json
+        if terms_json is not None:
+            sets.append("terms_json = :terms_json")
+            params["terms_json"] = terms_json
+        if digest is not None:
+            sets.append("digest = :digest")
+            params["digest"] = digest
+        if not sets:
+            raise ValueError("update_draft 至少要给出一个待写列（空 PATCH 由 service 先判 422）")
+        sets.append("revision = revision + 1")
+        result = conn.execute(
+            text(
+                "UPDATE rule_versions SET "
+                + ", ".join(sets)
+                + " WHERE workspace_id = :ws AND id = :id "
+                "AND state = 'DRAFT' AND revision = :revision"
+            ),
+            params,
+        )
+        return int(result.rowcount or 0)
+
+    def confirm(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        rule_id: str,
+        revision: int,
+        digest: str,
+        confirmed_at: str,
+        confirmation: str,
+    ) -> int:
+        """R3 的唯一写点（design §3.2）。
+
+        谓词 ``state='DRAFT' AND revision=:revision AND digest=:digest`` 把三件事一次钉死：
+        重复确认（已 ``CONFIRMED``）、旧 ``revision``、以及「读到行之后内容又被改过」
+        （摘要漂移）全部落成 ``rowcount == 0``。SET 里同时置 ``state`` /
+        ``confirmed_at`` / ``confirmation`` 三列，是 DDL 那条双条件 CHECK
+        ``(state='CONFIRMED')=(confirmed_at IS NOT NULL AND confirmation IS NOT NULL)``
+        的唯一满足路径——只写一侧会当场违约。
+        """
+        result = conn.execute(
+            text(
+                "UPDATE rule_versions SET state = 'CONFIRMED', confirmed_at = :confirmed_at, "
+                "confirmation = :confirmation, digest = :digest, revision = revision + 1 "
+                "WHERE workspace_id = :ws AND id = :id "
+                "AND state = 'DRAFT' AND revision = :revision AND digest = :digest"
+            ),
+            {
+                "ws": workspace_id,
+                "id": rule_id,
+                "revision": revision,
+                "digest": digest,
+                "confirmed_at": confirmed_at,
+                "confirmation": confirmation,
+            },
+        )
+        return int(result.rowcount or 0)
+
+    def list_confirmed_siblings(
+        self,
+        conn: Connection,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        exclude_rule_id: str,
+    ) -> list[dict[str, Any]]:
+        """C9 需要的「同活动下其它已确认版本」只读投影（design §5.3）。
+
+        只给 ``RuleContext.sibling_confirmed`` 声明的四个键（``id`` / ``template`` /
+        ``starts_at`` / ``ends_at``）：``starts_at`` / ``ends_at`` 住在 ``content_json`` 里，
+        ``callback_priority`` 模板**没有**这两列，故一律 ``.get()`` 取、缺失即 ``None``，
+        禁假设「每个模板都有时间窗」。顺序 ``created_at ASC, id ASC``，可复跑。
+        """
+        rows = conn.execute(
+            text(
+                "SELECT id, template, content_json FROM rule_versions "
+                "WHERE workspace_id = :ws AND activity_id = :aid "
+                "AND state = 'CONFIRMED' AND id != :exclude "
+                "ORDER BY created_at ASC, id ASC"
+            ),
+            {"ws": workspace_id, "aid": activity_id, "exclude": exclude_rule_id},
+        ).mappings()
+        siblings: list[dict[str, Any]] = []
+        for row in rows:
+            rule_id = str(row["id"])
+            content = json.loads(str(row["content_json"]))
+            if not isinstance(content, Mapping):
+                raise ValueError(f"rule_versions.content_json 必须是对象：rule={rule_id}")
+            siblings.append(
+                {
+                    "id": rule_id,
+                    "template": str(row["template"]),
+                    "starts_at": content.get("starts_at"),
+                    "ends_at": content.get("ends_at"),
+                }
+            )
+        return siblings
+
+    def list_confirmed_case_ids(
+        self, conn: Connection, *, workspace_id: str, rule_ids: list[str]
+    ) -> list[str]:
+        """``RuleDiff.requires_rerun_case_ids`` 的只读投影（design §6.5）。
+
+        取同工作区中 ``cases.state='CONFIRMED'`` 且 ``observed_rule_id`` 落在
+        ``(baseline, candidate)`` 里的 ``cases.id``，**升序去重**。``cases`` 归 M2-02 写、
+        当前可能整表为空 ⇒ 空入参与空结果都返回 ``[]``，禁假设「至少一行」。
+        基于 ``candidates`` 的 STALE 标记归 M2-02，本卡不碰。
+        """
+        if not rule_ids:
+            return []
+        marks = []
+        params: dict[str, Any] = {"ws": workspace_id}
+        for index, rule_id in enumerate(rule_ids):
+            mark = f"r{index}"
+            marks.append(f":{mark}")
+            params[mark] = rule_id
+        rows = conn.execute(
+            text(
+                "SELECT id FROM cases "
+                "WHERE workspace_id = :ws AND state = 'CONFIRMED' AND observed_rule_id IN ("
+                + ", ".join(marks)
+                + ") ORDER BY id ASC"
+            ),
+            params,
+        ).mappings()
+        ordered: list[str] = []
+        seen: set[str] = set()
+        for row in rows:
+            value = str(row["id"])
+            if value not in seen:
+                seen.add(value)
+                ordered.append(value)
+        return ordered

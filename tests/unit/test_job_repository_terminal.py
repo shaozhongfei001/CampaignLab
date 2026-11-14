@@ -170,20 +170,63 @@ def test_new_job_repository_methods_only_grew_the_surface() -> None:
     assert expected_new <= public, sorted(expected_new - public)
 
 
+#: A82 冻结面：M0-04/S2 交付时 ``repositories.__all__`` 的既有 10 名（**相对顺序**即判据的一部分）。
+_REPOS_ALL_FROZEN_10 = [
+    "ArtifactRecord",
+    "ArtifactRepository",
+    "AuditRecord",
+    "AuditRepository",
+    "IdempotencyRecord",
+    "IdempotencyRepository",
+    "JobRecord",
+    "JobRepository",
+    "WorkspaceRepository",
+    "job_from_row",
+]
+#: M2-01/S2b-1 依 design §11.3 获授权纯追加的 6 名（A231 迁移时登记；多一名少一名都判红）。
+_REPOS_ALL_S2B1_6 = [
+    "ActivityBindingRepository",
+    "ActivityRecord",
+    "ActivityRepository",
+    "BindingRecord",
+    "RuleVersionRecord",
+    "RuleVersionRepository",
+]
+
+
 def test_repositories_module_all_is_unchanged() -> None:
-    """``repositories.__all__`` 十项逐字未变（A82：禁改其余 4 个 Repository 类的公开面）。"""
-    assert repos_mod.__all__ == [
-        "ArtifactRecord",
-        "ArtifactRepository",
-        "AuditRecord",
-        "AuditRepository",
-        "IdempotencyRecord",
-        "IdempotencyRepository",
-        "JobRecord",
-        "JobRepository",
-        "WorkspaceRepository",
-        "job_from_row",
-    ]
+    """``repositories.__all__`` 的既有 10 名逐字未变（A82：禁改其余 4 个 Repository 类的公开面）。
+
+    **R16 迁移注记（A231；D-047 同族第三例）**：原判据 ``repos_mod.__all__ == [10 项字面量]``
+    —— 一条「前提哨兵」，把「M2-01/S2b-1 尚未落地」这件事写成了硬断言。S2b-1 依 design §11.3
+    纯追加 6 名（10→16，``numstat`` deleted=0）后它必然判红，而红因落在无权修改本文件的 lane 手里
+    （其写集只含 ``tests/**`` 的*新建*文件）⇒ 由编排器同批迁移（A226 选项 b、A224 同批纪律），
+    禁 lane 越界自修。
+
+    迁移形态＝「字面量相等 → 结构级对撞」，判据强度不降反升（A115：集合对撞，禁写死计数当分母）：
+
+    1. 既有 10 名必须**全部在位且相对顺序不变** —— 这才是原断言真正要保的东西；
+    2. 差集必须**恰为** S2b-1 授权的 6 名 ⇒ 多一名红、少一名红、改名红、塞未授权名也红；
+    3. ``denominator=0`` 断言：两张名单均非空且互斥，防对撞退化成对空集的空断言；
+    4. ``__all__`` 内不得有重复名。
+
+    函数名本批**不改**（改名会破坏既有引用与历史可追溯性），改名与 docstring 语义升级归 FU-52 同批。
+    阳性对照 4 条（全红 ＋ 字节级双向复原）原文见
+    ``evidence/M0/ORCHESTRATOR/r16-m2-01-s2b1-landing/commands-and-outputs.log`` 的 STAGE B 段。
+    """
+    actual = list(repos_mod.__all__)
+    frozen = list(_REPOS_ALL_FROZEN_10)
+    authorized = list(_REPOS_ALL_S2B1_6)
+    assert frozen and authorized, "denominator=0：冻结面与授权面两张名单都不得为空"
+    assert set(frozen).isdisjoint(authorized), "两张名单重叠 ⇒ 对撞判据失去意义"
+    assert len(actual) == len(set(actual)), f"__all__ 有重复名：{actual}"
+    kept = [n for n in actual if n in set(frozen)]
+    assert kept == frozen, f"既有 10 名的内容或相对顺序被改（A82）：{kept}"
+    added = [n for n in actual if n not in set(frozen)]
+    assert sorted(added) == sorted(authorized), (
+        "__all__ 的追加面 != M2-01/S2b-1 的授权面（design §11.3）："
+        f"多出 {sorted(set(added) - set(authorized))}、缺少 {sorted(set(authorized) - set(added))}"
+    )
 
 
 # ======================================================================================

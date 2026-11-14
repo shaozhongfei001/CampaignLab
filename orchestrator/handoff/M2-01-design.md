@@ -1320,3 +1320,77 @@ problem-428}.json` · `evidence/M2/summaries/M2-01.md`（**≤30 行**）。S7 �
 > **append-only 纪律**：本文 §1–§13 为 S1 冻结件。后续编排器裁定一律以 **§14 追记**形式增量写入
 > （体例＝`M0-02-design.md` §9 与 `M0-04-design.md` §11：「纯增量，历史行一字未改」），
 > 禁回头改写 §1–§13 的任何一行；`public_frozen` 面（规则版本状态机、9 个条款键）改动走 CR。
+## 14. 编排器裁定追记（append-only；§1–§13 一字未改）
+
+> 体例＝`M0-02-design.md` §9 与 `M0-04-design.md` §11（「纯增量，历史行一字未改」）。
+> 本节由编排器在 R16（M2-01/S2b-1 入库批，lane Hooke · `01a1db55-3aec-7093-9f55-785932c63478` · max/high）写入，
+> 依 A214 窄豁免**只在文末追加**（`numstat` 的 deleted 必须为 0），追加前的 1322 行逐字节未变
+> （前 1322 行拼接 sha256[:12] 的追加前后双向核验见 `evidence/M0/ORCHESTRATOR/r16-m2-01-s2b1-landing/00-index.md`）。
+
+### 14.1 A231 · §11.3 的 `repositories.__all__` 追加授权 ⇒ 既有前提哨兵由**编排器**同批迁移
+
+§11.3 授权 `infra/db/repositories.py` 纯追加 6 名（`ActivityRecord` · `BindingRecord` · `RuleVersionRecord` ·
+`ActivityRepository` · `ActivityBindingRepository` · `RuleVersionRepository`），`__all__` 由 10 → 16。
+但 M0-04/S2 留下的守护 `tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged`
+把 `__all__` 钉成**10 项字面量相等**，是一条「前提哨兵」（D-047 定义的缺陷类，本例是同族**第三例**）：
+它把「M2-01/S2b-1 尚未落地」写成硬断言，S2b-1 一落地必红，而红因落在**无权修改该文件**的 lane 手里
+（S2b-1 的 `tests/**` 写权只含*新建*文件）。
+
+**裁定（A231，与 A226 对 lane S4 两条哨兵的处置完全同型）**：由**编排器**同批迁移（A224 同批纪律），
+禁 lane 越界自修、禁削弱断言。迁移形态＝「字面量相等 → 结构级对撞」，判据强度不降反升：
+① 既有 10 名必须**全部在位且相对顺序不变**（原断言真正要保的 A82 冻结面）；
+② 差集必须**恰为** §11.3 授权的 6 名（多一名红、少一名红、改名红、塞未授权名也红）；
+③ `denominator=0` 断言（两张名单非空且互斥，防对撞退化成对空集的空断言）；④ `__all__` 不得有重复名。
+函数名本批不改（改名破坏既有引用与历史可追溯性），改名归 FU-52 同批。
+5 条阳性对照（4 条主体变异 ＋ 1 条判据自证）全红且字节级双向复原，见上述取证索引 §4。
+
+**给 S3/S4/S5/S6/S7 的直接影响**：`repositories.__all__` 的冻结面从此以「既有 10 名 ＋ 授权 6 名」的
+**对撞式**为准，禁再写 `== [字面量列表]` 形态的断言（PRE-14：写这类哨兵必须同批登记失效棒次／迁移责任人／迁移后形态）。
+
+### 14.2 A232 · §11.3「所有写 UPDATE 的 WHERE 必须含 guard 镜像」与 §3.2 的 `set_current_rule` SQL 原文冲突 ⇒ **specific 覆盖 general**
+
+§11.3 的 infra 段写：「所有写 UPDATE 的 WHERE 谓词必须含 §3 的 `guard` 镜像
+（`status='OPEN' AND revision=:revision` / `state='DRAFT' AND revision=:revision` /
+`state='DRAFT' AND revision=:revision AND digest=:digest`）」；
+而 §3.2 给 `activities.current_rule_id` 联动的 **SQL 原文**是：
+`UPDATE activities SET current_rule_id=:rule_id, revision=revision+1 WHERE workspace_id=:ws AND id=:activity_id`
+—— 谓词里**没有** `status`／`revision` 镜像。实现方照哪一条都会违反另一条。
+
+**裁定（A232）：维持 §3.2 的 SQL 原文（specific 覆盖 general），零代码改动。** 理由三条：
+
+1. **A214** 要求逐字实现 design 给出的 SQL 原文；§3.2 是针对这一条语句的**具体**规范，§11.3 是**一般**规则，
+   二者冲突时具体规范优先（否则「原文」失去意义）。
+2. **加 guard 在物理上需要一次额外读**：`confirmRule` 的 `If-Match` 携带的是**规则版本**的 `revision`，
+   不是活动的 `revision`；要给这条 UPDATE 补 `AND revision=:revision` 就必须先 SELECT 活动行，
+   而 §3.2 明文「禁先 SELECT 后 UPDATE 的裸检查」（物理保证＝谓词本身），补 guard 会直接违反它。
+3. **并发安全已由同事务的规则侧 guard 承担**：`set_current_rule` 在 `confirm` 的
+   `state='DRAFT' AND revision=:revision AND digest=:digest` 谓词成功后、于**同一事务**内执行；
+   且 `revision=revision+1` 是**相对**自增（不是绝对赋值），不会丢更新。
+
+**残留风险（如实登记，不掩盖）**：`current_rule_id=:rule_id` 是**绝对赋值**，故「同一活动的两个规则版本被并发确认」时
+后到者覆盖先到者，理论上可能使 `current_rule_id` 不等于 §3.2 定义的「`confirmed_at` 最大者」。
+SQLite 单写者 ＋ 事务串行化下窗口极窄，且 §3.2 已声明 `current_rule_id` 取「`confirmed_at` 最大者（并列时 `id` 字典序最大）」
+⇒ 归 **FU-54**：M2-01/S6（`tests/api/activities/**`）必须把「并发确认两个后继版本后 `getActivity` 的 `current_rule_id`
+仍等于 `confirmed_at` 最大者」钉成用例；若该用例在真实并发下判红，再立缺陷走 CR（可能要把这条 UPDATE 改成
+`WHERE ... AND (current_rule_id IS NULL OR revision=:revision)` 形态，属 §11.3 的一般规则回归）。
+
+### 14.3 A233 · §11.3「`api/deps.py` 纯追加」与「既有 import 行只允许追加名字」在 ruff `I001` 下字面不可同时满足 ⇒ 采纳 `TYPE_CHECKING` 块形态
+
+§11.3 要求 `api/deps.py` **纯追加**（`numstat` deleted=0），派单文 §1.3 又要求「既有 import 行只允许追加名字」。
+但本棒的两个 Protocol 签名需要 11 个 `api.common` 的 DTO ＋ 3 个 `activity_service` 的 `Outcome`：
+把 11 个名字插进既有 `from campaignlab.api.common import (...)` 括号内虽可满足 deleted=0，
+3 个 `Outcome` 却必须新增一条**运行期** `from campaignlab.application.activity_service import ...`，
+而 ruff 的 `I001`（import 排序/合并）会要求它与既有同模块 import 合并 ⇒ 与「不改既有 import 行」冲突。
+
+**裁定（A233）：采纳 lane 已落地的形态 —— 新增 1 行 `import typing` ＋ 1 个 `if typing.TYPE_CHECKING:` 块，
+既有 import 行一字未动。** 理由：① 模块已有 `from __future__ import annotations`，注解运行期不求值，
+故 `TYPE_CHECKING` 块既满足 mypy strict 又零运行期成本；② 它**降低**而非提高运行期耦合
+（`api/deps.py` 不在运行期依赖 `application/activity_service` 的具体符号），方向上更符合分层红线；
+③ 候选 (b)（把名字插进既有括号 ＋ 新增运行期 import）与 (a) 在功能、类型安全、四门读数上**完全等价**，
+唯一收益是「与既有 `WorkspaceCreateOutcome` 的运行期导入同型」这一风格偏好，
+为此重派一整棒 max 预算（lane 自报累计 ≈3.4M token）违反成本纪律 ⇒ 不采纳；
+④ 实测 `numstat` 175/0（deleted=0）、`ruff check` 与 `I001`/`E402` 全绿、`mypy` 101 文件 rc=0。
+
+**给 S3/S4 的直接影响**：`api/activities.py` 与 `api/rules.py` 在**运行期**需要这些 DTO（要构造响应体），
+故它们照 `api/workspaces.py` 的既有体例做运行期 import 即可，**不需要**照抄本节的 `TYPE_CHECKING` 形态；
+本节只解决「端口文件 `api/deps.py` 在纯追加约束下如何引用类型」这一个问题。

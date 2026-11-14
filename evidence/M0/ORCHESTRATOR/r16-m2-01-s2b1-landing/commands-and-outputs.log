@@ -1,0 +1,206 @@
+== R16 · M2-01/S2b-1 入库取证 · 命令原文与输出（编排器实跑，禁采信 lane 自报）==
+时点：2026-11-15T05:39:44+08:00　HEAD：fe9e4ce　分支：m0-framework
+lane：S2b-1 · task M2-01 · 档位 qwen3.8-max / high · agent_id 01a1db55-3aec-7093-9f55-785932c63478 · 昵称 Hooke · loop 2-of-3
+
+########## §1 交付面逐件实测（行 / 字节 / sha256[:12]）##########
+  src/campaignlab/application/activity_service.py            1999 行 / 88950 B / sha256[:12]=21425228694b
+  src/campaignlab/infra/db/repositories.py                   1884 行 / 82850 B / sha256[:12]=23437663c59e
+  src/campaignlab/api/deps.py                                346 行 / 13524 B / sha256[:12]=ed1075a86447
+  tests/unit/test_s2b_activity_surface.py                    605 行 / 24342 B / sha256[:12]=a64e4e8eb52a
+  tests/unit/test_s2b_activity_repositories.py               682 行 / 28889 B / sha256[:12]=e57e7467d6be
+  tests/unit/test_s2b_activity_service.py                    1163 行 / 48080 B / sha256[:12]=d99a137c498e
+  tests/unit/test_job_repository_terminal.py                 819 行 / 34134 B / sha256[:12]=794271b41609
+  orchestrator/handoff/M2-01-design.md                       1396 行 / 153979 B / sha256[:12]=2d39feaac2d1
+  orchestrator/defects/D-048.md                              61 行 / 5154 B / sha256[:12]=46df6b26bb47
+
+########## §2 git 面（numstat / status 归属）##########
+$ git diff --numstat
+  74	0	orchestrator/handoff/M2-01-design.md
+  175	0	src/campaignlab/api/deps.py
+  830	0	src/campaignlab/infra/db/repositories.py
+  56	13	tests/unit/test_job_repository_terminal.py
+  [rc=0]
+
+$ git status --porcelain --untracked-files=all
+   M orchestrator/handoff/M2-01-design.md
+   M src/campaignlab/api/deps.py
+   M src/campaignlab/infra/db/repositories.py
+   M tests/unit/test_job_repository_terminal.py
+  ?? orchestrator/defects/D-048.md
+  ?? src/campaignlab/application/activity_service.py
+  ?? tests/unit/test_s2b_activity_repositories.py
+  ?? tests/unit/test_s2b_activity_service.py
+  ?? tests/unit/test_s2b_activity_surface.py
+  [rc=0]
+
+########## §3 硬禁面零改动复核（sha256[:12] 与派单文/HEAD 对账）##########
+$ sha256sum src/campaignlab/api/app.py src/campaignlab/api/common.py src/campaignlab/worker/service.py src/campaignlab/worker/deps.py contracts/openapi.json | cut -c1-12,65-
+  110751903e4d  src/campaignlab/api/app.py
+  836e7b3e8d3a  src/campaignlab/api/common.py
+  7b0dd1591fd5  src/campaignlab/worker/service.py
+  ac59435dd93f  src/campaignlab/worker/deps.py
+  592571099d63  contracts/openapi.json
+  [rc=0]
+
+$ git diff --numstat -- contracts/ spec/ src/campaignlab/domain/ src/campaignlab/worker/ src/campaignlab/api/app.py src/campaignlab/api/common.py scripts/ pyproject.toml
+  [rc=0]
+
+########## §4 编排器独立复验（24 项对撞，脚本 .orch_tmp/v_s2b1.py）##########
+$ uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/v_s2b1.py
+  === 1. 逐件实测（行 / 字节 / sha256[:12]）对账 lane 自报 ===
+    [PASS] src/campaignlab/application/activity_service.py :: 自报 (1999, 88950, '21425228694b') 实测 (1999, 88950, '21425228694b')
+    [PASS] src/campaignlab/infra/db/repositories.py :: 自报 (1884, 82850, '23437663c59e') 实测 (1884, 82850, '23437663c59e')
+    [PASS] src/campaignlab/api/deps.py :: 自报 (346, 13524, 'ed1075a86447') 实测 (346, 13524, 'ed1075a86447')
+    [PASS] tests/unit/test_s2b_activity_surface.py :: 自报 (605, 24342, 'a64e4e8eb52a') 实测 (605, 24342, 'a64e4e8eb52a')
+    [PASS] tests/unit/test_s2b_activity_repositories.py :: 自报 (682, 28889, 'e57e7467d6be') 实测 (682, 28889, 'e57e7467d6be')
+    [PASS] tests/unit/test_s2b_activity_service.py :: 自报 (1163, 48080, 'd99a137c498e') 实测 (1163, 48080, 'd99a137c498e')
+  === 2. numstat（纯追加 deleted=0，A82）===
+    [PASS] src/campaignlab/infra/db/repositories.py deleted=0 :: 830	0	src/campaignlab/infra/db/repositories.py
+    [PASS] src/campaignlab/api/deps.py deleted=0 :: 175	0	src/campaignlab/api/deps.py
+  === 3. 硬禁面零改动（git status 归属）===
+    [FAIL] git status 面恰为 S2b-1 的 6 件（api/app.py、api/common.py、domain/**、worker/**、orchestrator/**、scripts/**、contracts/** 零改动） :: [" M orchestrator/handoff/M2-01-design.md", " M tests/unit/test_job_repository_terminal.py", "?? orchestrator/defects/D-048.md"]
+  === 4. 符号面对撞（集合差，非计数；A115）===
+    [PASS] repos.__all__ 既有 10 名在位且相对顺序不变 :: ['ArtifactRecord', 'ArtifactRepository', 'AuditRecord', 'AuditRepository', 'IdempotencyRecord', 'IdempotencyRepository', 'JobRecord', 'JobRepository', 'WorkspaceRepository', 'job_from_row']
+    [PASS] repos.__all__ 差集恰为授权的 6 名 :: ['ActivityBindingRepository', 'ActivityRecord', 'ActivityRepository', 'BindingRecord', 'RuleVersionRecord', 'RuleVersionRepository']
+    [PASS] repos.__all__ 无重复且共 16 名 :: 16
+    [PASS] deps.__all__ 既有面（HEAD 实取 9 名）全部在位且相对顺序不变 :: (['HealthService', 'SessionService', 'WorkspaceService', 'get_clock', 'get_config', 'get_health_service', 'get_session_service', 'get_workspace_service', 'require_session'], ['HealthService', 'SessionService', 'WorkspaceService', 'get_clock', 'get_config', 'get_health_service', 'get_session_service', 'get_workspace_service', 'require_session'])
+    [PASS] deps.__all__ 差集恰为 {ActivityService, RuleService, get_activity_service, get_rule_service} :: ['ActivityService', 'RuleService', 'get_activity_service', 'get_rule_service']
+    [PASS] api/common.PROBLEM_CODES 仍 20 :: 20
+    [PASS] DomainError 子类仍 14（零新增，design §11.2） :: ['AccessDenied', 'ArtifactCommitFailed', 'IdempotencyConflict', 'InputTooLarge', 'InternalFailure', 'InvalidScope', 'JobCapacity', 'OriginDenied', 'PreconditionRequired', 'ResourceNotFound', 'RevisionConflict', 'SessionInvalid', 'StateConflict', 'ValidationFailure']
+    [PASS] api/common.__all__ 仍 79（S2b-1 禁改 common） :: 79
+  === 5. 端口 vs 实现（Protocol 双向对撞）===
+    [PASS] deps.ActivityService ^ impl 公开方法 = ∅ :: port-only=[] impl-only=[]
+    [PASS] deps.RuleService ^ impl 公开方法 = ∅ :: port-only=[] impl-only=[]
+  === 6. deps 模块级私有函数恰 1（_state_service）===
+    [PASS] 私有函数面 :: ['_state_service']
+  === 7. activity_service.py：0 SQL 写点 / 0 墙钟字面量（A81 / D-045）===
+    [PASS] SQL 写点/ sqlalchemy 引入 = ∅
+    [PASS] 墙钟/sleep 字面量 = ∅（含注释与 docstring）
+    [PASS] src/campaignlab/infra/db/repositories.py 墙钟字面量 = ∅
+    [PASS] src/campaignlab/api/deps.py 墙钟字面量 = ∅
+    [PASS] 反向自证：同一扫描器在 repositories.py 上非空（SQL 写点确实只在这里）
+  === 8. 同一密钥 / 同一 detail（禁第二把密钥、禁第二句 detail）===
+    [PASS] BAD_CURSOR_DETAIL 与 workspace_service 同一对象（is 判定） :: True
+    [PASS] load_cursor_secret 与 workspace_service 同一对象（is 判定） :: True
+    [PASS] audit_role_of 与 workspace_service 同一对象（is 判定） :: True
+  === 9. activity_service.__all__ 面 ===
+    n=26
+     ["ACTION_ACTIVITY_ARCHIVED", "ACTION_ACTIVITY_CREATED", "ACTION_ACTIVITY_UPDATED", "ACTION_RULE_CONFIRMED", "ACTION_RULE_CONTENT_UPDATED", "ACTION_RULE_DRAFT_CREATED", "ACTION_RULE_LABEL_UPDATED", "ACTION_RULE_SUCCESSOR_DRAFT_CREATED", "ACTIVITIES_CURSOR_VERSION", "ACTIVITY_ID_PREFIX", "ARCHIVED_DETAIL", "DIGEST_MISMATCH_DETAIL", "DUPLICATE_EXTERNAL_DETAIL", "EMPTY_PATCH_DETAIL", "IMMUTABLE_DETAIL", "NOTE_REQUIRED_DETAIL", "RULE_ID_PREFIX", "TARGET_KIND_ACTIVITY", "TARGET_KIND_RULE", "ActivityCreateOutcome", "ActivityService", "ActivityWriteOutcome", "RuleService", "RuleWriteOutcome", "activity_query_digest", "rule_query_digest"]
+  
+  OVERALL = FAIL
+  [rc=1]
+
+########## §5 新增用例收集数（--collect-only 实测）##########
+$ uv run --no-sync pytest -q -p no:randomly --collect-only tests/unit/test_s2b_activity_surface.py 2>&1 | tail -2
+  
+  16 tests collected in 0.25s
+  [rc=0]
+
+$ uv run --no-sync pytest -q -p no:randomly --collect-only tests/unit/test_s2b_activity_repositories.py 2>&1 | tail -2
+  
+  16 tests collected in 0.24s
+  [rc=0]
+
+$ uv run --no-sync pytest -q -p no:randomly --collect-only tests/unit/test_s2b_activity_service.py 2>&1 | tail -2
+  
+  15 tests collected in 0.23s
+  [rc=0]
+
+$ uv run --no-sync pytest -q -p no:randomly --collect-only tests/unit/test_job_repository_terminal.py 2>&1 | tail -2
+  
+  24 tests collected in 0.25s
+  [rc=0]
+
+########## §6 哨兵迁移的阳性对照（STAGE B 原文，含第 1 版 PC-5 假绿的如实留痕）##########
+  == STAGE B（第 2 版）· 迁移后哨兵的阳性对照（编排器实跑；每条变异先做 AST 语义断言）==
+  基线：repositories.py 82850 B / 23437663c59e ；test_job_repository_terminal.py 34134 B / 794271b41609
+  基线 AST 实取：repos.__all__ 16 名；守护 _REPOS_ALL_FROZEN_10 10 名、_REPOS_ALL_S2B1_6 6 名
+  
+  -- 第 1 版 PC-5 的假绿（如实留痕，R16-9）--
+    变异写法 `_REPOS_ALL_FROZEN_10 = [] or [...]` ⇒ 字节 sha 变了（794271b41609 -> 60ab5fc1ca92）
+    但 Python 的 `or` 对空 list 返回右操作数 ⇒ AST 实取仍是原 10 名，语义**未生效** ⇒ rc=0 假绿。
+    该次变异已字节级复原（sha 回到 794271b41609，见 commands 段的 restore 输出）。
+    教训：只验 sha 变化不等于验变异生效 ⇒ 本版每条变异一律先 AST 实取被改对象再断言其**新值**。
+  
+  -- PC-A 迁移后基线（未变异）--
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-A baseline] rc=0
+      | .                                                                        [100%]
+      | 1 passed in 0.29s
+  
+  -- PC-1：repositories.py 的 __all__ 删掉既有名 job_from_row（期望判红：冻结面缺一名）--
+    变异生效（AST 语义断言通过）：repositories.py 23437663c59e -> 6b8c382e1994 ；__all__ 实取 15 名
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-1] rc=1
+      | =========================== short test summary info ============================
+      | FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      | 1 failed in 0.28s
+    复原核验：repositories.py -> 23437663c59e（sha 与 AST 双向复原）
+  
+  -- PC-2：repositories.py 的 __all__ 交换 ArtifactRecord / ArtifactRepository 的先后（期望判红：冻结面相对顺序被改（集合相同 ⇒ 计数型判据抓不到，只有顺序对撞能抓））--
+    变异生效（AST 语义断言通过）：repositories.py 23437663c59e -> f63ed40705d4 ；__all__ 实取 16 名
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-2] rc=1
+      | =========================== short test summary info ============================
+      | FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      | 1 failed in 0.26s
+    复原核验：repositories.py -> 23437663c59e（sha 与 AST 双向复原）
+  
+  -- PC-3：repositories.py 的 __all__ 追加一个未授权名 RogueRepository（期望判红：追加面超出 design §11.3 授权）--
+    变异生效（AST 语义断言通过）：repositories.py 23437663c59e -> 3f5555cc8913 ；__all__ 实取 17 名
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-3] rc=1
+      | =========================== short test summary info ============================
+      | FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      | 1 failed in 0.26s
+    复原核验：repositories.py -> 23437663c59e（sha 与 AST 双向复原）
+  
+  -- PC-4：repositories.py 的 __all__ 删掉授权名 BindingRecord（期望判红：授权面少一名（S2b-1 交付不完整））--
+    变异生效（AST 语义断言通过）：repositories.py 23437663c59e -> d1fd9bc915ad ；__all__ 实取 15 名
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-4] rc=1
+      | =========================== short test summary info ============================
+      | FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      | 1 failed in 0.27s
+    复原核验：repositories.py -> 23437663c59e（sha 与 AST 双向复原）
+  
+  -- PC-5（判据自证，非主体变异）：把守护里的 _REPOS_ALL_FROZEN_10 **真的**置空 --
+     目的：证明 denominator=0 断言不是死代码（冻结面被清空时守护必须判红，而非对空集静默通过）
+    变异生效（AST 语义断言通过）：test_job_repository_terminal.py 794271b41609 -> 3c6422a3b1e5 ；_REPOS_ALL_FROZEN_10 实取 []
+    $ uv run --no-sync pytest -q -p no:randomly tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      [PC-5] rc=1
+      | =========================== short test summary info ============================
+      | FAILED tests/unit/test_job_repository_terminal.py::test_repositories_module_all_is_unchanged
+      | 1 failed in 0.29s
+    复原核验：test_job_repository_terminal.py -> 794271b41609（sha 与 AST 双向复原）
+  
+  -- PC-D 全部复原后复跑（守护文件全量 + 本棒三个新测试文件）--
+    rc=0 | 71 passed in 19.70s
+    末态 sha：repositories.py=23437663c59e（== 基线 23437663c59e）· test_job_repository_terminal.py=794271b41609（== 迁移后 794271b41609）
+  
+  结论：4 条主体变异 ＋ 1 条判据自证全部判红，每条都先过 AST 语义断言、后字节级双向复原；基线与末态均 rc=0 ⇒ 迁移后的哨兵有牙。
+
+########## §7 活动树四门（**仅供归因**；入库读数以 run_commit 的冻结索引树为准）##########
+$ uv run --no-sync ruff format --check . 2>&1 | tail -2
+  289 files already formatted
+  [rc=0]
+
+$ uv run --no-sync ruff check . 2>&1 | tail -2
+  All checks passed!
+  [rc=0]
+
+$ uv run --no-sync mypy 2>&1 | tail -2
+  Success: no issues found in 101 source files
+  [rc=0]
+
+########## §8 design §14 追加的 A214 窄豁免核验（前 1322 行逐字节未变）##########
+$ git show HEAD:orchestrator/handoff/M2-01-design.md | wc -l
+  1322
+  [rc=0]
+
+$ git diff --numstat -- orchestrator/handoff/M2-01-design.md
+  74	0	orchestrator/handoff/M2-01-design.md
+  [rc=0]
+
+  前 1322 行拼接 sha256[:12] 追加前=518dca08c795 追加后=518dca08c795 identical=True（Stage C 脚本断言，见 §1 的 design 行）
+

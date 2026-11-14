@@ -22,6 +22,7 @@
 
 from __future__ import annotations
 
+import typing
 from datetime import datetime
 from typing import Protocol, cast, runtime_checkable
 
@@ -37,13 +38,37 @@ from campaignlab.application.workspace_service import WorkspaceCreateOutcome
 from campaignlab.clock import Clock
 from campaignlab.config import AppConfig
 
+if typing.TYPE_CHECKING:
+    from campaignlab.api.common import (
+        Activity,
+        ActivityCreate,
+        ActivityPage,
+        ActivityUpdate,
+        Confirmation,
+        RuleCheck,
+        RuleCreate,
+        RuleDiff,
+        RuleUpdate,
+        RuleVersion,
+        RuleVersionPage,
+    )
+    from campaignlab.application.activity_service import (
+        ActivityCreateOutcome,
+        ActivityWriteOutcome,
+        RuleWriteOutcome,
+    )
+
 __all__ = [
+    "ActivityService",
     "HealthService",
+    "RuleService",
     "SessionService",
     "WorkspaceService",
+    "get_activity_service",
     "get_clock",
     "get_config",
     "get_health_service",
+    "get_rule_service",
     "get_session_service",
     "get_workspace_service",
     "require_session",
@@ -104,6 +129,137 @@ class WorkspaceService(Protocol):
     ) -> WorkspaceCreateOutcome: ...
 
 
+@runtime_checkable
+class ActivityService(Protocol):
+    """端口：``api/activities.py``（M2-01 · S3）四个 op 依赖的成员面。
+
+    实现＝``application/activity_service.py::ActivityService``。成员面与该实现类的
+    **公开方法名集合逐字相等**（守护用 ``inspect`` 实取对撞，禁写死数字，A115）。
+
+    三处口径与既有 ``WorkspaceService`` 端口同形（design §11.10 的方案 A）：
+
+    - ``now`` 一律由实现类从注入的 ``Clock`` 取，application 层禁自取系统当前时刻；
+    - 写方法返回**纯数据结果**（``…Outcome``）而不是 ``Response``：状态码与头字段由路由组装，
+      幂等重放时路由用 ``api.common.replay_from_envelope`` 回放信封并重新生成 ``X-Request-Id``；
+    - ``if_match`` 是**可选**形参（``str | None``）：契约声明 ``If-Match`` 必填，但照抄成必填
+      形参会让缺头在进入函数体之前就被判成 422，契约要求的 428 永远不可达（design §6.2）。
+      428/412 的判定统一由实现类调 ``api.common.check_if_match`` 完成。
+
+    本端口的 DTO 与 Outcome 类型都在 ``if typing.TYPE_CHECKING`` 块里导入：模块已有
+    ``from __future__ import annotations``，注解在运行期不求值，故这样既满足 mypy，
+    又**不需要改动任何既有 import 行**（A82：本文件纯追加、``numstat`` 的 deleted 必须为 0；
+    而 ruff 的 ``I001`` 禁止同一模块出现第二条 ``from … import``，二者只有这一条路同时成立）。
+    """
+
+    def list_activities(
+        self,
+        *,
+        actor: Session,
+        workspace_id: str,
+        cursor: str | None,
+        limit: int,
+        q: str | None,
+        status: str | None,
+    ) -> ActivityPage: ...
+
+    def get_activity(self, *, workspace_id: str, activity_id: str) -> Activity: ...
+
+    def create_activity(
+        self,
+        *,
+        workspace_id: str,
+        payload: ActivityCreate,
+        body: bytes,
+        idempotency_key: str,
+        actor: Session,
+        request_id: str,
+    ) -> ActivityCreateOutcome: ...
+
+    def update_activity(
+        self,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        payload: ActivityUpdate,
+        body: bytes,
+        idempotency_key: str,
+        if_match: str | None,
+        actor: Session,
+        request_id: str,
+    ) -> ActivityWriteOutcome: ...
+
+
+@runtime_checkable
+class RuleService(Protocol):
+    """端口：``api/rules.py``（M2-01 · S4）七个 op 依赖的成员面。
+
+    实现＝``application/activity_service.py::RuleService``。成员面与该实现类的
+    **公开方法名集合逐字相等**。
+
+    ``create_rule`` / ``update_rule`` / ``confirm_rule`` 三个写 op 共用同一个
+    ``RuleWriteOutcome`` 形状，差别只在 ``status``（201 / 200 / 200），禁在路由层再判一次
+    op 类型。``check_rule`` 与 ``compare_rules`` 是只读的：归档后照常 200（design §3.1）。
+    """
+
+    def list_rules(
+        self,
+        *,
+        actor: Session,
+        workspace_id: str,
+        activity_id: str,
+        cursor: str | None,
+        limit: int,
+        q: str | None,
+        status: str | None,
+    ) -> RuleVersionPage: ...
+
+    def create_rule(
+        self,
+        *,
+        workspace_id: str,
+        activity_id: str,
+        payload: RuleCreate,
+        body: bytes,
+        idempotency_key: str,
+        actor: Session,
+        request_id: str,
+    ) -> RuleWriteOutcome: ...
+
+    def get_rule(self, *, workspace_id: str, rule_id: str) -> RuleVersion: ...
+
+    def update_rule(
+        self,
+        *,
+        workspace_id: str,
+        rule_id: str,
+        payload: RuleUpdate,
+        body: bytes,
+        idempotency_key: str,
+        if_match: str | None,
+        actor: Session,
+        request_id: str,
+    ) -> RuleWriteOutcome: ...
+
+    def confirm_rule(
+        self,
+        *,
+        workspace_id: str,
+        rule_id: str,
+        payload: Confirmation,
+        body: bytes,
+        idempotency_key: str,
+        if_match: str | None,
+        actor: Session,
+        request_id: str,
+    ) -> RuleWriteOutcome: ...
+
+    def check_rule(self, *, workspace_id: str, rule_id: str) -> RuleCheck: ...
+
+    def compare_rules(
+        self, *, workspace_id: str, rule_id: str, candidate_rule_id: str
+    ) -> RuleDiff: ...
+
+
 def get_config(request: Request) -> AppConfig:
     """取本次应用的配置。必须由 ``create_app()`` 装配；缺失即报错，不静默 ``load_config()``。
 
@@ -155,6 +311,25 @@ def get_health_service(request: Request) -> HealthService:
 def get_workspace_service(request: Request) -> WorkspaceService:
     """取工作区服务（实现：``application/workspace_service.py::WorkspaceService``）。"""
     return cast(WorkspaceService, _state_service(request, "workspace_service", WorkspaceService))
+
+
+def get_activity_service(request: Request) -> ActivityService:
+    """取活动服务（实现：``application/activity_service.py::ActivityService``）。
+
+    复用既有私有 ``_state_service(request, attribute, port)``，**禁**复制它的取值口径、
+    **禁**新写第二个私有取值助手（design §11.10 已把「各抄一份」判为方案 B 的代价，
+    本棒走方案 A）。``attribute`` 取 ``"activity_service"``，即 ``create_app`` 的
+    同名可注入形参（该形参由 S2b-2 追加，A217）。
+    """
+    return cast(ActivityService, _state_service(request, "activity_service", ActivityService))
+
+
+def get_rule_service(request: Request) -> RuleService:
+    """取规则版本服务（实现：``application/activity_service.py::RuleService``）。
+
+    同上，复用 ``_state_service``，``attribute`` 取 ``"rule_service"``。
+    """
+    return cast(RuleService, _state_service(request, "rule_service", RuleService))
 
 
 def require_session(request: Request) -> Session:
