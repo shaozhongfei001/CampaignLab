@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-15T02:12:04+08:00",
+  "updated_at": "2026-11-15T02:15:44+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1248,8 +1248,8 @@
         "over_input_cap": true,
         "over_cap_caliber": "两口径均超限且如实上报：§5.1 单轮输入上限 40k → 末态单轮 ≈113k（系统/派单 ≈7k ＋ 工具输出 ≈35k ＋ 自身产出 ≈71k）；§15.5 累计上限 200k（A183）→ ≈26 个工具轮 × 每轮重发全上下文均值 ≈60k ⇒ ≈1.6M。**无计费表读数 ⇒ estimated=true，按 A183 不入 token 分母**（不抹平、不用「纯产出在上限内」抵销）。",
         "tokens_note": "lane 自报为估算值（无计量句柄）；tokens_estimated=true ⇒ 依 A183 计入 token_entries_null，不影响 flash_share_tokens。",
-        "commit": null,
-        "commit_backfilled_at": null,
+        "commit": "1d9bcb0",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00",
         "outputs": {
           "new": [
             "src/campaignlab/worker/service.py",
@@ -1273,7 +1273,9 @@
         "scope_violation": "tests/integration/jobs/test_worker_deps.py 被改写，而 R13 派单文 §3 列为硬禁 ⇒ 已由 A221 追认（该文件第 441–449 行自带「它已出现 ⇒ …并改写本用例」的指令，属派单文与制品冲突，与 A211/R14-4 同型）。除此之外写权零越界。",
         "self_reported_violations": "lane 主动上报了 U-6 的越界与 token 双超限，未隐藏、未粉饰 ⇒ 记为诚实上报。",
         "misreport_note_A223": "lane 报的「第五处继承数字失真（259→261）」经复核**不是派单文错误**，而是编排器自己中途入库 fa3a6c8 改了分母；责任在编排器，见 R15-3 / A223 / PRE-10。",
-        "verified_by_orchestrator": true
+        "verified_by_orchestrator": true,
+        "commit_full": "1d9bcb022532ccae533fe164923621a14524ead0",
+        "commit_backfill_note": "sha 由 R15-backfill-sha 纯台账提交回填（mutate_ledger 在 commit 之前执行，本棒入库当时无法得知自己的 sha）；属补登此前无法得知的值，非改写历史（D-011/D-014）。"
       },
       {
         "task": "M2-01",
@@ -1296,8 +1298,8 @@
         "tokens_estimated": false,
         "tokens_note": "lane 因 429 消亡、回执丢失 ⇒ **无任何计量读数**。禁编造估算值：tokens=null，依 A183 计入 token_entries_null，不入 flash_share_tokens 分母。loop_rounds_used 同理留 null（lane 实际用了几轮 loop 无从得知，禁猜测）。",
         "landing_mode": "编排器自办入库（不重派、不重做）。依据：A168 的例外口径（与 A215 同型）—— 磁盘产出完整 ⇒ 逐条独立实测代替自报即可入库；重派会白耗一整棒 max 预算且无信息增量（既有交付面已能通过全部守护与四门）。",
-        "commit": null,
-        "commit_backfilled_at": null,
+        "commit": "b523635",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00",
         "park_restore_chain": "交付面在 M0-04/S2c 入库前按 PRE-12 泊出至 /tmp/park_a1b_R15/（MANIFEST.json 10 条 sha256）；本提交前复原并逐条核验 sha256 **全等**（含 D-044.md，其已依 A224 随 1d9bcb0 入库，泊出副本仅作留档）。复原时顺带删除泊出目录里带回的 __pycache__/*.pyc（陈旧字节码不得回到工作树）。",
         "outputs": {
           "new": [
@@ -1325,7 +1327,9 @@
           "A224（D-* 连续性守护强制并批）"
         ],
         "observer_effect_note": "采集取证件时第一次把日志直接写进 evidence/，导致「在树面 ⊆ ADD」断言被自己的日志判红（观测者效应）；已改为先落 /tmp、收尾再入库，并在 00-index.md §0 与日志抬头留痕。",
-        "verified_by_orchestrator": true
+        "verified_by_orchestrator": true,
+        "commit_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+        "commit_backfill_note": "sha 由 R15-backfill-sha 纯台账提交回填（mutate_ledger 在 commit 之前执行，本棒入库当时无法得知自己的 sha）；属补登此前无法得知的值，非改写历史（D-011/D-014）。"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
@@ -2579,7 +2583,10 @@
         },
         "u_items": "U-1→A219 · U-2→A220 · U-3→A222/FU-43 · U-4→A222/FU-44 · U-5→A222/FU-45 · U-6→A221 · U-7→A222/FU-46",
         "defects": "D-045（MINOR/CLOSED，编排器同批修正 docstring）· D-046（MAJOR/OPEN，工装面，PRE-12 规避，根治归 FU-39）",
-        "over_cap": "§5.1 单轮 ≈113k（上限 40k）与 §15.5 累计 ≈1.6M（上限 200k）两口径均超限，lane 如实上报；tokens_estimated=true 依 A183 不入 token 分母"
+        "over_cap": "§5.1 单轮 ≈113k（上限 40k）与 §15.5 累计 ≈1.6M（上限 200k）两口径均超限，lane 如实上报；tokens_estimated=true 依 A183 不入 token 分母",
+        "commit": "1d9bcb0",
+        "commit_full": "1d9bcb022532ccae533fe164923621a14524ead0",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00"
       },
       "remaining_sequence_R15": [
         "S4（qwen3.8-flash）",
@@ -2594,7 +2601,13 @@
         "③ 游标编解码归 S4：worker/service.py 里 cursor 载荷保持未编码（S2c 的红线 3），编解码在路由层完成；CURSOR_VERSION / BAD_CURSOR_DETAIL 沿用 application/workspace_service.py 的单一真源（A222/FU-46 现状），禁另写第二个版本号或第二句 detail。",
         "④ api/app.py 的挂载：A10 最小例外 ≤3 行，仅挂载位（app.include_router(jobs.router)），该文件第 156 行已有注释占位。**必须排在 M2-01/S2b-2 之前**（A217：同文件争用，既定顺序即 S4 先）。",
         "⑤ 上工第一步按 PRE-7 对 worker/service.py 与 worker/store.py 做符号级实测（256 行 / 21 个 def / 15+1 个公有方法），派单文里的数字一律视为待复核参考值；四门基线按 resume.baseline_authoritative 的**快照 ＋ 编排器自办增量**对账（A223/PRE-10），不符**不要直接判失真**，先查该键。"
-      ]
+      ],
+      "commit_s2c_R15": {
+        "sha": "1d9bcb0",
+        "full": "1d9bcb022532ccae533fe164923621a14524ead0",
+        "backfilled_at": "2026-11-15T02:15:44+08:00",
+        "note": "append-only 新键，禁改写既有 commit 字段（其记录的是更早子任务的入库 sha）"
+      }
     },
     "M1-01": {
       "status": "TODO",
@@ -3160,7 +3173,7 @@
       "s2a_delivered_R15": {
         "at": "2026-11-15T02:12:04+08:00",
         "commit_tag": "R15-landS2a",
-        "commit": null,
+        "commit": "b523635",
         "commit_note": "sha 由后续纯台账提交回填（resume.commit_backfill_pending_R15），禁写猜测值",
         "new": {
           "src/campaignlab/domain/activity/__init__.py": "161 行 / 5676 B / db271880cd20（__all__ 实测 55 项）",
@@ -3186,7 +3199,9 @@
         "layering": "domain/activity/** 对 campaignlab.{api,worker,application,infra} 的导入边 = 0；全 domain/** 唯一命中 errors.py:36 -> api.common 属 HEAD 既有、非本棒引入（收口归 FU-47 / A219 候选 B）",
         "guard_probe": "PC0 12 passed rc=0 · PC1 注入假名 1 failed rc=1 · PC2 移除真名 Activity 1 failed rc=1 · PC3 字节复原 sha 全等 12 passed rc=0 ⇒ 守护有牙且双向复原",
         "gates": "活动树 ruff format 275（采集时未含取证件）/ ruff check clean / mypy 95 / pytest 615 passed；冻结树 ruff 276 / mypy 95 / pytest 615",
-        "defects": "D-044（MINOR/CLOSED）—— 缺陷单与 A218、FU-48 依 A224 已随 1d9bcb0 入库"
+        "defects": "D-044（MINOR/CLOSED）—— 缺陷单与 A218、FU-48 依 A224 已随 1d9bcb0 入库",
+        "commit_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00"
       },
       "s2a_landed_by_orchestrator_R15": {
         "at": "2026-11-15T02:12:04+08:00",
@@ -3197,6 +3212,12 @@
         "no_lane_receipt": true,
         "tokens": null,
         "loop_rounds_used": null
+      },
+      "commit_s2a_R15": {
+        "sha": "b523635",
+        "full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+        "backfilled_at": "2026-11-15T02:15:44+08:00",
+        "note": "append-only 新键，禁改写既有 commit 字段（其记录的是更早子任务的入库 sha）"
       }
     },
     "M2-02": {
@@ -6613,7 +6634,10 @@
         "agent_id_backfill_rule": "A216：身份以 agent_id 为唯一键；本条为派单当时漏记的补登，非改写历史值",
         "returned_at": "2026-11-15T01:43:19+08:00",
         "result": "DONE",
-        "landed_note": "M0-04/S2c 入库提交（tag R15-landY2-S2c）。commit sha 由后续纯台账回填提交补登（见 resume.commit_backfill_pending_R15）；本提交内一律留 None，禁写猜测值。"
+        "landed_note": "M0-04/S2c 入库提交（tag R15-landY2-S2c）。commit sha 由后续纯台账回填提交补登（见 resume.commit_backfill_pending_R15）；本提交内一律留 None，禁写猜测值。",
+        "commit": "1d9bcb0",
+        "commit_full": "1d9bcb022532ccae533fe164923621a14524ead0",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00"
       },
       {
         "lane": "A1b",
@@ -6655,7 +6679,10 @@
         "landed_at": "2026-11-15T02:12:04+08:00",
         "landed_by": "编排器自办（不重派、不重做）",
         "landed_commit_tag": "R15-landS2a",
-        "close_agent_note": "本提交后应对 agent_id 01a1da6f-f30e-7181-a324-8f41da5ac537 执行 close_agent 关槽：该 lane 已 429 消亡、回执丢失，留着只会占并发额度且可能被误认为可续接。"
+        "close_agent_note": "本提交后应对 agent_id 01a1da6f-f30e-7181-a324-8f41da5ac537 执行 close_agent 关槽：该 lane 已 429 消亡、回执丢失，留着只会占并发额度且可能被误认为可续接。",
+        "commit": "b523635",
+        "commit_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+        "commit_backfilled_at": "2026-11-15T02:15:44+08:00"
       }
     ],
     "dispatch_requirements": [
@@ -17090,7 +17117,7 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": null,
+        "head": "b523635",
         "head_before": "1d9bcb0",
         "head_note": "本提交的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R15）",
         "ruff_formatted_files": 276,
@@ -17099,7 +17126,9 @@
         "in_scope_py": 97,
         "in_scope_md": 179,
         "as_of": "2026-11-15T02:12:04+08:00",
-        "commit_tag": "R15-landS2a"
+        "commit_tag": "R15-landS2a",
+        "head_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+        "head_backfilled_at": "2026-11-15T02:15:44+08:00"
       },
       "history": [
         {
@@ -17128,10 +17157,11 @@
           "delta": "+2 in-scope .py（worker/service.py、tests/unit/test_worker_service.py）；+5 in-scope .md（s2c-worker-service.md、commands-s2c.md、D-044.md、D-045.md、D-046.md；positive-control-s2c.log 为 .log 不在 ruff 作用域）；+44 条用例",
           "note": "M0-04/S2c（lane Y2）入库提交。head 由 mut_final 在 run_commit 成功后回填。",
           "head_backfilled_at": "2026-11-15T02:12:04+08:00",
-          "head_backfill_note": "A223/PRE-10 要求的 head 回填：该行记录的是 M0-04/S2c 入库提交，其 sha=1d9bcb0。属**补登此前无法得知的值**（mutate_ledger 在 commit 之前执行），非改写历史测量值（D-011/D-014）。"
+          "head_backfill_note": "A223/PRE-10 要求的 head 回填：该行记录的是 M0-04/S2c 入库提交，其 sha=1d9bcb0。属**补登此前无法得知的值**（mutate_ledger 在 commit 之前执行），非改写历史测量值（D-011/D-014）。",
+          "head_full": "1d9bcb022532ccae533fe164923621a14524ead0"
         },
         {
-          "head": null,
+          "head": "b523635",
           "head_note": "本提交（tag R15-landS2a）的 sha 由下一次纯台账提交回填，禁写猜测值",
           "head_before": "1d9bcb0",
           "at": "2026-11-15T02:12:04+08:00",
@@ -17141,7 +17171,10 @@
           "in_scope_py": 97,
           "in_scope_md": 179,
           "delta": "+7 in-scope .py（src/campaignlab/domain/activity/{__init__,bindings,checks,clauses,diff,digests,states}.py）；+1 in-scope .md（evidence/M0/ORCHESTRATOR/r15-m2-01-s2a-landing/00-index.md；同目录 commands-and-outputs.log 为 .log 后缀，不在 RUFF_SUFFIXES 内故不入分母）；api/common.py 与 test_domain_errors.py 为**修改**既有文件，故 py/md 分母不因其而变；无新增测试文件且用例数 12→12 ⇒ pytest 615 不变",
-          "note": "M2-01/S2a 编排器自办入库提交（lane A1b 因 429 消亡、回执丢失）。**下一棒派单时必须下发本行读数作为权威基线**（A223/PRE-10）：ruff 276 / mypy 95 / pytest 615。"
+          "note": "M2-01/S2a 编排器自办入库提交（lane A1b 因 429 消亡、回执丢失）。**下一棒派单时必须下发本行读数作为权威基线**（A223/PRE-10）：ruff 276 / mypy 95 / pytest 615。",
+          "head_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+          "head_backfilled_at": "2026-11-15T02:15:44+08:00",
+          "head_backfill_note": "同 subtask_log 的回填口径：补登此前无法得知的值，非改写历史测量值。"
         }
       ]
     },
@@ -17166,7 +17199,10 @@
       "honesty": "主动上报 U-6 越界与 token 双超限，未隐藏未粉饰；报的「第五处继承数字失真」经复核归因于编排器自办入库（A223/R15-3），不记 lane 缺陷",
       "tokens": 1600000,
       "tokens_estimated": true,
-      "context_single_round": 113000
+      "context_single_round": 113000,
+      "commit": "1d9bcb0",
+      "commit_full": "1d9bcb022532ccae533fe164923621a14524ead0",
+      "commit_backfilled_at": "2026-11-15T02:15:44+08:00"
     },
     "round15_lane_A1b_error": {
       "at": "2026-11-15T01:43:19+08:00",
@@ -17197,7 +17233,10 @@
       ],
       "landed_at": "2026-11-15T02:12:04+08:00",
       "landed_commit_tag": "R15-landS2a",
-      "disposition_landed": "已由编排器自办入库（本提交）。ADD = domain/activity/ 七模块 + api/common.py + tests/unit/test_domain_errors.py + 两件编排器取证件，共 11 路径。**不含缺陷单** —— D-044.md 依 A224 已随 1d9bcb0 入库。复原链、变异探针、四门读数全部记在 evidence/M0/ORCHESTRATOR/r15-m2-01-s2a-landing/。"
+      "disposition_landed": "已由编排器自办入库（本提交）。ADD = domain/activity/ 七模块 + api/common.py + tests/unit/test_domain_errors.py + 两件编排器取证件，共 11 路径。**不含缺陷单** —— D-044.md 依 A224 已随 1d9bcb0 入库。复原链、变异探针、四门读数全部记在 evidence/M0/ORCHESTRATOR/r15-m2-01-s2a-landing/。",
+      "landed_commit": "b523635",
+      "landed_commit_full": "b523635b108fd3a0c5a23d1fb1abb3a07eecec05",
+      "landed_commit_backfilled_at": "2026-11-15T02:15:44+08:00"
     },
     "commit_backfill_pending_R15": {
       "created_at": "2026-11-15T01:43:19+08:00",
@@ -17212,7 +17251,10 @@
       ],
       "updated_at_R15_S2a": "2026-11-15T02:12:04+08:00",
       "progress_note_R15_S2a": "M2-01/S2a 已入库（tag R15-landS2a），其 sha 同样只能在**下一次**纯台账提交里回填。待回填清单更新为：① M0-04/S2c = 1d9bcb0 已在本次回填进 baseline_authoritative.history[2].head；② 仍需回填 baseline_authoritative.current.head 与 history[-1].head（= 本提交 sha）、subtask_log[-2].commit（M0-04/S2c）与 subtask_log[-1].commit（M2-01/S2a）及各自 commit_backfilled_at、in_flight_agents 的 Y2/A1b 两条 .commit、tasks.M0-04.commit_s2c_R15 与 tasks.M2-01.commit_s2a_R15、tasks.M2-01.s2a_delivered_R15.commit。回填完成后把本键 status 置为 DONE（append-only，禁删键）。",
-      "status": "PENDING_ONE_MORE_PURE_LEDGER_COMMIT"
+      "status": "DONE",
+      "done_at": "2026-11-15T02:15:44+08:00",
+      "done_by": "R15-backfill-sha（纯台账提交，add_paths=[]）",
+      "done_detail": "已回填：subtask_log[-2].commit=1d9bcb0（M0-04/S2c）、subtask_log[-1].commit=b523635（M2-01/S2a）；baseline_authoritative.current.head=b523635 与 history[3].head=b523635（history[2].head=1d9bcb0 已在 S2a 提交内回填）；in_flight_agents 的 Y2/A1b 两条 .commit；round15_lane_Y2_return.commit 与 round15_lane_A1b_error.landed_commit；tasks.M0-04.commit_s2c_R15、tasks.M2-01.commit_s2a_R15 与 s2a_delivered_R15.commit。本提交只动 orchestrator/state.json，四门读数与上一提交完全相同（276/95/615）。"
     }
   },
   "acceptance": {
