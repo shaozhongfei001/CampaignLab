@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-14T11:33:38+08:00",
+  "updated_at": "2026-11-14T22:15:14+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1227,7 +1227,7 @@
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 0,
+    "dispatched_not_yet_returned": 2,
     "flash_share_dev_lanes": 0.3077,
     "flash_share_口径": {
       "all_lanes": "19/31=0.6129",
@@ -2379,7 +2379,50 @@
         "S6（**flash**）：tests/integration/jobs/** 租约与制品争用枚举（双执行者、失效 token、模拟中断、提交失败复用摘要）",
         "S8（**flash**）：AC-029 负例 + AC-031 写入侧证据采集与回执归档"
       ],
-      "remaining_sequence_note_R14": "本键 = R13 序列扣除已闭合的 S2b-3 后的完整余量。档位面：S2c = max（A168 链禁档位置换，但原 lane 已随主机重启消亡 ⇒ 以新 max lane 承接，禁降档）；S4/S5/S6/S8 = flash（卡片档位表）。S4 另带 A208 的 cli.py ≤3 行豁免与 A91 的 JobPage append-only 义务，并与 M2-01/S2b 在 api/app.py 上争用（裁定：M0-04/S4 先，M2-01 的挂载拆成独立微步骤串行）。"
+      "remaining_sequence_note_R14": "本键 = R13 序列扣除已闭合的 S2b-3 后的完整余量。档位面：S2c = max（A168 链禁档位置换，但原 lane 已随主机重启消亡 ⇒ 以新 max lane 承接，禁降档）；S4/S5/S6/S8 = flash（卡片档位表）。S4 另带 A208 的 cli.py ≤3 行豁免与 A91 的 JobPage append-only 义务，并与 M2-01/S2b 在 api/app.py 上争用（裁定：M0-04/S4 先，M2-01 的挂载拆成独立微步骤串行）。",
+      "s2c_frozen_face_measured_R15": {
+        "measured_at": "2026-11-14T22:15:14+08:00",
+        "measured_by": "编排器（PRE-7 / R15-1）：不采信派单文与账本里的继承数字，逐条实测",
+        "worker/store.py": {
+          "lines": 671,
+          "total_def": 20,
+          "public_methods": 15,
+          "public_method_names": [
+            "claimed",
+            "cancel_requested",
+            "total",
+            "get_job",
+            "pending_count",
+            "claim_next",
+            "renew",
+            "request_cancel",
+            "confirm_cancel",
+            "succeed",
+            "fail",
+            "reap_expired",
+            "enqueue",
+            "retry",
+            "fail_unhandled"
+          ],
+          "def_list_jobs": 0,
+          "freeze_rule": "**20 个既有 def（含私有）的签名/函数体/SQL 文本一字不改**；git diff --numstat 对该文件必须 deleted=0（体例同 A82/A169）",
+          "supersedes": "派单文 §1 的「16 个 def」与 s2c_obligations_R13 的「12 个方法」——两者均不成立，本键为唯一口径"
+        },
+        "worker/service.py": "ABSENT（S2c 新建；JobService 方法面 = list_jobs/get_job/cancel_job/retry_job，A169 点名，禁增减禁改名）",
+        "worker/deps.py": {
+          "type_ignore_line": 55,
+          "type_ignore_text": "from campaignlab.worker.service import JobService  # type: ignore[import-not-found]",
+          "get_job_service_line": 120,
+          "obligation": "A207：创建 worker/service.py 的**同一次提交**内删除 :55 的该 ignore，否则 strict 的 warn_unused_ignores 会把全表 mypy 判红。A206：get_job_service 的延迟 import 形态**不动**，反过来要求 JobService.__init__ 接受 store 关键字"
+        },
+        "infra/db/repositories.py": {
+          "__all___line": 42,
+          "job_from_row_line": 221,
+          "note": "S2c **禁碰**该文件（A215：锁已释放但下一顺位是 M2-01/S2b）。行号仅供参考，判据用符号名"
+        },
+        "worker_package_files": "__init__.py capacity.py deps.py errors.py integrity.py leases.py runner.py states.py store.py（service.py 待新建）",
+        "worker/integrity.__all__": 17
+      }
     },
     "M1-01": {
       "status": "TODO",
@@ -6090,69 +6133,72 @@
     ],
     "in_flight_agents": [
       {
-        "lane": "Y",
+        "lane": "Y2",
         "task": "M0-04",
-        "subtask": "S2b-3（A204 新立）",
+        "subtask": "S2c（A169 新立：worker/service.py + JobStore.list_jobs 纯追加）",
         "tier_planned": "qwen3.8-max",
         "reasoning": "high",
-        "brief": "orchestrator/handoff/R13-lane-Y-M0-04-S2b-3.md",
+        "brief": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md",
         "critical": true,
         "slack": 0,
         "loop_cap": 2,
-        "agent_id": "01a1d733-80c7-7611-81ef-742720a226ec",
-        "nickname": "Mendel",
-        "status": "RETURNED_LANDED",
-        "dispatch_mode": "send_input（A168：同一 max lane 续接，禁关槽、禁档位置换）",
-        "dispatched_at": "2026-11-14T10:04:42+08:00",
-        "write_set": [
-          "src/campaignlab/infra/db/repositories.py（append-only，A82/A204）",
-          "src/campaignlab/worker/integrity.py",
-          "tests/unit/test_worker_integrity.py",
-          "evidence/M0/M0-04/",
-          "orchestrator/handoff/M0-04-design.md（仅文末追加 A205 注记）"
+        "status": "DISPATCHED",
+        "dispatched_at": "2026-11-14T22:15:14+08:00",
+        "dispatch_mode": "spawn（A215：原 lane 随主机重启物理消亡，A168 的禁关槽/禁置换客观不可满足；档位不变，禁降档）",
+        "a215_compensation": [
+          "① 档位仍 qwen3.8-max / high，禁降档（S2c 含事务边界与跨层装配，命中手册 §6.3 强制 max 清单）",
+          "② s2c_obligations_R13 / remaining_sequence_R14 / scope_waivers_R13 / u_rulings_R13 四键全量随派单消息下发",
+          "③ 告知 S2b-3 成品已在 7c0c7c4、取证三件已在 evidence/M0/M0-04/，不必重做",
+          "④ 上工第一步复测 HEAD/四门/收集数，与 round15_predispatch 的基线不符即停手回报"
         ],
-        "next_serial": "S2c → S4/S5/S6/S8（flash）",
-        "returned_at": "2026-11-14T11:17:38+08:00",
-        "result": "DONE",
-        "landing_commit": "7c0c7c4",
-        "slot_closed": true,
-        "slot_closed_reason": "主机重启在即；A168 的禁关槽在进程消亡后客观不可满足（见 resume.round14_lane_Y_return.lane_closed_reason）",
-        "landing_commit_backfilled_at": "2026-11-14T11:33:38+08:00"
+        "write_set": [
+          "src/campaignlab/worker/service.py（新建：JobService，方法面 list_jobs/get_job/cancel_job/retry_job）",
+          "src/campaignlab/worker/store.py（纯追加 JobStore.list_jobs；既有 20 个 def 一字不改，numstat deleted=0）",
+          "src/campaignlab/worker/deps.py（**同一提交内**删除 :55 的 # type: ignore[import-not-found]，A207）",
+          "tests/**（S2c 的守护与用例）",
+          "evidence/M0/M0-04/",
+          "orchestrator/handoff/M0-04-design.md（仅文末追加，A214 窄豁免，deleted=0）"
+        ],
+        "hard_bans": [
+          "禁把 JobPage 提前落地（A91：JobPage 归 S4 在 api/common.py append-only 追加）",
+          "禁 worker import api（分层红线 3；cursor 载荷保持未编码，编解码归 S4）",
+          "禁碰 src/campaignlab/infra/db/repositories.py（该锁已释放但下一顺位是 M2-01/S2b，不是 S2c）",
+          "禁碰 domain/activity/**、api/common.py、tests/unit/test_domain_errors.py（= 邻居 lane A1b 的写集）",
+          "禁改 deps.py:120 的 get_job_service 提供器形态（A206：反过来要求 JobService.__init__ 接受 store 关键字）",
+          "AST/语法探针一律 uv run --no-sync python（3.14.10），禁系统 python3（3.12.3）—— R14-1",
+          "分母只报实测值 + 归因，禁写死数字当判据（R13-6）；尤其 store.py 的冻结面以实测 20 def / 15 公有方法为准（R15-1）"
+        ],
+        "next_serial": "S4（flash）→ S5（flash）→ S6（flash）→ S8（flash）；S2c 入库即释放 store.py 与 worker/deps.py 锁"
       },
       {
-        "lane": "A1",
+        "lane": "A1b",
         "task": "M2-01",
-        "subtask": "S2a（design §11.1 + §11.2；§11.3 拆出为 S2b，A210）",
+        "subtask": "S2a（A210 拆分：design §11.1 领域层六模块 + §11.2 契约 DTO 面；**不含 §11.3**）",
         "tier_planned": "qwen3.8-max",
         "reasoning": "high",
         "brief": "orchestrator/handoff/R14-lane-A1-M2-01-S2a.md",
         "critical": false,
         "slack": 4,
         "loop_cap": 3,
-        "status": "INTERRUPTED_BY_HOST_REBOOT",
-        "dispatched_at": "2026-11-14T10:04:42+08:00",
+        "status": "DISPATCHED",
+        "dispatched_at": "2026-11-14T22:15:14+08:00",
+        "dispatch_mode": "spawn（前一次 spawn 的 lane A1/Ramanujan 被主机重启打断且零落盘，本棒从零重做；派单文不变）",
+        "restart_note": "前棒零落盘已实测确认：src/campaignlab/domain/activity/ 目录不存在、api/common.py 的 len(__all__) 仍为 51 且该文件 diff 为 0 行 ⇒ 无前棒残留需要清理，可直接从 HEAD 开工。",
         "write_set": [
-          "src/campaignlab/domain/activity/**（只新建）",
-          "src/campaignlab/api/common.py（纯追加，numstat 0 删除行）",
+          "src/campaignlab/domain/activity/**（只新建：states/digests/clauses/bindings/checks/diff + __init__）",
+          "src/campaignlab/api/common.py（纯追加 DTO 面，numstat deleted 必须为 0）",
           "tests/unit/test_domain_errors.py（仅 len(common.__all__) 的数字字面量行）"
         ],
         "hard_bans": [
-          "禁碰 src/campaignlab/infra/db/repositories.py（A210：额度在 M0-04/S2b-3 手上）",
-          "禁碰 application/**、api/deps.py、api/app.py（= §11.3 = S2b）",
+          "禁碰 src/campaignlab/infra/db/repositories.py（A215：锁虽已释放，但下一顺位是 S2b；S2a 的 scope 不含仓储层）",
+          "禁碰 application/**、api/deps.py、api/app.py（= design §11.3 = S2b）",
           "禁碰 api/activities.py、api/rules.py（S3/S4）、tests/domain/**（S5）、evidence/**（S7）",
-          "禁改 orchestrator/handoff/M2-01-design.md（S1 已冻结）",
-          "禁新增 Problem.code 或 DomainError 子类（本设计零新增，实测 PROBLEM_CODES=20 / 子类=14）",
+          "禁改 orchestrator/handoff/M2-01-design.md（S1 已冻结入库 d62c0ca）",
+          "禁新增 Problem.code 或 DomainError 子类（本设计零新增；实测 PROBLEM_CODES=20 / 子类=14）",
+          "禁碰 worker/**（= 邻居 lane Y2 的写集）",
           "AST/语法探针一律 uv run --no-sync python（3.14.10），禁系统 python3（3.12.3）—— R14-1"
         ],
-        "next_serial": "S2b（max，等 S2b-3 入库）→ S3–S7（flash）",
-        "agent_id": "01a1d7cf-1a3b-7c23-a762-bea637ec25e6",
-        "nickname": "Ramanujan",
-        "interrupted_at": "2026-11-14T11:33:38+08:00",
-        "interrupted_reason": "主机（Win11）重启在即；close_agent 时 previous_status=running，零落盘",
-        "snapshot_ref": "/mnt/d/ws/codex_rd/ss_campaignlab/.orch_scratch/checkpoint_R14（本 lane 无在飞产出，快照内不含其文件；登记此路径只为统一口径）",
-        "resume_action": "以新的 qwen3.8-max / high lane 重派；派单文 orchestrator/handoff/R14-lane-A1-M2-01-S2a.md 不变",
-        "agent_id_backfilled_at": "2026-11-14T11:33:38+08:00",
-        "agent_id_backfill_reason": "R14 派单登记漏项：原 status=TO_SPAWN 且缺 agent_id/nickname，与实际（确已 spawn 过）不符"
+        "next_serial": "S2b（max，等 S2a 入库后派发；repositories.py 锁已就绪）→ S3–S7（全 flash）"
       }
     ],
     "dispatch_requirements": [
@@ -8664,6 +8710,32 @@
         "tier": "qwen3.8-max",
         "brief": "orchestrator/handoff/R14-lane-A1-M2-01-S2a.md",
         "note": "同批以 send_input 续接 lane Y → M0-04/S2b-3（A204）"
+      },
+      {
+        "at": "2026-11-14T22:15:14+08:00",
+        "round": 15,
+        "wave": 2,
+        "lane": "Y2",
+        "task": "M0-04",
+        "subtask": "S2c",
+        "tier": "qwen3.8-max",
+        "reasoning": "high",
+        "critical": true,
+        "brief": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md",
+        "note": "A215 ① 追认的 A168 强制例外：新 max lane 承接，禁降档；四项补偿措施随派单消息下发"
+      },
+      {
+        "at": "2026-11-14T22:15:14+08:00",
+        "round": 15,
+        "wave": 2,
+        "lane": "A1b",
+        "task": "M2-01",
+        "subtask": "S2a",
+        "tier": "qwen3.8-max",
+        "reasoning": "high",
+        "critical": false,
+        "brief": "orchestrator/handoff/R14-lane-A1-M2-01-S2a.md",
+        "note": "前棒（lane A1/Ramanujan）被主机重启打断且零落盘，本棒从零重做；派单文不变，基线经实测确认全部准确"
       }
     ],
     "q_verify": {
@@ -12918,6 +12990,15 @@
         "question": "lane 按「specific grant 覆盖 general ban」执行了追加，是否认可？候选 (a) 认可窄口径豁免 / (b) 把注记迁到 evidence 下、design 回退 HEAD 态。",
         "ruling": "**(a) 认可，并成文化为规则**：LANE-COMMON 对 orchestrator/** 的禁令是**默认值**，派单文可授予「单文件 + 仅文末追加 + numstat deleted=0」的窄豁免，且该豁免必须显式出现在 lane 的 write_set 中（本棒 write_set 确有此条）。实证：numstat 38/0，design 前 52 行 sha256 双向一致 ⇒ append-only 得证，未越界。",
         "action_taken": "接受 (a)。义务：把上述成文规则并入 FU-39③（补 orchestrator/handoff/LANE-COMMON.md 的通用约束段）同批落地，避免两次触碰同一文件。"
+      },
+      {
+        "id": "A215",
+        "round": 15,
+        "at": "2026-11-14T22:15:14+08:00",
+        "source": "编排器（R15 恢复派单前置：checkpoint 件 §5 的 A168 强制例外 + §7 锁表需正式生效）",
+        "question": "① A168 规定 M0-04 的 S2b-2→S2b-3→S2c 由同一 max lane 串行复用、禁关槽、禁档位置换，但原 lane（Mendel）已随主机重启物理消亡 ⇒ S2c 该如何承接？② repositories.py 的 append-only 锁已随 7c0c7c4 释放，下一顺位归谁？S2a 的硬禁是否同步解除？③ 第 3 槽是否派单？④ A210 要求的 S2b 派单文何时发、S2b 何时可派？",
+        "ruling": "**① 准得以新的 qwen3.8-max / high lane 承接 S2c，禁降档**，并强制附四项补偿措施（见 resume.round15_predispatch.lanes[Y2].a215_compensation）：档位不变、四键义务全量下发、告知 S2b-3 成品已入库不必重做、上工第一步复测基线。A168 的例外属**环境强制**而非违规，其合法性依据＝进程级资源不可跨主机重启存活；例外范围**仅限本次承接**，S2c 之后若 lane 存活则 A168 的复用规则照常生效。**② repositories.py 锁的下一顺位 = M2-01/S2b**（A210 的原意）；但 **S2a 对该文件的硬禁不解除** —— S2a 的 scope 是 design §11.1+§11.2，不含仓储层，这是 **scope 纪律**而非锁竞争，两者不可混淆。同时确认 checkpoint 件 §7 的整张锁表正式生效（common.py→S2a、app.py 争用 M0-04/S4 先、store.py 与 worker/deps.py→S2c、M0-04-design.md 仅文末追加）。**③ 第 3 槽留白**：本轮重新实测 29 个任务的 deps（不采信 R14 结论），可派者仅 M0-04 与 M2-01 两条链，其余 22 个 TODO 全部 blocked ⇒ 无可派独立开发件，留白优于派废单。编排器自有债务 FU-39/40/41/42 均须动 scripts/orch_harness.py、pyproject.toml 或 orchestrator/state.json，与编排器自身的写权/工装冲突，**不适合派给 lane**，由编排器在非关键路径窗口自办。**④ S2b 派单文由编排器在两条 lane 在飞期间编写（不阻塞派单）；S2b 仍须等 S2a 入库后才可派发** —— M2-01 是 lane 内串行链，且 S2b 的 application/activity_service.py 依赖 S2a 的 domain/activity/** 产出。",
+        "action_taken": "本提交解除 dag_paused、下发 R15 两条 lane（Y2 = M0-04/S2c、A1b = M2-01/S2a，均 qwen3.8-max / high）、第 3 槽留白；随后 spawn 两条 lane。S2b 派单文与 FU-39/40/41/42 排入在飞期间的编排器自办队列。"
       }
     ],
     "round7_predispatch": {
@@ -16020,7 +16101,178 @@
         "ledger": "ZERO（本提交冻结全部账本事实）",
         "lost": "仅 Ramanujan 的 S2a 上下文（零落盘，重派无损）+ Mendel 未落盘的中间推理（交付件已全部入库）"
       }
-    }
+    },
+    "round15_predispatch": {
+      "at": "2026-11-14T22:15:14+08:00",
+      "round": 15,
+      "wave": 2,
+      "mode": "parallel-2-lanes(+1 空槽留白)",
+      "as_of_head": "29f7b94",
+      "as_of_head_full": "29f7b9485605c6dd680faeb7c6fcd5008f14f16c",
+      "commits": 101,
+      "branch": "m0-framework",
+      "worktree_at_dispatch": "**干净**（git status --porcelain 为空，post_status_lines=0）：S2b-3 已随 7c0c7c4 入库、checkpoint 已随 29f7b94 入库 ⇒ 本轮两条 lane 从干净树开工，无在飞污染基线。两条 lane 的产出将以未跟踪件形态出现在共享工作树，故门禁一律跑冻结索引树（R11-3），A144(c) 用 owner_map 逐件归属。",
+      "baseline_reproduced_by_new_instance": {
+        "measured_at": "2026-11-14T22:15:14+08:00",
+        "method": "第 7 次接管的实例从磁盘实测（rule_no_trust_handoff_summary_assertions）：不采信 checkpoint 件的计数，一律现跑",
+        "ruff_format_check": "rc=0 / 259 files already formatted",
+        "ruff_check": "rc=0 / All checks passed!",
+        "mypy": "rc=0 / Success: no issues found in 86 source files",
+        "pytest": "571（550 frozen-scope collect + 21 GIT_ENV_IGNORES 静态收集：test_config.py 16 + test_counts_freshness.py 5）",
+        "uv_python": "3.14.10",
+        "system_python3": "3.12.3（禁用于探针）",
+        "live_contract": "contracts/openapi.json sha16=592571099d638251 / bytes=443309 / info.version=1.0.1",
+        "symbol_face_s2a": {
+          "api/common.__all__": 51,
+          "PROBLEM_CODES": 20,
+          "DomainError_subclasses": 14,
+          "domain/activity_exists": false,
+          "note": "S2a 派单文 §0 的基线数字经实测**全部准确**，无需纠正"
+        },
+        "symbol_face_s2c": {
+          "worker/store.py_lines": 671,
+          "worker/store.py_total_def": 20,
+          "worker/store.py_public_methods": 15,
+          "worker/store.py_public_method_names": "claimed cancel_requested total get_job pending_count claim_next renew request_cancel confirm_cancel succeed fail reap_expired enqueue retry fail_unhandled",
+          "worker/store.py_def_list_jobs": 0,
+          "worker/service.py": "ABSENT（待 S2c 新建）",
+          "worker/deps.py_type_ignore_line": 55,
+          "worker/deps.py_get_job_service_line": 120,
+          "repositories.py___all___line": 42,
+          "repositories.py_job_from_row_line": 221,
+          "worker/integrity.__all__": 17
+        }
+      },
+      "stale_baseline_corrections": {
+        "reason": "R15-1：派单文与账本里的三处继承数字/事实已过期，若原样交给 lane 会造成假红或误判越界",
+        "items": [
+          {
+            "where": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md §1",
+            "stale": "worker/store.py「671 行 / 16 个 def」",
+            "measured": "671 行 ✓ / 20 个 def（其中公有方法 15 个）/ def list_jobs = 0",
+            "ruling": "以实测 20 def / 15 公有方法为冻结面口径；「一字不改」的约束对象是全部 20 个既有 def（含私有），比 16 或 12 都更严，不放宽任何义务"
+          },
+          {
+            "where": "tasks.M0-04.s2c_obligations_R13 第 3 条",
+            "stale": "「JobStore.list_jobs 对 store.py 纯追加（A169：既有 12 个方法的签名/函数体/SQL 文本一字不改）」",
+            "measured": "既有公有方法 15 个、含私有共 20 个 def",
+            "ruling": "义务强度以实测为准（20 个 def 全部一字不改）；原文依 D-011 不改写，实测值另存 tasks.M0-04.s2c_frozen_face_measured_R15"
+          },
+          {
+            "where": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md §1",
+            "stale": "repositories.py「__all__ 第 52 行含 job_from_row」",
+            "measured": "^__all__ 在第 42 行；def job_from_row 在第 221 行（后者与派单文一致）",
+            "ruling": "派单一律给符号名不给行号；行号仅供参考且必须现场复测（与 D-012/D-014「禁写死数字」同源）"
+          },
+          {
+            "where": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md §0「在飞」段",
+            "stale": "在飞 = lane Z（M2-01-design.md）+ lane V（test_orch_harness.py + evidence/M0/FU-35/）",
+            "measured": "lane Z 的 M2-01/S1 已入库 d62c0ca、lane V 的 FU-35 已入库 6c35aad，两者均已关槽；本轮真实邻居 = lane A1b（M2-01/S2a）",
+            "ruling": "以 round15_predispatch.lanes 的 write_set 为准。S2c 写 worker/**、S2a 写 domain/activity/** 与 api/common.py ⇒ **写集完全不相交**，可安全并行"
+          }
+        ],
+        "handling": "不改写两份派单文（D-011 + 避免二次触碰冻结面）；权威基线与纠正写进本键，并在派单消息里显式声明「派单文 §0 的基线段以派单消息为准」。S2c 派单文 §0 本身即写明「HEAD = 见本消息」「基线：见本消息」，属该文预留的接口，不是改写。"
+      },
+      "dependency_face_remeasured": {
+        "method": "对 29 个任务逐条解析 deps，按「deps 全部落在 DONE/PASS_WITH_TODO」判可派（不采信 R14 的结论）",
+        "dispatchable": [
+          "M0-04（deps=M0-02 ✓，IN_PROGRESS）",
+          "M2-01（deps=M0-02 ✓，IN_PROGRESS）"
+        ],
+        "blocked_count": 22,
+        "blocked_examples": "M1-01←M0-04；M2-02←M2-01,M0-04；M3-01←M1-02,M3-P01；M5-03←M5-02,M5-P01（全表见本提交的派单前实测输出）",
+        "conclusion": "除这两条链外无可派独立开发件 ⇒ 第 3 槽留白（A215 ③）"
+      },
+      "lanes": [
+        {
+          "lane": "Y2",
+          "task": "M0-04",
+          "subtask": "S2c（A169 新立：worker/service.py + JobStore.list_jobs 纯追加）",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R13-lane-Y-M0-04-S2c.md",
+          "critical": true,
+          "slack": 0,
+          "loop_cap": 2,
+          "status": "DISPATCHED",
+          "dispatched_at": "2026-11-14T22:15:14+08:00",
+          "dispatch_mode": "spawn（A215：原 lane 随主机重启物理消亡，A168 的禁关槽/禁置换客观不可满足；档位不变，禁降档）",
+          "a215_compensation": [
+            "① 档位仍 qwen3.8-max / high，禁降档（S2c 含事务边界与跨层装配，命中手册 §6.3 强制 max 清单）",
+            "② s2c_obligations_R13 / remaining_sequence_R14 / scope_waivers_R13 / u_rulings_R13 四键全量随派单消息下发",
+            "③ 告知 S2b-3 成品已在 7c0c7c4、取证三件已在 evidence/M0/M0-04/，不必重做",
+            "④ 上工第一步复测 HEAD/四门/收集数，与 round15_predispatch 的基线不符即停手回报"
+          ],
+          "write_set": [
+            "src/campaignlab/worker/service.py（新建：JobService，方法面 list_jobs/get_job/cancel_job/retry_job）",
+            "src/campaignlab/worker/store.py（纯追加 JobStore.list_jobs；既有 20 个 def 一字不改，numstat deleted=0）",
+            "src/campaignlab/worker/deps.py（**同一提交内**删除 :55 的 # type: ignore[import-not-found]，A207）",
+            "tests/**（S2c 的守护与用例）",
+            "evidence/M0/M0-04/",
+            "orchestrator/handoff/M0-04-design.md（仅文末追加，A214 窄豁免，deleted=0）"
+          ],
+          "hard_bans": [
+            "禁把 JobPage 提前落地（A91：JobPage 归 S4 在 api/common.py append-only 追加）",
+            "禁 worker import api（分层红线 3；cursor 载荷保持未编码，编解码归 S4）",
+            "禁碰 src/campaignlab/infra/db/repositories.py（该锁已释放但下一顺位是 M2-01/S2b，不是 S2c）",
+            "禁碰 domain/activity/**、api/common.py、tests/unit/test_domain_errors.py（= 邻居 lane A1b 的写集）",
+            "禁改 deps.py:120 的 get_job_service 提供器形态（A206：反过来要求 JobService.__init__ 接受 store 关键字）",
+            "AST/语法探针一律 uv run --no-sync python（3.14.10），禁系统 python3（3.12.3）—— R14-1",
+            "分母只报实测值 + 归因，禁写死数字当判据（R13-6）；尤其 store.py 的冻结面以实测 20 def / 15 公有方法为准（R15-1）"
+          ],
+          "next_serial": "S4（flash）→ S5（flash）→ S6（flash）→ S8（flash）；S2c 入库即释放 store.py 与 worker/deps.py 锁"
+        },
+        {
+          "lane": "A1b",
+          "task": "M2-01",
+          "subtask": "S2a（A210 拆分：design §11.1 领域层六模块 + §11.2 契约 DTO 面；**不含 §11.3**）",
+          "tier_planned": "qwen3.8-max",
+          "reasoning": "high",
+          "brief": "orchestrator/handoff/R14-lane-A1-M2-01-S2a.md",
+          "critical": false,
+          "slack": 4,
+          "loop_cap": 3,
+          "status": "DISPATCHED",
+          "dispatched_at": "2026-11-14T22:15:14+08:00",
+          "dispatch_mode": "spawn（前一次 spawn 的 lane A1/Ramanujan 被主机重启打断且零落盘，本棒从零重做；派单文不变）",
+          "restart_note": "前棒零落盘已实测确认：src/campaignlab/domain/activity/ 目录不存在、api/common.py 的 len(__all__) 仍为 51 且该文件 diff 为 0 行 ⇒ 无前棒残留需要清理，可直接从 HEAD 开工。",
+          "write_set": [
+            "src/campaignlab/domain/activity/**（只新建：states/digests/clauses/bindings/checks/diff + __init__）",
+            "src/campaignlab/api/common.py（纯追加 DTO 面，numstat deleted 必须为 0）",
+            "tests/unit/test_domain_errors.py（仅 len(common.__all__) 的数字字面量行）"
+          ],
+          "hard_bans": [
+            "禁碰 src/campaignlab/infra/db/repositories.py（A215：锁虽已释放，但下一顺位是 S2b；S2a 的 scope 不含仓储层）",
+            "禁碰 application/**、api/deps.py、api/app.py（= design §11.3 = S2b）",
+            "禁碰 api/activities.py、api/rules.py（S3/S4）、tests/domain/**（S5）、evidence/**（S7）",
+            "禁改 orchestrator/handoff/M2-01-design.md（S1 已冻结入库 d62c0ca）",
+            "禁新增 Problem.code 或 DomainError 子类（本设计零新增；实测 PROBLEM_CODES=20 / 子类=14）",
+            "禁碰 worker/**（= 邻居 lane Y2 的写集）",
+            "AST/语法探针一律 uv run --no-sync python（3.14.10），禁系统 python3（3.12.3）—— R14-1"
+          ],
+          "next_serial": "S2b（max，等 S2a 入库后派发；repositories.py 锁已就绪）→ S3–S7（全 flash）"
+        }
+      ],
+      "slot_note": "并发上限 3，本批用 2（Y2 + A1b），第 3 槽**留白**，依据见 dependency_face_remeasured。留白期间编排器自办：① 编写 M2-01/S2b 派单文（A210 触发的义务，A215 ④）；② 对 orchestrator/handoff/M2-01-design.md（1322 行）做前向引用普查（R14-5 的预防面，避免它在 S2a 入库时被悬空门拦停）；③ 视窗口处理 FU-41（M0-03b 的 2 处 rc:null）。FU-39/FU-40 涉及 scripts/orch_harness.py 与 pyproject.toml，在 lane 在飞期间**不动**（避免改到自己正在依赖的工装）。",
+      "write_scope_disjoint": true,
+      "disjoint_proof": "Y2 只写 src/campaignlab/worker/{service.py(新),store.py(追加),deps.py(删 1 行 ignore)} + tests/** + evidence/M0/M0-04/ + M0-04-design.md(文末追加)；A1b 只写 src/campaignlab/domain/activity/**(新) + api/common.py(追加) + tests/unit/test_domain_errors.py(1 行字面量)。两者无共同文件、无共同目录前缀；tests/** 与 tests/unit/test_domain_errors.py 的交集为空（Y2 的测试落在 tests/unit/test_worker_service*.py 与 tests/integration/jobs/**，A1b 不新建测试文件）。共享件 api/app.py 与 infra/db/repositories.py **本批两者都不碰** ⇒ 无锁竞争。"
+    },
+    "in_flight_agents_note_round15": "R15 在飞 = Y2（M0-04/S2c · max · 关键路径 · slack 0）+ A1b（M2-01/S2a · max · slack 4）。两者均为**新 spawn**：原 lane Y（Mendel）已交付 S2b-3 并入库 7c0c7c4 后关槽、且随主机重启物理消亡（A215 ① 追认例外、禁降档）；原 lane A1（Ramanujan）被重启打断且零落盘，本棒从零重做。第 3 槽留白。回收后按 checkpoint 件 §10 步骤 7 的出口检查项执行：回执归档 → subtask_log 追加 + flash_share 程序化重算（先自证能复现旧值）→ PENDING 精确回填 → **close_agent 显式关槽**（R14-6）→ run_commit 入库 → 复测 HEAD 与 counts。",
+    "round15_self_corrections": [
+      {
+        "id": "R15-1",
+        "at": "2026-11-14T22:15:14+08:00",
+        "severity": "MINOR",
+        "owner": "编排器",
+        "rule_violated": "R13-6 / D-012 / D-014：禁把未经实测的继承数字当判据交给 lane（分母只报实测值 + 归因）",
+        "fact": "派单前对 M0-04/S2c 的冻结面逐条实测，发现两个**互相矛盾且都不对**的继承数字：派单文 R13-lane-Y-M0-04-S2c.md §1 写 worker/store.py「671 行 / 16 个 def」，账本 tasks.M0-04.s2c_obligations_R13 写「既有 12 个方法…一字不改」；实测为 671 行 / **20 个 def**（公有方法 **15 个**）/ def list_jobs = 0。同文 §1 又写 repositories.py「__all__ 第 52 行含 job_from_row」，实测 ^__all__ 在**第 42 行**（job_from_row 在 221 行，与派单文一致）；§0 的「在飞 lane Z / lane V」亦已完全过期（两者分别随 d62c0ca / 6c35aad 入库并已关槽）。",
+        "impact": "未造成实际损害（派单前实测拦下）。若原样下发，危害有两种形态：① lane 按「16 个 def」写守护断言 ⇒ 与实测 20 不符而判自己红，或反过来放松断言；② lane 按「12 个方法」理解 append-only 义务 ⇒ 可能误以为其余 8 个 def 可改，**放宽**了 A169 的约束。第 ② 种尤其危险：它是**静默放宽**，不会报错。",
+        "correction": "以实测值为唯一口径：store.py 冻结面 = **20 个既有 def 全部一字不改**（含私有），numstat 对该文件必须 deleted=0；行号一律不作为判据，只给符号名。原文依 D-011 不改写，实测值另存 tasks.M0-04.s2c_frozen_face_measured_R15 与 resume.round15_predispatch.baseline_reproduced_by_new_instance.symbol_face_s2c，并在两条 lane 的派单消息里显式声明「派单文 §0/§1 的基线与分母以本消息为准」。",
+        "prevention": "派单前必须对**该棒要动到的每个冻结面**做一次符号级实测（行数 / def 数 / 公有方法名清单 / 关键符号是否存在），把实测值写进 round*_predispatch 的 baseline 键；派单文里的任何具体数字一律视为**待复核的参考值**，不得直接当判据下发。本条已作为 PRE-7 记入 resume.dispatch_preconditions_note_R15。",
+        "rule_added": "resume.dispatch_preconditions_note_R15（PRE-7）"
+      }
+    ],
+    "dispatch_preconditions_note_R15": "PRE-7（R15-1 新增）：派单前必须对该棒要动到的每个冻结面做符号级实测（行数 / def 数 / 公有方法名清单 / 关键符号存在性 / 行号仅供参考），把实测值写进 round*_predispatch.baseline_reproduced_by_new_instance；派单文里的具体数字一律视为待复核的参考值，禁直接当判据下发。与 PRE-6（R14-4：派单前反查断言对象）并列为派单前置检查项。"
   },
   "acceptance": {
     "baseline_total": 35,
@@ -16899,8 +17151,40 @@
       "applies_to": "S3b/S4 的 5 个路由 + 已交付的 api/health.py"
     }
   },
-  "dag_paused": true,
+  "dag_paused": false,
   "dag_paused_at": "2026-11-14T11:33:38+08:00",
   "dag_pause_reason": "主机（Win11）计划重启。人类指令：评估完成进度 → 保存完整 checkpoint 确保可断点续跑 → checkpoint 保存后停止开发。子智能体进程与编排器会话是进程级资源，重启必死；已完成的工作已送进 git 历史（7c0c7c4），不可再生的上下文已快照，账本与恢复剧本已随本提交冻结。",
-  "dag_pause_resume_precondition": "解除条件（两条必须同时满足）：① 人类给出明确「开工」指令；② checkpoint 件 §10 的步骤 1–5 全部通过 —— 复测 branch=m0-framework / HEAD=本 checkpoint 提交 / commits=101 / git status 干净；读 resume.checkpoint_R14 与 docs/delivery/LONG-HORIZON-ORCHESTRATION.md；bash scripts/doctor.sh 体检 + 确认 uv run --no-sync python -V = 3.14.10；四门基线复跑与 counts（259/86/571）一致；然后把 dag_paused 置回 false 并记 dag_resumed_at。在此之前禁 spawn / send_input 任何开发 lane。"
+  "dag_pause_resume_precondition": "解除条件（两条必须同时满足）：① 人类给出明确「开工」指令；② checkpoint 件 §10 的步骤 1–5 全部通过 —— 复测 branch=m0-framework / HEAD=本 checkpoint 提交 / commits=101 / git status 干净；读 resume.checkpoint_R14 与 docs/delivery/LONG-HORIZON-ORCHESTRATION.md；bash scripts/doctor.sh 体检 + 确认 uv run --no-sync python -V = 3.14.10；四门基线复跑与 counts（259/86/571）一致；然后把 dag_paused 置回 false 并记 dag_resumed_at。在此之前禁 spawn / send_input 任何开发 lane。",
+  "dag_resumed_at": "2026-11-14T22:15:14+08:00",
+  "dag_resume_evidence": {
+    "human_instruction": "「开工」（R15 首个动作；checkpoint 件 §10 步骤 5 的条件①）",
+    "step1_git": {
+      "branch": "m0-framework",
+      "head_full": "29f7b9485605c6dd680faeb7c6fcd5008f14f16c",
+      "head_short": "29f7b94",
+      "commits": 101,
+      "worktree": "clean（git status --porcelain 为空）",
+      "matches_checkpoint_R14": true
+    },
+    "step2_docs_read": [
+      "orchestrator/handoff/R14-CHECKPOINT.md（284 行 / 40682 B）",
+      "resume.checkpoint_R14（机器可读索引）",
+      "docs/delivery/LONG-HORIZON-ORCHESTRATION.md（流程规范：档位判据 / loop 3+1 / 每轮出口关槽检查项）"
+    ],
+    "step3_env": {
+      "uv_python": "3.14.10（铁律 §1.3 前提成立）",
+      "system_python3": "3.12.3（禁用于任何 AST/语法探针 —— R14-1）"
+    },
+    "step4_gates": {
+      "ruff_format_check": "259 files already formatted",
+      "ruff_check": "All checks passed!",
+      "mypy": "Success: no issues found in 86 source files",
+      "frozen_scope_collect": 550,
+      "git_env_ignores_collect": "16 (test_config.py) + 5 (test_counts_freshness.py) = 21",
+      "pytest_passed": 571,
+      "verdict": "四项与 counts 现值（259/86/571）逐数一致 ⇒ 绿基线，可派单"
+    },
+    "step5_action": "本提交置 dag_paused=false 并记 dag_resumed_at；此前未 spawn / send_input 任何开发 lane"
+  },
+  "dag_pause_reason_resolved": "原 reason（主机重启 + 人类要求 checkpoint 后停止）已由人类的「开工」指令解除；原 dag_pause_reason / dag_paused_at / dag_pause_resume_precondition 三键依 D-011 保留不改写，作为历史留痕。"
 }
