@@ -1,0 +1,182 @@
+=== 开跑前快照 ===
+ M src/campaignlab/api/common.py
+ M src/campaignlab/worker/deps.py
+ M src/campaignlab/worker/store.py
+ M tests/integration/jobs/test_worker_deps.py
+ M tests/unit/test_domain_errors.py
+?? src/campaignlab/domain/activity/
+?? src/campaignlab/worker/service.py
+?? tests/unit/test_worker_service.py
+----
+401	0	src/campaignlab/api/common.py
+1	1	src/campaignlab/worker/deps.py
+65	0	src/campaignlab/worker/store.py
+45	18	tests/integration/jobs/test_worker_deps.py
+2	2	tests/unit/test_domain_errors.py
+sha256 开跑前：
+  c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562  src/campaignlab/worker/store.py
+  ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d  src/campaignlab/worker/service.py
+  ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f  src/campaignlab/worker/deps.py
+  686ab99091d777c8b524af21c8a291bdff84661391e927f2d375946ea5018859  tests/unit/test_worker_service.py
+
+=== 基线（未变异）=== rc=0  44 passed in 10.15s
+
+--- PC1 ---
+target     : src/campaignlab/worker/store.py
+mutation   : list_jobs 的排序方向反转（created_at ASC）
+anchor     : 'key=lambda record: record.created_at, reverse=True'
+rc         : 1   (期望 != 0)
+summary    : 4 failed, 40 passed in 10.23s
+red_count  : 4
+red_ids    : ['test_list_jobs_first_page_yields_limit_items_and_an_unencoded_payload', 'test_list_jobs_full_walk_visits_every_row_exactly_once', 'test_list_jobs_orders_created_at_desc_then_id_asc', 'test_list_jobs_second_page_consumes_the_keyset_and_exhausts']
+sha256_pre : c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+sha256_post: c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+restored   : True
+
+--- PC2 ---
+target     : src/campaignlab/worker/store.py
+mutation   : 在既有 pending_count 的 docstring 里加一个字符（伪造「纯追加」被破坏）
+anchor     : '"""非终态计数（A88②）。只读'
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 11.83s
+red_count  : 1
+red_ids    : ['test_store_py_frozen_defs_are_byte_identical']
+sha256_pre : c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+sha256_post: c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+restored   : True
+
+--- PC3 ---
+target     : src/campaignlab/worker/store.py
+mutation   : 往 list_jobs 里塞一条 jobs 表 DML 文本（破 A81 SQL 写点唯一）
+anchor     : 'page: list[JobRecord] = []'
+rc         : 1   (期望 != 0)
+summary    : 2 failed, 42 passed in 10.06s
+red_count  : 2
+red_ids    : ['test_store_and_service_carry_no_jobs_dml_text', 'test_store_py_sql_text_is_still_only_the_three_transaction_control_statements']
+sha256_pre : c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+sha256_post: c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+restored   : True
+
+--- PC4 ---
+target     : src/campaignlab/worker/service.py
+mutation   : service.py 新增一条 worker -> api 导入边（破 A169③ 的分层预裁）
+anchor     : 'from campaignlab.domain.errors import DomainError'
+rc         : 1   (期望 != 0)
+summary    : 2 failed, 42 passed in 9.85s
+red_count  : 2
+red_ids    : ['test_service_py_contributes_no_worker_to_api_edge', 'test_worker_to_api_edges_are_exactly_the_frozen_baseline']
+sha256_pre : ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+sha256_post: ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+restored   : True
+
+--- PC5 ---
+target     : src/campaignlab/worker/service.py
+mutation   : 把 store 从 keyword-only 降级成位置参数（破 A206）
+anchor     : 'def __init__(self, *, store: JobStore) -> None:'
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 10.65s
+red_count  : 1
+red_ids    : ['test_job_service_constructor_takes_keyword_only_store']
+sha256_pre : ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+sha256_post: ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+restored   : True
+
+--- PC6 ---
+target     : src/campaignlab/worker/service.py
+mutation   : 在 service.py 里取一次系统当前时间（破 worker/__init__.py 红线 3）
+anchor     : '__all__ = ["JobService"]'
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 10.98s
+red_count  : 1
+red_ids    : ['test_service_module_never_reads_the_system_clock']
+sha256_pre : ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+sha256_post: ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+restored   : True
+
+--- PC7 ---
+target     : src/campaignlab/worker/deps.py
+mutation   : 把 deps.py 那条 type: ignore[import-not-found] 加回去（破 A207）
+anchor     : 'from campaignlab.worker.service import JobService'
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 11.00s
+red_count  : 1
+red_ids    : ['test_deps_no_longer_carries_the_import_not_found_ignore']
+sha256_pre : ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+sha256_post: ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+restored   : True
+
+--- PC8 ---
+target     : src/campaignlab/worker/service.py
+mutation   : 在 service.py 末尾追加第二个行→DTO 转换器（破 A169①「禁复制第二份」）
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 10.89s
+red_count  : 1
+red_ids    : ['test_service_module_def_face_is_exactly_the_delivered_one']
+sha256_pre : ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+sha256_post: ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d
+restored   : True
+
+--- PC9 ---
+target     : src/campaignlab/worker/store.py
+mutation   : 去掉 q 折叠的 casefold（破 design §1 的 NFKC + casefold 口径）
+anchor     : 'needle = unicodedata.normalize("NFKC", q).casefold() if q else None'
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 43 passed in 11.09s
+red_count  : 1
+red_ids    : ['test_list_jobs_q_matches_id_kind_and_stage_with_nfkc_casefold']
+sha256_pre : c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+sha256_post: c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562
+restored   : True
+
+=== 收尾核验 ===
+git status/numstat 与开跑前逐字一致 : True
+四个文件 sha256 与开跑前逐个一致   : True
+  c9e9416dfb0514aa7671315b1f892e1f6b7342d59ffc32485ebdcc54c3372562  src/campaignlab/worker/store.py
+  ad62252fd1de638394e3cf776f916c63030efa4173273b15876b9879eef5a95d  src/campaignlab/worker/service.py
+  ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f  src/campaignlab/worker/deps.py
+  686ab99091d777c8b524af21c8a291bdff84661391e927f2d375946ea5018859  tests/unit/test_worker_service.py
+ M src/campaignlab/api/common.py
+ M src/campaignlab/worker/deps.py
+ M src/campaignlab/worker/store.py
+ M tests/integration/jobs/test_worker_deps.py
+ M tests/unit/test_domain_errors.py
+?? src/campaignlab/domain/activity/
+?? src/campaignlab/worker/service.py
+?? tests/unit/test_worker_service.py
+----
+401	0	src/campaignlab/api/common.py
+1	1	src/campaignlab/worker/deps.py
+65	0	src/campaignlab/worker/store.py
+45	18	tests/integration/jobs/test_worker_deps.py
+2	2	tests/unit/test_domain_errors.py
+=== 复原后复验绿 === rc=0  44 passed in 11.01s
+=== PC10/PC11（A207 连带改写的两条守护）===
+deps.py sha256 开跑前 : ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+基线（未变异）        : rc=0  18 passed in 6.26s
+
+--- PC10 ---
+target     : src/campaignlab/worker/deps.py
+mutation   : 在 deps.py 模块级加一条对 worker.service 的** eager **导入（破延迟加载形态）
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 17 passed in 5.60s
+red_count  : 1
+red_ids    : ['test_deps_module_keeps_the_lazy_import_form_after_s2c_landed']
+sha256_pre : ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+sha256_post: ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+restored   : True
+
+--- PC11 ---
+target     : src/campaignlab/worker/deps.py
+mutation   : 在 deps.py 运行期绑定一个 JobService 名字（破「不得在运行期绑定」那条断言）
+rc         : 1   (期望 != 0)
+summary    : 1 failed, 17 passed in 5.36s
+red_count  : 1
+red_ids    : ['test_deps_module_keeps_the_lazy_import_form_after_s2c_landed']
+sha256_pre : ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+sha256_post: ac59435dd93f4a0a02f08078fc914b9dd0c99ea5196c15cdb6ac7f854629a95f
+restored   : True
+
+=== 收尾核验 ===
+deps.py 复原到开跑前摘要 : True
+git status/numstat 一致  : True
+复原后复验绿             : rc=0  18 passed in 5.63s

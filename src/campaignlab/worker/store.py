@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import contextlib
 import sqlite3
+import unicodedata
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -669,3 +670,67 @@ class JobStore:
         else:
             problem = problem_of(InternalFailure("作业执行失败"), request_id=None)
         return self.fail(lease, problem=problem, now=now)
+
+    # ------------------------------------------------------------- listJobs（S2c / A169 纯追加）
+
+    def list_jobs(
+        self,
+        *,
+        workspace_id: str,
+        limit: int,
+        after: tuple[str, str] | None = None,
+        q: str | None = None,
+        states: Sequence[str] | None = None,
+    ) -> list[JobRecord]:
+        """取一页作业（最多 ``limit`` 行），排序 ``created_at DESC, id ASC``（design §1）。
+
+        与 ``WorkspaceRepository.list_page`` 同口径：``after`` 是上一页末行的
+        ``(created_at, id)``，键集谓词是那条 SQL 的 Python 对偶
+        ``created_at < k0 OR (created_at = k0 AND id > k1)``；``q`` 非空时过滤发生在
+        Python 侧，故**先过滤后计数**（先 LIMIT 会切掉本应命中的后续行，翻页就漏数据）。
+        调用方（``worker/service.py``）传 ``limit + 1`` 以判断有没有下一页；本方法不判
+        ``next_cursor``、不组装任何分页壳（A169④），也不碰 ``str`` 形态的游标（A169③：
+        编解码归 S4）。
+
+        ``q`` 命中 ``id`` / ``kind`` / ``stage`` 三列，折叠口径 NFKC + casefold 与
+        ``repositories._fold`` 同式（等价性由守护用例钉住）。本模块刻意**不** import 那个
+        私有名、也**不**新增第二个公共折叠函数：``repositories.py`` 的 append-only 豁免
+        不给 S2c（已按 A159 报 U 项）。
+
+        只读，**不开** ``BEGIN IMMEDIATE``（design §1：listJobs / getJob 都是只读短连接）。
+        红线 1（A81）照旧成立：本方法**一条 SQL 文本都没有** —— 取行走 A204 纯追加的
+        ``JobRepository.list_for_workspace``，排序 / 键集 / 筛选都在它返回的行序上做。
+        这是刻意的取舍：把这三件事下推成 SQL 需要给 ``repositories.py`` 再开一个
+        append-only 方法，而该文件不在本 lane 的写集内。
+        """
+        if limit < 1:
+            raise ValueError(f"limit 必须 >= 1：{limit}")
+        with connect(self._engine) as conn:
+            rows = self._jobs.list_for_workspace(conn, workspace_id)
+        # 两趟稳定排序得到 created_at DESC, id ASC：先按 id 升序，再按 created_at 逆序。
+        # Python 的 sort 稳定，且 reverse=True 不颠倒等值元素的相对次序，故同一 created_at
+        # 的行仍按 id 升序 —— 与 SQL 的 ORDER BY created_at DESC, id ASC 逐行等价。
+        ordered = sorted(rows, key=lambda record: record.id)
+        ordered = sorted(ordered, key=lambda record: record.created_at, reverse=True)
+        needle = unicodedata.normalize("NFKC", q).casefold() if q else None
+        page: list[JobRecord] = []
+        for record in ordered:
+            if states is not None and record.state not in states:
+                continue
+            if needle is not None and not any(
+                needle in unicodedata.normalize("NFKC", field).casefold()
+                for field in (record.id, record.kind, record.stage)
+            ):
+                continue
+            if after is not None:
+                key_created_at, key_id = after
+                # 键集谓词：created_at < k0 OR (created_at = k0 AND id > k1)
+                passed = record.created_at < key_created_at or (
+                    record.created_at == key_created_at and record.id > key_id
+                )
+                if not passed:
+                    continue
+            page.append(record)
+            if len(page) >= limit:
+                break
+        return page

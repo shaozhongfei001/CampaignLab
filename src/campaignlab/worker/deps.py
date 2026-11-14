@@ -52,7 +52,7 @@ from campaignlab.infra.artifacts import ArtifactWriter
 from campaignlab.worker.store import JobStore
 
 if TYPE_CHECKING:
-    from campaignlab.worker.service import JobService  # type: ignore[import-not-found]
+    from campaignlab.worker.service import JobService
 
 __all__ = [
     "get_artifact_writer",

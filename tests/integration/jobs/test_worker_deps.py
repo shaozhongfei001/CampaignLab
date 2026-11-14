@@ -12,9 +12,12 @@
    ``(workspace_id, kind, sha256)`` 走完整路径后 ``artifacts`` 表**恰 1 行**（design §11:157）；
    被禁的第三种（先 ``commit()`` 再把 record 交回 ``succeed(artifacts=...)``）单独落一条，
    断言它**必须红**（``IntegrityError``）且事务整体回滚。
-③ **A169**：``worker/service.py`` 属 S2c、当前不存在。故本模块缺席时
-   ``campaignlab.worker.deps`` 仍须 import 成功、返回注解仍是 ``JobService``、
-   调用 ``get_job_service()`` 抛**指名 S2c** 的 ``RuntimeError``（不静默返回替身）；
+③ **A169 → S2c 已落地（A207 同批改写）**：``worker/service.py`` 已由 M0-04/S2c 交付，
+   ``deps.py`` 那条 ``# type: ignore[import-not-found]`` 同批删除（留着会让全表 mypy 因
+   ``warn_unused_ignores`` 判红）。原判据「缺席时 import 仍成功」的自带前提断言明写
+   「它已出现 ⇒ …并改写本用例」，故这一组改成钉**延迟加载形态不变**（模块级不导入
+   ``worker.service``、运行期不绑定 ``JobService``、返回注解仍是 ``JobService``）
+   ＋「导入失败即指名报错」（用 ``monkeypatch`` 造缺席，不再依赖真实文件状态）；
    另用 ``sys.modules`` 注入桩模块证明延迟导入这条路真的通（不只是错误分支通）。
 
 库用活契约 DDL 建，不跑 alembic —— 与本目录 ``test_artifact_write.py`` 同体例。
@@ -437,28 +440,52 @@ def test_deps_exports_exactly_the_four_design_symbols() -> None:
         assert callable(getattr(deps, symbol)), symbol
 
 
-def test_deps_module_is_importable_while_worker_service_is_absent() -> None:
-    """A169：``service.py`` 缺席时本模块照样 import 成功，返回注解仍是 ``JobService``。
+def test_deps_module_keeps_the_lazy_import_form_after_s2c_landed() -> None:
+    """A169 / A207：``service.py`` 已落地，但 ``deps.py`` 的**延迟加载形态**必须一字不动。
 
-    这条用例自带前提断言：``service.py`` 一旦出现（S2c 落地），它就会判红，
-    逼使来人同步处理那条 ``# type: ignore[import-not-found]``（strict 开着
-    ``warn_unused_ignores``，留着会让全表 mypy 判红）。
+    原判据是「``service.py`` 缺席时本模块照样 import 成功」，其自带前提断言明写
+    「它已出现 ⇒ 请删掉 deps.py 里的 type: ignore[import-not-found] **并改写本用例**」——
+    S2c 照办（A207），本条即改写后的形态。改钉**静态面**是因为「import deps 不传递拉起
+    worker.service」这件事在 ``service.py`` 存在之后已无法用 ``sys.modules`` 观测：
+    同一 pytest 会话里 ``tests/unit/test_worker_service.py`` 早就导入过它了。
+
+    于是钉三条：① 模块级（非 ``TYPE_CHECKING``）没有对 ``worker.service`` 的导入；
+    ② ``deps`` 命名空间里没有运行期绑定的 ``JobService``；③ 返回注解仍是字符串
+    ``"JobService"``（``from __future__ import annotations`` 的形态，S4 的路由签名要用）。
     """
-    assert not SERVICE_PATH.exists(), (
-        "前提：worker/service.py 属 S2c，本子任务交付时不存在；"
-        "它已出现 ⇒ 请删掉 deps.py 里的 type: ignore[import-not-found] 并改写本用例"
-    )
-    assert SERVICE_MODULE not in sys.modules
+    assert SERVICE_PATH.is_file(), "前提：S2c 已交付 worker/service.py"
+    deps_path = SERVICE_PATH.with_name("deps.py")
+    tree = ast.parse(deps_path.read_text(encoding="utf-8"))
+    eager = [
+        node.lineno
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == SERVICE_MODULE
+    ]
+    assert eager == [], f"deps.py 不得在模块级导入 worker.service（延迟加载形态）：行 {eager}"
+    assert not hasattr(deps, "JobService"), "deps 不得在运行期绑定 JobService"
     assert deps.get_job_service.__annotations__["return"] == "JobService"
 
 
-def test_get_job_service_names_s2c_until_worker_service_lands(config: AppConfig) -> None:
-    """缺席时调用 ⇒ ``RuntimeError`` 且文本指名 S2c，**不**静默返回 ``None`` 或替身。"""
+def test_get_job_service_names_the_module_when_the_lazy_import_fails(
+    config: AppConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """延迟导入失败 ⇒ ``RuntimeError`` 且文本指名模块，**不**静默返回 ``None`` 或替身。
+
+    S2c 已交付 ``worker/service.py``，「缺席」不再能靠真实文件状态制造，故改用
+    ``monkeypatch`` 把 ``_SERVICE_MODULE`` 指到一个不存在的模块名：走的仍是
+    ``_load_service_module`` 里同一条 ``ModuleNotFoundError -> RuntimeError`` 分支，
+    判据强度不降反升（原来那条只能证明「文件不在时报错」，这条证明「导入失败就报错」）。
+
+    ``_SERVICE_MISSING`` 常量文本里「S2c 尚未交付」的措辞在 S2c 落地后已过期，但
+    ``deps.py`` 本棒只准删 :55 的 ignore 注释（A207），故不改它 —— 已报 U 项。
+    """
+    monkeypatch.setattr(deps, "_SERVICE_MODULE", SERVICE_MODULE + "_absent_probe")
     with pytest.raises(RuntimeError) as excinfo:
         get_job_service(config=config)
-    message = str(excinfo.value)
-    assert "S2c" in message and SERVICE_MODULE in message
-    assert excinfo.value.__cause__ is not None, "必须保留 ModuleNotFoundError 作为 __cause__"
+    assert SERVICE_MODULE in str(excinfo.value)
+    assert isinstance(excinfo.value.__cause__, ModuleNotFoundError), (
+        "必须保留 ModuleNotFoundError 作为 __cause__"
+    )
 
 
 def test_get_job_service_lazily_resolves_the_module_once_it_exists(

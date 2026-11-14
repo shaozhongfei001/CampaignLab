@@ -206,3 +206,51 @@ A82 的 append-only 豁免**纯追加**（`infra/db/repositories.py`，`git diff
 `expected_byte_size` / `actual_byte_size` ← `None`。落地实现见 `worker/integrity.py::_check_job`，
 守护见 `tests/unit/test_worker_integrity.py`（S2b-3 后 30 条），取证见
 `evidence/M0/M0-04/s2b3-integrity-jobs.md`。
+
+## §9-S2 行 · S2c 落地注记（S2c 追加；D-011：历史文本只加注不改写）
+
+**交付面**：`worker/service.py:JobService(list_jobs, get_job, cancel_job, retry_job)` 新建（A169 点名，
+方法面**恰为**四个，禁增减禁改名）＋ `JobStore.list_jobs` 对 `worker/store.py` **纯追加**
+（`git diff --numstat` = 65 add / **0 del**；既有 20 个 `def` 的源码段 sha256 逐个未变，守护见
+`tests/unit/test_worker_service.py::test_store_py_frozen_defs_are_byte_identical`）。
+`worker/deps.py` 只删了 :55 那一条 `# type: ignore[import-not-found]`（A207），运行期 `importlib`
+延迟加载形态一字未动；连带改写了 `tests/integration/jobs/test_worker_deps.py` 里两条
+「以 `service.py` 缺席为前提」的用例 —— 依据是那条用例**自带前提断言**的原文：
+「它已出现 ⇒ 请删掉 deps.py 里的 type: ignore[import-not-found] **并改写本用例**」。
+
+**§1 `listJobs` 分页口径的落点**：排序 `created_at DESC, id ASC`、键集谓词
+`created_at < k0 OR (created_at = k0 AND id > k1)`、每页取 `limit+1` 判 `next_cursor`，与
+`WorkspaceRepository.list_page` / `WorkspaceService.list_workspaces` 同口径，但**落在 Python 侧**
+而不是 SQL 侧：`JobStore.list_jobs` 一条 SQL 文本都没有，取行走 A204 的
+`JobRepository.list_for_workspace`，排序／键集／筛选在其返回的行序上做。原因是
+`infra/db/repositories.py` 的 append-only 豁免不给 S2c（A82／A204 已用尽），而 `store.py` 的模块
+纪律是「SQL 一律委托 `JobRepository`」—— 其 `immediate()` 上方那句「只此三条是本模块出现的全部
+SQL 文本」在 S2c 之后仍为真，已钉成守护。**代价**：每翻一页都要取该工作区的全部 `jobs` 行；
+M0 数据量下可接受。若 S4／S5 要把它下推成 SQL，需要编排器给 `repositories.py` 再开一次
+append-only 豁免（形如 `JobRepository.list_page(conn, *, workspace_id, limit, after, q, states)`）。
+
+**游标的分层切面（A169③ 预裁的落地形态）**：`JobService.list_jobs` 收发的是**未编码**载荷
+`{"v":1,"q":<16hex>,"k":[created_at,id],"s":actor_id}`（与 `encode_cursor` 的入参同形状，键序也照抄），
+`query_digest` 由调用方按 §1 的公式算好传入；`encode_cursor` / `decode_cursor` / `canonical_json`
+的调用点**归 S4**。载荷的**绑定校验**（版本／查询摘要／actor／`k` 形状 → 400 `BAD_CURSOR`
+同一句 detail）留在本层：只有本层同时握有本次请求的 `limit` / `q` / `status` / `actor_id`。
+`CURSOR_VERSION` 与 `BAD_CURSOR_DETAIL` 直接 import `application/workspace_service.py` 的那一份，
+本层不写第二个版本号、不写第二句 detail（A169③「游标禁另发明」）。
+
+**留给 S4 的三件事**（S2c 一律未做，A91／A169④）：① `JobPage` 在 `api/common.py` append-only
+追加，`items` 由 `infra.db.repositories.job_from_row` 逐行映射（本层只交 `JobRecord`，
+一个转换器都没复制，`service.py` 里定义的函数**恰为** 8 个并已钉成守护）；② `str ↔ payload`
+的编解码与 `query_digest` 的计算；③ §6 给 `listJobs` 声明的 404 `RESOURCE_NOT_FOUND`
+（工作区不存在）—— A206 把 `JobService` 的构造面钉成只有 `store=`，`JobStore` 也没有工作区
+查读面，故这条 404 **无法由本层产生**，需 S4 在路由侧先核工作区，或由编排器另裁给
+`JobService` 加第二个注入项（后者要动 `deps.py:135`，超出 A207 的窄豁免）。
+
+**实测更正（R15-1 三处之外的第四处）**：`worker/*.py` 里 `worker → api` 的导入边在 HEAD 树上
+**实测有 6 条**（`deps.py:47`、`states.py:20`、`runner.py:30`、`errors.py:27`、`integrity.py:59`、
+`store.py:33`；AST 与 grep 两种口径一致），且 `worker/deps.py` 的模块 docstring 明写「import
+`infra`／`api`／`application` 都是**正向边，合法**」，`infra/db/repositories.py` 自己也 import
+`api.common` 取 DTO。故「worker 禁 import api」不是本仓既有的分层事实，`worker/__init__.py` 的
+红线 3 是**显式时钟**而非分层。S2c 仍按派单硬约束让 `service.py` 保持 **0 条** `→ api` 边
+（已钉成守护），但那 6 条既有边按 LANE-COMMON §6「判据必须能在未改动的 HEAD 树上成立」
+被冻结成**基线集合**而非清零；是否要把「worker → api」上提为全仓分层守护的通用一面，
+归编排器立 followup 统一收口。
