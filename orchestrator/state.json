@@ -1944,7 +1944,8 @@
     "dispatched_not_yet_returned_note_R17_S2b2": "2→1：lane S2b-2（M2-01 · Mendel · 01a1dc3f-4619-7492-8be3-0cb3078c3e8a · flash/medium（A234））已回执、已终裁 PASS、已入库（tag R17-landS2b2）⇒ 关账。lane S5（M0-04/S5 · Kierkegaard · flash · critical=true）已回执 DONE_WITH_GAP 但**尚未入库** ⇒ 依 R15 口径仍计 1，其入库提交后转 0。S2b-2 的并发槽在纯台账回填提交之后由 close_agent 显式释放（手册 §15.11）。",
     "dispatched_not_yet_returned_note_R17_S2b2BF": "维持 **1**：lane S2b-2 已入库（87c897a）且 sha 已回填、并发槽已由 close_agent 释放 ⇒ 关账；lane S5（M0-04/S5 · Kierkegaard · 01a1dc3e-86e5-73f3-8786-003d10ada510 · flash · critical=true）**已回执 DONE_WITH_GAP 但尚未入库** ⇒ 依 R15 口径计 1。其 4 件（tests/integration/jobs/ 下 conftest.py / test_state_machine.py / test_idempotency.py / test_jobs_api.py）此刻为未跟踪件，本提交仍以 untracked_owner_map 归属登记（A144(c)），归不上的未跟踪 in-scope 件即越界、run_commit 会回滚。",
     "dispatched_not_yet_returned_note_R17_S5": "1→0：lane S5（M0-04/S5 · Kierkegaard · 01a1dc3e-86e5-73f3-8786-003d10ada510 · flash/medium · critical=true · slack=0）已回执 DONE_WITH_GAP、已终裁 PASS（A239–A242）、已入库（tag R17-landS5）⇒ 关账。**Round 17 的两条 lane 至此全部落地**（S2b-2 @87c897a ＋ S5 @本提交），在飞计数归零；S5 的并发槽在纯台账回填提交之后由 close_agent 显式释放（手册 §15.11）。下一步派 Round 18（M0-04/S6 ∥ M2-01/S3）时，本键由 predispatch 提交置回 2（PRE-13：派单记录先于 spawn 入库）。",
-    "dispatched_not_yet_returned_note_R18": "0→2：Round 18 派出 lane **S6**（M0-04/S6 · flash/medium · critical=true · slack=0 · loop 2 · A243 重切后范围）与 lane **S3**（M2-01/S3 · flash/medium · A244 的 app.py ≤3 行豁免 · A245 的预期红 2 件归编排器同批迁移）。两条 lane 的写集实测**零交叉**（tests/integration/jobs/ 两件新建 vs api/activities.py＋api/app.py＋tests/api/activities/ 两件新建）⇒ 满足 N4，可并行。本键在 predispatch 提交内即置 2（PRE-13 要求派单上下文先入库），agent_id 由 spawn 之后的纯台账提交回填；若 spawn 失败，该提交必须把本键回退并如实登记失败（禁留假在飞计数）。**subtask_log 本批不动**（仍 45 条）⇒ flash_share 三项读数不变（tasks 0.5556 / dev 0.3438 / tokens 0.6655），两项护栏仍未达标，如实上报不粉饰、禁为凑配比降档（手册 §6.6）。"
+    "dispatched_not_yet_returned_note_R18": "0→2：Round 18 派出 lane **S6**（M0-04/S6 · flash/medium · critical=true · slack=0 · loop 2 · A243 重切后范围）与 lane **S3**（M2-01/S3 · flash/medium · A244 的 app.py ≤3 行豁免 · A245 的预期红 2 件归编排器同批迁移）。两条 lane 的写集实测**零交叉**（tests/integration/jobs/ 两件新建 vs api/activities.py＋api/app.py＋tests/api/activities/ 两件新建）⇒ 满足 N4，可并行。本键在 predispatch 提交内即置 2（PRE-13 要求派单上下文先入库），agent_id 由 spawn 之后的纯台账提交回填；若 spawn 失败，该提交必须把本键回退并如实登记失败（禁留假在飞计数）。**subtask_log 本批不动**（仍 45 条）⇒ flash_share 三项读数不变（tasks 0.5556 / dev 0.3438 / tokens 0.6655），两项护栏仍未达标，如实上报不粉饰、禁为凑配比降档（手册 §6.6）。",
+    "guardrail_note_R18_backfill": "本批（predispatch ＋ 本次回填）均为**纯台账／纯 md** 提交，subtask_log 未动（仍 45 条）⇒ flash_share 三项读数不变，程序化重算与台账逐字全等（units 30/54、dev lanes 11/32、tokens 792000/1190000）。**两项护栏仍均未达标**（flash_share_tasks 0.5556 < 0.60；flash_share_tokens 0.6655 > 0.35），如实上报不粉饰。Round 18 两条 lane 均 flash，回收后预计 tasks 32/56=0.5714、dev 13/34=0.3824（算术预测，非入账值），tokens 面无计量句柄故不动（A183）。**禁为凑配比降档或改写口径**（手册 §6.6）。"
   },
   "tasks": {
     "M0-01": {
@@ -7596,9 +7597,9 @@
         "slack": 0,
         "loop_cap": 2,
         "loop_rounds_used": 0,
-        "agent_id": null,
-        "nickname": null,
-        "status": "PREDISPATCH_COMMITTED_AWAITING_SPAWN",
+        "agent_id": "01a1dff2-a13f-7531-91c9-1eeccf61a928",
+        "nickname": "Lorentz",
+        "status": "IN_FLIGHT",
         "brief": "orchestrator/handoff/R18-lane-M0-04-S6.md",
         "brief_sha256_12": "4f15d3614700",
         "write_set": [
@@ -7614,7 +7615,11 @@
         "returned_at": null,
         "landing_commit": null,
         "landing_tag": null,
-        "slot_closed_at": null
+        "slot_closed_at": null,
+        "spawned_at": "2026-11-16T00:10:33+08:00",
+        "agent_id_backfilled_at": "2026-11-16T00:10:33+08:00",
+        "status_note_R18": "PREDISPATCH_COMMITTED_AWAITING_SPAWN -> **IN_FLIGHT**（spawn 成功）。**与 R17 约定的差异（如实登记）**：R17 的回填把 dispatched_at 覆盖为回填时刻；本批**保留** predispatch 提交里写下的 dispatched_at 原值（＝派单上下文入库时刻），另立新键 spawned_at 记录 spawn 时刻 —— 两个时刻语义不同，覆盖会丢失 PRE-13 第一步的实际时间（D-011 append-only 精神）。",
+        "mapping_verified_by": "按 spawn 调用顺序回填（第 1 个调用 = lane S6），与 mapping_basis 的预告一致；并以**磁盘写集面**二次验证为准（A216）：回收时对撞实际改动路径 —— tests/integration/jobs/ 下 2 件新建。若发现映射反了，以磁盘面为准并在台账如实登记自纠。"
       },
       {
         "lane": "S3",
@@ -7627,9 +7632,9 @@
         "slack": 4,
         "loop_cap": 2,
         "loop_rounds_used": 0,
-        "agent_id": null,
-        "nickname": null,
-        "status": "PREDISPATCH_COMMITTED_AWAITING_SPAWN",
+        "agent_id": "01a1dff3-0aed-7620-a0f8-6b3e08af0d77",
+        "nickname": "Nash",
+        "status": "IN_FLIGHT",
         "brief": "orchestrator/handoff/R18-lane-M2-01-S3.md",
         "brief_sha256_12": "67acfc97305e",
         "write_set": [
@@ -7647,7 +7652,11 @@
         "returned_at": null,
         "landing_commit": null,
         "landing_tag": null,
-        "slot_closed_at": null
+        "slot_closed_at": null,
+        "spawned_at": "2026-11-16T00:10:33+08:00",
+        "agent_id_backfilled_at": "2026-11-16T00:10:33+08:00",
+        "status_note_R18": "PREDISPATCH_COMMITTED_AWAITING_SPAWN -> **IN_FLIGHT**（spawn 成功）。**与 R17 约定的差异（如实登记）**：R17 的回填把 dispatched_at 覆盖为回填时刻；本批**保留** predispatch 提交里写下的 dispatched_at 原值（＝派单上下文入库时刻），另立新键 spawned_at 记录 spawn 时刻 —— 两个时刻语义不同，覆盖会丢失 PRE-13 第一步的实际时间（D-011 append-only 精神）。",
+        "mapping_verified_by": "按 spawn 调用顺序回填（第 2 个调用 = lane S3），与 mapping_basis 的预告一致；并以**磁盘写集面**二次验证为准（A216）：回收时对撞实际改动路径 —— api/activities.py 新建 ＋ api/app.py +3/-0 ＋ tests/api/activities/ 2 件新建。若发现映射反了，以磁盘面为准并在台账如实登记自纠。"
       }
     ],
     "dispatch_requirements": [
@@ -10530,10 +10539,10 @@
         "critical": true,
         "brief": "orchestrator/handoff/R18-lane-M0-04-S6.md",
         "brief_sha256_12": "4f15d3614700",
-        "agent_id": null,
-        "nickname": null,
-        "agent_id_backfilled_at": null,
-        "note": "关键路径（critical=true、slack=0）⇒ loop 上限 2（手册 15.6 第 1 条）。必携 tasks['M0-04'].s6_obligations_R17 的五条义务（派单文 §1/§2/§4/§5 已逐条落位）；**禁碰 api/app.py**（并行邻居 S3 的写集）。预期红清单为**空集**（派单文 §2.1，附实测依据）。 || PRE-13：本条随 predispatch 提交入库，agent_id / nickname 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch），禁写猜测值。"
+        "agent_id": "01a1dff2-a13f-7531-91c9-1eeccf61a928",
+        "nickname": "Lorentz",
+        "agent_id_backfilled_at": "2026-11-16T00:10:33+08:00",
+        "note": "关键路径（critical=true、slack=0）⇒ loop 上限 2（手册 15.6 第 1 条）。必携 tasks['M0-04'].s6_obligations_R17 的五条义务（派单文 §1/§2/§4/§5 已逐条落位）；**禁碰 api/app.py**（并行邻居 S3 的写集）。预期红清单为**空集**（派单文 §2.1，附实测依据）。 || PRE-13：本条随 predispatch 提交入库，agent_id / nickname 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch），禁写猜测值。 || 回填（R18-backfill-agentid）：agent_id=01a1dff2-a13f-7531-91c9-1eeccf61a928、nickname=Lorentz（Round 18 第 1 个 spawn 调用，与 mapping_basis 的顺序一致）。"
       },
       {
         "at": "2026-11-15T23:54:19+08:00",
@@ -10547,10 +10556,10 @@
         "critical": false,
         "brief": "orchestrator/handoff/R18-lane-M2-01-S3.md",
         "brief_sha256_12": "67acfc97305e",
-        "agent_id": null,
-        "nickname": null,
-        "agent_id_backfilled_at": null,
-        "note": "必携 s3_precondition_note_R17 的端到端 `is` 同一性判据义务（派单文 §1 原文引用 ＋ §4 V9）；预期红清单 **2 件**（E1 test_s3b_routes.py / E2 test_s2b2_app_injection.py G6），依 **A245** 由编排器在其入库提交内同批迁移，lane 禁改、只贴红原文。与 S4 互斥（同改 app.py，N4 禁双主写）⇒ S4 必须排在本棒入库之后。 || PRE-13：本条随 predispatch 提交入库，agent_id / nickname 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch），禁写猜测值。"
+        "agent_id": "01a1dff3-0aed-7620-a0f8-6b3e08af0d77",
+        "nickname": "Nash",
+        "agent_id_backfilled_at": "2026-11-16T00:10:33+08:00",
+        "note": "必携 s3_precondition_note_R17 的端到端 `is` 同一性判据义务（派单文 §1 原文引用 ＋ §4 V9）；预期红清单 **2 件**（E1 test_s3b_routes.py / E2 test_s2b2_app_injection.py G6），依 **A245** 由编排器在其入库提交内同批迁移，lane 禁改、只贴红原文。与 S4 互斥（同改 app.py，N4 禁双主写）⇒ S4 必须排在本棒入库之后。 || PRE-13：本条随 predispatch 提交入库，agent_id / nickname 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch），禁写猜测值。 || 回填（R18-backfill-agentid）：agent_id=01a1dff3-0aed-7620-a0f8-6b3e08af0d77、nickname=Nash（Round 18 第 2 个 spawn 调用，与 mapping_basis 的顺序一致）。"
       }
     ],
     "q_verify": {
@@ -18558,10 +18567,10 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": null,
-        "head_full": null,
+        "head": "bc8a52d",
+        "head_full": "bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0",
         "head_before": "1c591b4",
-        "head_note": "本提交（tag R18-predispatch）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_predispatch）；禁写猜测值。",
+        "head_note": "本提交（tag R18-predispatch）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_predispatch）；禁写猜测值。 || 回填（R18-backfill-agentid，2026-11-16T00:10:33+08:00）：sha = bc8a52d（全 bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0），parent = 1c591b4。读数 305/107/734（109 py + 196 md）已由 R18-predispatch 提交的**冻结索引树四门**实测背书（ruff_format / ruff_check / mypy / pytest_frozen 全 rc=0；frozen_pytest=713 ＋ git_env_ignores_collect=21 = 734）。",
         "ruff_formatted_files": 305,
         "mypy_source_files": 107,
         "pytest_passed": 734,
@@ -18828,8 +18837,8 @@
           "note": "R17-checkpoint（2ac9176）＋ R18-resume（1c591b4，纯台账：dag_paused=true→false、FU-57 关闭为 CLOSED_NOT_A_DEFECT、R18-1 自纠、PRE-23 新立、recovery_history 第 3 条）。R18-resume 的 step2 已在冻结索引树上三方对账通过（MEASURED==EXPECT==ledger==302/107/734、109py+193md）。"
         },
         {
-          "head": "THIS_COMMIT",
-          "head_full": null,
+          "head": "bc8a52d",
+          "head_full": "bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0",
           "head_before": "1c591b4",
           "head_note": "本提交（tag R18-predispatch）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_predispatch）；禁写猜测值。",
           "ruff_formatted_files": 305,
@@ -20603,9 +20612,9 @@
       "as_of_head_before": "1c591b4",
       "branch": "m0-framework",
       "baseline_at_dispatch": {
-        "head": null,
-        "head_full": null,
-        "head_note": "本提交（tag R18-predispatch）的 sha 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch）；禁写猜测值。其 parent = 1c591b4。",
+        "head": "bc8a52d",
+        "head_full": "bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0",
+        "head_note": "本提交（tag R18-predispatch）的 sha 由 spawn 之后的纯台账提交回填（resume.commit_backfill_pending_R18_predispatch）；禁写猜测值。其 parent = 1c591b4。 || 回填（R18-backfill-agentid）：sha = bc8a52d（全 bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0）。",
         "head_before": "1c591b4",
         "ruff_formatted_files": 305,
         "mypy_source_files": 107,
@@ -20713,11 +20722,12 @@
         "resume.in_flight_agents[-2:].agent_id/.nickname <- spawn 返回值（同上顺序，并以磁盘写集面二次验证）",
         "本键 .status PENDING->DONE ＋ .backfilled_at/.backfilled_commit/.backfill_detail"
       ],
-      "status": "PENDING",
-      "backfilled_at": null,
-      "backfilled_commit": null,
-      "backfill_detail": null
-    }
+      "status": "DONE",
+      "backfilled_at": "2026-11-16T00:10:33+08:00",
+      "backfilled_commit": "bc8a52d",
+      "backfill_detail": "六类目标已核销（回填前逐条断言为 None / 'THIS_COMMIT' / PENDING，禁重复写入、禁写猜测值）：① baseline_authoritative.current.head/.head_full <- bc8a52d（全 bc8a52dc3b263a53a02bfb13956f9b6e3f13abd0）；② baseline_authoritative.history[-1].head（'THIS_COMMIT'）/.head_full <- bc8a52d；③ round18_predispatch.baseline_at_dispatch.head/.head_full <- bc8a52d；④ dispatch_log[-2:] 的 agent_id/nickname/agent_id_backfilled_at <- S6=01a1dff2-a13f-7531-91c9-1eeccf61a928/Lorentz、S3=01a1dff3-0aed-7620-a0f8-6b3e08af0d77/Nash；⑤ in_flight_agents[-2:] 同上，status PREDISPATCH_COMMITTED_AWAITING_SPAWN -> IN_FLIGHT，新增 spawned_at / status_note_R18 / mapping_verified_by；⑥ 本键 status PENDING -> DONE。两条 lane 均 spawn 成功，**无 SPAWN_FAILED**，故 budget.dispatched_not_yet_returned 维持 2（无需回退）。"
+    },
+    "in_flight_agents_note_round18": "Round 18 两条 lane 于 2026-11-16T00:10:33+08:00 完成 spawn 并回填 agent_id，status = IN_FLIGHT，在飞计数 2（并发 3 槽占 2，第 3 槽刻意留白，理由见 round18_predispatch.slot_note）。写集实测零交叉 ⇒ 满足 N4，可并行；互为 IN_FLIGHT_CONTAMINATION，双方均禁改／禁 add／禁 checkout／禁 clean-reset-stash 对方写集（PRE-11 / A161）。编排器在本提交（R18-backfill-agentid）期间以 untracked_owner_map 按**逐件精确路径**归属未跟踪件（A144(c)）：S6/Lorentz = ['tests/integration/jobs/test_lease.py', 'tests/integration/jobs/test_artifact.py']；S3/Nash = ['src/campaignlab/api/activities.py', 'src/campaignlab/api/app.py', 'tests/api/activities/__init__.py', 'tests/api/activities/test_activities_router_s3.py']；归不上的即越界，run_commit 回滚拒绝提交。本提交仍走 run_commit 的**冻结索引树四门**（索引此刻只含 orchestrator/state.json，在飞 lane 的未跟踪件不入冻结树），并带 expect_counts 逐条对账 305/107/734（109 py + 196 md），不符即回滚。"
   },
   "acceptance": {
     "baseline_total": 35,
