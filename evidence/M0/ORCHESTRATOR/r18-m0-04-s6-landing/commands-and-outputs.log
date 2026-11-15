@@ -1,0 +1,401 @@
+# R18 · M0-04/S6 入库取证 —— 命令原文与输出（编排器实测，禁采信自报）
+# 组装时点：2026-11-16T02:39:17+08:00
+# 入库前 HEAD：4b9150c　分支：m0-framework　tag：R18-landS6
+# 口径：一切读数由编排器独立实测（rule_no_trust_handoff_summary_assertions）；入库四门跑在**冻结索引树**上（R11-3 ＋ D-046 的 frozen_env 导入隔离，工装 scripts/orch_harness.py）。
+# 本文件由 .orch_tmp 下**已留档的真实捕获输出**逐段拼接而成，禁重打字（保证取证原文与实际执行不脱钩）。
+# 解释器口径：uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1 / PRE-21）。
+# 本批特别说明：编排器初稿曾把 lane 自报的 V1=14 / V2=19 误判为「自报失真」。§3 / §4 为本误判的**回源实证**，结论是 lane **无失真**，误判源于编排器探针的口径缺陷 ⇒ 立自纠 R18-8 ＋ PRE-29。
+
+##############################################################################
+# §1 编排器独立复验主证据（S6 交付面 / 保护面 / V1–V11 / 全量 pytest / PC-5 复放 / 悬空引用）
+# 来源捕获件：.orch_tmp/r18_v_s6b.out（10202 B / sha256[:12]=f608b2ad41eb，逐字原样转贴，零改写）
+# 编排器按语：
+# 注意：本捕获件 §4 打印的 `V1 lease ... want=14 **MISMATCH**` 与 `V2 artifact ... want=19 **MISMATCH**`
+#       是**编排器探针脚本自身的口径缺陷**（r18_v_s6.py:108 把派单文的「目录关键字过滤」期望值
+#       want=14/19 与「按单文件路径」收集口径配对），**不是 lane 交付面的不符**。
+#       该缺陷已由 §3 / §4 两段的实证复跑推翻并更正（见 00-index.md §3bis 与台账 R18-8 / PRE-29）。
+#       本段按「不重写历史」原则**逐字原样保留**，包括那两行错误的 MISMATCH。
+##############################################################################
+
+
+==============================================================================
+§0 取证时点 2026-11-16T02:11:39+08:00 · git 面
+==============================================================================
+$ git rev-parse --short HEAD
+  rc=0
+  | 4b9150c
+$ git status --porcelain -uall
+  rc=0
+  | ?? tests/integration/jobs/test_artifact.py
+  | ?? tests/integration/jobs/test_lease.py
+V7 numstat HEAD（S3 已入库 ⇒ 预期**空**）:
+$ git diff --numstat HEAD
+  rc=0
+  numstat 为空: True
+
+==============================================================================
+§1 交付面逐件字节实测（编排器口径 lines=len(text.split('\n'))）
+==============================================================================
+  tests/integration/jobs/test_lease.py: {'lines': 477, 'bytes': 20778, 'sha256_12': '112b149f1b12', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  tests/integration/jobs/test_artifact.py: {'lines': 114, 'bytes': 4924, 'sha256_12': '1d65896e618a', 'crlf': 0, 'bom': False, 'ends_nl': True}
+
+==============================================================================
+§2 保护面 9 件 sha 对撞（路径由 git ls-files 解析）
+==============================================================================
+  tests/api/conftest.py: 2df41d5585dd  **MISMATCH** want=90ba7b17b115
+  tests/integration/bootstrap/conftest.py: 4cf68d885b68  **MISMATCH** want=90ba7b17b115
+  tests/integration/jobs/conftest.py: 90ba7b17b115  OK
+  tests/integration/jobs/test_state_machine.py: 39e6c8423b1a  OK
+  tests/integration/jobs/test_idempotency.py: 69a69d80abeb  OK
+  tests/integration/jobs/test_jobs_api.py: 64a157a2f176  OK
+  tests/integration/jobs/test_artifact_write.py: ffce1792d82f  OK
+  tests/integration/jobs/test_worker_deps.py: 69234fb4f35d  OK
+  tests/integration/jobs/test_jobs_router_s4.py: c3110b40b71d  OK
+  tests/unit/test_jobs_conftest_no_autouse.py: 0f37d540f63a  OK
+  另：tests/integration/jobs/__init__.py 期望 056664ce00b3 -> 056664ce00b3
+
+==============================================================================
+§3 S3 已入库面 sha 对撞（lane S6 禁触碰）
+==============================================================================
+  src/campaignlab/api/activities.py: 887bd377a4f7  OK
+  src/campaignlab/api/app.py: 76fcb0778f64  OK
+  tests/api/activities/__init__.py: 8ccc54fe0ab9  OK
+  tests/api/activities/test_activities_router_s3.py: e4d1d145cca5  OK
+  tests/unit/test_s3b_routes.py: ae4416aeabbf  OK
+  tests/unit/test_s2b2_app_injection.py: 8902dff88058  OK
+
+==============================================================================
+§4 V1/V2/V3/V4 —— collected 实取
+==============================================================================
+  V1 lease: rc=0 collected=9 want=14 **MISMATCH**  ['9 tests collected in 0.04s']
+  V2 artifact: rc=0 collected=1 want=19 **MISMATCH**  ['1 test collected in 0.01s']
+  V3 dir: rc=0 collected=98 want=98 OK  ['98 tests collected in 0.04s']
+  V4 state_machine: rc=0 collected=13 want=13 OK  ['13 tests collected in 0.02s']
+
+==============================================================================
+§5 目标新例的存在性与断言面（U-1 终裁：可满足真残差，禁 issues[0]['retryable']）
+==============================================================================
+  目标例存在: True
+  lease 内 test_ 函数数: 6
+  禁用形态 issues[0]["retryable"] 命中数: 1
+  def 位置 :207
+    213:     """中断作业的 Problem 形状残差 ＋ 行级 retryable。既有覆盖：集成层 T7
+    215:     ``reaped.cancelled == 0`` / ``lease_until`` 清空 / ``problem["code"] == "INTERNAL_ERROR"``
+    216:     / ``issues[0]["code"] == "JOB_INTERRUPTED"`` 六项——状态与 code / issues[0].code 由 T7
+    217:     覆盖，本例只补形状残差与行级 retryable，不重复断言那六项。
+    219:     本例残差断言（U-1 终裁版）：``problem["status"] == 500``；``problem["code"] !=
+    220:     JOB_INTERRUPTED``（N7③，标签常量 import 自 ``worker.errors``，禁自造字符串）；行级
+    221:     ``record.retryable is True``（经 ``get_job`` 读行，``retryable`` 的真实落点是 jobs 行，
+    223:     ``issues[0]["retryable"]``——该键在契约 ``extra="forbid"`` 下不可能存在。时间流逝
+    236:     assert record is not None
+    237:     assert record.retryable is True
+    238:     assert record.problem_json is not None
+    240:     assert problem["status"] == 500
+    241:     assert problem["code"] != JOB_INTERRUPTED
+  JOB_INTERRUPTED 是否以 import 常量出现: True
+  import 行: ['``problem["status"] == 500``、``problem["code"] != JOB_INTERRUPTED``（标签用 import 常量）、', 'from campaignlab.worker.errors import JOB_INTERRUPTED, LeaseLost', '    JOB_INTERRUPTED``（N7③，标签常量 import 自 ``worker.errors``，禁自造字符串）；行级']
+
+==============================================================================
+§6 V8 红线扫描（lease + artifact）
+==============================================================================
+  HIT tests/integration/jobs/test_lease.py:53 [INSERT ] "INSERT INTO workspaces(id, name, source_class, authorization_note, revision,"
+  HIT tests/integration/jobs/test_lease.py:109 [SELECT ] "SELECT COUNT(*) FROM audit WHERE workspace_id = ?", (workspace_id,)
+  HIT tests/integration/jobs/test_artifact.py:42 [INSERT ] "INSERT INTO workspaces(id, name, source_class, authorization_note, revision,"
+  红线命中总数: 3
+
+==============================================================================
+§7 V10 时钟使用面（AST：必须 fixed_clock/advance_clock 驱动，0 处系统时间）
+==============================================================================
+  tests/integration/jobs/test_lease.py: clock-ish=['FixedClock', 'advance_clock', 'clock', 'fixed_clock']  禁用读数=['now']
+  tests/integration/jobs/test_artifact.py: clock-ish=['FixedClock', 'fixed_clock']  禁用读数=['now']
+
+==============================================================================
+§8 V6 质量门（工作树快照）
+==============================================================================
+$ uv run --no-sync ruff check .
+  rc=0
+  | All checks passed!
+$ uv run --no-sync ruff format --check .
+  rc=0
+  | 313 files already formatted
+$ uv run --no-sync mypy
+  rc=0
+  | Success: no issues found in 112 source files
+
+==============================================================================
+§9 V5 全量 pytest —— **关键**：D-051 已随 3422621 入库 ⇒ 预期 0 failed（U-4 应已消除）
+==============================================================================
+$ uv run --no-sync pytest -q
+  rc=0
+  | tests/unit/test_s3d_application.py::test_process_restart_invalidates_session_via_new_app_instance
+  | tests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail
+  | tests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/starlette/testclient.py:518: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+  |     return super().request(
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | 748 passed, 6 warnings in 161.15s (0:02:41)
+  FULL rc: 0 | ['748 passed, 6 warnings in 161.15s (0:02:41)']
+  ledger 哨兵单跑:
+$ uv run --no-sync pytest -q tests/unit/test_state_ledger.py::test_every_md_on_disk_has_ledger_entry
+  rc=0
+  | .                                                                        [100%]
+  | 1 passed in 0.03s
+
+==============================================================================
+§10 PC-5 复放（编排器自办：证明 U-1 终裁版判据**有牙**）
+==============================================================================
+  [0] 复原基准 sha=112b149f1b12 bytes=20778
+  [1] 目标断言原文出现次数 = 1
+  [2] 变异态 sha=8441748853db（!= 基准 112b149f1b12）
+  [3] AST 生效证明（存在 `record.retryable is False` 比较节点）: True
+$ uv run --no-sync pytest -q tests/integration/jobs/test_lease.py
+  rc=1
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | =========================== short test summary info ============================
+  | FAILED tests/integration/jobs/test_lease.py::test_interrupted_job_marked_job_interrupted
+  | 1 failed, 8 passed, 1 warning in 5.79s
+  [4] 判据 rc=1  => **必须为 1（判红）才算有牙**
+     红原文 | >       assert record.retryable is False
+     红原文 | E       assert True is False
+  [5] 逐字节复原 sha=112b149f1b12 == 基准 112b149f1b12 : True
+$ uv run --no-sync pytest -q tests/integration/jobs/test_lease.py
+  rc=0
+  | .........                                                                [100%]
+  | =============================== warnings summary ===============================
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | 9 passed, 1 warning in 6.04s
+  [6] 复原后 rc=0（应为 0）
+
+==============================================================================
+§11 悬空引用实扫（本批预计 add：2 py + 3 取证件）
+==============================================================================
+  dangling(2 py): []
+
+S6_VERIFY_DONE 2026-11-16T02:11:39+08:00
+RC=0
+
+##############################################################################
+# §2 三个疑点的只读澄清探针（per-file collected 真值 / 断言面 / 时钟面）
+# 来源捕获件：.orch_tmp/r18_s6_clarify.out（6650 B / sha256[:12]=1c7a8df2a87c，逐字原样转贴，零改写）
+##############################################################################
+
+==============================================================================
+疑点 1：per-file collected 的真值，以及 lane 自报 14/19 的可能成因
+==============================================================================
+
+tests/integration/jobs/test_lease.py: rc=0
+  summary line: ['9 tests collected in 0.02s']
+  test-id lines: 9
+     test_two_claimers_only_one_wins
+     test_expired_lease_token_commit_rejected
+     test_interrupted_job_marked_job_interrupted
+     test_cancel_vs_complete_first_commit_wins[CVC-a-cancel-first]
+     test_cancel_vs_complete_first_commit_wins[CVC-b-complete-first]
+     test_renew_extends_lease_by_30s
+     test_terminal_state_is_immutable[T-IMM-SUCCEEDED]
+     test_terminal_state_is_immutable[T-IMM-FAILED]
+     test_terminal_state_is_immutable[T-IMM-CANCELLED]
+
+tests/integration/jobs/test_artifact.py: rc=0
+  summary line: ['1 test collected in 0.01s']
+  test-id lines: 1
+     test_verify_artifact_index_detects_missing_file
+
+-- 假设检验：glob 'test_artifact*.py' 会不会得到 19？ --
+  artifact + artifact_write: ['14 tests collected in 0.01s']
+
+-- 目录内逐件 collected（求和必须 == 98） --
+    1  tests/integration/jobs/test_artifact.py
+   13  tests/integration/jobs/test_artifact_write.py
+    3  tests/integration/jobs/test_idempotency.py
+    7  tests/integration/jobs/test_jobs_api.py
+   34  tests/integration/jobs/test_jobs_router_s4.py
+    9  tests/integration/jobs/test_lease.py
+   13  tests/integration/jobs/test_state_machine.py
+   18  tests/integration/jobs/test_worker_deps.py
+  SUM = 98  summary: ['98 tests collected in 0.06s']
+
+==============================================================================
+疑点 2：AST 扫到的 'now' 究竟是 clock.now() 还是 datetime.now()
+==============================================================================
+  tests/integration/jobs/test_lease.py:184  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:232  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:233  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:69  clock.now
+  tests/integration/jobs/test_lease.py:136  fixed_clock.now
+  tests/integration/jobs/test_lease.py:137  fixed_clock.now
+  tests/integration/jobs/test_lease.py:178  fixed_clock.now
+  tests/integration/jobs/test_lease.py:187  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:199  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:202  Name 'now' -> now
+  tests/integration/jobs/test_lease.py:230  fixed_clock.now
+  tests/integration/jobs/test_lease.py:273  fixed_clock.now
+  tests/integration/jobs/test_lease.py:357  fixed_clock.now
+  tests/integration/jobs/test_lease.py:399  fixed_clock.now
+  tests/integration/jobs/test_lease.py:430  fixed_clock.now
+  tests/integration/jobs/test_lease.py:133  fixed_clock.now
+  tests/integration/jobs/test_lease.py:176  fixed_clock.now
+  tests/integration/jobs/test_lease.py:228  fixed_clock.now
+  tests/integration/jobs/test_lease.py:271  fixed_clock.now
+  tests/integration/jobs/test_lease.py:286  fixed_clock.now
+  tests/integration/jobs/test_lease.py:295  fixed_clock.now
+  tests/integration/jobs/test_lease.py:311  fixed_clock.now
+  tests/integration/jobs/test_lease.py:355  fixed_clock.now
+  tests/integration/jobs/test_lease.py:397  fixed_clock.now
+  tests/integration/jobs/test_lease.py:405  fixed_clock.now
+  tests/integration/jobs/test_lease.py:305  fixed_clock.now
+  tests/integration/jobs/test_lease.py:320  fixed_clock.now
+  tests/integration/jobs/test_lease.py:331  fixed_clock.now
+  tests/integration/jobs/test_lease.py:408  fixed_clock.now
+  tests/integration/jobs/test_lease.py:416  fixed_clock.now
+  tests/integration/jobs/test_lease.py:421  fixed_clock.now
+  tests/integration/jobs/test_lease.py:438  fixed_clock.now
+  tests/integration/jobs/test_lease.py:441  fixed_clock.now
+  tests/integration/jobs/test_lease.py:448  fixed_clock.now
+  tests/integration/jobs/test_lease.py:456  fixed_clock.now
+  tests/integration/jobs/test_lease.py: 文本 'datetime.now' 命中 0 / 'utcnow' 0 / 'time.time(' 0 / 'monotonic' 0 / 'time.sleep' 0 / 'asyncio.sleep' 0 / '# type: ignore' 0
+  tests/integration/jobs/test_artifact.py:76  fixed_clock.now
+  tests/integration/jobs/test_artifact.py:79  fixed_clock.now
+  tests/integration/jobs/test_artifact.py:89  fixed_clock.now
+  tests/integration/jobs/test_artifact.py:70  fixed_clock.now
+  tests/integration/jobs/test_artifact.py: 文本 'datetime.now' 命中 0 / 'utcnow' 0 / 'time.time(' 0 / 'monotonic' 0 / 'time.sleep' 0 / 'asyncio.sleep' 0 / '# type: ignore' 0
+
+==============================================================================
+疑点 3：INSERT/SELECT 是否属该层的合法形态（既有已入库同目录件同样含 SQL？）
+==============================================================================
+  tests/integration/jobs/conftest.py (tracked=True): INSERT=0 SELECT=0 UPDATE=0
+  tests/integration/jobs/test_state_machine.py (tracked=True): INSERT=1 SELECT=0 UPDATE=0
+  tests/integration/jobs/test_idempotency.py (tracked=True): INSERT=1 SELECT=0 UPDATE=0
+  tests/integration/jobs/test_jobs_api.py (tracked=True): INSERT=1 SELECT=0 UPDATE=0
+  tests/integration/jobs/test_artifact_write.py (tracked=True): INSERT=3 SELECT=4 UPDATE=0
+  tests/integration/jobs/test_worker_deps.py (tracked=True): INSERT=1 SELECT=2 UPDATE=1
+  tests/integration/jobs/test_jobs_router_s4.py (tracked=True): INSERT=1 SELECT=1 UPDATE=2
+
+==============================================================================
+疑点 3b：src/** 里是否被这两件污染（禁 SQL 上行到 src）—— 只确认这两件不在 src 下
+==============================================================================
+  两件均在 tests/integration/jobs/ 下（集成测试层，直连 sqlite 建 fixture 属既有先例）
+
+==============================================================================
+补充：lease 的 6 个 test_ 函数与参数化展开
+==============================================================================
+  test_two_claimers_only_one_wins  decorators=[]
+  test_expired_lease_token_commit_rejected  decorators=[]
+  test_interrupted_job_marked_job_interrupted  decorators=[]
+  test_cancel_vs_complete_first_commit_wins  decorators=["pytest.mark.parametrize('direction', ['cancel-first', 'complete-first'], ids=['CVC-a-cancel-first', 'CVC-b-complete-first'])"]
+  test_renew_extends_lease_by_30s  decorators=[]
+  test_terminal_state_is_immutable  decorators=["pytest.mark.parametrize('scenario', ['terminal-SUCCEEDED', 'terminal-FAILED', 'terminal-CANCELLED'], ids=['T-IMM-SUCCEEDED', 'T-IMM-FAILED', 'T-IMM-CANCELLED'])"]
+RC=0
+
+##############################################################################
+# §3 **口径回源实证**：按派单文 §4 逐字命令复跑 V1/V2（目录关键字过滤），并按文件分解命中
+# 来源捕获件：.orch_tmp/r18_kprobe.out（1987 B / sha256[:12]=3cf18827aec9，逐字原样转贴，零改写）
+# 编排器按语：
+# 本段是推翻 §1 内 MISMATCH 误判的**主证据**：-k lease = 14/98、-k artifact = 19/98，
+#       与 lane 自报逐字相符；per-file 口径为 9 / 1（两者并不矛盾，可精确闭合）。
+##############################################################################
+
+=== [1] collect-only -k lease (directory tests/integration/jobs) ===
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+14/98 tests collected (84 deselected) in 0.05s
+
+=== [2] collect-only -k artifact ===
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+19/98 tests collected (79 deselected) in 0.04s
+
+=== [3] per-file test_lease.py collected ===
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 tests collected in 0.01s
+
+=== [4] per-file test_artifact.py collected ===
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 test collected in 0.01s
+
+=== [5] HEAD-version baseline (git stash of untracked not needed; use git show) ===
+--- pre-existing files in dir (tracked at HEAD) ---
+8
+tests/integration/jobs/__init__.py
+tests/integration/jobs/conftest.py
+tests/integration/jobs/test_artifact_write.py
+tests/integration/jobs/test_idempotency.py
+tests/integration/jobs/test_jobs_api.py
+tests/integration/jobs/test_jobs_router_s4.py
+tests/integration/jobs/test_state_machine.py
+tests/integration/jobs/test_worker_deps.py
+
+=== [6] which files match -k lease ===
+      9 tests/integration/jobs/test_lease.py
+      5 tests/integration/jobs/test_state_machine.py
+
+=== [7] which files match -k artifact ===
+      1 tests/integration/jobs/test_artifact.py
+     13 tests/integration/jobs/test_artifact_write.py
+      5 tests/integration/jobs/test_worker_deps.py
+
+##############################################################################
+# §4 **口径回源**：派单文原文取证（V1/V2 的逐字命令与期望值）＋ 派单文自身指纹
+# 来源捕获件：.orch_tmp/r18_brief_v1v2.out（5920 B / sha256[:12]=bcfb07974fa8，逐字原样转贴，零改写）
+# 编排器按语：
+# 派单文 orchestrator/handoff/R18-lane-M0-04-S6.md：248(wc -l)/249(split) 行、26367 B、
+#       sha256[:12]=4f15d3614700、sha1=1f52c7293f7e2f767a79ea3f2f8d5e2827196205。
+#       第 115/116 行逐字给出 V1/V2 的命令与期望（≥11 / ≥19），证明二者本就是目录过滤口径。
+##############################################################################
+
+=== brief sha/size ===
+  248 26367 orchestrator/handoff/R18-lane-M0-04-S6.md
+1f52c7293f7e2f767a79ea3f2f8d5e2827196205  orchestrator/handoff/R18-lane-M0-04-S6.md
+
+=== V1 / V2 / V3 / V4 / V10 lines verbatim (with line numbers) ===
+232:V1_lease: rc=<>, collected=<>
+233:V2_artifact: rc=<>, collected=<>
+234:V3_dir: rc=<>, collected=<>
+235:V4_state_machine: rc=<>, collected=<>
+241:V10_clock_usage: <每例用的 fixture 名>
+
+=== context: the verification-command block containing -k lease ===
+83-### 3.A `test_lease.py` 的 6 名（全部落地；每例只断言「残差」列，禁重复既有断言）
+84-
+85-| # | 函数名（逐字） | 既有覆盖（实测 file::test / 行号） | **本棒必须断言的残差** |
+86-|---|---|---|---|
+87:| 1 | `test_two_claimers_only_one_wins` | **仅单元层** `tests/unit/test_job_repository_terminal.py:361`；集成层 `-k lease` 现选中的 5 例（T3×2/T4/T5/T7）**无一**涉及双认领 | 在 `migrated_job_db` 上只留一条 QUEUED，两个认领者先后 `claim_next` ⇒ **恰一个** `claimed is True`；另一个 `claimed is False` 且 DB 侧该行 `state=='RUNNING'`、`attempt==1`、只有一个 lease_token。若 `Claim.contended`（实测字段存在）在你构造的串行争用下恒为 `False`，**如实报 U 并说明语义**，禁为过测改期望 |
+88-| 2 | `test_expired_lease_token_commit_rejected` | 集成层 T5 尾部（`test_state_machine.py:290-293`）只覆盖「**终态后**同租约再 `succeed` → `LeaseLost`」；T3 反路只覆盖「`attempt=99` 陈旧身份 `renew` → `renewed is False`」。单元层 `tests/unit/test_worker_runner.py:440` 是 runner 级 | **过期**（非终态）路径：`claim_next` → `advance_clock(31)`（> `LEASE_TTL_SECONDS`）→ `pytest.raises(LeaseLost)` 于 `succeed(...)`；并断言 DB 侧该行**仍为 `RUNNING`**、`lease_until` 未被改写；再以 token/attempt 不匹配的 `Lease` 调 `fail(...)` 同样 `LeaseLost` |
+89-| 3 | `test_interrupted_job_marked_job_interrupted` | **集成层已覆盖大部分**：T7（`test_state_machine.py:342-383`）已断言 `FAILED` / `reaped.interrupted==1` / `reaped.cancelled==0` / `lease_until` 清空 / `problem["code"]=="INTERNAL_ERROR"` / `problem["issues"][0]["code"]=="JOB_INTERRUPTED"` | **窄残差**（T7 未断言的字段，A88④ 的完整 Problem 形状）：`problem["status"]==500`、`problem["issues"][0]["retryable"] is True`、且 `problem["code"] != "JOB_INTERRUPTED"`（N7③：`JOB_INTERRUPTED` 禁提升为 `Problem.code`）。**禁**重复断言 T7 已钉的 6 项；在 docstring 里注明「状态与 code/issues[0].code 由 T7 覆盖，本例只补形状残差」 |
+90-| 4 | `test_cancel_vs_complete_first_commit_wins` | **仅单元层** `tests/unit/test_worker_runner.py:712 test_cancel_then_complete_first_committer_wins`；集成层 T4 只到 `CANCEL_REQUESTED`、T8 只做 executor confirm / expiry reap，**无争用** | 集成层双向：(a) `request_cancel` 后执行者 `succeed` ⇒ 断言**先提交者定终态**（按 store 的真实守卫 `state IN ('RUNNING','CANCEL_REQUESTED')` 断言实际终态，并把 `revision` 的递增值与审计行数一并钉住）；(b) `succeed` 之后 `confirm_cancel` ⇒ 断言终态**不变**、第二次写被拒（`LeaseLost` 或 `rowcount==0`，以实测为准）。两向的真实语义若与卡片「取消/完成只有一个终态」表述有出入，**报 U**，禁自行发明 |
+91-| 5 | `test_renew_extends_lease_by_30s` | T3 正路（`test_state_machine.py:178-187`）只断言 `after[3] > before[3]` 与 `not is_expired(...)`，**未断言延长量** | **窄残差**：断言新 `lease_until` **恰等于** `now + LEASE_TTL_SECONDS`（`from campaignlab.worker.leases import LEASE_TTL_SECONDS`）。**禁写字面量 `30`**（`worker/leases.py:37` 注释原文「禁在此另写 30」；D-012 / D-014 禁写死）。函数名里的 `30s` 只是规格值（实测 `application/worker.py:47 WORKER_LEASE_SECONDS: Final = 30`，`LEASE_TTL_SECONDS` 是其 re-export） |
+--
+111-## §4 判据（回收时编排器**逐条独立复验**，禁采信你的自报）
+112-
+113-| 判据 | 命令（逐字） | 期望 |
+114-|---|---|---|
+115:| V1 租约门 | `uv run --no-sync pytest -q tests/integration/jobs -k lease` | rc=0；collected **≥11**（现值 **5** ＋ 你新增 **6**；若你参数化则更多，须在回执报出实数） |
+116-| V2 制品门 | `uv run --no-sync pytest -q tests/integration/jobs -k artifact` | rc=0；collected **≥19**（现值 **18** ＋ 新增 **1**） |
+117-| V3 目录面 | `uv run --no-sync pytest -q tests/integration/jobs` | rc=0；collected **≥95**（现值 **88** ＋ 新增 **7**） |
+118-| V4 状态机门未回归 | `uv run --no-sync pytest -q tests/integration/jobs -k state_machine` | rc=0；collected **13**（现值，禁变） |
+119-| V5 全量 | `uv run --no-sync pytest -q` | rc=0；passed **≥741**（现值 734 ＋ 新增 7；口径＝冻结树实跑 ＋ GIT_ENV_IGNORES 静态 21） |
+--
+143-
+144-```
+145-python3 -c "import hashlib,pathlib;[print(p, pathlib.Path(p).stat().st_size, hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()[:12]) for p in ['tests/integration/jobs/conftest.py','tests/integration/jobs/test_state_machine.py','tests/integration/jobs/test_idempotency.py','tests/integration/jobs/test_jobs_api.py','tests/integration/jobs/__init__.py','tests/integration/jobs/test_artifact_write.py','tests/integration/jobs/test_worker_deps.py','tests/integration/jobs/test_jobs_router_s4.py','tests/unit/test_jobs_conftest_no_autouse.py']]"
+146-uv run --no-sync pytest --collect-only -q tests/integration/jobs | tail -2
+147:uv run --no-sync pytest --collect-only -q tests/integration/jobs -k lease | tail -2
+148-uv run --no-sync pytest --collect-only -q tests/integration/jobs -k artifact | tail -2
+149-```
+150-
+151-符号面（AST 实取，**枚举/计数类断言一律以此为准**，PRE-20）：
