@@ -1,0 +1,394 @@
+################################################################################
+# R18 · M0-04/S8 入库批 —— 编排器复验的命令原文与完整输出（逐字，禁重打、禁删改；D-011）
+# 采集时点：2026-11-16T04:20:19+08:00   仓库根：/home/szf/dev/CampaignLab   分支：m0-framework
+# 说明：本文件按**时间顺序**保留全部脚本输出，包括 §1 的 4 条**假 FAIL**（编排器探针字段路径错，
+#       已由 R18-9 / PRE-30 纠正）。错误原文**逐字保留不删改**，与 R18-8 的处置同口径。
+################################################################################
+
+==================================================================================
+§1 【保留的错误原文】初版回填复验探针 .orch_tmp/r18_vbf_s8.py —— 假 FAIL 逐条
+   根因：按想象的键名写断言（resume.in_flight / resume.s8_predispatch_R18 /
+         counts.in_scope_py 顶层 / budget.* 误读为 resume.* / commands.md 必须不存在），
+         未先实测台账真实结构。当次运行打印 OVERALL: RED（假红）。
+   命令：uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/r18_vbf_s8.py
+==================================================================================
+[PASS] T dispatch_log[-1].agent_id -> '01a1e0b9-916a-7ac0-9318-e10f8be00768'
+[PASS] T dispatch_log[-1].nickname -> 'Planck'
+[FAIL] dispatch_log[-1].commit -> None                # 假 FAIL：该条目的 sha 由 tasks[M0-04].s8_predispatch_R18.commit 承载
+[FAIL] in_flight S8 count==1 -> 0                     # 假 FAIL：真键名 resume.in_flight_agents，非 resume.in_flight
+[FAIL] commit_backfill_pending state==DONE -> None    # 假 FAIL：真键名 .status（值确为 DONE），非 .state
+[FAIL] s8_predispatch_R18.commit -> None              # 假 FAIL：真位 tasks['M0-04'].s8_predispatch_R18，非 resume.*
+[FAIL] s8_predispatch_R18.agent_id -> None            # 假 FAIL：同上
+[FAIL] tasks[M0-04].baseline.head -> None             # 假 FAIL：该卡无 baseline 键；基线在 resume.baseline_authoritative
+[FAIL] state.json has no PENDING_BACKFILL_AFTER_SPAWN anywhere -> 2
+                                                      # 假 FAIL：2 处命中在 .why 与 .backfill_note 的**散文留痕**内（描述哨兵约定），
+                                                      #          非待回填值；该键 .status 实测已为 DONE
+[FAIL] counts unchanged -> {'pytest_passed': 748, 'mypy_source_files': 112, 'ruff_formatted_files': 317, 'in_scope_py': null, 'in_scope_md': null}
+                                                      # 假 FAIL：in_scope_* 真位在 counts.ruff_formatted_files_composition 下 = 114 / 203
+[FAIL] dispatched_not_yet_returned 保持 1 -> None     # 假 FAIL：真位 budget.dispatched_not_yet_returned，实测 = 1（与承诺一致）
+[FAIL] subtask_log 保持 47 条 -> 0                    # 假 FAIL：真位 budget.subtask_log，实测 = 47（与承诺一致）
+flash_share: {}                                       # 假空：真位 budget.flash_share_tasks / _dev_lanes / _tokens / _detail
+OVERALL: RED   <-- 假红；纠正后为 GREEN（见 §2）
+
+==================================================================================
+§2 【纠正后】按真路径复验 6 类回填目标 .orch_tmp/r18_vbf_s8c.py
+   命令：uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/r18_vbf_s8c.py
+   注：其中 T4 两条 FAIL 亦是探针预期错 —— baseline_authoritative.current.head 的正确口径是
+       **被记录的 predispatch 提交本体 67ba545**（head_note 原文：'回填（R18-backfill-S8agentid…）：
+       sha = 67ba545…parent = f105061'），与 tasks[M0-04].s8_predispatch_R18.commit 同口径；
+       探针误设为回填批自身的 f53ff8d。history[-1] 实测 {head:67ba545, commit_tag:R18-predispatch-S8}，
+       与 R18-landS6->928676d 等先例同构 ⇒ 判 PASS。
+==================================================================================
+[PASS] T1 dispatch_log[-1].agent_id -> '01a1e0b9-916a-7ac0-9318-e10f8be00768'
+[PASS] T1 dispatch_log[-1].nickname -> 'Planck'
+[PASS] T1 dispatch_log[-1].agent_id_backfilled_at -> '2026-11-16T03:46:17+08:00'
+[PASS] T1 dispatch_log len==16 -> 16
+[PASS] T2 in_flight_agents[S8] 恰 1 处 -> 1
+[PASS] T2 .agent_id -> '01a1e0b9-916a-7ac0-9318-e10f8be00768'
+[PASS] T2 .nickname -> 'Planck'
+[PASS] T2 .status==IN_FLIGHT -> 'IN_FLIGHT'
+[PASS] T2 .spawned_after_predispatch==True -> True
+[PASS] T2 .spawned_at 非空 -> '2026-11-16T03:46:17+08:00'
+[PASS] T2 .agent_id_backfilled_at 非空 -> '2026-11-16T03:46:17+08:00'
+[PASS] T3 round18_predispatch_S8.baseline_at_dispatch.head==67ba545 -> '67ba545'
+[FAIL] T4 baseline_authoritative.current.head==f53ff8d -> '67ba545'
+[PASS] T4 .current.head_full 40 位 -> '67ba545e9cf3ce4eabf0a4af711e4120245f74a0'
+[FAIL] T4 .history[-1].head==f53ff8d -> '67ba545'
+[PASS] T4 git HEAD 一致 -> 'f53ff8d'
+[PASS] T5 .commit==67ba545（predispatch 提交本体，非回填批） -> '67ba545'
+[PASS] T5 .commit_full 40 位 -> '67ba545e9cf3ce4eabf0a4af711e4120245f74a0'
+[PASS] T5 .commit_backfilled_at 非空 -> '2026-11-16T03:46:17+08:00'
+[PASS] T5 .status==IN_FLIGHT -> 'IN_FLIGHT'
+[PASS] T6 .status==DONE -> 'DONE'
+[PASS] T6 .backfilled_commit==67ba545 -> '67ba545'
+[PASS] T6 .backfilled_at 非空 -> '2026-11-16T03:46:17+08:00'
+[PASS] counts 317/112/748 + 114py/203md（114+203==317） -> {'ruff': 317, 'mypy': 112, 'pytest': 748, 'py': 114, 'md': 203, 'total': 317}
+[FAIL] dispatched_not_yet_returned 保持 1 -> None
+[FAIL] subtask_log 保持 47 条（本批不入账） -> 0
+
+flash_share: {}
+
+============================================================
+OVERALL: RED
+
+==================================================================================
+§3 真键名定位探针 .orch_tmp/r18_keyprobe.py（先实测结构、再写断言 —— 此即 PRE-30 的做法）
+   命令：uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/r18_keyprobe.py
+==================================================================================
+(键位命中行见 §2 的 PASS 记录)
+
+==================================================================================
+§4 S8 交付面独立复验 .orch_tmp/r18_s8reverify.py（24 件 face 对撞 ＋ 写权闭集 ＋ 前向引用 ＋ AC 面 ＋ 码注册表）
+   命令：uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/r18_s8reverify.py
+   注：§B 内 'A253 检查 ... commands.md 是否存在: True（必须 False）' 一行是**探针预期写错**：
+       该文件是既有已跟踪件、正是 A253 的冲突源；正确判据＝S8 未新建也未修改它（实测成立，R18-9）。
+==================================================================================
+########## A. 24 件交付面：实测 vs 自报（bytes/sha 必须逐字相符） ##########
+  [OK ] evidence/M0/M0-04/commands-s8.md  self=682L/33034B/653cc29d980e  meas=682L/33034B/653cc29d980e
+  [OK ] evidence/M0/M0-04/ac.md  self=53L/5565B/832679d66274  meas=53L/5565B/832679d66274
+  [OK ] evidence/M0/M0-04/job-states.md  self=582L/21463B/0d84c90542ec  meas=582L/21463B/0d84c90542ec
+  [OK ] evidence/M0/M0-04/gates/V1.log  self=6L/331B/bf7f5757a6fe  meas=6L/331B/bf7f5757a6fe
+  [OK ] evidence/M0/M0-04/gates/V2.log  self=13L/827B/835f6327ee93  meas=13L/827B/835f6327ee93
+  [OK ] evidence/M0/M0-04/gates/V3.log  self=13L/819B/82d5eea17c9a  meas=13L/819B/82d5eea17c9a
+  [OK ] evidence/M0/M0-04/gates/V4.log  self=13L/823B/150d8370b6c4  meas=13L/823B/150d8370b6c4
+  [OK ] evidence/M0/M0-04/gates/V5.log  self=7L/305B/73026e7a042c  meas=7L/305B/73026e7a042c
+  [OK ] evidence/M0/M0-04/gates/V6.log  self=49L/2987B/a0f20510714a  meas=49L/2987B/a0f20510714a
+  [OK ] evidence/M0/M0-04/gates/V7.log  self=6L/281B/feed9aa2838c  meas=6L/281B/feed9aa2838c
+  [OK ] evidence/M0/M0-04/gates/V8.log  self=147L/8083B/7044f493f827  meas=147L/8083B/7044f493f827
+  [OK ] evidence/M0/M0-04/gates/V9.log  self=37L/3470B/580636291d05  meas=37L/3470B/580636291d05
+  [OK ] evidence/M0/M0-04/http/listJobs.json  self=0L/927B/66bbe5754511  meas=1L/927B/66bbe5754511
+  [OK ] evidence/M0/M0-04/http/getJob.json  self=0L/296B/c0bd18d44a34  meas=1L/296B/c0bd18d44a34
+  [OK ] evidence/M0/M0-04/http/cancelJob-200.json  self=0L/297B/51f0689a3b5a  meas=1L/297B/51f0689a3b5a
+  [OK ] evidence/M0/M0-04/http/cancelJob-409.json  self=0L/248B/6df6b49f6bac  meas=1L/248B/6df6b49f6bac
+  [OK ] evidence/M0/M0-04/http/cancelJob-412.json  self=0L/229B/65c2f7c5a3fd  meas=1L/229B/65c2f7c5a3fd
+  [OK ] evidence/M0/M0-04/http/cancelJob-428.json  self=0L/245B/d9686d113283  meas=1L/245B/d9686d113283
+  [OK ] evidence/M0/M0-04/http/retryJob-202.json  self=0L/327B/305bbb8926d3  meas=1L/327B/305bbb8926d3
+  [OK ] evidence/M0/M0-04/http/retryJob-429.json  self=0L/305B/07afd740f7c7  meas=1L/305B/07afd740f7c7
+  [OK ] evidence/M0/M0-04/http/problem-404.json  self=0L/254B/a8d41d2445ad  meas=1L/254B/a8d41d2445ad
+  [OK ] evidence/M0/M0-04/http/problem-422.json  self=0L/360B/225adf278af5  meas=1L/360B/225adf278af5
+  [OK ] evidence/M0/M0-04/http/problem-500.json  self=0L/230B/1cac23746307  meas=1L/230B/1cac23746307
+  [OK ] evidence/M0/summaries/M0-04.md  self=15L/2498B/1547f357dd80  meas=15L/2498B/1547f357dd80
+
+  不符项 0 条: 无
+
+########## B. 写权面闭集对撞（A253：必须是 commands-s8.md，禁 commands.md） ##########
+  git status -uall 条数: 24
+  非 ?? （已跟踪件被改）: 无（纯新增，符合「纯证据棒」约束）
+  超出自报清单的落盘件: 无
+  A253 检查 evidence/M0/M0-04/commands.md 是否存在: True（必须 False）
+  A253 检查 S3 的 commands.md 是否被改:  无改动
+
+########## C. 前向引用 6 条是否全部被本棒落盘闭合 ##########
+  OK  evidence/M0/M0-04/commands-s8.md (file)
+  OK  evidence/M0/M0-04/ac.md (file)
+  OK  evidence/M0/M0-04/job-states.md (file)
+  OK  evidence/M0/M0-04/gates/ (dir)
+  OK  evidence/M0/M0-04/http/ (dir)
+  OK  evidence/M0/summaries/M0-04.md (file)
+
+########## D. AC-031 禁判（owner=M5-01）＋ AC-029 判定在场 ##########
+  ac.md 行数: 53
+    'AC-029' 命中 1 次
+    'AC-031' 命中 2 次
+    'PASS' 命中 2 次
+    'FAIL' 命中 2 次
+    'M5-01' 命中 4 次
+    CTX: （逐字清单见 `commands-s8.md` §3）；错误码全部取自已注册 / `domain/errors.py::PROBLEM_CODES`（D-019，无发明码）。 /  / ## AC-031（`spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:39`） /  / **判定（口径固定，本卡不出 PASS/FAIL）：写入侧前提已交付 ＋ 判定归 M5-01（`primary_owner = M5-01`）。** /  / 写入侧前提四项（实测指针）
+    CTX: ntegration/jobs/test_artifact_write.py`（`V4` 目录关键字实测，rc=0）。 /  / 「停受理备份＋恢复至新目录＋运行迁移校核」的端到端复跑与 AC-031 判定**归 M5-01 负责**； / 本件不引用其任何尚未存在的落点路径（PRE-28）。 /  / ## 交叉指针 /  / - 任务小结：`evidence/M0/summaries/M0-04.md`（同批新建，已在台账 `forward_reference_registry` 登记、本棒
+
+########## E. summaries/M0-04.md ≤30 行 ##########
+  行数 15 (<=30: True)
+
+########## F. Problem.code 是否全属注册 20 码 ##########
+  样本内出现的 code: ['INTERNAL_ERROR', 'JOB_CAPACITY', 'PRECONDITION_REQUIRED', 'RESOURCE_NOT_FOUND', 'REVISION_CONFLICT', 'STATE_CONFLICT', 'VALIDATION_ERROR']
+  注册码总数: 20
+  未注册码: 无
+
+==================================================================================
+§5 门的独立复跑（派单文 §4 的**逐字**命令；PRE-29：禁按单文件路径替代 -k 目录口径）
+   脚本：.orch_tmp/r18_s8gates.sh
+==================================================================================
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+cd /home/szf/dev/CampaignLab
+O=/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/r18_s8gates.out
+: > "$O"
+run() { echo "===== $1 =====" | tee -a "$O"; shift; "$@" >> "$O" 2>&1; echo "rc=$?" | tee -a "$O"; }
+run "V1 契约 sha16/bytes（逐字）" uv run --no-sync python -c "import hashlib,pathlib;d=pathlib.Path('contracts/openapi.json').read_bytes();print(hashlib.sha256(d).hexdigest()[:16],len(d))"
+run "V2 -k state_machine（逐字）" uv run --no-sync pytest -q tests/integration/jobs -k state_machine
+run "V3 -k lease（逐字）" uv run --no-sync pytest -q tests/integration/jobs -k lease
+run "V4 -k artifact（逐字）" uv run --no-sync pytest -q tests/integration/jobs -k artifact
+run "V5 test_job_dto.py" uv run --no-sync pytest -q tests/unit/test_job_dto.py
+run "V7 check_contracts" uv run --no-sync python scripts/check_contracts.py check --validate
+echo "===== V6b ruff format --check 全树（S8 的 4 件 md 落盘后应为 321） =====" | tee -a "$O"
+uv run --no-sync ruff format --check . >> "$O" 2>&1; echo "rc=$?" | tee -a "$O"
+echo "===== AC-029 判定原文 =====" | tee -a "$O"
+grep -n -A3 'AC-029' evidence/M0/M0-04/ac.md >> "$O" 2>&1; echo "rc=$?" | tee -a "$O"
+echo "ALLDONE" | tee -a "$O"--- 输出 ---
+===== V1 契约 sha16/bytes（逐字） =====
+592571099d638251 443309
+rc=0
+===== V2 -k state_machine（逐字） =====
+.............                                                            [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+13 passed, 85 deselected, 1 warning in 6.28s
+rc=0
+===== V3 -k lease（逐字） =====
+..............                                                           [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+14 passed, 84 deselected, 1 warning in 8.24s
+rc=0
+===== V4 -k artifact（逐字） =====
+...................                                                      [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+19 passed, 79 deselected, 1 warning in 9.01s
+rc=0
+===== V5 test_job_dto.py =====
+..................................................................       [100%]
+66 passed in 0.62s
+rc=0
+===== V7 check_contracts =====
+CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6
+rc=0
+===== V6b ruff format --check 全树（S8 的 4 件 md 落盘后应为 321） =====
+321 files already formatted
+rc=0
+===== AC-029 判定原文 =====
+7:## AC-029（`spec/CampaignLab-SDD-v1.0/qa/ACCEPTANCE.md:37`）
+8-
+9-**判定：PASS**
+10-
+rc=0
+ALLDONE
+
+==================================================================================
+§6 git 侧实测（HEAD / 分支 / 远端 / 落盘件）
+==================================================================================
+# git rev-parse --abbrev-ref HEAD
+m0-framework
+# git log --oneline -4
+f53ff8d chore(R18-backfill-S8agentid): 纯台账回填 M0-04/S8 的 predispatch 提交 sha 67ba545 ＋ PRE-13 第三步（spawn_agent 返回的 agent_id=01a1e0b9-916a-7ac0-9318-e10f8be00768 / nickname=Planck）＋ in_flight[lane=S8] 状态迁移 PREDISPATCH_COMMITTED_AWAITING_SPAWN->IN_FLIGHT ＋ spawned_after_predispatch False->True
+67ba545 chore(R18-predispatch-S8): M0-04/S8 派单文入库（wave-3 唯一解锁点 · 21 个 TODO 任务 · critical=true/slack=0）＋ 裁定 A253（design §9 的 commands.md 落点已被 S3 占用 ⇒ S8 落 commands-s8.md，禁改写已入库件）＋ A252 空号留痕（从未入账、作废不复用，避免与已入库文本自相矛盾）＋ PRE-25/26/27/28/29 逐项自检留痕 ＋ dispatch_log 15→16 ＋ in_flight 8→9 ＋ dispatched 0→1
+f105061 chore(R18-backfill-S6sha): 纯台账回填 M0-04/S6 的入库提交 sha 928676d（tag R18-landS6）＋ close_agent(Lorentz) 的并发槽释放时点登记 ＋ 兑现前批 OPEN 承诺的 S3 回执补遗件入库 sha 回填（s3_return_addendum_note_R18 的 done_commit，该 note 已于 R18-landS6 关闭为 DONE）
+928676d feat(M0-04/S6): tests/integration/jobs 集成层残差 2 件落地（test_lease.py 6 函数 9 例 ＋ test_artifact.py 1 函数 1 例；目录面 collected 88→98）＋ 编排器自办 PC-5 复放实证有牙 ＋ 终裁 A250/A251（U-4 采纳候选 (a) 判定已消除 · 6 项自报偏差全部 PASS · 零返工）＋ 自纠 R18-8 ＋ 新立 PRE-29（口径回源义务）＋ 兑现前批 OPEN 承诺入库 S3 回执补遗件 ＋ subtask_log 46→47 ＋ flash_share 程序化重算 ＋ 护栏两项如实报未达标
+# git rev-parse origin/m0-framework
+f53ff8d1f925bc1d1018733fb9e4523b811cb0e0
+# git status --porcelain -uall | wc -l  (lane 24 件 + 编排器 3 件 = 27)
+27
+# git status --porcelain -uall
+?? evidence/M0/M0-04/ac.md
+?? evidence/M0/M0-04/commands-s8.md
+?? evidence/M0/M0-04/gates/V1.log
+?? evidence/M0/M0-04/gates/V2.log
+?? evidence/M0/M0-04/gates/V3.log
+?? evidence/M0/M0-04/gates/V4.log
+?? evidence/M0/M0-04/gates/V5.log
+?? evidence/M0/M0-04/gates/V6.log
+?? evidence/M0/M0-04/gates/V7.log
+?? evidence/M0/M0-04/gates/V8.log
+?? evidence/M0/M0-04/gates/V9.log
+?? evidence/M0/M0-04/http/cancelJob-200.json
+?? evidence/M0/M0-04/http/cancelJob-409.json
+?? evidence/M0/M0-04/http/cancelJob-412.json
+?? evidence/M0/M0-04/http/cancelJob-428.json
+?? evidence/M0/M0-04/http/getJob.json
+?? evidence/M0/M0-04/http/listJobs.json
+?? evidence/M0/M0-04/http/problem-404.json
+?? evidence/M0/M0-04/http/problem-422.json
+?? evidence/M0/M0-04/http/problem-500.json
+?? evidence/M0/M0-04/http/retryJob-202.json
+?? evidence/M0/M0-04/http/retryJob-429.json
+?? evidence/M0/M0-04/job-states.md
+?? evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/00-index.md
+?? evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/commands-and-outputs.log
+?? evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/lane-return-raw.md
+?? evidence/M0/summaries/M0-04.md
+# 已跟踪件被改（必须为空）
+(空)
+
+==================================================================================
+§7 入库批 counts 预测的实测依据
+   ruff format --check . （工作树，仅 lane 24 件落盘时）= 321  -> 见 §5 的 V6b
+   + 编排器 2 件 md（00-index.md / lane-return-raw.md）= 323
+   in_scope_py 114（零 .py 改动） + in_scope_md 209 = 323  <- A101 恒等式
+   mypy 112 / pytest 748 均沿用（零 .py、零新增用例）
+   不入分母：9 件 gates/*.log + 11 件 http/*.json + 本 .log = 21 件（后缀不在 RUFF_SUFFIXES=('.py','.md')）
+==================================================================================
+323 files already formatted
+--- 编排器 2 件 md 的 face（ruff format 之后实测；本 .log 自身的 face 由驱动在 add 前实测，避免自指）---
+evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/00-index.md 207L 18039B 350f148775dd
+evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/lane-return-raw.md 84L 9609B f069a34b46d2
+
+@@@ORCH_S8_REVERIFY_DONE
+
+==================================================================================
+§8 文本卫生（normalize）实测 —— 11 件 http/*.json 各 +1 字节（TRAILING_NL_ADDED）
+   命令：uv run --no-sync python .orch_tmp/r18_norm_s8.py
+   双 face 对照见 00-index.md §1bis；台账入 normalize 后的值（入库后可复现口径）。
+==================================================================================
+normalize 修正条数: 11
+normalize 修正明细: {"/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/listJobs.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/getJob.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/cancelJob-200.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/cancelJob-409.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/cancelJob-412.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/cancelJob-428.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/retryJob-202.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/retryJob-429.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/problem-404.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/problem-422.json": ["TRAILING_NL_ADDED"], "/home/szf/dev/CampaignLab/evidence/M0/M0-04/http/problem-500.json": ["TRAILING_NL_ADDED"]}
+
+face 发生变化的件数: 11
+  evidence/M0/M0-04/http/listJobs.json
+     before={'lines': 1, 'bytes': 927, 'sha256_12': '66bbe5754511'}
+     after ={'lines': 1, 'bytes': 928, 'sha256_12': 'cb29c66a470d'}
+  evidence/M0/M0-04/http/getJob.json
+     before={'lines': 1, 'bytes': 296, 'sha256_12': 'c0bd18d44a34'}
+     after ={'lines': 1, 'bytes': 297, 'sha256_12': '6641c6d76f29'}
+  evidence/M0/M0-04/http/cancelJob-200.json
+     before={'lines': 1, 'bytes': 297, 'sha256_12': '51f0689a3b5a'}
+     after ={'lines': 1, 'bytes': 298, 'sha256_12': '2f0518e6d610'}
+  evidence/M0/M0-04/http/cancelJob-409.json
+     before={'lines': 1, 'bytes': 248, 'sha256_12': '6df6b49f6bac'}
+     after ={'lines': 1, 'bytes': 249, 'sha256_12': 'f74b26fc9668'}
+  evidence/M0/M0-04/http/cancelJob-412.json
+     before={'lines': 1, 'bytes': 229, 'sha256_12': '65c2f7c5a3fd'}
+     after ={'lines': 1, 'bytes': 230, 'sha256_12': '5caf43c34fe0'}
+  evidence/M0/M0-04/http/cancelJob-428.json
+     before={'lines': 1, 'bytes': 245, 'sha256_12': 'd9686d113283'}
+     after ={'lines': 1, 'bytes': 246, 'sha256_12': 'b1c76ad079ed'}
+  evidence/M0/M0-04/http/retryJob-202.json
+     before={'lines': 1, 'bytes': 327, 'sha256_12': '305bbb8926d3'}
+     after ={'lines': 1, 'bytes': 328, 'sha256_12': '1fef1e910c56'}
+  evidence/M0/M0-04/http/retryJob-429.json
+     before={'lines': 1, 'bytes': 305, 'sha256_12': '07afd740f7c7'}
+     after ={'lines': 1, 'bytes': 306, 'sha256_12': 'b15bd870a75a'}
+  evidence/M0/M0-04/http/problem-404.json
+     before={'lines': 1, 'bytes': 254, 'sha256_12': 'a8d41d2445ad'}
+     after ={'lines': 1, 'bytes': 255, 'sha256_12': '19697edeacc9'}
+  evidence/M0/M0-04/http/problem-422.json
+     before={'lines': 1, 'bytes': 360, 'sha256_12': '225adf278af5'}
+     after ={'lines': 1, 'bytes': 361, 'sha256_12': '64a3b557796e'}
+  evidence/M0/M0-04/http/problem-500.json
+     before={'lines': 1, 'bytes': 230, 'sha256_12': '1cac23746307'}
+     after ={'lines': 1, 'bytes': 231, 'sha256_12': '58d1bf5e57c8'}
+
+=== post-normalize FACE 字典（供驱动使用） ===
+FACE = {
+    "evidence/M0/M0-04/commands-s8.md": {"lines": 682, "bytes": 33034, "sha256_12": "653cc29d980e"},
+    "evidence/M0/M0-04/ac.md": {"lines": 53, "bytes": 5565, "sha256_12": "832679d66274"},
+    "evidence/M0/M0-04/job-states.md": {"lines": 582, "bytes": 21463, "sha256_12": "0d84c90542ec"},
+    "evidence/M0/M0-04/gates/V1.log": {"lines": 6, "bytes": 331, "sha256_12": "bf7f5757a6fe"},
+    "evidence/M0/M0-04/gates/V2.log": {"lines": 13, "bytes": 827, "sha256_12": "835f6327ee93"},
+    "evidence/M0/M0-04/gates/V3.log": {"lines": 13, "bytes": 819, "sha256_12": "82d5eea17c9a"},
+    "evidence/M0/M0-04/gates/V4.log": {"lines": 13, "bytes": 823, "sha256_12": "150d8370b6c4"},
+    "evidence/M0/M0-04/gates/V5.log": {"lines": 7, "bytes": 305, "sha256_12": "73026e7a042c"},
+    "evidence/M0/M0-04/gates/V6.log": {"lines": 49, "bytes": 2987, "sha256_12": "a0f20510714a"},
+    "evidence/M0/M0-04/gates/V7.log": {"lines": 6, "bytes": 281, "sha256_12": "feed9aa2838c"},
+    "evidence/M0/M0-04/gates/V8.log": {"lines": 147, "bytes": 8083, "sha256_12": "7044f493f827"},
+    "evidence/M0/M0-04/gates/V9.log": {"lines": 37, "bytes": 3470, "sha256_12": "580636291d05"},
+    "evidence/M0/M0-04/http/listJobs.json": {"lines": 1, "bytes": 928, "sha256_12": "cb29c66a470d"},
+    "evidence/M0/M0-04/http/getJob.json": {"lines": 1, "bytes": 297, "sha256_12": "6641c6d76f29"},
+    "evidence/M0/M0-04/http/cancelJob-200.json": {"lines": 1, "bytes": 298, "sha256_12": "2f0518e6d610"},
+    "evidence/M0/M0-04/http/cancelJob-409.json": {"lines": 1, "bytes": 249, "sha256_12": "f74b26fc9668"},
+    "evidence/M0/M0-04/http/cancelJob-412.json": {"lines": 1, "bytes": 230, "sha256_12": "5caf43c34fe0"},
+    "evidence/M0/M0-04/http/cancelJob-428.json": {"lines": 1, "bytes": 246, "sha256_12": "b1c76ad079ed"},
+    "evidence/M0/M0-04/http/retryJob-202.json": {"lines": 1, "bytes": 328, "sha256_12": "1fef1e910c56"},
+    "evidence/M0/M0-04/http/retryJob-429.json": {"lines": 1, "bytes": 306, "sha256_12": "b15bd870a75a"},
+
+==================================================================================
+§9 00-index.md 追加 §1bis 后的 ruff format 复验
+==================================================================================
+2 files left unchanged
+323 files already formatted
+
+==================================================================================
+§10 悬空引用实扫（先测真集再定 allowlist；PRE-30）
+   命令：uv run --no-sync python .orch_tmp/r18_dang_s8.py
+==================================================================================
+ADD 条数: 28 (lane 24 + orch 3 + state 1)
+ADD 中磁盘缺失: 无
+
+=== h.dangling_refs(ADD) 实测 ===
+条数: 1
+   evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/00-index.md -> orchestrator/handoff/R18-lane-M2-01-S4.md
+
+==================================================================================
+§11 最终 face（normalize 后）—— **权威值写入 .orch_tmp/s8_face.json**，
+    由驱动 r18_land_s8.py 在 preflight 逐件复测并断言相等（不符即 RED、零副作用）。
+    本节列出的是**打印当刻**的 face；本 .log 自身的 face 无法自指，以 s8_face.json 为准。
+==================================================================================
+  evidence/M0/M0-04/commands-s8.md 682L/33034B/653cc29d980e  [SAME]
+  evidence/M0/M0-04/ac.md 53L/5565B/832679d66274  [SAME]
+  evidence/M0/M0-04/job-states.md 582L/21463B/0d84c90542ec  [SAME]
+  evidence/M0/M0-04/gates/V1.log 6L/331B/bf7f5757a6fe  [SAME]
+  evidence/M0/M0-04/gates/V2.log 13L/827B/835f6327ee93  [SAME]
+  evidence/M0/M0-04/gates/V3.log 13L/819B/82d5eea17c9a  [SAME]
+  evidence/M0/M0-04/gates/V4.log 13L/823B/150d8370b6c4  [SAME]
+  evidence/M0/M0-04/gates/V5.log 7L/305B/73026e7a042c  [SAME]
+  evidence/M0/M0-04/gates/V6.log 49L/2987B/a0f20510714a  [SAME]
+  evidence/M0/M0-04/gates/V7.log 6L/281B/feed9aa2838c  [SAME]
+  evidence/M0/M0-04/gates/V8.log 147L/8083B/7044f493f827  [SAME]
+  evidence/M0/M0-04/gates/V9.log 37L/3470B/580636291d05  [SAME]
+  evidence/M0/M0-04/http/listJobs.json 1L/928B/cb29c66a470d  [SAME]
+  evidence/M0/M0-04/http/getJob.json 1L/297B/6641c6d76f29  [SAME]
+  evidence/M0/M0-04/http/cancelJob-200.json 1L/298B/2f0518e6d610  [SAME]
+  evidence/M0/M0-04/http/cancelJob-409.json 1L/249B/f74b26fc9668  [SAME]
+  evidence/M0/M0-04/http/cancelJob-412.json 1L/230B/5caf43c34fe0  [SAME]
+  evidence/M0/M0-04/http/cancelJob-428.json 1L/246B/b1c76ad079ed  [SAME]
+  evidence/M0/M0-04/http/retryJob-202.json 1L/328B/1fef1e910c56  [SAME]
+  evidence/M0/M0-04/http/retryJob-429.json 1L/306B/b15bd870a75a  [SAME]
+  evidence/M0/M0-04/http/problem-404.json 1L/255B/19697edeacc9  [SAME]
+  evidence/M0/M0-04/http/problem-422.json 1L/361B/64a3b557796e  [SAME]
+  evidence/M0/M0-04/http/problem-500.json 1L/231B/58d1bf5e57c8  [SAME]
+  evidence/M0/summaries/M0-04.md 15L/2498B/1547f357dd80  [SAME]
+  evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/00-index.md 239L/20666B/ff74e43264a1  [DRIFT(以本行为准，驱动会重测)]
+  evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/lane-return-raw.md 84L/9609B/f069a34b46d2  [SAME]
+  evidence/M0/ORCHESTRATOR/r18-m0-04-s8-landing/commands-and-outputs.log 365L/26713B/01a9d5f91fc8  [DRIFT(以本行为准，驱动会重测)]
+
+@@@ORCH_S8_REVERIFY_DONE

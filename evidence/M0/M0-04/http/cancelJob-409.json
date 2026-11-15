@@ -1,0 +1,1 @@
+{"type":"urn:campaignlab:problem:state_conflict","title":"当前状态不允许该操作","status":409,"code":"STATE_CONFLICT","detail":"作业已处于 SUCCEEDED，不可再请求取消","request_id":"61cd81e73a264a4d9db7bf773332193f","issues":[]}

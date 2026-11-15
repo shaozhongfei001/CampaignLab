@@ -1,0 +1,1 @@
+{"type":"urn:campaignlab:problem:precondition_required","title":"缺少 If-Match 前置条件","status":428,"code":"PRECONDITION_REQUIRED","detail":"本操作要求提供 If-Match 头","request_id":"61b31174120c45bba5337855cc8fa97c","issues":[]}

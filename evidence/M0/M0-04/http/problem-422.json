@@ -1,0 +1,1 @@
+{"type":"urn:campaignlab:problem:validation_error","title":"字段校验未通过","status":422,"code":"VALIDATION_ERROR","detail":"请求体或查询参数校验未通过","request_id":"9196e5bbf95b4b71b44647630ffacdab","issues":[{"code":"VALIDATION_ERROR","location":"/query/limit","message":"Input should be greater than or equal to 1","severity":"ERROR"}]}

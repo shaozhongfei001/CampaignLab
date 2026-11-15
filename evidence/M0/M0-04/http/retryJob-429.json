@@ -1,0 +1,1 @@
+{"type":"urn:campaignlab:problem:job_capacity","title":"作业队列已满","status":429,"code":"JOB_CAPACITY","detail":"该工作区的待办作业已达上限 10 个，请按 Retry-After 稍后重试；已提交的结果入口保持不变。","request_id":"ead0b434a164431d8c7a480db4c2ac3d","issues":[]}

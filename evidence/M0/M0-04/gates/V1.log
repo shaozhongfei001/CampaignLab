@@ -1,0 +1,6 @@
+### id=V1
+$ uv run --no-sync python -c "import hashlib,pathlib;d=pathlib.Path('contracts/openapi.json').read_bytes();print(hashlib.sha256(d).hexdigest()[:16],len(d))"
+# ts=2026-11-16T03:54:31+08:00
+# env=uv 0.13.7 / CPython 3.14.10 x86_64 Linux / HEAD=f53ff8d / cwd=/home/szf/dev/CampaignLab
+592571099d638251 443309
+### id=V1 rc=0

@@ -1,0 +1,1 @@
+{"type":"urn:campaignlab:problem:revision_conflict","title":"修订号不匹配","status":412,"code":"REVISION_CONFLICT","detail":"If-Match 与当前修订号不一致","request_id":"9ec43ad5c8034d82b751e7db9d120c29","issues":[]}

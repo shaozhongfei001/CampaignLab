@@ -1,0 +1,6 @@
+### id=V7
+$ uv run --no-sync python scripts/check_contracts.py check --validate
+# ts=2026-11-16T03:57:42+08:00
+# env=uv 0.13.7 / CPython 3.14.10 x86_64 Linux / HEAD=f53ff8d / cwd=/home/szf/dev/CampaignLab
+CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6
+### id=V7 rc=0

@@ -1,0 +1,7 @@
+### id=V5
+$ uv run --no-sync pytest -q tests/unit/test_job_dto.py
+# ts=2026-11-16T03:55:03+08:00
+# env=uv 0.13.7 / CPython 3.14.10 x86_64 Linux / HEAD=f53ff8d / cwd=/home/szf/dev/CampaignLab
+..................................................................       [100%]
+66 passed in 0.45s
+### id=V5 rc=0

@@ -1,0 +1,37 @@
+### id=V9-1
+$ uv run --no-sync pytest -q tests/integration/jobs/test_artifact.py::test_verify_artifact_index_detects_missing_file -v
+# ts=2026-11-16T03:57:57+08:00
+# env=uv 0.13.7 / CPython 3.14.10 x86_64 Linux / HEAD=f53ff8d / cwd=/home/szf/dev/CampaignLab
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /home/szf/dev/CampaignLab
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 1 item
+
+tests/integration/jobs/test_artifact.py .                                [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 1 passed, 1 warning in 0.57s =========================
+### id=V9-1 rc=0
+### id=V9-2
+$ uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/_tools/v9_integrity.py
+# ts=2026-11-16T03:57:59+08:00
+# env=uv 0.13.7 / CPython 3.14.10 x86_64 Linux / HEAD=f53ff8d / cwd=/home/szf/dev/CampaignLab
+/home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+@@@V9 verify_same_filesystem: OK（同盘前提成立）
+@@@V9 committed={"workspace_id": "ws-s9", "artifact_id": "art-b3cd46157b584e49bf2e50d85f28acdb", "kind": "JOB_RESULT", "sha256": "5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "relative_path": "results/JOB_RESULT/ws-s9/5d/5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "byte_size": 24, "path": "/tmp/s8-v9-j6_1i0n3/results/JOB_RESULT/ws-s9/5d/5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "reused_file": false, "reused_row": false}
+@@@V9 healthy-db verify_artifact_index -> []
+@@@V9 manifest_rows -> [{"workspace_id": "ws-s9", "artifact_id": "art-b3cd46157b584e49bf2e50d85f28acdb", "kind": "JOB_RESULT", "sha256": "5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "relative_path": "results/JOB_RESULT/ws-s9/5d/5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "byte_size": 24, "created_at": "2026-11-13T01:00:00+00:00"}]
+@@@V9 inject: unlink referenced artifact /tmp/s8-v9-j6_1i0n3/results/JOB_RESULT/ws-s9/5d/5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a
+@@@V9 injected verify_artifact_index -> [{"workspace_id": "ws-s9", "artifact_id": "art-b3cd46157b584e49bf2e50d85f28acdb", "relative_path": "results/JOB_RESULT/ws-s9/5d/5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "expected_sha256": "5d1f99d6ef40743b935126ad125d8b5079033570fc35bfab973bb8341ae8bf8a", "actual_sha256": null, "reason": "MISSING_FILE", "expected_byte_size": null, "actual_byte_size": null}]
+@@@V9 LOCATABLE: 差异含 workspace_id/artifact_id/relative_path/expected_sha256 四要素，可定位到该制品
+@@@V9 GUARD_SIGNAL: discrepancies 非空（1 条）即切换守卫的阻断信号；判定归 M5-01，本件不出结论
+@@@V9_DONE
+### id=V9-2 rc=0
