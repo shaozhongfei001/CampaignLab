@@ -2,7 +2,7 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-16T03:09:06+08:00",
+  "updated_at": "2026-11-16T03:15:47+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
@@ -1648,10 +1648,10 @@
         "over_cap": null,
         "over_input_cap": null,
         "over_cap_caliber": "tokens 为 null（无计量句柄 ＋ lane 未报）⇒ A183 的 200k 累计上限**不可判定**，如实记 null（禁取下界粉饰为 false、亦禁取上界武断为 true）。未降档、未重派（交付面完整 ＋ 编排器独立复验全绿 ＋ 10 例新 collected 全过 ＋ PC-5 有牙实证），沿 D-044 / R14-Y / R16-S4 / R17-S2b2 / R17-S5 / R18-S3 先例。loop 用满 **2 / 2** 但未硬撑第 3 轮。",
-        "commit": null,
-        "commit_full": null,
+        "commit": "928676d",
+        "commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
         "commit_note": "sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）。禁写猜测值。",
-        "commit_backfilled_at": null,
+        "commit_backfilled_at": "2026-11-16T03:15:47+08:00",
         "deliverable": "tests/integration/jobs/test_lease.py（新建 **477 行 / 20778 B / 112b149f1b12**，6 函数 / **9 collected**：CVC×2、T-IMM×3 参数化）；tests/integration/jobs/test_artifact.py（新建 **114 行 / 4924 B / 1d65896e618a**，1 函数 / **1 collected**）。目录面 tests/integration/jobs collected **88→98**（逐件求和 1+13+3+7+34+9+13+18=98 闭合）。编排器同批：取证件 3 件 ＋ **兑现前批 OPEN 承诺**的 S3 回执补遗件 1 件。",
         "by_orchestrator_same_batch": "① **PC-5 复放**（对第 2 轮新落地态实证判据有牙，补齐 lane 自报偏差 #4 的缺口）：变异 `record.retryable is True`→`is False`，变异态 sha **8441748853db**，AST 生效证明 **True**，rc=**1**，红原文 `assert True is False` / `FAILED …::test_interrupted_job_marked_job_interrupted`（1 failed, 8 passed），逐字节复原回 **112b149f1b12**，复原后 rc=0 / 9 passed。② **取证件 3 件**（00-index.md / commands-and-outputs.log / lane-return-raw.md）。③ **兑现 4b9150c 的 OPEN 承诺**：S3 回执补遗件 lane-return-raw-addendum.md （60 行 / 6540 B / b034f3415b4e，逐字收录 close_agent(Nash) 带回的 PC-1(b)/PC-2 完整原文），并把 resume.s3_return_addendum_note_R18 由 OPEN 关闭为 **DONE**（append-only，原 OPEN 记录不改写）。合批理由依 R17-S5 / A241 先例，已在提交信息与台账显式声明。④ **口径回源实证**（R18-8）：按派单文逐字命令复跑 V1/V2 并按文件分解命中，推翻初稿的假 MISMATCH。",
         "positive_controls": "lane 自办 PC-1..PC-4（PC-1/PC-2 取证于**第 1 轮**落地态 006aa53d2694；lane 自报偏差 #4 如实声明未对第 2 轮新态重放）；**编排器自办 PC-5 复放**（对第 2 轮新态，有牙实证，见 by_orchestrator_same_batch ①）⇒ 最终落地态的有牙性**已有一方实证**，无缺口。",
@@ -2973,17 +2973,19 @@
           "dangling_refs": [],
           "PC5_replay": "有牙（rc=1 → 复原 → rc=0）"
         },
-        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit": "928676d",
+        "commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
         "commit_tag": "R18-landS6",
-        "commit_backfilled_at": null,
+        "commit_backfilled_at": "2026-11-16T03:15:47+08:00",
         "evidence": "evidence/M0/ORCHESTRATOR/r18-m0-04-s6-landing/{00-index.md,commands-and-outputs.log,lane-return-raw.md}",
         "note": "**S6 已交付并入库**。M0-04 余 **S8**（任务级取证面：闭合 forward_reference_registry 的 evidence/M0/M0-04/ac.md 与 evidence/M0/summaries/M0-04.md 两条前向引用；AC 判定在此批）。**S8 是 wave-3 的唯一解锁点**（21 个 TODO 任务依赖它）⇒ critical=true、slack=0。**M0-04 全链 S5→S6→S8 闭合前禁判任务 DONE、禁开 wave-3**。"
       },
       "commit_s6_R18": {
-        "sha": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "sha": "928676d",
         "tag": "R18-landS6",
-        "note": "sha 由下一次纯台账提交回填，禁写猜测值"
+        "note": "已由 R18-backfill-S6sha 回填：sha=928676d（全 928676dcfc49ac74919d466da42e9c87c4154d2d），parent=4b9150c。原 note「sha 由下一次纯台账提交回填，禁写猜测值」的义务**已履行**。",
+        "sha_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
+        "backfilled_at": "2026-11-16T03:15:47+08:00"
       },
       "remaining_sequence_R18_post_S6": "**S8**（M0-04 任务级取证面：闭合 forward_reference_registry 里 evidence/M0/M0-04/ac.md 与 evidence/M0/summaries/M0-04.md 两条前向引用；**AC 判定在此批**）。**S5 / S6 已交付**（S5 随 R17-S5、S6 随本提交 tag R18-landS6）⇒ 剩 **1 个子任务**。**S8 是 wave-3 的唯一解锁点**（21 个 TODO 任务依赖它）⇒ critical=true、slack=0，**下一棒优先派 S8**。S8 派单文须过 **PRE-25/26/27**（派单侧）**与 PRE-29**（回收侧口径回源，本轮新立）。**S8 闭合前禁判 M0-04 任务 DONE、禁开 wave-3**。",
       "subtask_progress_note_R18_S6": "M0-04 进度：S1 / S2a / S2b（S2b-1 ＋ S2b-2 ＋ S2b-3）/ S2c / S3 / S4 / S5 / **S6** 已 DONE ⇒ 剩 **S8**（任务级取证与 AC 判定）。**S8 是 wave-3 唯一解锁点**（21 个 TODO 任务）⇒ 下一棒优先。本批**未新增**技术债（defects_raised 与 followups_created 均为空集）；lane 的仓库外残留（/mnt/c temp、/home/szf/.s6_land）不入库、编排器不代删，已如实登记为未尽面（取证件 00-index.md §8）。"
@@ -7635,16 +7637,18 @@
         "mapping_basis": "spawn_agent 的返回值按调用顺序对应：Round 18 第一个 spawn 调用的消息体是 lane **S6** 的派单指令（首行「你是 CampaignLab 项目的开发子智能体 **lane S6**（任务 M0-04 / 子任务 S6）」、指向派单文 R18-lane-M0-04-S6.md 并给出其 sha256[:12]=4f15d3614700）；第二个调用是 lane **S3**（指向 R18-lane-M2-01-S3.md，sha256[:12]=67acfc97305e）。**并将以磁盘写集面二次验证**：S6 的写集全在 tests/integration/jobs/ 下 2 个新建件、S3 的写集是 api/activities.py 新建 ＋ api/app.py +3/-0 ＋ tests/api/activities/ 2 件新建，两者路径前缀零交叉，回收时对撞即可确证（若发现映射反了，按 A216 以磁盘面为准并在台账如实登记自纠）。",
         "result": "DONE",
         "returned_at": "2026-11-16T01:57:43+08:00",
-        "landing_commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "landing_commit": "928676d",
         "landing_tag": "R18-landS6",
-        "slot_closed_at": null,
+        "slot_closed_at": "2026-11-16T03:15:47+08:00",
         "spawned_at": "2026-11-16T00:10:33+08:00",
         "agent_id_backfilled_at": "2026-11-16T00:10:33+08:00",
         "status_note_R18": "PREDISPATCH_COMMITTED_AWAITING_SPAWN -> **IN_FLIGHT**（spawn 成功）。**与 R17 约定的差异（如实登记）**：R17 的回填把 dispatched_at 覆盖为回填时刻；本批**保留** predispatch 提交里写下的 dispatched_at 原值（＝派单上下文入库时刻），另立新键 spawned_at 记录 spawn 时刻 —— 两个时刻语义不同，覆盖会丢失 PRE-13 第一步的实际时间（D-011 append-only 精神）。",
         "mapping_verified_by": "按 spawn 调用顺序回填（第 1 个调用 = lane S6），与 mapping_basis 的预告一致；并以**磁盘写集面**二次验证为准（A216）：回收时对撞实际改动路径 —— tests/integration/jobs/ 下 2 件新建。若发现映射反了，以磁盘面为准并在台账如实登记自纠。",
         "returned_at_note": "**近似值**：这是编排器**写台账的时点**，非精确回收时点。原始回执未在回收当刻落盘（R18-6）⇒ 精确时点不可复原，禁凭记忆重构。",
-        "status_note_R18_S6": "回执 `RESULT: DONE`（loop 2/2）⇒ 编排器终裁 **PASS**（A250 / A251，零返工）。本提交入库其 2 件交付面 ＋ 编排器取证件 3 件 ＋ 兑现前批 OPEN 承诺的 S3 回执补遗件 1 件。**lane 无失真**：V1=14 / V2=19 经回源实证与派单文逐字命令的实测值完全一致（编排器初稿的「失真」误判归 R18-8，A252 作废不立）。landing_commit 由下一次纯台账提交回填；`slot_closed_at`：close_agent(Lorentz) 已执行、并发槽已释放。",
-        "landed_at": "2026-11-16T03:09:06+08:00"
+        "status_note_R18_S6": "回执 `RESULT: DONE`（loop 2/2）⇒ 编排器终裁 **PASS**（A250 / A251，零返工）。本提交入库其 2 件交付面 ＋ 编排器取证件 3 件 ＋ 兑现前批 OPEN 承诺的 S3 回执补遗件 1 件。**lane 无失真**：V1=14 / V2=19 经回源实证与派单文逐字命令的实测值完全一致（编排器初稿的「失真」误判归 R18-8，A252 作废不立）。landing_commit 由下一次纯台账提交回填；`slot_closed_at`：close_agent(Lorentz) 已执行、并发槽已释放。 || 回填（R18-backfill-S6sha）：landing_commit=928676d，slot_closed_at 已登记。",
+        "landed_at": "2026-11-16T03:09:06+08:00",
+        "landing_commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
+        "slot_closed_note": "close_agent(Lorentz / 01a1dff2-a13f-7531-91c9-1eeccf61a928) 已执行，并发槽已释放。**如实登记**：精确的 close 时点当时未留档（S6_RETURN.slot_closed_at 只记了日期），本键填的是**回填时点**而非精确 close 时点 ⇒ 二者语义不同，不混用、不重构。与 S3 批不同的是：close_agent(Lorentz) 带回的 previous_status.completed 是**第 2 轮**终态回执，**不含**第 1 轮原文 ⇒ lane 第 1 轮回执确认不可复原（已在 lane-return-raw.md 归档口径段 ② 明示），本批**无**类似 S3 的「补遗更正」需求。"
       },
       {
         "lane": "S3",
@@ -18747,10 +18751,10 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-        "head_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "head": "928676d",
+        "head_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
         "head_before": "4b9150c",
-        "head_note": "本提交（tag R18-landS6）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）；禁写猜测值。",
+        "head_note": "本提交（tag R18-landS6）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）；禁写猜测值。 || 回填（R18-backfill-S6sha，2026-11-16T03:15:47+08:00）：sha = 928676d（全 928676dcfc49ac74919d466da42e9c87c4154d2d），parent = 4b9150c。读数 316/112/748（114 py + 202 md）已由 R18-landS6 提交的**冻结索引树四门**实测背书（ruff_format / ruff_check / mypy / pytest_frozen 全 rc=0；frozen_pytest=727 ＋ git_env_ignores_collect=21 = 748；post_commit_status_lines=0）。",
         "ruff_formatted_files": 316,
         "mypy_source_files": 112,
         "pytest_passed": 748,
@@ -19051,10 +19055,10 @@
           "note": "R18 · M2-01/S3 入库（tag R18-landS3）：lane 4 件 ＋ 编排器同批迁移 E1/E2（A245/A248）＋ D-051 立单 ＋ 取证件 3 件 ＋ A247–A249 终裁 ＋ R18-4/5/6/7 自纠 ＋ FU-59/60/61 新立 ＋ PRE-25/26/27/28 ＋ subtask_log 45→46 ＋ flash_share 程序化重算 ＋ 护栏两项如实报未达标。"
         },
         {
-          "head": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-          "head_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+          "head": "928676d",
+          "head_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
           "head_before": "4b9150c",
-          "head_note": "本提交（tag R18-landS6）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）；禁写猜测值。",
+          "head_note": "本提交（tag R18-landS6）的 sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）；禁写猜测值。 || 回填（R18-backfill-S6sha，2026-11-16T03:15:47+08:00）：sha = 928676d（全 928676dcfc49ac74919d466da42e9c87c4154d2d），parent = 4b9150c。读数 316/112/748（114 py + 202 md）已由 R18-landS6 提交的**冻结索引树四门**实测背书（ruff_format / ruff_check / mypy / pytest_frozen 全 rc=0；frozen_pytest=727 ＋ git_env_ignores_collect=21 = 748；post_commit_status_lines=0）。",
           "ruff_formatted_files": 316,
           "mypy_source_files": 112,
           "pytest_passed": 748,
@@ -21174,14 +21178,15 @@
       ],
       "done_at": "2026-11-16T03:09:06+08:00",
       "done_in_commit_tag": "R18-landS6",
-      "done_commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "done_commit": "928676d",
       "done_evidence": "evidence/M0/ORCHESTRATOR/r18-m2-01-s3-landing/lane-return-raw-addendum.md",
       "done_evidence_face": {
         "lines": 60,
         "bytes": 6540,
         "sha256_12": "b034f3415b4e"
       },
-      "done_note": "**已兑现**：补遗件随本批（M0-04/S6 入库批）同批入库，逐字收录 close_agent(Nash) 带回的 PC-1(b) / PC-2 完整原文（含红原文与复原 sha），并在文首明写「本件是 lane-return-raw.md 归档口径段 ② 的更正补遗」。合批理由与 counts 影响（in_scope_md +1）已在 landing_plan 事先声明，本批**按声明执行**，未偏离。原 OPEN 记录（created_at / fact / impact / correction / landing_plan / related）**逐字保留不改写**（D-011 append-only）。sha 由下一次纯台账提交回填（done_commit）。"
+      "done_note": "**已兑现**：补遗件随本批（M0-04/S6 入库批）同批入库，逐字收录 close_agent(Nash) 带回的 PC-1(b) / PC-2 完整原文（含红原文与复原 sha），并在文首明写「本件是 lane-return-raw.md 归档口径段 ② 的更正补遗」。合批理由与 counts 影响（in_scope_md +1）已在 landing_plan 事先声明，本批**按声明执行**，未偏离。原 OPEN 记录（created_at / fact / impact / correction / landing_plan / related）**逐字保留不改写**（D-011 append-only）。sha 由下一次纯台账提交回填（done_commit）。 || 回填（R18-backfill-S6sha）：done_commit=928676d。补遗件已随 R18-landS6 实际入库（git show --stat 实测该批 7 件含 lane-return-raw-addendum.md，+59 行）。",
+      "done_commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d"
     },
     "round18_lane_S6_return": {
       "lane": "S6",
@@ -21217,18 +21222,19 @@
       "tokens_estimated": true,
       "tokens_note": "lane 两段回执原文与 close_agent(Lorentz) 带回的完整终态回执中**均无** token 字段（编排器已复核）⇒ 依 A183 记 null，token_entries_null 35→**36**，不入 flash_share_tokens 分母。禁凭记忆重构。",
       "archive_note": "原始回执**逐字留档**于同目录 lane-return-raw.md（R18-6 / FU-61 的人工纪律先行）。不可复原部分已在该件归档口径段明示：① COVERAGE_MAP_3B 的 **3 名**逐条映射全文（第 2 轮回传尾部 `…3125 tokens truncated…`，窄请求重发只取回尾段 2 名）；② lane **第 1 轮**回执全文（close_agent 带回的是第 2 轮终态回执）；③ token 用量（两段均无该字段）。**禁凭记忆重构**。",
-      "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-      "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-      "landing_commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "commit": "928676d",
+      "commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
+      "landing_commit": "928676d",
       "landing_tag": "R18-landS6",
       "landed_at": "2026-11-16T03:09:06+08:00",
-      "commit_backfilled_at": null,
+      "commit_backfilled_at": "2026-11-16T03:15:47+08:00",
       "commit_note": "sha 由下一次纯台账提交回填（resume.commit_backfill_pending_R18_S6）。禁写猜测值。",
-      "slot_closed_at": "2026-11-16（close_agent(Lorentz) 已执行，并发槽已释放；精确时点未留档 ⇒ 只记日期，禁重构）"
+      "slot_closed_at": "2026-11-16（close_agent(Lorentz) 已执行，并发槽已释放；精确时点未留档 ⇒ 只记日期，禁重构）",
+      "landed_at_note": "landed_at 保持 R18-landS6 批写入的原值（run_commit 的 mutate 时点），本回填**不改写**它；commit_backfilled_at=2026-11-16T03:15:47+08:00 才是回填时点。两键语义不同，如实区分。"
     },
     "commit_backfill_pending_R18_S6": {
       "created_at": "2026-11-16T03:09:06+08:00",
-      "status": "PENDING",
+      "status": "DONE",
       "why": "run_commit 的 mutate_ledger 在 git commit 之前执行，拿不到本提交 sha（沿 commit_backfill_round6 / _pending_R15 / _R16 / _R16_S4 / _R16_S2b1 / _R17 / _R17_S2b2 / _R17_S5 / _R18_predispatch / _R18_S3 的既有惯例）。回填必须走**纯台账提交**（只动 orchestrator/state.json、零交付件改动、四门读数与本提交完全相同），且回填前逐条断言目标键为 None / 'PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT'，禁重复写入、禁写猜测值。",
       "to_backfill": [
         "resume.baseline_authoritative.current.head/.head_full 与 .history[-1].head/.head_full <- 本提交 sha（tag R18-landS6）",
@@ -21237,7 +21243,11 @@
         "budget.subtask_log 的 S6 条目 .commit/.commit_full/.commit_backfilled_at <- 本提交 sha",
         "tasks['M0-04'].s6_delivered_R18.commit/.commit_full/.commit_backfilled_at 与 .commit_s6_R18 <- 本提交 sha",
         "本键自身 status PENDING->DONE ＋ backfilled_commit/<sha> ＋ backfilled_at"
-      ]
+      ],
+      "backfilled_commit": "928676d",
+      "backfilled_commit_full": "928676dcfc49ac74919d466da42e9c87c4154d2d",
+      "backfilled_at": "2026-11-16T03:15:47+08:00",
+      "backfill_note": "7 类目标全部回填完毕（to_backfill 的 6 项 ＋ s3_return_addendum_note_R18.done_commit）。本提交为**纯台账提交**：ADD 只有 orchestrator/state.json，零交付件改动；counts 五项与 928676d **完全相同**（{\"ruff_formatted_files\": 316, \"mypy_source_files\": 112, \"pytest_passed\": 748, \"in_scope_py\": 114, \"in_scope_md\": 202}），四门读数亦须相同（state.json 是 .json，既不入 ruff 的 py+md 作用域也不入 mypy 的 src/tests/scripts 域）。回填前已逐条断言现值为 PENDING / None（幂等守护），回填后本键 status=DONE。"
     },
     "dangling_allowlist_note_R18_S6": "`allow_dangling = ()`，`dangling_refs(add_paths 全集 6 件)` 实测 **0** 条，驱动内做**集合相等**断言（preflight 与 mut 各一次）。`orchestrator/state.json` 按 `DANGLING_SWEEP_SKIP` 豁免（其引用面由 tests/unit/test_state_ledger.py 的 test_every_ledger_defect_has_md_on_disk 与 test_change_request_ids_are_unique 两条机器守护专管）。本批取证件遵守 **PRE-28**：指向后续棒（M0-04/S8、M2-01/S4–S7）的落点**只写职责归属、不写路径字面量**，故 `evidence/M0/M0-04/ac.md` 与 `evidence/M0/summaries/M0-04.md` 两条前向引用**留在** forward_reference_registry 中登记，**不在取证件里写成裸路径**（避免悬空）。",
     "next_actions_R18_post_S6": [
