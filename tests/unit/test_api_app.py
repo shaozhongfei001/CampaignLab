@@ -26,6 +26,10 @@ REPO = Path(__file__).resolve().parents[2]
 TESTSERVER = OriginHostGuard(frozenset({"testserver"}), frozenset({"http://testserver"}))
 LOOPBACK_ONLY = OriginHostGuard(frozenset({"127.0.0.1:8000"}), frozenset({"http://127.0.0.1:8000"}))
 
+#: ``TESTSERVER`` 白名单里的 Origin 值（R18-12）：FU-60 探针必须显式带上，
+#: 否则非安全方法会在路由前被 ``OriginHostGuard`` 判 403，掩盖 404 事实。
+LOOPBACK_ORIGIN: dict[str, str] = {"Origin": "http://testserver"}
+
 
 class _StubHealthService:
     """替身：只为验证依赖注入位可用（真实的 HealthService 属 S3d）。"""
@@ -118,3 +122,57 @@ def test_health_returns_200_when_dependency_overridden(tmp_path: Path) -> None:
     assert response.status_code == 200
     assert response.json() == payload.model_dump(mode="json")
     assert response.headers["X-Request-Id"]
+
+
+def test_activities_router_is_not_mounted_without_activity_service(tmp_path: Path) -> None:
+    """FU-60（编排器在 M2-01/S4 入库批同批补，A257 的裁定落地面；纵深防御第二层）。
+
+    裸 ``create_app()``（不注入 ``activity_service``）⇒ activities 的 **4** 条路由**不得**挂载，
+    必须 404 Problem。先例＝本文件 ``test_jobs_router_is_not_mounted_by_s3c`` 的 jobs 同形探针
+    （该探针只覆盖 jobs，对 activities **0 命中** —— 这正是 lane S3 的 PC-3 与本棒 lane S4 的
+    PC-1 先后实测到的「无牙」缺口）。路径面按 **PRE-30** 实测取值（``activities.router.routes``
+    的 4 条，方法与路径逐字对撞），**禁**手写想象路径。
+    """
+    with TestClient(
+        create_app(_config(tmp_path), guard=TESTSERVER), raise_server_exceptions=False
+    ) as client:
+        for method, probe in (
+            ("GET", "/api/v1/workspaces/ws-1/activities"),
+            ("POST", "/api/v1/workspaces/ws-1/activities"),
+            ("GET", "/api/v1/workspaces/ws-1/activities/act-1"),
+            ("PATCH", "/api/v1/workspaces/ws-1/activities/act-1"),
+        ):
+            #: **R18-12**：必须带白名单 ``Origin``。实测 ``OriginHostGuard`` 是 BaseHTTPMiddleware，
+            #: 对非安全方法（POST/PATCH）**先于路由**判来源；TestClient 默认不带 Origin ⇒ 会得到
+            #: 403 ``ORIGIN_DENIED`` 而**掩盖**「路由未挂载 ⇒ 404」这一本守护要盯的事实。
+            response = client.request(method, probe, headers=LOOPBACK_ORIGIN)
+            assert response.status_code == 404, (method, probe)
+            assert response.json()["code"] == "RESOURCE_NOT_FOUND", (method, probe)
+
+
+def test_rules_router_is_not_mounted_without_rule_service(tmp_path: Path) -> None:
+    """FU-60：裸 ``create_app()``（不注入 ``rule_service``）⇒ rules 的 **7** 条路由**不得**挂载。
+
+    与 activities 探针**同形**（A259 的精确集合不变量盯 **import 面**，本探针盯**运行期挂载面**，
+    两层互不替代）。7 条路径按 **PRE-30** 实测取自 ``rules.router.routes``（5 个唯一 path / 7 个
+    operationId），方法逐条与装饰器一致 —— 用 ``client.request(method, …)`` 而非一律 GET，
+    以免「方法不匹配 405」把「路由未挂载 404」掩盖掉（后者才是本守护要盯的事实）。
+    """
+    with TestClient(
+        create_app(_config(tmp_path), guard=TESTSERVER), raise_server_exceptions=False
+    ) as client:
+        for method, probe in (
+            ("GET", "/api/v1/workspaces/ws-1/activities/act-1/rules"),
+            ("POST", "/api/v1/workspaces/ws-1/activities/act-1/rules"),
+            ("GET", "/api/v1/workspaces/ws-1/rules/rule-1"),
+            ("PATCH", "/api/v1/workspaces/ws-1/rules/rule-1"),
+            ("POST", "/api/v1/workspaces/ws-1/rules/rule-1/confirm"),
+            ("GET", "/api/v1/workspaces/ws-1/rules/rule-1/checks"),
+            ("GET", "/api/v1/workspaces/ws-1/rules/rule-1/diff"),
+        ):
+            #: **R18-12**：必须带白名单 ``Origin``。实测 ``OriginHostGuard`` 是 BaseHTTPMiddleware，
+            #: 对非安全方法（POST/PATCH）**先于路由**判来源；TestClient 默认不带 Origin ⇒ 会得到
+            #: 403 ``ORIGIN_DENIED`` 而**掩盖**「路由未挂载 ⇒ 404」这一本守护要盯的事实。
+            response = client.request(method, probe, headers=LOOPBACK_ORIGIN)
+            assert response.status_code == 404, (method, probe)
+            assert response.json()["code"] == "RESOURCE_NOT_FOUND", (method, probe)

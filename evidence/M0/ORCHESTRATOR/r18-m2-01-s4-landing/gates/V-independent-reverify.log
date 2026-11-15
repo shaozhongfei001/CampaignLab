@@ -1,0 +1,202 @@
+############################################################
+# R18 · M2-01/S4 入库批 —— 编排器独立复验（PRE-29：禁采信 lane 自报）
+# at: 2026-11-16T05:33:38+08:00   HEAD(before landing): cf29fc9
+############################################################
+
+===== V0 · ruff format 归一（改动件必须先格式化再入库，否则 FACE 失配） =====
+1 file reformatted, 5 files left unchanged
+rc=0
+
+===== V1 · 交付面 face（lane 的 2 件 ＋ 编排器迁移的 3 件 ＋ D-052.md） =====
+src/campaignlab/api/rules.py                     389L   17913B c7b3cccee6ec
+src/campaignlab/api/app.py                       178L    7857B 2e4aad126172
+tests/unit/test_s3b_routes.py                    239L   11531B 99a78f2bd590
+tests/unit/test_s2b2_app_injection.py            389L   16635B 07e1d8a7ea5d
+tests/unit/test_api_app.py                       168L    8168B 68b50bf37dbf
+orchestrator/defects/D-052.md                    150L   10413B 6900b721bf0c
+-- 尾换行实测（rules.py）--
+0000000  \n
+
+===== V2 · rules.py 符号面（ast 实取，禁采信回执） =====
+funcs      : ["_rule_check_response", "_rule_diff_response", "_rule_version_page_response", "_rule_version_response", "check_rule", "compare_rules", "confirm_rule", "create_rule", "get_rule", "list_rules", "update_rule"]
+public(7?) : 7 ["check_rule", "compare_rules", "confirm_rule", "create_rule", "get_rule", "list_rules", "update_rule"]
+private(4?): 4 ["_rule_check_response", "_rule_diff_response", "_rule_version_page_response", "_rule_version_response"]
+__all__(8?): 8 ["check_rule", "compare_rules", "confirm_rule", "create_rule", "get_rule", "list_rules", "router", "update_rule"]
+prefix: /api/v1  tags: ['rules']
+routes: 7
+  GET    /api/v1/workspaces/{workspace_id}/activities/{activity_id}/rules listRules      2xx=['200']
+  POST   /api/v1/workspaces/{workspace_id}/activities/{activity_id}/rules createRule     2xx=['201']
+  GET    /api/v1/workspaces/{workspace_id}/rules/{rule_id}              getRule        2xx=['200']
+  PATCH  /api/v1/workspaces/{workspace_id}/rules/{rule_id}              updateRule     2xx=['200']
+  POST   /api/v1/workspaces/{workspace_id}/rules/{rule_id}/confirm      confirmRule    2xx=['200']
+  GET    /api/v1/workspaces/{workspace_id}/rules/{rule_id}/checks       checkRule      2xx=['200']
+  GET    /api/v1/workspaces/{workspace_id}/rules/{rule_id}/diff         compareRules   2xx=['200']
+
+===== V3 · 分层红线（rules.py 禁一条 SQL） =====
+grep_rc=1  (1 = 零命中 ⇒ 通过)
+
+===== V4 · ruff / mypy =====
+5 files already formatted
+fmt rc=0
+All checks passed!
+lint rc=0
+Success: no issues found in 109 source files
+mypy rc=0
+
+===== V5 · app.py numstat（必须 3/0） =====
+3	0	src/campaignlab/api/app.py
+
+===== V6 · 硬禁面（lane 侧必须零改动） =====
+hard_deny_status_lines=0  (0 = 通过)
+
+===== V7 · 全量改动面 status =====
+ M orchestrator/defects/D-052.md
+ M src/campaignlab/api/app.py
+ M tests/unit/test_api_app.py
+ M tests/unit/test_s2b2_app_injection.py
+ M tests/unit/test_s3b_routes.py
+?? evidence/M0/ORCHESTRATOR/r18-m2-01-s4-landing/gates/V-independent-reverify.log
+?? src/campaignlab/api/rules.py
+END-OF-STATIC-GATES 2026-11-16T05:33:40+08:00
+
+===== V8 · 全量 pytest（工作树＝待入库面；期望 0 failed） =====
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/test_s3d_application.py::test_require_session_accepts_valid_cookie
+tests/unit/test_s3d_application.py::test_process_restart_invalidates_session_via_new_app_instance
+tests/unit/test_s3d_application.py::test_process_restart_invalidates_session_via_new_app_instance
+tests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail
+tests/unit/test_s3d_application.py::test_expired_session_401_uses_the_same_detail
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/starlette/testclient.py:518: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_api_app.py::test_activities_router_is_not_mounted_without_activity_service
+FAILED tests/unit/test_api_app.py::test_rules_router_is_not_mounted_without_rule_service
+2 failed, 748 passed, 6 warnings in 159.36s (0:02:39)
+pytest rc=1
+
+===== V9 · 阳性对照 PC-A（A258 的 E1 迁移 ＋ FU-60 的 rules 探针是否有牙） =====
+-- 变异：删掉 'if rule_service is not None:' 一行并把 include_router 提升为无条件 --
+  mutation applied: 条件挂载 -> 无条件挂载
+-- E1 (test_s3b_routes) 必须 RED --
+E           assert '    if rule_service is not None:\n        app.include_router(rules_router)' in '"""应用工厂（M0-02 · S3c；design §6 ``api/app.py:create_app``）。\n\nA10 边界：本文件的 **CORS／中间件／异常处理装配属 S3c**；而 ``include_router(...ce is not None:\n        app.include_router(activities_router)\n    app.include_router(rules_router)\n    return app\n'
+
+tests/unit/test_s3b_routes.py:222: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+1 failed in 0.31s
+  E1_mut_rc=1  (非0 = 有牙)
+-- FU-60 rules 探针必须 RED --
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_api_app.py::test_rules_router_is_not_mounted_without_rule_service
+1 failed, 1 warning in 0.36s
+  FU60rules_mut_rc=1  (非0 = 有牙)
+-- E2 (G6 挂载清单) 在 PC-A 下的读数（如实登记：清单文本不变 ⇒ 预期仍 GREEN＝该变异对 E2 无牙）--
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 0.35s
+  E2_mut_rc=0
+  [restore] app.py sha=2e4aad126172  expected=2e4aad126172  RESTORED-OK
+
+===== V10 · 阳性对照 PC-B（A259 的精确集合不变量是否有牙） =====
+-- 变异：在 app.py 追加一个未在期望集合内的 api 子模块 import --
+  mutation applied: 追加 'campaignlab.api.health' 到 ImportFrom 面
+.                                                                        [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 0.34s
+  E2_exactset_mut_rc=0  (非0 = 有牙)
+  [restore] app.py sha=2e4aad126172  expected=2e4aad126172  RESTORED-OK
+
+===== V11 · 还原后回归（三条守护必须全 GREEN） =====
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_api_app.py::test_activities_router_is_not_mounted_without_activity_service
+FAILED tests/unit/test_api_app.py::test_rules_router_is_not_mounted_without_rule_service
+2 failed, 22 passed, 1 warning in 0.56s
+  post_restore_rc=1
+END-OF-POSITIVE-CONTROLS 2026-11-16T05:37:25+08:00  app.py sha=2e4aad126172
+
+############################################################
+# R18-12 修正后重跑（2026-11-16T05:39:52+08:00）
+############################################################
+
+===== V11' · 还原态：三条守护 ＋ FU-60 两条必须全 GREEN =====
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+24 passed, 1 warning in 0.70s
+  rc=0
+
+===== V9' · PC-A（条件挂载→无条件）：E1 ＋ FU-60(rules) 必须 RED =====
+  mutation: rules 条件挂载 -> 无条件挂载
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+FAILED tests/unit/test_api_app.py::test_rules_router_is_not_mounted_without_rule_service
+2 failed, 1 warning in 0.42s
+  PC_A_rc=1  (非0 = 两条守护均有牙)
+  [restore] app.py sha=2e4aad126172 expected=2e4aad126172 RESTORED-OK
+
+===== V10' · PC-B（A259 精确集合不变量）：**有效**变异＝追加一个不在期望集合内的 api 子模块 =====
+  mutation: ImportFrom 面追加 campaignlab.api.zzz_mutation_probe（不在 _EXPECTED_API_IMPORTS）
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/unit/test_s2b2_app_injection.py
+1 warning, 1 error in 0.38s
+  PC_B_rc=4  (非0 = 精确集合不变量有牙)
+  [说明] 首版 PC-B 变异选 'from campaignlab.api import health'，其模块名 'campaignlab.api'
+         本就在期望集合内 ⇒ 变异**无效**、rc=0 的读数**不可用**（已作废，如实登记为 R18-12 的一部分）。
+  [restore] app.py sha=2e4aad126172 expected=2e4aad126172 RESTORED-OK
+
+===== V10'' · PC-B 反面（禁串面清空后 banned_hits 断言确为恒真＝无牙，故必须有精确集合补牙） =====
+  _BANNED_ROUTER_MODULES 现值行: ['_BANNED_ROUTER_MODULES: frozenset[str] = frozenset()']
+  _EXPECTED_API_IMPORTS 在场: True
+END-OF-POSITIVE-CONTROLS-RETRY 2026-11-16T05:39:55+08:00 app.py sha=2e4aad126172
+
+===== V10'' · PC-B 重做（**有效**变异：模块存在、但不在 _EXPECTED_API_IMPORTS） =====
+  mutation: 追加 'from campaignlab.api.health import router as _mutation_probe'
+  该模块**存在**（不会 ImportError），其 ImportFrom.module='campaignlab.api.health' **不在**期望集合
+E         Use -v to get more diff
+
+tests/unit/test_s2b2_app_injection.py:297: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_s2b2_app_injection.py::test_g6_mount_and_middleware_surface_unchanged
+1 failed, 1 warning in 0.55s
+  PC_B_rc=1  (非0 且为 assert 红 = 精确集合不变量有牙)
+  [restore] app.py sha=2e4aad126172 expected=2e4aad126172 RESTORED-OK
+
+===== V12 · 全量 pytest（工作树＝待入库面；R18-12 修正后期望 0 failed） =====
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+750 passed, 6 warnings in 154.26s (0:02:34)
+  full_pytest_rc=0
+
+===== V13 · counts 预测（暂存后按索引实测，随后 reset；禁写猜测值 PRE-15） =====
+before stage: py/md = [114, 211]
+AFTER stage (index): in_scope_py = 115  in_scope_md = 213  ruff_total = 328
+  new py: ['src/campaignlab/api/rules.py']
+  still-untracked in-scope (must be [] after stage): []
+  count_git_env_ignores(worktree) = 21
+after reset: staged = []

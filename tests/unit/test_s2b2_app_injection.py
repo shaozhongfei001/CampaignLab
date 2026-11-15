@@ -38,7 +38,19 @@ TESTSERVER = OriginHostGuard(frozenset({"testserver"}), frozenset({"http://tests
 # 故 activities 从禁串面**移除**；
 # rules 仍禁至 M2-01/S4 落地（届时同型迁移）。原「两个」的表述因此降为**一个**，判据强度不降：
 # S4 之前谁 import rules 仍然判红。
-_BANNED_ROUTER_MODULES = frozenset(f"campaignlab.api.{leaf}" for leaf in ("rul" + "es",))
+_BANNED_ROUTER_MODULES: frozenset[str] = frozenset()
+
+#: **R18-S4 迁移（A259，append-only 注记；上文原注记原文保留不改写，D-011）**：
+#: M2-01/S4 已合法落地 ``api/rules.py``，并在 ``app.py`` 里 import ＋ 条件挂载（``numstat 3/0``）
+#: ⇒ 禁串面**清空**（原「一个」降为**零个**）。但清空会使 ``banned_hits`` 断言沦为恒真的
+#: **无牙**判据，故同批把判据**升级**为「``campaignlab.api.*`` 的 import 集合必须**恰等于**
+#: 期望集合」这一精确集合不变量（更强：多一个 / 少一个 / 换一个都判红）。
+#: 期望集合按 **PRE-30**（断言期望值回源义务）**实测取值**，非手写想象：
+#: ``ast`` 扫 ``app.py`` 的 ``ImportFrom`` 得 ``campaignlab.api.*`` 子集实测 **8** 项。
+_EXPECTED_API_IMPORTS = frozenset(
+    f"campaignlab.api.{leaf}" if leaf else "campaignlab.api"
+    for leaf in ("", "activities", "common", "deps", "jobs", "rules", "session", "workspaces")
+)
 
 #: G3：条件装配面的期望字典——五个服务形参各对应一个同名 app.state 属性。
 #: 无条件赋值不会进入该字典，故这条断言与「不注入就不装配」同源。
@@ -71,6 +83,7 @@ EXPECTED_MOUNT_LINES = [
     "app.include_router(workspaces_router)",
     "app.include_router(jobs_router)",
     "app.include_router(activities_router)",
+    "app.include_router(rules_router)",
 ]
 
 
@@ -279,6 +292,12 @@ def test_g6_mount_and_middleware_surface_unchanged() -> None:
     }
     banned_hits = imported_modules & _BANNED_ROUTER_MODULES
     assert not banned_hits, f"A217 ③：不得 import {sorted(banned_hits)}"
+    #: A259：禁串面已随 S4 落地而清空 ⇒ 用**精确集合**不变量补牙（禁留恒真断言）。
+    api_imports = {m for m in imported_modules if m.startswith("campaignlab.api")}
+    assert api_imports == _EXPECTED_API_IMPORTS, (
+        f"campaignlab.api.* 的 import 面漂移：多={sorted(api_imports - _EXPECTED_API_IMPORTS)} "
+        f"少={sorted(_EXPECTED_API_IMPORTS - api_imports)}"
+    )
 
     middleware: list[str] = []
     middleware_lines: list[int] = []

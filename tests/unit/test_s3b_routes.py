@@ -200,6 +200,15 @@ def test_app_py_contains_only_the_a85_mount_lines() -> None:
     此前**没有任何既有守护判红**（``tests/unit/test_api_app.py`` 的裸装配 404 探针只覆盖 jobs，
     对 activities 0 命中），属判据「无牙」的真缺陷；追加 pair 后该变异会使二元组失配而判红。
     强度不降：多一条红、少一条红、换序红、改成无条件红、删 import 红。
+
+    **R18-S4 迁移注记（A258，编排器同批修正；上文注记原文保留不改写，D-011）**：
+    M2-01/S4 依 A217 ③ 落地 ``app.include_router(rules_router)``（与 session / workspaces /
+    jobs / activities **同形**的条件挂载 ``if rule_service is not None:``，``numstat 3/0``）
+    ⇒ 挂载行由 5 增至 **6**。迁移采 lane S4 的 PC-1 **迁移形态学仿真**结论＝V3 形态
+    （``pairs`` 追加 rules 二元组 **且** 计数 5→6，两处同改）：实测只改计数（V1 形态）会得到
+    BASE/MUT **双绿**的无牙守护 —— 「条件挂载改成无条件挂载」这一 R16-4 / R16-9 同族变异将
+    再次无人可拦；V3 形态实测 BASE=GREEN / MUT=RED @213 ⇒ 判据**有牙**，强度不降反升
+    （新增「rules 挂载行恰 1 条」与「rules_router 出现 ≤3 行」两条）。
     """
     source = (_REPO / "src/campaignlab/api/app.py").read_text(encoding="utf-8")
     pairs = (
@@ -207,6 +216,7 @@ def test_app_py_contains_only_the_a85_mount_lines() -> None:
         "    if workspace_service is not None:\n        app.include_router(workspaces_router)",
         "    if workspace_service is not None:\n        app.include_router(jobs_router)",
         "    if activity_service is not None:\n        app.include_router(activities_router)",
+        "    if rule_service is not None:\n        app.include_router(rules_router)",
     )
     for pair in pairs:
         assert pair in source
@@ -214,13 +224,16 @@ def test_app_py_contains_only_the_a85_mount_lines() -> None:
     assert "import router as workspaces_router" in source
     assert "import router as jobs_router" in source
     assert "import router as activities_router" in source
+    assert "import router as rules_router" in source
     mounted_lines = [
         line for line in source.splitlines() if line.strip().startswith("app.include_router(")
     ]
-    assert len(mounted_lines) == 5
+    assert len(mounted_lines) == 6
     assert len([line for line in mounted_lines if "jobs" in line]) == 1
     assert len([line for line in mounted_lines if "activities" in line]) == 1
+    assert len([line for line in mounted_lines if "rules" in line]) == 1
     assert len([line for line in source.splitlines() if "session_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "workspaces_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "jobs_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "activities_router" in line]) <= 3
+    assert len([line for line in source.splitlines() if "rules_router" in line]) <= 3

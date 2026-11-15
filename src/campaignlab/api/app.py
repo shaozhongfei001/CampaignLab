@@ -42,6 +42,7 @@ from campaignlab.api.deps import (
     WorkspaceService,
 )
 from campaignlab.api.jobs import router as jobs_router
+from campaignlab.api.rules import router as rules_router
 from campaignlab.api.session import router as session_router
 from campaignlab.api.workspaces import router as workspaces_router
 from campaignlab.clock import Clock, SystemClock
@@ -172,4 +173,6 @@ def create_app(
         app.include_router(jobs_router)
     if activity_service is not None:
         app.include_router(activities_router)
+    if rule_service is not None:
+        app.include_router(rules_router)
     return app
