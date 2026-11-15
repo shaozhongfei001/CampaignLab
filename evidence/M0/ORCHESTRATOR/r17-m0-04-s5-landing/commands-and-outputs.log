@@ -1,0 +1,200 @@
+# R17 · M0-04/S5 入库取证 —— 命令原文与输出
+# 口径：一切读数由编排器在本机实测（rule_no_trust_handoff_summary_assertions）；lane 自报仅作对照。
+# generated_at: 2026-11-15T08:06:28+08:00
+# HEAD_before: 50be48f  (full 50be48fb2f56c19d6e64be24c2b08d1270746e52)
+# branch: m0-framework
+
+## A. 仓库状态（入库前）
+$ git rev-parse --abbrev-ref HEAD; git log --oneline -3; git status --porcelain=v1 -uall
+m0-framework
+50be48f chore(R17-backfill-sha): 纯台账回填 M2-01/S2b-2 的 commit sha 87c897a ＋ 如实登记本批 normalize_file 命中 1 件（取证索引 TRAILING_NL_ADDED，e64663c84cca→3f1825ee4fa0，+1 B）＋ close_agent(Mendel) 已释放并发槽
+87c897a feat(M2-01/S2b-2): create_app 的 activity_service / rule_service 注入位落地（app.py 14/2 · kwonly 有序 7 名 · app.state 6→8）＋ 9 条新守护（G1–G9）＋ 编排器 49 项独立复验全绿并终裁 A235–A238
+641551c chore(R17-backfill-agentid): 纯台账回填 predispatch 提交 sha 054ef90 ＋ PRE-13 第三步回填两条 lane 的 agent_id（S5=Kierkegaard · S2b-2=Mendel，status PREDISPATCHED→IN_FLIGHT）
+?? evidence/M0/ORCHESTRATOR/r17-m0-04-s5-landing/commands-and-outputs.log
+?? orchestrator/defects/D-049.md
+?? tests/integration/jobs/conftest.py
+?? tests/integration/jobs/test_idempotency.py
+?? tests/integration/jobs/test_jobs_api.py
+?? tests/integration/jobs/test_state_machine.py
+?? tests/unit/test_jobs_conftest_no_autouse.py
+
+## B. 交付面逐件实测（lane 4 件 ＋ 编排器同批补牙的静态哨兵 1 件）
+$ wc -l -c <5 files> && sha256sum <5 files>
+  217  8509 tests/integration/jobs/conftest.py
+  503 18040 tests/integration/jobs/test_state_machine.py
+  154  5697 tests/integration/jobs/test_idempotency.py
+  300 11320 tests/integration/jobs/test_jobs_api.py
+  104  4483 tests/unit/test_jobs_conftest_no_autouse.py
+ 1278 48049 total
+90ba7b17b11525ddb11939b2fd08367f76376552ecc1e7c61d0713ce55a3311e  tests/integration/jobs/conftest.py
+39e6c8423b1a47b318030db21eca294248dd6f5eae92d045592ba36491557ccc  tests/integration/jobs/test_state_machine.py
+69a69d80abebf1c626eb43e2fdb0d0f664757bae913f53d4afd3bc5ffd29574a  tests/integration/jobs/test_idempotency.py
+64a157a2f176b034a05d5cb0a31c790aa5e381d59136e0114503b94f1d13f6a7  tests/integration/jobs/test_jobs_api.py
+0f37d540f63ac3aa177aeb51b234a738fa09374856e9a31aa06222a424379f19  tests/unit/test_jobs_conftest_no_autouse.py
+49b419b3b4078562265fab43a1114a50b26f6489ca99664b790b980378f2d4fe  orchestrator/defects/D-049.md
+
+## C. 硬禁面 / 冻结面（sha 对撞 ＋ numstat 全空）
+$ sha256sum <frozen faces>
+ed1075a86447e5a4808e19835c4dc49d44d8c3709811fd5d8a64b3be4c26d471  src/campaignlab/api/deps.py
+21425228694ba2aeab979e6215e00bd4420f6326fff19ba1ad1a49ec6eeb50d8  src/campaignlab/application/activity_service.py
+f039722660bbba904c989625065394d1e030e5297c74f4ccc2ef2352d4c3bf8c  src/campaignlab/api/app.py
+592571099d63825188446e33d297befa8911554a77782b9318a34e328b33aec1  contracts/openapi.json
+fadf666b810db4839a67ca49a2cf7f035f0af0ef55b8d7029fa5332ace0c5904  tests/unit/test_s2b2_app_injection.py
+$ git diff --numstat HEAD -- <untouched faces>   # 逐件空 == 未改
+  src/campaignlab/api/common.py -> []
+  src/campaignlab/api/jobs.py -> []
+  src/campaignlab/worker/service.py -> []
+  src/campaignlab/worker/deps.py -> []
+  src/campaignlab/worker/runner.py -> []
+  pyproject.toml -> []
+  scripts/orch_harness.py -> []
+  tests/integration/jobs/test_artifact_write.py -> []
+  tests/integration/jobs/test_jobs_router_s4.py -> []
+  tests/integration/jobs/test_worker_deps.py -> []
+  tests/integration/jobs/__init__.py -> []
+  orchestrator/handoff/M0-04-design.md -> []
+  orchestrator/handoff/R17-lane-M0-04-S5.md -> []
+
+## D. 编排器独立复验（81 项对撞，脚本 .orch_tmp/v_s5.py，用**仓库解释器** 3.14 执行 —— 见 §D-1）
+$ uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/v_s5.py 2>&1 | tee /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/out_v_s5.txt
+### 1. 交付面实测（行 / 字节 / sha256[:12]）
+   tests/integration/jobs/conftest.py             lines= 217 bytes=  8509 sha12=90ba7b17b115 nl=217 single_nl_end=True
+   tests/integration/jobs/test_state_machine.py   lines= 503 bytes= 18040 sha12=39e6c8423b1a nl=503 single_nl_end=True
+   tests/integration/jobs/test_idempotency.py     lines= 154 bytes=  5697 sha12=69a69d80abeb nl=154 single_nl_end=True
+   tests/integration/jobs/test_jobs_api.py        lines= 300 bytes= 11320 sha12=64a157a2f176 nl=300 single_nl_end=True
+### 2. git 面：4 件必须是未跟踪；工作树不得有其它脏面
+### 3. conftest 的 9 个 fixture（名集相等 + 零 autouse）
+   fixtures: ['data_dir', 'migrated_job_db', 'fixed_clock', 'advance_clock', 'job_store', 'stub_handler', 'registry_with_stub', 'idem_key', 'http_client']
+### 4. 遮蔽关系实测（解释 PC-4 为何不红 —— lane U-3 的事实面）
+   tests/integration/jobs/test_artifact_write.py  own fixtures=['data_dir', 'engine', 'clock', 'store', 'writer', 'other_device']
+   tests/integration/jobs/test_worker_deps.py     own fixtures=['data_dir', 'db_path', 'engine', 'config', 'clock', 'store', 'other_device']
+   tests/integration/jobs/test_jobs_router_s4.py  own fixtures=['harness', 'client', 'ws']
+   conftest 名被既有模块级 fixture 遮蔽的交集: ['data_dir']
+### 5. 状态机矩阵 T1–T9（函数名前缀 + 参数化 id）
+   test_state_machine funcs(9): ['test_t1_claim_queued_to_running', 'test_t2_cancel_queued_to_cancelled', 'test_t3_renew_keeps_running_and_extends_lease', 'test_t4_running_to_cancel_requested', 'test_t5_succeed_with_valid_lease', 'test_t6_fail_known_problem', 'test_t7_reap_expired_running_to_failed', 'test_t8_cancel_requested_to_cancelled', 'test_t9_retry_creates_new_queued']
+   param ids(13): ['T1-earliest-queued-first', 'T2-queued-direct-cancelled', 'T3-renew-extends-lease', 'T3-stale-lease-rejected', 'T4-running-cancel-keeps-lease', 'T5-valid-lease-succeeds', 'T6-permanent-validation-error', 'T6-retryable-internal-error', 'T7-lease-expiry-reap', 'T8-executor-confirm', 'T8-expiry-reap', 'T9-retry-from-cancelled', 'T9-retry-from-failed']
+### 6. 幂等 3 例 / API 7 例（函数名集）
+   idempotency(3): ['test_same_key_same_request_same_object', 'test_same_key_different_request_409', 'test_replay_body_byte_identical']
+   jobs_api(7): ['test_list_pagination_and_cursor', 'test_bad_cursor_400', 'test_status_filter_multi_value', 'test_cross_workspace_is_404', 'test_cancel_missing_if_match_428', 'test_cancel_stale_if_match_412', 'test_retry_capacity_429_has_retry_after']
+### 7. 禁串扫描（4 件）＋ type: ignore
+### 8. U-1 事实面：ObjectKind 的 Literal 成员数（派单/裁定原文称 21）
+   ObjectKind members(20): ['workspace', 'activity', 'rule', 'import', 'snapshot', 'definition', 'case', 'run', 'candidate', 'preflight', 'receipt', 'comparison', 'review', 'diagnosis', 'question', 'report', 'action', 'job', 'export', 'evidence']
+### 9. U-4 事实面：活契约里 jobs 面无创建端点（submitJob 出现 0 次）
+### 10. U-2 事实面：detail 断言用 import 常量 ＋ AST 防副本自守护
+### 11. PC-6 复原证据：STUB_KIND 终态
+### 12. 硬禁面零改动（sha 对撞；app.py 取 S2b-2 入库后终态）
+### 13. 用例数（--collect-only 实测）
+   tests/integration/jobs/test_state_machine.py   collected=13
+   tests/integration/jobs/test_idempotency.py     collected=3
+   tests/integration/jobs/test_jobs_api.py        collected=7
+   conftest collect rc=5 tail=['no tests collected in 0.00s']
+==============================================================================
+==============================================================================
+TOTAL 81 · PASS 81 · FAIL 0
+
+## D-1. 编排器自纠（R17-3）：复验脚本必须用仓库解释器
+第 1 次执行误用系统 python3（3.12），在 ast.parse('src/campaignlab/api/common.py') 处崩溃：
+  File "<unknown>", line 976 / except ValueError, binascii.Error: /
+  SyntaxError: multiple exception types must be parenthesized
+成因＝该文件用了 PEP 758 的 3.14 语法（不带括号的 except 多异常类型），系统 3.12 无法解析。
+纠正＝改用 uv run --no-sync python（仓库 .venv 的 3.14）执行；立 PRE-21 固化该口径。
+本次崩溃**零副作用**（脚本在 §8 之前只做只读实测，未写任何文件）。
+
+## E. 该目录全量复跑（既有 65 例 ＋ 新增 23 例 == 88，验证 conftest 未打红既有用例）
+$ uv run --no-sync pytest -q -p no:randomly tests/integration/jobs | tail -3
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+88 passed, 1 warning in 36.68s
+
+## E-1. 编排器同批补牙的静态哨兵（A241：autouse 禁令此前只在 docstring 里，无机器判据）
+$ uv run --no-sync pytest -q -p no:randomly tests/unit/test_jobs_conftest_no_autouse.py | tail -3
+...                                                                      [100%]
+3 passed in 0.01s
+$ uv run --no-sync ruff check tests/unit/test_jobs_conftest_no_autouse.py && uv run --no-sync mypy tests/unit/test_jobs_conftest_no_autouse.py
+All checks passed!
+Success: no issues found in 1 source file
+
+## F. PC-ORCH-1/2（PRE-18：先 AST 断言变异生效 → 两项观测 → 字节级复原对撞）
+$ uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/pc_orch_s5.py 2>&1 | tee /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/out_pc_orch_s5.txt
+baseline: conftest sha12=90ba7b17b115 autouse={'data_dir': False, 'migrated_job_db': False, 'fixed_clock': False, 'advance_clock': False, 'job_store': False, 'stub_handler': False, 'registry_with_stub': False, 'idem_key': False, 'http_client': False}
+[baseline] sentinel rc=0 :: 3 passed in 0.01s
+mutating line 76: '@pytest.fixture\n'
+[A] 变异生效：migrated_job_db autouse=True（应为 True）；全表 autouse=True 的有 ['migrated_job_db']
+[B1] 哨兵 rc=1 :: tests/unit/test_jobs_conftest_no_autouse.py:86: AssertionError | 1 failed, 2 passed in 0.02s   （期望 rc=1、1 failed ⇒ 禁令有牙）
+[B2] 既有三件 rc=0 :: 65 passed, 1 warning in 50.76s   （期望 rc=0、65 passed ⇒ lane 的 PC-4 GAP 自报属实）
+[C] 复原 sha12=90ba7b17b115 == baseline 90ba7b17b115 -> True
+[D] 复原后哨兵 rc=0 :: 3 passed in 0.01s
+VERDICT: sentinel_has_teeth=True existing_still_green=True restored=True => PASS
+解读：一次变异（给 conftest 的 migrated_job_db 加 autouse=True）＋ 两项观测 —— 
+  [B1] 哨兵 rc=1 / 1 failed ⇒ 禁令**有牙**（A241 补的静态哨兵确实能抓）；
+  [B2] 既有三件 rc=0 / 65 passed ⇒ lane 的 PC-4 GAP 自报**属实**（派单文 §7 的判红预言不成立，D-049 ③）；
+  [C] 复原 sha256[:12]=90ba7b17b115 == 入库前实测值 ⇒ 变异零残留；[D] 复原后哨兵回到 3 passed。
+
+## G. 未跟踪件归属面（A144(c)）与本次 owner_map
+$ git ls-files --others --exclude-standard
+evidence/M0/ORCHESTRATOR/r17-m0-04-s5-landing/commands-and-outputs.log
+orchestrator/defects/D-049.md
+tests/integration/jobs/conftest.py
+tests/integration/jobs/test_idempotency.py
+tests/integration/jobs/test_jobs_api.py
+tests/integration/jobs/test_state_machine.py
+tests/unit/test_jobs_conftest_no_autouse.py
+本次入库时**无其它在飞 lane**（S2b-2 已于 87c897a 入库、50be48f 回填、close_agent 释放槽）⇒ owner_map 为空集，
+classify_untracked 的 outside 必须为空（本棒 5 件 .py ＋ D-049.md ＋ 取证 2 件全在 add_paths 内）。
+
+## H. 四门口径与 EXPECT
+lane 自报（活动树口径，含邻居在飞增量，仅作对照）：ruff format --check 298 files / mypy 106 / pytest 731 passed。
+权威读数＝run_commit 在**冻结索引树**上的实测，且必须与本驱动 EXPECT 逐条相等，否则 git reset + 台账 checkout 回滚。
+EXPECT：ruff_formatted_files=301 / mypy_source_files=107 / pytest_passed=734 / in_scope_py=109 / in_scope_md=192。
+换算：入库前 294（104 py + 190 md）/ 102 / 708 ＋ lane 4 件 .py ＋ 编排器哨兵 1 件 .py ＋ D-049.md ＋ 本取证索引 .md
+      ⇒ py 104+5=109、md 190+2=192、ruff 109+192=301、mypy 102+5=107、pytest 708+23+3=734（冻结树实跑 713 ＋ GIT_ENV_IGNORES 静态 21）。
+      commands-and-outputs.log 为 .log 后缀 ⇒ 不入 ruff 分母。
+
+## I. flash_share 口径反向复算（先证可复现，再算新值）
+$ python3 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/flash_r17_s5.py
+recompute(now, 44 entries) = {"subtask_entries": 43, "subtask_units_total": 53, "subtask_units_flash": 29, "token_entries_known": 10, "token_entries_null": 33, "tokens_known_total": 1190000, "tokens_known_flash": 792000, "dev_lane_units_total": 31, "dev_lane_units_flash": 10}
+derived now  tasks/dev/tokens = (0.5472, 0.3226, 0.6655)
+ledger       tasks/dev/tokens = (0.5472, 0.3226, 0.6655)
+caliber reproducible = True
+recompute(after +1 flash dev entry) = {"subtask_entries": 44, "subtask_units_total": 54, "subtask_units_flash": 30, "token_entries_known": 10, "token_entries_null": 34, "tokens_known_total": 1190000, "tokens_known_flash": 792000, "dev_lane_units_total": 32, "dev_lane_units_flash": 11}
+predicted tasks/dev/tokens = (0.5556, 0.3438, 0.6655)
+结论：现值反向重算与账本三项逐位相等 ⇒ 口径可复现；本棒（flash、dev lane、tokens=null+estimated）入库后
+预期 tasks=30/54=0.5556、dev=11/32=0.3438、tokens 保持 0.6655 —— 与 A234 在派单时给出的预测**逐位相符**（交叉验证）。
+两项护栏仍未达标（tasks<0.60、tokens>0.35），如实上报不粉饰、不为凑配比改判。
+
+§J. PREFLIGHT RED #1 —— 编排器自办驱动的**断言口径缺陷**（自纠 R17-4 ＋ 新立 PRE-22；**零副作用**）
+
+[J-1] 命令（第 1 次执行入库驱动的 --preflight-only，只读、零副作用）
+  export PATH="$HOME/.local/bin:$PATH"; cd /home/szf/dev/CampaignLab
+  uv run --no-sync python .orch_tmp/r17_s5_commit.py --preflight-only
+[J-2] 输出原文（RC=1，仅 1 项判红）
+PREFLIGHT RED（零副作用，未提交）：
+  - untracked outside == ADD: got=['evidence/M0/ORCHESTRATOR/r17-m0-04-s5-landing/00-index.md', 'orchestrator/defects/D-049.md', 'tests/integration/jobs/conftest.py', 'tests/integration/jobs/test_idempotency.py', 'tests/integration/jobs/test_jobs_api.py', 'tests/integration/jobs/test_state_machine.py', 'tests/unit/test_jobs_conftest_no_autouse.py'] want=[同上 7 件 + 'evidence/M0/ORCHESTRATOR/r17-m0-04-s5-landing/commands-and-outputs.log']
+[J-3] 归因（**读判据实现后确认**，非猜测）
+  scripts/orch_harness.py:
+    def classify_untracked(owner_map):
+        owners = dict(owner_map or {})
+        untracked = untracked_in_scope()          # ← 只在 in-scope 范围内取未跟踪件
+    def untracked_in_scope():
+        raw = git_out("ls-files", "--others", "--exclude-standard", "-z")
+        return sorted(n for n in raw.split("\0") if n and in_scope(n))
+    def in_scope(rel):
+        if rel.startswith(EXCLUDED_PREFIXES): return False
+        return rel.endswith(RUFF_SUFFIXES)      # RUFF_SUFFIXES == ('.py', '.md')
+  ⇒ evidence/…/commands-and-outputs.log 是 **.log** 后缀，本就**不会**出现在 outside 里。
+  驱动 preflight §8 把期望集写成 add_paths 全集（8 件）⇒ 期望集口径与被调判据口径**不一致**。
+  性质判定：**不是漏检、不是越权件、不是交付面缺陷**，而是编排器自己写的断言错了（判据本身有效）。
+[J-4] 处置（同批修正，并加两条自证断言防该口径被误读）
+  期望集改为 ADD_IN_SCOPE = [p for p in ADD if h.in_scope(p)]（7 件），并同批新增：
+    ck("ADD in-scope subset is 7", len(ADD_IN_SCOPE) == 7)
+    ck("cmdlog excluded from outside", (CMDLOG not in outside) and (not h.in_scope(CMDLOG)))
+  反向自证（PRE-18 精神）：若 .log 哪天真进了 outside，第二条断言立即判红 ⇒ 判据非恒真。
+[J-5] 副作用实测（**零**）
+  --preflight-only 只读：HEAD 仍 50be48f；git status --porcelain 仍 7 件未跟踪（与入库前逐件相同）；
+  orchestrator/state.json 未改动（run_commit 未被调用）。
+[J-6] 自纠与防再发
+  **R17-4**（编排器驱动断言口径）：如实入档，禁粉饰为「一次通过」。
+  **PRE-22（新立）**：凡断言的期望集来自某判据函数的返回值，必须**先读该函数的过滤条件**
+  （in_scope / _is_mypy_scope / EXCLUDED_PREFIXES / RUFF_SUFFIXES 之类），期望集必须用**同一过滤条件**构造；
+  禁拿「意图中的全集」当期望。与 PRE-15（判据由实测产生）、PRE-20（派单文三类断言派单前实测）、
+  PRE-21（探针脚本一律用仓库解释器）同族，一并写进 Round 18 起所有派单文与编排器驱动的自检清单。
