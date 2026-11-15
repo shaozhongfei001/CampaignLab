@@ -1,0 +1,556 @@
+# R18 · M2-01/S3 入库取证 —— 命令原文与输出（编排器实测，禁采信自报）
+# 组装时点：2026-11-16T01:28:37+08:00
+# 入库前 HEAD：c94eff9　分支：m0-framework　tag：R18-landS3
+# 口径：一切读数由编排器实测（rule_no_trust_handoff_summary_assertions）；入库四门跑在**冻结索引树**上（R11-3 ＋ D-046 的 frozen_env 导入隔离，工装 scripts/orch_harness.py）。
+# 本文件由 .orch_tmp 下**已留档的真实捕获输出**逐段拼接而成，禁重打字（保证取证原文与实际执行不脱钩）。
+# 解释器口径：uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1 / PRE-21：会对 PEP 758 假报 SyntaxError）。
+
+##############################################################################
+# §1 新鲜独立复验（本次取证的主证据；编排器 r18_ev_s3.py 实跑，含 §M 阳性对照 PC-U2 的变异→判红→逐字节复原全链）
+# 来源捕获件：.orch_tmp/r18_ev_s3.out（12121 B，逐字原样转贴，零改写）
+##############################################################################
+
+==============================================================================
+§A git 面（取证时点 2026-11-16T01:21:47+08:00）
+==============================================================================
+$ git rev-parse --short HEAD
+  rc=0
+  | c94eff9
+$ git branch --show-current
+  rc=0
+  | m0-framework
+$ git status --porcelain -uall
+  rc=0
+  | M src/campaignlab/api/app.py
+  |  M tests/unit/test_s2b2_app_injection.py
+  |  M tests/unit/test_s3b_routes.py
+  | ?? orchestrator/defects/D-051.md
+  | ?? src/campaignlab/api/activities.py
+  | ?? tests/api/activities/__init__.py
+  | ?? tests/api/activities/test_activities_router_s3.py
+  | ?? tests/integration/jobs/test_artifact.py
+  | ?? tests/integration/jobs/test_lease.py
+$ git diff --numstat HEAD
+  rc=0
+  | 3	0	src/campaignlab/api/app.py
+  | 10	3	tests/unit/test_s2b2_app_injection.py
+  | 16	1	tests/unit/test_s3b_routes.py
+
+==============================================================================
+§B 交付面逐件字节实测（编排器 face_of 口径：lines=len(text.split('\n'))）
+==============================================================================
+  src/campaignlab/api/activities.py: {'lines': 222, 'bytes': 9955, 'sha256_12': '887bd377a4f7', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  src/campaignlab/api/app.py: {'lines': 176, 'bytes': 7726, 'sha256_12': '76fcb0778f64', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  tests/api/activities/__init__.py: {'lines': 2, 'bytes': 89, 'sha256_12': '8ccc54fe0ab9', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  tests/api/activities/test_activities_router_s3.py: {'lines': 222, 'bytes': 8872, 'sha256_12': 'e4d1d145cca5', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  tests/unit/test_s3b_routes.py: {'lines': 227, 'bytes': 10365, 'sha256_12': 'ae4416aeabbf', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  tests/unit/test_s2b2_app_injection.py: {'lines': 371, 'bytes': 15265, 'sha256_12': '8902dff88058', 'crlf': 0, 'bom': False, 'ends_nl': True}
+  orchestrator/defects/D-051.md: {'lines': 75, 'bytes': 8257, 'sha256_12': '11c70447e327', 'crlf': 0, 'bom': False, 'ends_nl': True}
+
+==============================================================================
+§C 冻结先例／禁改面 sha 独立复测（A247 ①／A248 ① 的前提）
+==============================================================================
+  src/campaignlab/api/common.py: 1169 行 / 45605 B / 836e7b3e8d3a  OK
+  src/campaignlab/api/jobs.py: 372 行 / 16916 B / 735d30baf0c4  OK
+  src/campaignlab/api/deps.py: 347 行 / 13524 B / ed1075a86447  OK
+  src/campaignlab/application/activity_service.py: 2000 行 / 88950 B / 21425228694b  OK
+  contracts/openapi.json: 16748 行 / 443309 B / 592571099d63  OK
+  src/campaignlab/api/session.py: 171 行 / 6945 B / 14be2b2fda59  n/a(未冻结基线)
+  src/campaignlab/api/workspaces.py: 113 行 / 5045 B / 4c1d74aeeeb3  n/a(未冻结基线)
+  tests/unit/test_api_app.py: 121 行 / 5271 B / a97c32a63756  OK
+  tests/integration/jobs/conftest.py: 218 行 / 8509 B / 90ba7b17b115  OK
+  tests/unit/test_jobs_conftest_no_autouse.py: 105 行 / 4483 B / 0f37d540f63a  OK
+
+==============================================================================
+§D V1 —— 新增测试面实跑（uv run --no-sync pytest -q tests/api/activities）
+==============================================================================
+$ uv run --no-sync pytest -q tests/api/activities
+  rc=0
+  | ....                                                                     [100%]
+  | =============================== warnings summary ===============================
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | 4 passed, 1 warning in 1.37s
+  V1 rc=0 : True
+
+==============================================================================
+§E V4/V5 —— app.py 挂载面（numstat 恰 3/0；include_router 恰 5；activities_router 恰 1）
+==============================================================================
+$ git diff --numstat HEAD -- src/campaignlab/api/app.py
+  rc=0
+  | 3	0	src/campaignlab/api/app.py
+  include_router 调用点 5 ['health.router', 'session_router', 'workspaces_router', 'jobs_router', 'activities_router']
+  activities_router 恰 1: True
+  add_middleware 顺序: ['BaseHTTPMiddleware', 'CORSMiddleware']
+
+==============================================================================
+§F V6/V7 —— activities.py 公开面／私面／__all__／operation_id／declared_responses
+==============================================================================
+  public: ['create_activity', 'get_activity', 'list_activities', 'update_activity']
+  private: ['_activity_page_response', '_activity_response']
+  __all__: ['create_activity', 'get_activity', 'list_activities', 'router', 'update_activity'] 字母序: True
+  router 定义存在: True
+  declared_responses 调用点: 4
+    args: ['200'] kw: []
+    args: ['201'] kw: []
+    args: ['200'] kw: []
+    args: ['200'] kw: []
+
+==============================================================================
+§G V9 —— 依赖注入同一性判据（进程内对象身份 `is`，非响应体代理）
+==============================================================================
+  166: assert _RESOLVED[-1] is injected
+  182: assert _RESOLVED[-1] is stub
+  207: assert _RESOLVED[-1] is stub
+
+==============================================================================
+§H V8 —— 红线扫描（sleep/monotonic/datetime.now/utcnow/time.time/asyncio.sleep/type: ignore）
+==============================================================================
+  红线命中总数: 0
+
+==============================================================================
+§I A248 落地证据 —— E1 的 pairs 已含 activities 条件挂载对（逐字）
+==============================================================================
+  PAIR_SRC in E1: False
+  E1 中 'activities' 命中行数: 8
+  E2 _BANNED_ROUTER_MODULES 含 activities: False
+
+==============================================================================
+§J E1+E2 迁移后实跑（A245/A248 的预期红由编排器同批迁移闭合）
+==============================================================================
+$ uv run --no-sync pytest -q tests/unit/test_s3b_routes.py tests/unit/test_s2b2_app_injection.py
+  rc=0
+  | ................                                                         [100%]
+  | =============================== warnings summary ===============================
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | 16 passed, 1 warning in 0.49s
+  E1+E2 rc=0: True
+
+==============================================================================
+§K 质量门（工作树快照；权威值以 run_commit 的冻结索引树为准）
+==============================================================================
+$ uv run --no-sync ruff check .
+  rc=0
+  | All checks passed!
+$ uv run --no-sync ruff format --check .
+  rc=0
+  | 311 files already formatted
+$ uv run --no-sync mypy
+  rc=0
+  | Success: no issues found in 112 source files
+
+==============================================================================
+§L 悬空引用实扫（PRE-17：集合相等断言，allow_dangling=() 预期 0 条）
+==============================================================================
+  dangling_refs(7 件) = 0 []
+
+==============================================================================
+§M PC-U2 —— 编排器自办阳性对照（证明 A248 处置② 的判据**有牙**）
+==============================================================================
+  [0] 复原基准 sha=76fcb0778f64 bytes=7726
+  [1] 变异态（条件挂载 -> 无条件挂载）sha=6d50dbbf9299  <= lane 自报 PC-3 变异 sha 6d50dbbf9299 应逐字相同
+  [2] AST 生效证明：include_router 调用点 5（应为 5，条件层被削平）
+$ uv run --no-sync pytest -q tests/unit/test_s3b_routes.py tests/unit/test_s2b2_app_injection.py
+  rc=1
+  |         for pair in pairs:
+  | >           assert pair in source
+  | E           assert '    if activity_service is not None:\n        app.include_router(activities_router)' in '"""应用工厂（M0-02 · S3c；design §6 ``api/app.py:create_app``）。\n\nA10 边界：本文件的 **CORS／中间件／异常处理装配属 S3c**；而 ``include_router(...ice is not None:\n        app.include_router(jobs_router)\n    app.include_router(activities_router)\n    return app\n'
+  | 
+  | tests/unit/test_s3b_routes.py:212: AssertionError
+  | =============================== warnings summary ===============================
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | =========================== short test summary info ============================
+  | FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+  | 1 failed, 15 passed, 1 warning in 0.54s
+  [3] 判据 rc=1  =>  **必须为 1（判红）才算有牙**
+     红原文 | >           assert pair in source
+     红原文 | E           assert '    if activity_service is not None:\n        app.include_router(activities_router)' in '"""应用工厂（M0-02 · S3c；design §6 ``api/app.py:create_app``）。\n\nA10 边界：本文件
+     红原文 | tests/unit/test_s3b_routes.py:212: AssertionError
+     红原文 | FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+  [4] 逐字节复原 sha=76fcb0778f64 == 基准 76fcb0778f64 : True
+$ uv run --no-sync pytest -q tests/unit/test_s3b_routes.py tests/unit/test_s2b2_app_injection.py
+  rc=0
+  | ................                                                         [100%]
+  | =============================== warnings summary ===============================
+  | .venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  |   /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  |     from starlette.testclient import TestClient as TestClient  # noqa
+  | 
+  | -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+  | 16 passed, 1 warning in 0.56s
+  [5] 复原后 E1+E2 rc=0（应为 0）
+
+==============================================================================
+§N 全量 pytest —— 见 .orch_tmp/r18_vfull.out（本轮已实测：工作树 rc=0 / 747 passed / 0 failed）
+==============================================================================
+  说明：本脚本不重跑全量（耗时 2:46）。工作树全量已于本轮实测并留档 r18_vfull.out：
+        [FULL] rc=0 passed=747 failed=0 summary='747 passed, 6 warnings in 166.32s'
+        747 = 基线 734 + S3 的 4 + S6 在飞的 9（当时点）。计划外红 = 空集。
+  冻结索引树的**权威**全量值由 run_commit 实跑并与 expect_counts[pytest_passed]=738 逐条对账
+  （738 = 734 + S3 的 4；S6 的 2 件未跟踪、不入索引 ⇒ 不在冻结树内）。
+
+EVIDENCE_CAPTURE_DONE 2026-11-16T01:21:47+08:00
+RC=0
+
+##############################################################################
+# §2 lane S3 交付面的 V1–V11 逐项对撞（Round 18 早段捕获，r18_verify.py）
+# 来源捕获件：.orch_tmp/r18_vs3.out（5882 B，逐字原样转贴，零改写）
+##############################################################################
+========================================================================
+VERIFY lane S3 (M2-01/S3) —— 编排器独立复验，禁采信自报
+========================================================================
+[S3] 件字节面 src/campaignlab/api/activities.py: {"lines": 222, "bytes": 9955, "sha256_12": "887bd377a4f7", "crlf": 0, "bom": false, "ends_nl": true}
+[S3] 件字节面 tests/api/activities/__init__.py: {"lines": 2, "bytes": 89, "sha256_12": "8ccc54fe0ab9", "crlf": 0, "bom": false, "ends_nl": true}
+[S3] 件字节面 tests/api/activities/test_activities_router_s3.py: {"lines": 222, "bytes": 8872, "sha256_12": "e4d1d145cca5", "crlf": 0, "bom": false, "ends_nl": true}
+[S3.V4] numstat rc=0 lines=1 :: ['3\t0\tsrc/campaignlab/api/app.py']
+[S3.V4] added=3 deleted=0 => added<=3:True deleted==0:True
+[S3.V5] include_router 调用点 5 个: ['health.router', 'session_router', 'workspaces_router', 'jobs_router', 'activities_router']
+[S3.V5] 含 activities_router 恰 1: True
+[S3.V6] public=['create_activity', 'get_activity', 'list_activities', 'router', 'update_activity']
+[S3.V6] private=['_activity_page_response', '_activity_response']
+[S3.V6] __all__=['create_activity', 'get_activity', 'list_activities', 'router', 'update_activity']
+[S3.V6] public 恰等: True (多 [] / 缺 [])
+[S3.V6] private 恰等: True (多 [] / 缺 [])
+[S3.V6] __all__ 5 名且字母序: True :: ['create_activity', 'get_activity', 'list_activities', 'router', 'update_activity']
+[S3.V7] list_activities: verb=router.get operation_id='listActivities' 期望='listActivities' 命中=True
+[S3.V7] list_activities: responses=declared_responses(200) path=/workspaces/{workspace_id}/activities
+[S3.V7] create_activity: verb=router.post operation_id='createActivity' 期望='createActivity' 命中=True
+[S3.V7] create_activity: responses=declared_responses(201) path=/workspaces/{workspace_id}/activities
+[S3.V7] get_activity: verb=router.get operation_id='getActivity' 期望='getActivity' 命中=True
+[S3.V7] get_activity: responses=declared_responses(200) path=/workspaces/{workspace_id}/activities/{activity_id}
+[S3.V7] update_activity: verb=router.patch operation_id='updateActivity' 期望='updateActivity' 命中=True
+[S3.V7] update_activity: responses=declared_responses(200) path=/workspaces/{workspace_id}/activities/{activity_id}
+[S3.V8] hits=0
+[S3.V9] tests/api/activities/test_activities_router_s3.py: TestClient=True get_activity_service=True ' is ' 同一性断言=False activity_service=True
+     166: assert _RESOLVED[-1] is injected
+     182: assert _RESOLVED[-1] is stub
+     207: assert _RESOLVED[-1] is stub
+     220: assert route.methods is not None and route.methods == {method}
+[S3.V10] app.state 键 8 个: ['activity_service', 'clock', 'config', 'guard', 'health_service', 'rule_service', 'session_service', 'workspace_service']
+[S3.V10] add_middleware 顺序: ['BaseHTTPMiddleware', 'CORSMiddleware']
+[S3.V10] FastAPI kwargs: openapi_url=None docs_url=None redoc_url=None
+[S3.V10] create_app kwonly 7 名有序: ['clock', 'guard', 'session_service', 'health_service', 'workspace_service', 'activity_service', 'rule_service']
+[S3.V10] ALLOWED_METHODS: ['__all__ = ["ALLOWED_HEADERS", "ALLOWED_METHODS", "create_app", "origin_host_guard_middleware"]', 'ALLOWED_METHODS: Final[tuple[str, ...]] = (', 'allow_methods=list(ALLOWED_METHODS),']
+[S3.V10] ALLOWED_HEADERS: ['__all__ = ["ALLOWED_HEADERS", "ALLOWED_METHODS", "create_app", "origin_host_guard_middleware"]', 'ALLOWED_HEADERS: Final[tuple[str, ...]] = (', 'allow_headers=list(ALLOWED_HEADERS),']
+[S3.V1-collect] collect rc=0 collected=4
+[S3.V1] rc=0 passed=4 failed=0 summary='4 passed, 1 warning in 1.42s'
+[S3.V3] ruff_check rc=0 :: All checks passed!
+[S3.V3] ruff_format rc=0 :: 310 files already formatted
+[S3.V3] mypy rc=0 :: Success: no issues found in 112 source files
+[S3.V11] numstat rc=0 lines=0 :: EMPTY
+[S3.5] 派单文冻结面共 13 件（允许变动：['src/campaignlab/api/app.py']）
+    ALLOW src/campaignlab/api/app.py: sha want=f039722660bb got=76fcb0778f64 | bytes want=7576 got=7726 | lines want=173 got=176
+    OK    src/campaignlab/api/common.py: sha want=836e7b3e8d3a got=836e7b3e8d3a | bytes want=45605 got=45605 | lines want=1169 got=1169
+    OK    src/campaignlab/api/deps.py: sha want=ed1075a86447 got=ed1075a86447 | bytes want=13524 got=13524 | lines want=347 got=347
+    OK    src/campaignlab/api/jobs.py: sha want=735d30baf0c4 got=735d30baf0c4 | bytes want=16916 got=16916 | lines want=372 got=372
+    OK    src/campaignlab/api/session.py: sha want=14be2b2fda59 got=14be2b2fda59 | bytes want=6945 got=6945 | lines want=171 got=171
+    OK    src/campaignlab/api/workspaces.py: sha want=4c1d74aeeeb3 got=4c1d74aeeeb3 | bytes want=5045 got=5045 | lines want=113 got=113
+    OK    src/campaignlab/application/activity_service.py: sha want=21425228694b got=21425228694b | bytes want=88950 got=88950 | lines want=2000 got=2000
+    OK    src/campaignlab/domain/ids.py: sha want=4badc18586c9 got=4badc18586c9 | bytes want=2726 got=2726 | lines want=64 got=64
+    OK    tests/api/conftest.py: sha want=2df41d5585dd got=2df41d5585dd | bytes want=7489 got=7489 | lines want=194 got=194
+    OK    tests/api/test_contract_declarations.py: sha want=a9af20101fe7 got=a9af20101fe7 | bytes want=11110 got=11110 | lines want=215 got=215
+    OK    tests/unit/test_api_app.py: sha want=a97c32a63756 got=a97c32a63756 | bytes want=5271 got=5271 | lines want=121 got=121
+    OK    tests/unit/test_s2b2_app_injection.py: sha want=fadf666b810d got=fadf666b810d | bytes want=14545 got=14545 | lines want=364 got=364
+    OK    tests/unit/test_s3b_routes.py: sha want=b0122388342a got=b0122388342a | bytes want=8983 got=8983 | lines want=212 got=212
+[S3.5] 冻结面**判红** 0 件
+[S3.5] 允许变动且确实变动 1 件 :: [('src/campaignlab/api/app.py', 'f039722660bb', '76fcb0778f64', 7576, 7726)]
+
+##############################################################################
+# §3 U-1 / U-2 的事实对撞（A247 / A248 的裁定依据；grep 三面、common.py 的 defs 与 __all__ 实取、jobs.py 先例形态实取）
+# 来源捕获件：.orch_tmp/r18_ufacts.out（9723 B，逐字原样转贴，零改写）
+##############################################################################
+=== U-1 事实核查：IF_MATCH_PATTERN 是否真的全仓不存在 ===
+grep rc = 0 (1 = 0 命中)
+src/campaignlab/api/activities.py:19:  的 ``IF_MATCH_PATTERN`` 常量，见派单 §9 U 项）。
+--- If-Match 的既有形态（jobs.py 先例） ---
+src/campaignlab/api/jobs.py:29:  ``replay_from_envelope`` 的 M0-02 落地口径；顺序固定「先幂等、后 If-Match」（API.md）；
+src/campaignlab/api/jobs.py:216:        alias="If-Match",
+src/campaignlab/api/jobs.py:228:    处置顺序：先幂等（peek 命中即逐字节重放）、再 If-Match（缺 → 428、陈旧 → 412）。
+src/campaignlab/api/jobs.py:300:        alias="If-Match",
+src/campaignlab/api/common.py:821:    """``ETag: "<revision>"``（带双引号十进制整数，对齐 If-Match 正则 ``^"[1-9][0-9]*"$``）。"""
+src/campaignlab/api/common.py:828:    Q3 裁定：M0-02 的 5 个 op 均未声明 If-Match，故 ``create_workspace`` **不得**调用本函数；
+src/campaignlab/api/common.py:829:    helper 仍须实现并被单测钉住，供 M1 起 16 个 If-Match op 复用。
+src/campaignlab/api/common.py:830:    顺序固定「先幂等、后 If-Match」（API.md）。
+src/campaignlab/api/common.py:833:        raise PreconditionRequired("本操作要求提供 If-Match 头")
+src/campaignlab/api/common.py:835:        raise RevisionConflict("If-Match 与当前修订号不一致")
+--- check_if_match 定义 ---
+825:def check_if_match(header: str | None, current_revision: int) -> None:
+826-    """缺头 → 428 ``PRECONDITION_REQUIRED``；不匹配 → 412 ``REVISION_CONFLICT``。
+827-
+828-    Q3 裁定：M0-02 的 5 个 op 均未声明 If-Match，故 ``create_workspace`` **不得**调用本函数；
+829-    helper 仍须实现并被单测钉住，供 M1 起 16 个 If-Match op 复用。
+830-    顺序固定「先幂等、后 If-Match」（API.md）。
+831-    """
+832-    if header is None:
+833-        raise PreconditionRequired("本操作要求提供 If-Match 头")
+834-    if header != etag(current_revision):
+835-        raise RevisionConflict("If-Match 与当前修订号不一致")
+836-
+837-
+
+=== U-2 事实核查：test_api_app.py 的裸装配 404 探针只覆盖 jobs？ ===
+8:3. **每个响应都是 Problem 形且带 X-Request-Id**：404（未知路径）、403（回环守卫）、
+44:def test_no_second_openapi_surface(tmp_path: Path) -> None:
+51:def test_jobs_router_is_not_mounted_by_s3c(tmp_path: Path) -> None:
+57:        # 故改用**行为**断言——jobs / workspaces 路由不存在必须 404 Problem。
+60:            assert response.status_code == 404, probe
+62:        # health 路由确实挂上了：500 来自「S3d 未装配」，而非「路由不存在」的 404
+66:def test_unknown_route_is_problem_404_with_request_id(tmp_path: Path) -> None:
+69:    assert response.status_code == 404
+73:    assert body["status"] == 404
+79:def test_origin_host_guard_returns_problem_403(tmp_path: Path) -> None:
+90:def test_health_is_500_problem_while_service_is_pending(tmp_path: Path) -> None:
+105:def test_health_returns_200_when_dependency_overridden(tmp_path: Path) -> None:
+--- activities 是否被任何裸装配探针覆盖 ---
+rc = 1 | (0 命中 => U-2 的前提成立)
+
+=== E1 的 pairs 机制原文（test_s3b_routes.py:180-212） ===
+ 176|         workspace_service=_StubWorkspaceService(),
+ 177|     )
+ 178|     wired_mounted = _mounted_routers(wired)
+ 179|     assert session_api.router in wired_mounted
+ 180|     assert workspaces_api.router in wired_mounted
+ 181| 
+ 182| 
+ 183| def test_app_py_contains_only_the_a85_mount_lines() -> None:
+ 184|     """A85 / A10 挂载面守护。
+ 185| 
+ 186|     **R16 迁移注记（A226 / D-047，编排器同批修正）**：M0-04/S4 依 A10 最小例外（≤3 行）落地
+ 187|     ``app.include_router(jobs_router)`` 后，原判据「挂载行恰 3 条 **且** 不含 jobs」必然失真。
+ 188|     迁移为「挂载行恰 4 条，其中含 jobs 的恰 1 条，且 jobs 必须是与 workspaces **同形的条件挂载**」
+ 189|     —— 判据由「禁 jobs」升级为「jobs 只能以被授权的条件形态出现」，强度不降：多一条红、少一条红、
+ 190|     把 jobs 改成无条件挂载、删掉 ``import router as jobs_router``，四种形态均判红。
+ 191|     函数名沿用历史（A85 时代语义＝「只有那三条挂载行」），改名归 FU-52。
+ 192|     """
+ 193|     source = (_REPO / "src/campaignlab/api/app.py").read_text(encoding="utf-8")
+ 194|     pairs = (
+ 195|         "    if session_service is not None:\n        app.include_router(session_router)",
+ 196|         "    if workspace_service is not None:\n        app.include_router(workspaces_router)",
+ 197|         "    if workspace_service is not None:\n        app.include_router(jobs_router)",
+ 198|     )
+ 199|     for pair in pairs:
+ 200|         assert pair in source
+ 201|     assert "import router as session_router" in source
+ 202|     assert "import router as workspaces_router" in source
+ 203|     assert "import router as jobs_router" in source
+ 204|     mounted_lines = [
+ 205|         line for line in source.splitlines() if line.strip().startswith("app.include_router(")
+ 206|     ]
+ 207|     assert len(mounted_lines) == 4
+ 208|     assert len([line for line in mounted_lines if "jobs" in line]) == 1
+ 209|     assert len([line for line in source.splitlines() if "session_router" in line]) <= 3
+ 210|     assert len([line for line in source.splitlines() if "workspaces_router" in line]) <= 3
+ 211|     assert len([line for line in source.splitlines() if "jobs_router" in line]) <= 3
+ 212| 
+
+=== E2 的相关断言原文（test_s2b2_app_injection.py:30-70 与 260-280） ===
+  30| APP_SOURCE = REPO / "src" / "campaignlab" / "api" / "app.py"
+  31| DEPS_SOURCE = REPO / "src" / "campaignlab" / "api" / "deps.py"
+  32| T0 = datetime(2026, 11, 13, 1, 0, 0, tzinfo=UTC)
+  33| TESTSERVER = OriginHostGuard(frozenset({"testserver"}), frozenset({"http://testserver"}))
+  34| 
+  35| # 尚不存在的两个 router 模块名（A217 ③ 归 S3/S4）：按 §2.6 用拼接构造，禁直写禁串。
+  36| _BANNED_ROUTER_MODULES = frozenset(
+  37|     f"campaignlab.api.{leaf}" for leaf in ("activ" + "ities", "rul" + "es")
+  38| )
+  39| 
+  40| #: G3：条件装配面的期望字典——五个服务形参各对应一个同名 app.state 属性。
+  41| #: 无条件赋值不会进入该字典，故这条断言与「不注入就不装配」同源。
+  42| EXPECTED_WIRING = {
+  43|     "session_service": "session_service",
+  44|     "health_service": "health_service",
+  45|     "workspace_service": "workspace_service",
+  46|     "activity_service": "activity_service",
+  47|     "rule_service": "rule_service",
+  48| }
+  49| 
+  50| #: G1：kwonly 的期望有序清单（尾部追加两个注入位，既有五个一字不改）。
+  51| EXPECTED_KWONLY = [
+  52|     "clock",
+  53|     "guard",
+  54|     "session_service",
+  55|     "health_service",
+  56|     "workspace_service",
+  57|     "activity_service",
+  58|     "rule_service",
+  59| ]
+  60| 
+  61| #: G6：挂载行的期望有序清单（新增挂载或换序都会破坏它）。
+  62| EXPECTED_MOUNT_LINES = [
+  63|     "app.include_router(health.router)",
+  64|     "app.include_router(session_router)",
+  65|     "app.include_router(workspaces_router)",
+  66|     "app.include_router(jobs_router)",
+  67| ]
+  68| 
+  69| 
+  70| @pytest.fixture
+ 260|     source = APP_SOURCE.read_text(encoding="utf-8")
+ 261|     lines = source.splitlines()
+ 262|     tree = ast.parse(source)
+ 263|     mount_pairs = sorted(
+ 264|         (node.lineno, lines[node.lineno - 1].strip())
+ 265|         for node in _calls_named(tree, "include_router")
+ 266|     )
+ 267|     ordered = [text for _, text in mount_pairs]
+ 268|     assert ordered == EXPECTED_MOUNT_LINES
+ 269|     assert [text for text in ordered if "jobs" in text] == ["app.include_router(jobs_router)"]
+ 270|     imported_modules = {
+ 271|         node.module for node in tree.body if isinstance(node, ast.ImportFrom) and node.module
+ 272|     }
+ 273|     banned_hits = imported_modules & _BANNED_ROUTER_MODULES
+ 274|     assert not banned_hits, f"A217 ③：不得 import {sorted(banned_hits)}"
+ 275| 
+ 276|     middleware: list[str] = []
+ 277|     middleware_lines: list[int] = []
+ 278|     for call in _calls_named(tree, "add_middleware"):
+ 279|         first = call.args[0] if call.args else None
+ 280|         if isinstance(first, ast.Name):
+
+=== S3 落地件独立实测（字节面） ===
+  src/campaignlab/api/activities.py: lines=222 bytes=9955 sha=887bd377a4f7 crlf=0
+  src/campaignlab/api/app.py: lines=176 bytes=7726 sha=76fcb0778f64 crlf=0
+  tests/api/activities/__init__.py: lines=2 bytes=89 sha=8ccc54fe0ab9 crlf=0
+  tests/api/activities/test_activities_router_s3.py: lines=222 bytes=8872 sha=e4d1d145cca5 crlf=0
+=== app.py numstat ===
+3	0	src/campaignlab/api/app.py
+=== app.py diff 原文 ===
+diff --git a/src/campaignlab/api/app.py b/src/campaignlab/api/app.py
+index b34ac6f..24533fb 100644
+--- a/src/campaignlab/api/app.py
++++ b/src/campaignlab/api/app.py
+@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
+ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+ 
+ from campaignlab.api import health
++from campaignlab.api.activities import router as activities_router
+ from campaignlab.api.common import (
+     DomainError,
+     OriginHostGuard,
+@@ -169,4 +170,6 @@ def create_app(
+     # M0-04/S4（A10 最小例外，≤3 行）：app.include_router(jobs.router)
+     if workspace_service is not None:
+         app.include_router(jobs_router)
++    if activity_service is not None:
++        app.include_router(activities_router)
+     return app
+rc=0
+
+##############################################################################
+# §4 编排器同批迁移 E1 / E2（A245：两件不在 M2-01 的 scope_allow，预期红归编排器迁移，lane 禁改）
+# 来源捕获件：.orch_tmp/r18_mig.out（1356 B，逐字原样转贴，零改写）
+##############################################################################
+=== BEFORE ===
+E1 {'lines': 212, 'bytes': 8983, 'sha256_12': 'b0122388342a', 'crlf': 0}
+E2 {'lines': 364, 'bytes': 14545, 'sha256_12': 'fadf666b810d', 'crlf': 0}
+OK   E1-a pairs 追加 activities 条件挂载二元组
+OK   E1-b import 断言追加 activities
+OK   E1-c 挂载行计数 4->5 ＋ activities 恰 1
+OK   E1-d activities_router 出现次数上限
+OK   E1-e docstring 追加 R18 迁移注记（append-only）
+OK   E2-a 禁串面移除 activities（rules 保留）
+OK   E2-b EXPECTED_MOUNT_LINES 追加 activities
+=== AFTER ===
+E1 {'lines': 226, 'bytes': 10360, 'sha256_12': '1f22fccbfd99', 'crlf': 0}
+E2 {'lines': 372, 'bytes': 15268, 'sha256_12': '9135b043cae7', 'crlf': 0}
+EDITS: 7
+migrate_rc=0
+--- 迁移后跑 E1/E2（期望全绿）---
+................                                                         [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+16 passed, 1 warning in 0.67s
+pytest_rc=0
+
+##############################################################################
+# §5 PC-U2 的**首次**执行（早于 §6 的 ruff 修复 ⇒ E1 判红行为 :211；修复后同一判据位移到 :212，见 §1 的 §M）
+# 来源捕获件：.orch_tmp/r18_pcu2.out（1834 B，逐字原样转贴，零改写）
+##############################################################################
+落地态 sha: 76fcb0778f64 | 期望 76fcb0778f64 | 相符: True
+落地态 activities 条件挂载: True
+[基线] E1+E2 rc=0 :: 16 passed, 1 warning in 2.17s
+=== 施加变异：条件挂载 -> 无条件挂载 ===
+变异态 sha: 6d50dbbf9299
+变异生效证明（AST）：activities 条件挂载 = False => 期望 False
+[变异态] E1+E2 rc=1（期望 != 0）
+[变异态] FAILED: ['test_app_py_contains_only_the_a85_mount_lines']
+    E           assert '    if activity_service is not None:\n        app.include_router(activities_router)' in '"""应用工厂（M0-02 · S3c；design §6 ``api/app.py:create_app``）。\n\nA10 边界：本文件的 **CORS／中间件／异常处理装配属
+红原文（尾 900 字）：
+／中间件／异常处理装配属 S3c**；而 ``include_router(...ice is not None:\n        app.include_router(jobs_router)\n    app.include_router(activities_router)\n    return app\n'
+
+tests/unit/test_s3b_routes.py:211: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines
+1 failed, 15 passed, 1 warning in 1.50s
+
+=== 字节级复原 ===
+复原 sha: 76fcb0778f64 | == 落地态: True | 字节全等: True
+[复原后] E1+E2 rc=0 :: 16 passed, 1 warning in 0.75s
+PC_U2_VERDICT: 有牙（TEETH）
+rc=0
+
+##############################################################################
+# §6 编排器自引入的 2 处 E501 ＋ 1 处 ruff format 违规：实测拦下与修复（A248.side_effect_honest ①）
+# 来源捕获件：.orch_tmp/r18_fixruff.out（633 B，逐字原样转贴，零改写）
+##############################################################################
+OK   E2 注记折行（E501）
+OK   E1 docstring 折行（E501）
+=== 折行后再跑 ruff format（收敛 frozenset 单行形态） ===
+  ruff format tests/unit/test_s3b_routes.py tests/unit/test_s2b2_app_injection.py -> rc=0 :: 1 file reformatted, 1 file left unchanged
+  ruff check . -> rc=0 :: All checks passed!
+  ruff format --check . -> rc=0 :: 310 files already formatted
+=== AFTER ===
+E1 {'lines': 227, 'bytes': 10365, 'sha256_12': 'ae4416aeabbf', 'crlf': 0, 'ends_nl': True}
+E2 {'lines': 371, 'bytes': 15265, 'sha256_12': '8902dff88058', 'crlf': 0, 'ends_nl': True}
+E1+E2 pytest rc= 0 :: 16 passed, 1 warning in 0.54s
+rc=0
+
+##############################################################################
+# §7 全量 pytest（工作树，含 S6 在飞 2 件）：747 passed / 0 failed，计划外红＝空集
+# 来源捕获件：.orch_tmp/r18_vfull.out（662 B，逐字原样转贴，零改写）
+##############################################################################
+========================================================================
+VERIFY 全量 pytest（工作树）—— 按 A245 的预期红清单归因
+========================================================================
+[FULL] rc=0 passed=747 failed=0 summary='747 passed, 6 warnings in 166.32s (0:02:46)'
+[FULL] 预期红恰 2 件 = E1/E2: False
+[FULL] 预期红命中: []
+[FULL] **计划外**红（必须为空）: []
+[FULL] 预期红未出现（说明已迁移或不成立）: ['tests/unit/test_s2b2_app_injection.py::test_g6_mount_and_middleware_surface_unchanged', 'tests/unit/test_s3b_routes.py::test_app_py_contains_only_the_a85_mount_lines']
+full_rc=0
+
+##############################################################################
+# §8 悬空引用实扫与未跟踪件归属（PRE-17 集合相等断言 / A144(c) 归属分类）
+##############################################################################
+dangling_refs(本批 add_paths 全集) 实测 = 0 条 ⇒ allow_dangling = ()，与驱动内 ALLOW_DANGLING=[] 集合相等。
+说明：本文与 00-index.md、lane-return-raw.md、D-051.md 刻意只引用磁盘上**已存在**的路径 ⇒ 预期悬空 0 条。
+特别地：M2-01 的任务级取证面（evidence/M2/M2-01/**）归 **S7** 产出，本批三件取证文**不引其路径**，
+以免新增前向引用（resume.forward_reference_registry 里 evidence/M2/M2-01/ 一条的 allow_dangling_scope
+明载「仅当 orchestrator/handoff/M2-01-design.md 被再次暂存时才需豁免」，本批不暂存该 design ⇒ 不触发）。
+
+untracked_owner_map = {"S6/Lorentz": ["tests/integration/jobs/test_lease.py",
+                                      "tests/integration/jobs/test_artifact.py"]}
+成因：本批入库时 lane **S6（Lorentz）仍在飞**（其第 2 轮已于本批之前回传 RESULT: DONE，但其 2 件产物
+属**另一个任务 M0-04 的入库批**，一任务一提交 ⇒ 本批禁 add）。A144(c) 要求未跟踪 in-scope 件必须归属，
+归不上即判越界并拒绝提交 ⇒ 显式登记归属，classify_untracked 的 outside 必须为空集。

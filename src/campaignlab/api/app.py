@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from campaignlab.api import health
+from campaignlab.api.activities import router as activities_router
 from campaignlab.api.common import (
     DomainError,
     OriginHostGuard,
@@ -169,4 +170,6 @@ def create_app(
     # M0-04/S4（A10 最小例外，≤3 行）：app.include_router(jobs.router)
     if workspace_service is not None:
         app.include_router(jobs_router)
+    if activity_service is not None:
+        app.include_router(activities_router)
     return app

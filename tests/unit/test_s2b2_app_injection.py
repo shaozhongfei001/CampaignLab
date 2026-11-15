@@ -33,9 +33,12 @@ T0 = datetime(2026, 11, 13, 1, 0, 0, tzinfo=UTC)
 TESTSERVER = OriginHostGuard(frozenset({"testserver"}), frozenset({"http://testserver"}))
 
 # 尚不存在的两个 router 模块名（A217 ③ 归 S3/S4）：按 §2.6 用拼接构造，禁直写禁串。
-_BANNED_ROUTER_MODULES = frozenset(
-    f"campaignlab.api.{leaf}" for leaf in ("activ" + "ities", "rul" + "es")
-)
+# **R18 迁移注记（A245 / A248，append-only；上文原注记保留不改写，D-011）**：
+# M2-01/S3 已合法落地 activities（app.py 条件挂载 ＋ import，numstat 3/0），
+# 故 activities 从禁串面**移除**；
+# rules 仍禁至 M2-01/S4 落地（届时同型迁移）。原「两个」的表述因此降为**一个**，判据强度不降：
+# S4 之前谁 import rules 仍然判红。
+_BANNED_ROUTER_MODULES = frozenset(f"campaignlab.api.{leaf}" for leaf in ("rul" + "es",))
 
 #: G3：条件装配面的期望字典——五个服务形参各对应一个同名 app.state 属性。
 #: 无条件赋值不会进入该字典，故这条断言与「不注入就不装配」同源。
@@ -59,11 +62,15 @@ EXPECTED_KWONLY = [
 ]
 
 #: G6：挂载行的期望有序清单（新增挂载或换序都会破坏它）。
+#: **R18 迁移注记（A245 / A248，append-only）**：M2-01/S3 落地 activities 条件挂载后追加第 5 项；
+#: 清单顺序＝app.py 里的实际挂载顺序（health -> session -> workspaces -> jobs -> activities）。
+#: S4 落地 rules 后再追加第 6 项（同型迁移）。
 EXPECTED_MOUNT_LINES = [
     "app.include_router(health.router)",
     "app.include_router(session_router)",
     "app.include_router(workspaces_router)",
     "app.include_router(jobs_router)",
+    "app.include_router(activities_router)",
 ]
 
 

@@ -189,23 +189,38 @@ def test_app_py_contains_only_the_a85_mount_lines() -> None:
     —— 判据由「禁 jobs」升级为「jobs 只能以被授权的条件形态出现」，强度不降：多一条红、少一条红、
     把 jobs 改成无条件挂载、删掉 ``import router as jobs_router``，四种形态均判红。
     函数名沿用历史（A85 时代语义＝「只有那三条挂载行」），改名归 FU-52。
+
+    **R18 迁移注记（A245 / A248，编排器同批修正；R16 注记原文保留不改写，D-011）**：
+    M2-01/S3 依 A217 ③ 落地 ``app.include_router(activities_router)``（同样是 ``if activity_service
+    is not None:`` 的条件形态，``numstat 3/0``）后，原判据「挂载行恰 4 条」必然失真。迁移为
+    「挂载行恰 **5** 条，其中含 activities 的恰 1 条，且 activities 必须是与
+    session / workspaces / jobs **同形的条件挂载**」——即把 activities 的
+    「if ＋ include_router」二元组追加进 ``pairs``。
+    该追加同时闭合 lane S3 报的 **U-2**：其 PC-3 实测发现「把条件挂载改成无条件挂载」这一变异
+    此前**没有任何既有守护判红**（``tests/unit/test_api_app.py`` 的裸装配 404 探针只覆盖 jobs，
+    对 activities 0 命中），属判据「无牙」的真缺陷；追加 pair 后该变异会使二元组失配而判红。
+    强度不降：多一条红、少一条红、换序红、改成无条件红、删 import 红。
     """
     source = (_REPO / "src/campaignlab/api/app.py").read_text(encoding="utf-8")
     pairs = (
         "    if session_service is not None:\n        app.include_router(session_router)",
         "    if workspace_service is not None:\n        app.include_router(workspaces_router)",
         "    if workspace_service is not None:\n        app.include_router(jobs_router)",
+        "    if activity_service is not None:\n        app.include_router(activities_router)",
     )
     for pair in pairs:
         assert pair in source
     assert "import router as session_router" in source
     assert "import router as workspaces_router" in source
     assert "import router as jobs_router" in source
+    assert "import router as activities_router" in source
     mounted_lines = [
         line for line in source.splitlines() if line.strip().startswith("app.include_router(")
     ]
-    assert len(mounted_lines) == 4
+    assert len(mounted_lines) == 5
     assert len([line for line in mounted_lines if "jobs" in line]) == 1
+    assert len([line for line in mounted_lines if "activities" in line]) == 1
     assert len([line for line in source.splitlines() if "session_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "workspaces_router" in line]) <= 3
     assert len([line for line in source.splitlines() if "jobs_router" in line]) <= 3
+    assert len([line for line in source.splitlines() if "activities_router" in line]) <= 3
