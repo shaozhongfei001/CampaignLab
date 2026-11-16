@@ -1,0 +1,53 @@
+# 编排器独立复验日志（PRE-29：禁采信 lane 自报）
+# lane      : S6 / task M2-01 / 昵称 Beauvoir / agent_id 01a1e5f2-19a3-73d3-ba36-5dcbcdb4bb91
+# tier_used : qwen3.8-flash（reasoning medium）
+# 复验脚本  : .orch_tmp/orch_v6s2.py（scratch 前缀 orch_，PRE-39 ①）
+# 命令原文  : cd /home/szf/dev/CampaignLab && uv run --no-sync python /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/orch_v6s2.py
+# 复验时点  : 2026-11-17T05:05:26+08:00 · HEAD=aa3d02be675d0993c4097f0576398c0565c96912（入库前）
+# 结论      : VERIFY RESULT: GREEN（26 判据全过；rc=0）
+# 注        : 本文件是上述命令的**逐字 stdout+stderr**，仅在文件头追加本注释块；
+#             v1 脚本（orch_v6s.py）曾判 RED 2 项，经裁定为**编排器自身判据失真**
+#             （R19-15 §6.1 正则过匹配 .py 文件名 / R19-16 工作树 vs 冻结索引树口径混用），
+#             非 lane 缺陷；v1 的 RED 原文摘要见 00-index.md §5。
+# ---------------------------------------------------------------------------
+AT 2026-11-17T05:05:26+08:00
+SCRIPT orch_v6s2.py（v1 的两处判据失真已修，见模块 docstring）
+HEAD: aa3d02be675d0993c4097f0576398c0565c96912 rc 0
+BRANCH: m0-framework
+PASS ① 7 件交付件全部实存 :: ['tests/api/activities/conftest.py', 'tests/api/activities/test_bindings_api.py', 'tests/api/activities/test_conflicts.py', 'tests/api/activities/test_contract_declarations_m2.py', 'tests/api/activities/test_etag.py', 'tests/api/activities/test_list_filters.py', 'tests/api/activities/test_rule_diff.py']
+PASS ①b 实测 face 与 lane 自报**逐项相同**（对撞，非采信） :: {}
+{"tests/api/activities/conftest.py": [365, 14029, "ce3c39e555c5"], "tests/api/activities/test_etag.py": [293, 12847, "47474347ed57"], "tests/api/activities/test_conflicts.py": [317, 12629, "0ce9e9d36074"], "tests/api/activities/test_rule_diff.py": [143, 6334, "703e06aeed13"], "tests/api/activities/test_bindings_api.py": [164, 6737, "2aaf4d7df5a3"], "tests/api/activities/test_list_filters.py": [192, 9109, "d19cd794eaf1"], "tests/api/activities/test_contract_declarations_m2.py": [81, 3969, "1b78851294f8"]}
+PASS ② 编码四判据全过（严格 utf-8 / 无 BOM·CR·NUL / 无 C0·C1 / 尾换行） :: []
+PASS ③ 未跟踪件**只**落在本棒写权面与已登记的在飞豁免件上 :: ['orchestrator/handoff/M1-01-design.md', 'tests/api/activities/conftest.py', 'tests/api/activities/test_bindings_api.py', 'tests/api/activities/test_conflicts.py', 'tests/api/activities/test_contract_declarations_m2.py', 'tests/api/activities/test_etag.py', 'tests/api/activities/test_list_filters.py', 'tests/api/activities/test_rule_diff.py']
+PASS ③b 本棒 7 件全部在未跟踪集合内 :: []
+PASS ③c **零修改既有文件**（无 M/A/D 行） :: []
+PASS ③d `git diff --numstat` 输出为空（deleted 列全 0）
+PASS ③e A144(c) 归属分类：越界件 == 0 :: {'attributed': {'S1': ['orchestrator/handoff/M1-01-design.md'], 'S6': ['tests/api/activities/conftest.py', 'tests/api/activities/test_bindings_api.py', 'tests/api/activities/test_conflicts.py', 'tests/api/activities/test_contract_declarations_m2.py', 'tests/api/activities/test_etag.py', 'tests/api/activities/test_list_filters.py', 'tests/api/activities/test_rule_diff.py']}, 'outside': []}
+PASS ④ 冻结面 8 件 sha256[:12] 逐字未变（含 A272 硬禁面 `tests/api/activities/__init__.py`） :: {}
+PASS ⑤ 派单文 §6.1 可解析（正则命中） :: 3505
+PASS ⑤a R19-15 修正生效：§6.1 里的 `.py` 文件名 token 已被剔除（v1 假 RED 的成因） :: {'file_tokens_in_sec': 7, 'n_brief_after_strip': 43, 'n_ast': 43}
+PASS ⑤b AST 实取用例总数 == 43 :: 43
+PASS ⑤c AST 实取名集合 == 派单文 §6.1 具名集合（**逐字集合相等**） :: {'only_in_code': [], 'only_in_brief': [], 'n_code': 43, 'n_brief': 43}
+PASS ⑤d 无重名（跨 6 文件函数名唯一）
+PASS ⑤e A273 三条 428 具名函数实存
+PASS ⑤f A274 两条 FU-54 具名函数实存（落在 test_etag.py）
+{"tests/api/activities/test_etag.py": 13, "tests/api/activities/test_conflicts.py": 10, "tests/api/activities/test_rule_diff.py": 4, "tests/api/activities/test_bindings_api.py": 5, "tests/api/activities/test_list_filters.py": 8, "tests/api/activities/test_contract_declarations_m2.py": 3}
+{"ledger_ruff_formatted_files": 345, "tracked_in_scope_py": 125, "tracked_in_scope_md": 220, "untracked_in_scope": ["orchestrator/handoff/M1-01-design.md", "tests/api/activities/conftest.py", "tests/api/activities/test_bindings_api.py", "tests/api/activities/test_conflicts.py", "tests/api/activities/test_contract_declarations_m2.py", "tests/api/activities/test_etag.py", "tests/api/activities/test_list_filters.py", "tests/api/activities/test_rule_diff.py"], "worktree_ruff_expect(R11-3 恒等式)": 353}
+PASS ⑥0 台账 counts 的 in-scope 恒等式成立（ruff_formatted_files == tracked py + tracked md） :: (345, 125, 220)
+PASS ⑥a ruff format --check（**工作树**口径）rc==0 :: (0, '353 files already formatted')
+PASS ⑥a2 工作树报数 == 台账值 + 未跟踪 in-scope 件数（R11-3 恒等式，程序化派生，禁写死） :: {'measured': 353, 'expect': 353}
+PASS ⑥b ruff check rc==0 :: (0, 'All checks passed!')
+PASS ⑥b ruff check 文本含 All checks passed :: 'All checks passed!'
+PASS ⑥c mypy 全仓（工作树含在飞 7 件） rc==0 :: (0, 'Success: no issues found in 130 source files')
+PASS ⑥c mypy 全仓（工作树含在飞 7 件） 文本含 130 source files :: 'Success: no issues found in 130 source files'
+PASS ⑥d pytest 本目录 rc==0 :: (0, '47 passed, 1 warning in 23.41s')
+PASS ⑥d pytest 本目录 文本含 47 passed :: '47 passed, 1 warning in 23.41s'
+PASS ⑥e pytest 领域层未回归 rc==0 :: (0, '48 passed in 0.23s')
+PASS ⑥e pytest 领域层未回归 文本含 48 passed :: '48 passed in 0.23s'
+PASS ⑥f collect-only 全仓 rc==0 :: (0, '852 tests collected in 0.73s')
+PASS ⑥f collect-only 全仓 文本含 852 tests collected :: '852 tests collected in 0.73s'
+PASS ⑥g 契约门禁未回归 rc==0 :: (0, 'CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6')
+PASS ⑥g 契约门禁未回归 文本含 CONTRACT CHECK PASS :: 'CONTRACT CHECK PASS 登记项=13 实测差异=13 元校验=6'
+PASS ⑥h mypy 隔离在飞 7 件后 == 台账 mypy_source_files（本棒归因面自洽） :: (0, 'Success: no issues found in 123 source files')
+======================================================================
+VERIFY RESULT: GREEN
