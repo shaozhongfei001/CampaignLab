@@ -15,8 +15,9 @@
   由 service 侧判定（两者择一的口径取 service 调，N5 禁两处都调）。
 - ``If-Match`` 照 design §1.4/§6.2 声明为**可选**形参并保留契约长度与正则：照契约的
   ``required=true`` 直译会让缺头在进入函数体前被判 422，428 永不可达；形参声明形态
-  逐字照 ``api/jobs.py::cancel_job`` 的 A228 先例（pattern 取契约字面，仓内没有可 import
-  的 ``IF_MATCH_PATTERN`` 常量，见派单 §9 U 项）。
+  逐字照 ``api/jobs.py::cancel_job`` 的 A228 先例；pattern **单源**取 ``api/common.py`` 的
+  ``IF_MATCH_PATTERN`` 常量 —— FU-59 / A271 已落地该常量，故 D-051 §49 与本文件原先记的
+  「仓内没有可 import 的常量」口径自本批起**作废**，禁再内联第二份正则。
 - ETag 出现面逐 op 以 design §6.1 为准：列表 200 **无** ETag（切片 headers 实测只有
   ``X-Request-Id``，禁发明），对象响应带 ``etag(revision)``；幂等重放的 ETag 从信封取、
   禁重算（``replay_from_envelope`` 的既有口径）。
@@ -33,6 +34,7 @@ from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response
 
 from campaignlab.api.common import (
     IDEMPOTENCY_KEY_HEADER,
+    IF_MATCH_PATTERN,
     X_REQUEST_ID_HEADER,
     Activity,
     ActivityCreate,
@@ -189,7 +191,7 @@ async def update_activity(
         default=None,
         min_length=3,
         max_length=32,
-        pattern=r'^"[1-9][0-9]*"$',
+        pattern=IF_MATCH_PATTERN,
     ),
     actor: Session = Depends(require_session),  # noqa: B008
     svc: ActivityService = Depends(get_activity_service),  # noqa: B008

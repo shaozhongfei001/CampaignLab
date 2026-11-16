@@ -328,10 +328,28 @@ def test_jobs_router_mounted_only_when_workspace_service_assembled(tmp_path: Pat
     assert "state" not in cancel_absent.json()
 
 
-def test_common_all_is_79_with_jobpage_and_problem_codes_still_20() -> None:
+def test_common_all_is_pinned_with_jobpage_and_problem_codes_still_20() -> None:
+    """``api/common.py`` 公开面钉桩（S4 侧）。
+
+    **函数名刻意不再嵌数字**：原名 ``..._is_79_...`` 在项数变更后会与断言体自相矛盾，
+    这正是 D-044 修过的形态，故本批连同函数名一起收敛（历史 node id 的原样留档见
+    ``evidence/M0/M0-04/positive-control-s4.log``，依 D-011 不改写）。
+
+    **79 → 80 的归因（D-012/D-014）**：FU-59 / A271 解冻批在 ``api/common.py`` 新增 HTTP
+    常量 ``IF_MATCH_PATTERN``（If-Match 正则的全仓单源，值逐字镜像活契约）并纳入
+    ``__all__``；同批把 ``api/activities.py`` 1 处 ＋ ``api/jobs.py`` 2 处 ＋
+    ``api/rules.py`` 2 处的内联字面量改为 import 该常量。
+
+    同族的另一处钉桩在
+    ``tests/unit/test_domain_errors.py::test_common_public_surface_is_unchanged``；
+    两处**必须同批过账**，且由
+    ``tests/unit/test_if_match_pattern_single_source.py::test_all_common_surface_pins_agree_with_runtime``
+    机器化钉住「不许静默分叉」（R19-10 的根治）。
+    """
     surface = list(common_module.__all__)
-    assert len(surface) == 79
+    assert len(surface) == 80
     assert "JobPage" in surface
+    assert "IF_MATCH_PATTERN" in surface
     assert len(PROBLEM_CODES) == 20
     assert surface.count("JobPage") == 1
 

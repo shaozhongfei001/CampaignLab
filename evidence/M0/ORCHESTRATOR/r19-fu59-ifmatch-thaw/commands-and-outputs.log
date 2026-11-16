@@ -1,0 +1,209 @@
+### A1 分支 / HEAD / 与 origin 的距离
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; git rev-parse --abbrev-ref HEAD; git rev-parse HEAD; git rev-list --left-right --count origin/m0-framework...HEAD
+[rc=0]
+m0-framework
+89b013ad52f902257d33308f7caa42891b1838f8
+0	0
+
+### A2 工作树状态（改动 6 件 ＋ 未跟踪 1 件）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; git status --porcelain
+[rc=0]
+ M src/campaignlab/api/activities.py
+ M src/campaignlab/api/common.py
+ M src/campaignlab/api/jobs.py
+ M src/campaignlab/api/rules.py
+ M tests/integration/jobs/test_jobs_router_s4.py
+ M tests/unit/test_domain_errors.py
+?? tests/unit/test_if_match_pattern_single_source.py
+
+### A3 上一提交（parent）主题行
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; git log -1 --format='%h %s' 89b013a | cut -c1-200
+[rc=0]
+89b013a chore(R19-backfill-S5land): **纯台账批**（`ADD=[]`，零文件改动 ⇒ counts 五项**逐字不变** 341/122/798(124py+217md)）—— **兑现 `b834a27` 的 17 处哨兵**（PRE-35 全
+
+### B1 改动件的 numstat（HEAD -> 工作树）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; git diff --numstat -- src/campaignlab/api/activities.py src/campaignlab/api/common.py src/campaignlab/api/jobs.py src/campaignlab/api/rules.py tests/integration/jobs/test_jobs_router_s4.py tests/unit/test_domain_errors.py tests/unit/test_if_match_pattern_single_source.py
+[rc=0]
+5	3	src/campaignlab/api/activities.py
+19	1	src/campaignlab/api/common.py
+3	2	src/campaignlab/api/jobs.py
+6	4	src/campaignlab/api/rules.py
+20	2	tests/integration/jobs/test_jobs_router_s4.py
+9	4	tests/unit/test_domain_errors.py
+
+### B2 逐件 sha256[:12] / 行数 / 字节数（工作树侧）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; for f in src/campaignlab/api/activities.py src/campaignlab/api/common.py src/campaignlab/api/jobs.py src/campaignlab/api/rules.py tests/integration/jobs/test_jobs_router_s4.py tests/unit/test_domain_errors.py tests/unit/test_if_match_pattern_single_source.py; do printf "%s %s %s %s\n" "$f" "$(wc -l < "$f")" "$(wc -c < "$f")" "$(sha256sum "$f" | cut -c1-12)"; done
+[rc=0]
+src/campaignlab/api/activities.py 223 10121 3865f3eb6b3c
+src/campaignlab/api/common.py 1186 47180 b2908617d193
+src/campaignlab/api/jobs.py 372 16934 e9b575602e56
+src/campaignlab/api/rules.py 391 18034 eac1377a4b72
+tests/integration/jobs/test_jobs_router_s4.py 701 27630 ddd3ba8c362f
+tests/unit/test_domain_errors.py 194 8205 ff4c25a659b6
+tests/unit/test_if_match_pattern_single_source.py 354 16753 6fa13556ab67
+
+### B3 逐件 sha256[:12]（HEAD 侧，即改动前的冻结面读数）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; for f in src/campaignlab/api/activities.py src/campaignlab/api/common.py src/campaignlab/api/jobs.py src/campaignlab/api/rules.py tests/integration/jobs/test_jobs_router_s4.py tests/unit/test_domain_errors.py; do printf "%s %s\n" "$f" "$(git show HEAD:$f | sha256sum | cut -c1-12)"; done
+[rc=0]
+src/campaignlab/api/activities.py 887bd377a4f7
+src/campaignlab/api/common.py 836e7b3e8d3a
+src/campaignlab/api/jobs.py 735d30baf0c4
+src/campaignlab/api/rules.py c7b3cccee6ec
+tests/integration/jobs/test_jobs_router_s4.py c3110b40b71d
+tests/unit/test_domain_errors.py a933def6c4e5
+
+### C1 正则字面量在 in-scope Python 里的全部命中（应恰 1 处 = common.py 的定义行）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; grep -rn --include='*.py' -F '^"[1-9][0-9]*"$' src tests scripts | grep -v __pycache__
+[rc=0]
+src/campaignlab/api/common.py:190:IF_MATCH_PATTERN: Final = r'^"[1-9][0-9]*"$'
+
+### C2 收敛点（pattern=IF_MATCH_PATTERN）的全部命中（应恰 5 处）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; grep -rn --include='*.py' -F 'pattern=IF_MATCH_PATTERN' src tests scripts | grep -v __pycache__
+[rc=0]
+src/campaignlab/api/rules.py:260:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/rules.py:308:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/activities.py:194:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/jobs.py:221:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/jobs.py:305:        pattern=IF_MATCH_PATTERN,
+
+### C3 IF_MATCH_PATTERN 的定义点与 __all__ 登记位
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; grep -n 'IF_MATCH_PATTERN' src/campaignlab/api/common.py
+[rc=0]
+88:    "IF_MATCH_PATTERN",
+190:IF_MATCH_PATTERN: Final = r'^"[1-9][0-9]*"$'
+839:    """``ETag: "<revision>"``（带双引号十进制整数，其字面必须 fullmatch ``IF_MATCH_PATTERN``）。"""
+
+### C4 三个路由文件的 import 位（ruff I001 的 isort 口径：常量段内字母序）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; grep -n -B1 -A1 'IF_MATCH_PATTERN,' src/campaignlab/api/activities.py src/campaignlab/api/jobs.py src/campaignlab/api/rules.py
+[rc=0]
+src/campaignlab/api/activities.py-36-    IDEMPOTENCY_KEY_HEADER,
+src/campaignlab/api/activities.py:37:    IF_MATCH_PATTERN,
+src/campaignlab/api/activities.py-38-    X_REQUEST_ID_HEADER,
+--
+src/campaignlab/api/activities.py-193-        max_length=32,
+src/campaignlab/api/activities.py:194:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/activities.py-195-    ),
+--
+src/campaignlab/api/jobs.py-50-    IDEMPOTENCY_KEY_HEADER,
+src/campaignlab/api/jobs.py:51:    IF_MATCH_PATTERN,
+src/campaignlab/api/jobs.py-52-    DomainError,
+--
+src/campaignlab/api/jobs.py-220-        max_length=32,
+src/campaignlab/api/jobs.py:221:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/jobs.py-222-    ),
+--
+src/campaignlab/api/jobs.py-304-        max_length=32,
+src/campaignlab/api/jobs.py:305:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/jobs.py-306-    ),
+--
+src/campaignlab/api/rules.py-47-    IDEMPOTENCY_KEY_HEADER,
+src/campaignlab/api/rules.py:48:    IF_MATCH_PATTERN,
+src/campaignlab/api/rules.py-49-    X_REQUEST_ID_HEADER,
+--
+src/campaignlab/api/rules.py-259-        max_length=32,
+src/campaignlab/api/rules.py:260:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/rules.py-261-    ),
+--
+src/campaignlab/api/rules.py-307-        max_length=32,
+src/campaignlab/api/rules.py:308:        pattern=IF_MATCH_PATTERN,
+src/campaignlab/api/rules.py-309-    ),
+
+### D1 契约里 If-Match 形参的条数与 schema 去重后的种数
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json;spec=json.load(open('contracts/openapi.json'));ps=[p for it in spec['paths'].values() for op in it.values() if isinstance(op,dict) for p in (op.get('parameters') or []) if isinstance(p,dict) and p.get('name')=='If-Match'];sh={json.dumps(p.get('schema'),sort_keys=True) for p in ps};print('params=',len(ps));print('distinct_schema=',len(sh));[print(s) for s in sorted(sh)]"
+[rc=0]
+params= 16
+distinct_schema= 1
+{"maxLength": 32, "minLength": 3, "pattern": "^\"[1-9][0-9]*\"$", "type": "string"}
+
+### D2 updateActivity 的 If-Match schema 原文
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json;spec=json.load(open('contracts/openapi.json'));op=spec['paths']['/workspaces/{workspace_id}/activities/{activity_id}']['patch'];print('operationId=',op['operationId']);[print(json.dumps(p,ensure_ascii=False)) for p in op['parameters'] if p.get('name')=='If-Match']"
+[rc=0]
+operationId= updateActivity
+{"name": "If-Match", "in": "header", "required": true, "schema": {"type": "string", "minLength": 3, "maxLength": 32, "pattern": "^\"[1-9][0-9]*\"$"}}
+
+### D3 活契约 sha256[:16] 与台账 live_openapi_sha16 对撞
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; sha256sum contracts/openapi.json | cut -c1-16; uv run --no-sync python -c "import json;print('ledger=',json.load(open('orchestrator/state.json'))['resume']['self_check_gates_rc0']['counts']['live_openapi_sha16'])"
+[rc=0]
+592571099d638251
+ledger= 592571099d638251
+
+### D4 运行期常量与契约 pattern 逐字对撞
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json,sys;sys.path.insert(0,'src');from campaignlab.api import common as c;spec=json.load(open('contracts/openapi.json'));p=[q for it in spec['paths'].values() for op in it.values() if isinstance(op,dict) for q in (op.get('parameters') or []) if isinstance(q,dict) and q.get('name')=='If-Match'];print('constant=',repr(c.IF_MATCH_PATTERN));print('all_equal=',all(x['schema']['pattern']==c.IF_MATCH_PATTERN for x in p));print('in___all__=','IF_MATCH_PATTERN' in c.__all__);print('len___all__=',len(c.__all__))"
+[rc=0]
+constant= '^"[1-9][0-9]*"$'
+all_equal= True
+in___all__= True
+len___all__= 80
+
+### E1 ruff check .
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync ruff check .
+[rc=0]
+All checks passed!
+
+### E2 ruff format --check .
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync ruff format --check . | tail -3
+[rc=0]
+342 files already formatted
+
+### E3 mypy
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync mypy 2>&1 | tail -3
+[rc=0]
+Success: no issues found in 123 source files
+
+### E4 pytest（本批三面：新哨兵 ＋ 两处同族钉桩）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync pytest -q tests/unit/test_if_match_pattern_single_source.py tests/unit/test_domain_errors.py tests/integration/jobs/test_jobs_router_s4.py 2>&1 | tail -6
+[rc=0]
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /home/szf/dev/CampaignLab/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 1 warning in 15.83s
+
+### E5 pytest（全量工作树，用于 pytest_passed 的静态侧对账）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync pytest -q 2>&1 | tail -3
+[rc=0]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+809 passed, 6 warnings in 165.10s (0:02:45)
+
+### F1 入库前的哨兵全量普查（PRE-35）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json,sys;sys.path.insert(0,'/mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp');import r19ck_full as c;st=json.load(open('orchestrator/state.json'));s=c.sentinel_paths(st);print('count=',len(s));[print(x) for x in s]" 2>&1 | tail -8
+[rc=0]
+count= 3
+$.resume.commit_backfill_pending_R19_S5landBF.status
+$.resume.round19_backfill_S5land.commit
+$.resume.round19_backfill_S5land.commit_full
+
+### F2 台账 counts 现值（入库前）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json;c=json.load(open('orchestrator/state.json'))['resume']['self_check_gates_rc0']['counts'];print({k:c[k] for k in ('ruff_formatted_files','mypy_source_files','pytest_passed')});print({k:c['ruff_formatted_files_composition'][k] for k in ('total','in_scope_py','in_scope_md')})"
+[rc=0]
+{'ruff_formatted_files': 341, 'mypy_source_files': 122, 'pytest_passed': 798}
+{'total': 341, 'in_scope_py': 124, 'in_scope_md': 217}
+
+### F3 baseline_authoritative.current 的双套读数分叉（R19-11 的实测证据）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; uv run --no-sync python -c "import json;cur=json.load(open('orchestrator/state.json'))['resume']['baseline_authoritative']['current'];K=('ruff_formatted_files','mypy_source_files','pytest_passed','in_scope_py','in_scope_md');print('counts(权威)=',{k:cur['counts'][k] for k in K});print('flat(陈旧)=',{k:cur[k] for k in K});print('as_of=',cur['as_of']);print('commit_tag=',cur['commit_tag'],'head=',cur['head'])"
+[rc=0]
+counts(权威)= {'ruff_formatted_files': 341, 'mypy_source_files': 122, 'pytest_passed': 798, 'in_scope_py': 124, 'in_scope_md': 217}
+flat(陈旧)= {'ruff_formatted_files': 330, 'mypy_source_files': 113, 'pytest_passed': 750, 'in_scope_py': 115, 'in_scope_md': 215}
+as_of= 2026-11-16T23:30:59+08:00
+commit_tag= R19-landS5 head= b834a27
+
+### G1 本批 7 件交付面 ＋ 2 件取证件的 file -bi（须含 charset=utf-8）
+$ export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH; cd /home/szf/dev/CampaignLab; file -bi src/campaignlab/api/activities.py src/campaignlab/api/common.py src/campaignlab/api/jobs.py src/campaignlab/api/rules.py tests/integration/jobs/test_jobs_router_s4.py tests/unit/test_domain_errors.py tests/unit/test_if_match_pattern_single_source.py evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/00-index.md evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/commands-and-outputs.log 2>&1 | sed 's/^/  /'
+[rc=0]
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  text/plain; charset=utf-8
+  cannot open `evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/00-index.md' (No such file or directory)
+  cannot open `evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/commands-and-outputs.log' (No such file or directory)
+
+### G2 两件取证件自身的 file -bi（G1 运行时它们尚未落盘 ⇒ 在此补录）
+$ file -bi evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/00-index.md evidence/M0/ORCHESTRATOR/r19-fu59-ifmatch-thaw/commands-and-outputs.log
+[rc=0]
+text/plain; charset=utf-8
+text/plain; charset=utf-8

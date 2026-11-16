@@ -48,6 +48,7 @@ from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response
 from campaignlab.api.common import (
     CURSOR_MAX_LENGTH,
     IDEMPOTENCY_KEY_HEADER,
+    IF_MATCH_PATTERN,
     DomainError,
     JobPage,
     ResourceNotFound,
@@ -217,7 +218,7 @@ async def cancel_job(
         default=None,
         min_length=3,
         max_length=32,
-        pattern=r'^"[1-9][0-9]*"$',
+        pattern=IF_MATCH_PATTERN,
     ),
     actor: Session = Depends(require_session),  # noqa: B008
     clock: Clock = Depends(get_clock),  # noqa: B008
@@ -301,7 +302,7 @@ async def retry_job(
         default=None,
         min_length=3,
         max_length=32,
-        pattern=r'^"[1-9][0-9]*"$',
+        pattern=IF_MATCH_PATTERN,
     ),
     actor: Session = Depends(require_session),  # noqa: B008
     clock: Clock = Depends(get_clock),  # noqa: B008

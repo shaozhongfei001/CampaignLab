@@ -85,6 +85,7 @@ __all__ = [
     "IDEMPOTENCY_KEY_HEADER",
     "IDEMPOTENCY_KEY_MAX_LENGTH",
     "IDEMPOTENCY_KEY_MIN_LENGTH",
+    "IF_MATCH_PATTERN",
     "PROBLEM_CODES",
     "PROBLEM_MEDIA_TYPE",
     "RESOURCE_ID_PATTERN",
@@ -170,6 +171,23 @@ PROBLEM_MEDIA_TYPE: Final = "application/problem+json"
 IDEMPOTENCY_KEY_HEADER: Final = "Idempotency-Key"
 IDEMPOTENCY_KEY_MIN_LENGTH: Final = 8
 IDEMPOTENCY_KEY_MAX_LENGTH: Final = 128
+
+#: If-Match / ETag 的强验证器字面 —— **全仓单源**（FU-59 ＋ A271 ＋ D-051 §49 的收敛落点）。
+#: 取值逐字来自活契约 ``contracts/openapi.json`` 里 operationId ``updateActivity``
+#: （``paths`` 的 ``/workspaces/{workspace_id}/activities/{activity_id}`` ＋ ``patch``）→
+#: ``parameters`` 中 ``name == "If-Match"`` 那一项 → ``schema.pattern``。
+#: 实测（2026-11-17，台账 ``live_openapi_sha16 = 592571099d638251``）：全契约共 **16** 个
+#: If-Match 形参，其 schema **逐字同构**（``type=string`` / ``minLength=3`` /
+#: ``maxLength=32`` / 同一 pattern）⇒ 本常量即 M1 起 16 个 If-Match op 的唯一取值点，
+#: 路由层**禁**再内联第二份正则（守护＝``tests/unit/test_if_match_pattern_single_source.py``，
+#: 含阳性对照，PRE-33/PRE-34 禁无牙）。
+#: **落点裁定（A271）**：本文件是 HTTP 公共件的**定义点**（模块 docstring 首段「所有取值都
+#: 写死在此并附出处，禁止在调用点现编」），而 R5-1 的「严禁重新定义」只辖 docstring 里
+#: **具名枚举**的已搬移符号（``PROBLEM_CODES`` / ``_TITLE_BY_CODE`` / ``_STATUS_BY_CODE``
+#: / ``DomainError`` 及其 13 个子类 / ``_new_request_id`` / ``RESOURCE_ID_PATTERN``）；
+#: 本常量不属该集合，且与同样定义于本文件的 ``etag()`` / ``check_if_match()`` 互为对偶
+#: ⇒ 定义点就是本文件，**不是** ``domain/``（common.py 非纯转发面，实测见 A271）。
+IF_MATCH_PATTERN: Final = r'^"[1-9][0-9]*"$'
 
 #: design §2：游标 = ``b64u(canonical_json(payload)) + "." + hmac_sha256(secret, b64u)[:16]``，
 #: 编码后总长必须 ≤300（活契约 ``next_cursor`` 的 maxLength）。
@@ -818,7 +836,7 @@ def accepted_response(
 
 
 def etag(revision: int) -> str:
-    """``ETag: "<revision>"``（带双引号十进制整数，对齐 If-Match 正则 ``^"[1-9][0-9]*"$``）。"""
+    """``ETag: "<revision>"``（带双引号十进制整数，其字面必须 fullmatch ``IF_MATCH_PATTERN``）。"""
     return f'"{revision}"'
 
 

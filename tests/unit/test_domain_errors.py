@@ -161,15 +161,20 @@ def test_common_py_contains_no_moved_definition() -> None:
 
 
 def test_common_public_surface_is_unchanged() -> None:
-    """``api/common.py`` 公开面钉桩：``__all__`` 共 78 项、全部可解析、20 码全在其中。
+    """``api/common.py`` 公开面钉桩：``__all__`` 项数、全部可解析、20 码全在其中。
 
     78 是 **M2-01/S2a 追加 DTO 面之后的实测值**（51 → 78，净增 27）；依 A218 采用设计文档 §11.2
     的「按新实取值更新」口径。按 D-012/D-014，引用计数必须给归因，故本行数字**只在公开面再次变更时**
-    才允许改动，且须同批过账。函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
+    才允许改动，且须同批过账。**79 → 80 的归因（D-012/D-014）**：FU-59 / A271 解冻批在
+    ``api/common.py`` 新增 HTTP 常量 ``IF_MATCH_PATTERN``（If-Match 正则的全仓单源，值逐字
+    镜像活契约）并纳入 ``__all__``；同批把 ``api/activities.py`` 1 处 ＋ ``api/jobs.py`` 2 处
+    ＋ ``api/rules.py`` 2 处的内联字面量改为 import 该常量，守护落在
+    ``tests/unit/test_if_match_pattern_single_source.py``。
+    函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
     「公开面任何增减都必须在本用例显式过账」—— D-044 修正了原名/原 docstring 与断言体自相矛盾之处。
     """
-    assert len(common.__all__) == 79
-    assert len(set(common.__all__)) == 79
+    assert len(common.__all__) == 80
+    assert len(set(common.__all__)) == 80
     for name in common.__all__:
         assert hasattr(common, name), f"__all__ 声明了但取不到：{name}"
     assert set(MOVED_PUBLIC) <= set(common.__all__)
