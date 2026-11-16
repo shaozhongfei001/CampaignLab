@@ -1,0 +1,453 @@
+############################################################
+# R19 · M2-01/S5 入库批 —— 编排器独立复验（PRE-29：禁采信 lane 自报）
+# at: 2026-11-17T00:29:46+08:00   HEAD(before landing): 4050852
+# 复验者：编排器（orchestrator）· 全部命令由编排器亲自在 WSL2 /home/szf/dev/CampaignLab 实跑
+# 口径：一律 uv run --no-sync python（仓库 .venv 3.14.10），禁系统 python3
+#
+# ★ 版本说明（如实登记，append-only 不回改）：
+#   本文件是**重建版 v2**。首版 v1 在 §A 段被 cat 进来的源文件是 UTF-16LE
+#   （编排器与在飞 lane 共用了同名 scratch 文件 r19s5_baseline.out，被 lane 覆盖），
+#   导致整份 .log 变成混合编码（file -bi = application/octet-stream；python 严格 utf-8
+#   解码在偏移 919 处撞 0xff 0xfe 的 UTF-16LE BOM）⇒ 违反「取证 .log/.md 必须纯 UTF-8」
+#   的入库判据，**拒绝入库**。v2 起编排器取证一律使用 orch_ 前缀，与在飞 lane 命名空间不相交。
+#   碰撞的完整取证见本文件 §G；责任归属见台账 R19-9 / PRE-39 / FU-63。
+############################################################
+
+===== A · 基线实测（A269 的事实依据） =====
+# 如实登记：spawn 前那次实测的**原件**（.orch_tmp/r19s5_baseline.out）已被在飞 lane 的同名
+#           scratch 覆盖（见 §G）⇒ 本段是编排器于入库批时点在**同一工作树**上按**同口径重跑**
+#           的重建实测。HEAD 由 d976974 推进到 4050852，后者经 git show --numstat 实证为
+#           **纯台账批**（只动 orchestrator/state.json，359/41）⇒ src/tests 面与 A269 权威基线同面。
+#           实测读数与 A269 的期望值**逐字吻合**：ruff format --check → 339 files already formatted；
+#           mypy → Success: no issues found in 122 source files；collect → 798（domain/activity 48）；
+#           台账 counts 330/113/750（115 py + 215 md），reproduce_py/reproduce_md 回源实跑同为 115/215。
+############################################################
+# 编排器基线**重建**实测（原 .orch_tmp/r19s5_baseline.out 已被在飞 lane 的同名 scratch 覆盖）
+# at: 2026-11-17T00:12:28+08:00
+# 如实登记：本节**不是** spawn 前那次实测的原件（原件已毁，见 R19-9 / D-053）；
+#           它是编排器在入库批时点于同一工作树上**重跑**的同口径读数。
+#           HEAD 已由 d976974 推进到 4050852（tag R19-resume-S5spawn，**纯台账批**，
+#           git show --numstat 实证零 src/** 零 tests/** 零配置改动）⇒ src/tests 面与
+#           A269 的权威基线**同面**，读数应逐字一致；不一致即判红。
+############################################################
+== V0a HEAD
+40508529f8d11c823cede3e947dd9972022e50d5
+rc=0
+== V0a2 HEAD short
+4050852
+== V0a3 tag of HEAD
+4050852
+40508529f8d11c823cede3e947dd9972022e50d5 chore(R19-resume-S5spawn): **人类「开工」授权的续跑第①批 · 纯台账**（`ADD=[]`，零文件改动 ⇒ counts 五项**逐字不变** 330/113/7
+== V0b porcelain -uall (9 件未跟踪 = S5 写权面; tracked 改动必须 0)
+?? tests/domain/__init__.py
+?? tests/domain/activity/__init__.py
+?? tests/domain/activity/test_bindings.py
+?? tests/domain/activity/test_checks.py
+?? tests/domain/activity/test_clause_gate.py
+?? tests/domain/activity/test_diff.py
+?? tests/domain/activity/test_digest.py
+?? tests/domain/activity/test_layering.py
+?? tests/domain/activity/test_states.py
+rc=0
+== V0b2 tracked modifications only (must be empty)
+rc=0  lines=0
+== V0c tests/domain exists (S5 已落地 => True)
+True
+== V0d pytest collect whole repo (A269 期望 798 = 750+48)
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+798 tests collected in 1.06s
+rc=0
+== V0d2 pytest collect tests/domain/activity (期望 48)
+
+48 tests collected in 0.18s
+== V0e ruff format --check . (A269 期望 339)
+339 files already formatted
+rc=0
+== V0f ruff check .
+All checks passed!
+rc=0
+== V0g mypy (A269 期望 122)
+Success: no issues found in 122 source files
+rc=0
+== V0h counts 台账实取（入库前应为 330/113/750 · 115py+215md）
+  pytest_passed      = 750
+  mypy_source_files  = 113
+  ruff_formatted     = 330
+  in_scope_py        = 115
+  in_scope_md        = 215
+== V0h2 counts 口径回源（台账逐字 reproduce 命令实跑）
+  RUN reproduce_py  -> 115
+  RUN reproduce_md  -> 215
+== V0i 7 目标文件名在 tests/** 下的同名碰撞（应全 0，落地前口径）
+  test_states        tracked命中=0
+  test_clause_gate   tracked命中=0
+  test_digest        tracked命中=0
+  test_bindings      tracked命中=0
+  test_checks        tracked命中=0
+  test_diff          tracked命中=0
+  test_layering      tracked命中=0
+== V0j 既有包标记 __init__.py 尺寸（A262 体例先例）
+153 tests/__init__.py
+117 tests/api/__init__.py
+ 52 tests/unit/__init__.py
+ 52 tests/integration/__init__.py
+ 89 tests/api/activities/__init__.py
+108 tests/integration/jobs/__init__.py
+571 total
+== V0k python ver
+Python 3.14.10
+== V0l git log -4
+4050852 chore(R19-resume-S5spawn): **人类「开工」授权的续跑第①批 · 纯台账**（`ADD=[]`，零文件改动 ⇒ counts 五项**逐字不变** 330/113/750(115py+215md)）—— `dag_paused` True→**False** ＋ **兑现 `d976974` 的 10 处哨兵**（PRE-35 全量普查：**8 处彻底清掉**、2 处 `baseline_authoritative.current.head/.head_full` 因本批推进 HEAD 而改写为本批哨兵并如实留痕）＋ **PRE-13 第③步落地 `spawn_agent` 的真实返回值**（agent_id `01a1e4e1-ecc2-7dc1-b31c-c05b9b18524b` / nickname `Sagan`；**PRE-31 双键** (lane='S5', task='M2-01') 定位，仓内另有 lane=='S5' 属 **M0-04**／昵称 Kierkegaard ⇒ preflight 把「干扰条实存」本身也做成断言）＋ 三处 status `PREDISPATCH_COMMITTED_AWAITING_SPAWN`→**IN_FLIGHT**（`dispatch_log[17]` · `in_flight_agents[(S5,M2-01)]` · `tasks['M2-01'].s5_predispatch_R19`）＋ `spawned_after_predispatch` False→**True** ＋ `tier_used`=`qwen3.8-flash`（**显式**指定 model，未静默继承父模型；手册 §15.1 / A234）＋ **三个 pending 键全部 DONE、不再递延**（`_R19_S5` 由中间态 `SHA_BACKFILLED__AGENT_ID_PENDING_SPAWN` 收尾；`_R19_S5_spawn` 的 7 项义务逐条兑现；`_R19_checkpoint` 的 4 项兑现）＋ 终裁 **A269**（**U-BASELINE 的派单时预裁**：派单文 §4.1 把基线锚在 `0765099`、§8 规定 HEAD 不等于它即停手上报，但 `0765099` 之后的两次推进 `fe3bed7`/`d976974` **全是编排器自己的纯文档提交**、零 `src/**` 零 `tests/**` 零配置改动 ⇒ 让 lane 走完整上报纯属空转、还要白烧它只有 2 的 loop 帽；本裁定以 spawn 前**亲自实测**的权威基线全表取代 §4.1 的 HEAD/counts 行与 §2 的「ruff 328→337」为 **330→339**，并明确 §4.2/§4.3/§4.4 的**被测符号面分母不受影响、一律照原文**；**如实登记副作用**：这把「lane 自行发现并上报 U」的交叉验证换成了编排器自证 ⇒ 已要求 lane 仍须自行复测全表并贴命令原文、回收时按 PRE-29 独立复验，交叉验证只是**换了时点没有取消**；派单文本体**未改**——它已被 sha256 锚定，改它会破坏 `brief_face` 三件套与 `fe3bed7` 的归属实证，故取代关系只存在于本裁定与 spawn message，lane 必须同时读两者，这是**已知的一致性风险点**、由回执 `MEASURED_DELTAS` 兜底）＋ 自纠 **R19-6**（`commit_backfill_pending_R19_S5_spawn.precondition_carried` 残留「普查基线＝**8** 处」而真值是 **10**，少计 `checkpoint_R19.commit/.commit_full` 2 处；根因＝驱动里 `checkpoint_R19` 键的写入顺序**晚于**该清单常量，`d976974` 批的末断言已把实测 10 条回写进**机器可读**的 `sites_expected_after_mut`、文档 §5/§6 也都写 10，但**同一常量的另一处出口——人类可读的描述串——没被一起改**，即「一个事实写两个位点、只修了机器那个」；**如实区分发现时点、禁美化**：R19-3/R19-4 是**提交前**被末断言拦下（HEAD 未动、零副作用），本条是 `d976974` **已入库并已 push 之后**在停机自检与续跑第 0 步复核中**迟发现**的 ⇒ 只能按 D-011 append-only 更正，原值**原样保留**于 `precondition_carried_superseded_R19_6`；**影响如实**：零数据损失、零错误动作——PRE-35 本身要求义务方**全量 walk 实测**而非读常量，故正确的义务方不会被误导，残余风险仅是「偷懒把 8 当期望值去断言会判红」，等级**低于** R19-4 的伪哨兵永久污染、**高于**纯文字笔误；修正＝append-only 更正 ＋ preflight P17/P17b/P17c 把「靶点实存／尚无更正痕迹／权威清单确为 10 条」做成前置断言（已被人改过则判红不执行，幂等）＋ 新 pending 键的描述字段一律**指向** `sites_expected_after_mut` 而**不再复述数字**，并由 mut 末断言用**窄口径正则**机器守护（只禁「普查基线/基线/合计/残留/恰 ＋ 数字 ＋ 处」这一种可陈旧形态，**不做裸子串匹配**——裸匹配会把 sha `d976974`、日期、`R19`、`§9` 无辜命中而误判红，这是本批写驱动时自查抓出的第 3 个 bug）＋ **PRE-37 增补第 3 款**（同一事实若同时存在于机器可读位点与人类可读描述，二者必须由**同一赋值点**派生；历史上已写两遍的，末断言除比对实测集合外还须扫描描述字段里该事实的所有数字并要求一致）＋ 机器化归**既有 FU-62** 追加用例「描述性字段里的数字与其权威位点不一致即判红」，**不新立单**以免单号通胀）＋ `dag_resume_authorization_R19` / `dag_resume_evidence_R19`（续跑第 0 步 **17/17 全绿**的机器断言证据：HEAD==origin==`d976974`、工作树 0 行、四门 rc=0、counts 双镜像逐项相等 115/215/330、哨兵恰 10、账规模 18/11/49/52(末 D-052)/62(末 FU-62)/5/7(A262–A268)/21、`checkpoint_R19` 32 keys、flash_share 三比值与 `recompute_flash_share` 逐项相等、两份文档 face 三件套未变）＋ `dag_pause_reason_R19_resolved`（原文按 D-011 保留不改）＋ `baseline_authoritative` current 推进到本提交（写新哨兵）＋ history 追加第 **21** 条（快照 counts 与 current 逐字相同）＋ 新建 `commit_backfill_pending_R19_resumeS5spawn`（义务方＝下一次纯台账提交，或 S5 的入库批同批做）＋ counters **活指针**另立 `resume.counters_next`（A269→**A270** · R19-6→**R19-7** · baseline_history_index 21→**22**；dispatch_log/in_flight/subtask_log 三个索引**未消耗**——本批只就地更新、未新增条目；D/PRE/FU 三号**未消耗**）而 `checkpoint_R19.counters_next` **冻结保留**为 checkpoint 时点快照 ＋ 自纠 **R19-7**（本批驱动的 preflight `P04` 原样照抄了**停机 checkpoint 批**的「工作树 0 行」判据，但续跑第 1 步一 spawn、lane S5 立刻在 `tests/domain/**` 落了**恰 9 件**未跟踪 .py ⇒ 判据的**适用前提已变**；preflight **提交前拦下**、零副作用零数据损失，**且失败方向是安全侧**——过严只白跑一轮，反之写松就可能把在飞件误 stage 进纯台账批、违反 D-046 并让 counts 与 A269 的期望值全部错位；修正＝P04 拆成 5 条并照 `r17_backfill_agentid.py` 的既有写法实现「零 tracked 改动／未跟踪件全部落在写权面内／⊆ 冻结的 9 件（多一件即越权）／索引为空／直接调 `classify_untracked` 断言 outside 为空」，把 A144(c) 的判定**提前到 preflight** 而不是等 run_commit 第 6 步才回滚；**同批修掉同源的第二处错误**——`OWNER_MAP` 原写成 `{路径: (lane, task)}` 而 `classify_untracked` 的签名是 `Mapping[lane_descriptor, Sequence[prefix]]`、**键值方向写反**，若不修 A144(c) 会把 9 件全判越界；已回源既有惯例改为 `{"lane-S5(M2-01/S5)-IN_FLIGHT-Sagan": [9 件]}`，并按 **PRE-31** 在描述符里同时带 task 与 nickname（仓内 lane 名 `S5` 与 M0-04 的 S5／Kierkegaard 同形，只写 "S5" 会歧义）；**新立 PRE-38**＝preflight 判据的**适用时点声明**义务：凡涉及工作树／索引／在飞件形态的断言必须声明适用时点、禁跨批复用断言文本而不复核前提，必须**同时**断言「允许的」与「禁止的」两侧，凡 harness 已提供判定函数的必须直接调用它而禁另写近似逻辑（口径分叉＝陈旧度温床，与 R19-6 的「一个事实两个位点」同族），复用任何辅助函数或既有断言前按 PRE-36 第 2 款 `inspect.getsource` 回源核对其**签名与副作用面**；机器化归既有 **FU-62** 追加用例，不新立单）＋ `preconditions_added_R19_resumeS5spawn` 登记 **PRE-38** 与 **PRE-37 第 3 款** ＋ flash_share **程序化重算**（无新样本 ⇒ 三比值与 9 个聚合键逐项不变，两项护栏仍**双双未达标** 0.5862<0.60 ／ 0.6655>0.35 且仅 10/48 条有计量句柄 ⇒ 统计上不可判、**FU-61 保持 OPEN**，如实报、**禁**为凑配比降档）＋ 末断言 `sentinel_paths(state)` **恰 11 处**且由**赋值点反推**、实测集合**回写** `sites_expected_after_mut`（PRE-37 第 1 款），8 处已清掉的**零残留**
+d976974 chore(R19-checkpoint-S5pd): **人类显式授权的停机 checkpoint** —— `orchestrator/handoff/R19-CHECKPOINT.md` 入库（304 行 / 35043 B / sha256[:12] b80e41f17d0e；12 节：sha 锚点 · 本回合落地 · 三次提交前拦截 · DAG 状态 · S5 派单状态与 spawn 指令 · 续跑 runbook · 哨兵与待兑现义务 · 工具链陷阱 10 条 · 档位与护栏 · loop engineering · 计数器 · 数据损失声明与停机授权 · 关键文件索引）＋ **兑现 fe3bed7 的 21 处哨兵**（PRE-35 全量普查：19 处**彻底清掉**、2 处 `baseline_authoritative.current.head/.head_full` 因本批推进 HEAD 而改写为本批哨兵并如实留痕）＋ **spawn 义务显式重新递延**（新键 `commit_backfill_pending_R19_S5_spawn`；理由＝`spawn_agent` 尚未调用、agent_id 客观不存在，依 A183/PRE-13 禁写猜测值）＋ `dag_paused` False→**True** ＋ `resume.checkpoint_R19` 登记 ＋ counts 329/113/750(115py+214md)→**330/113/750(115py+215md)**（只 +1 md；**双份镜像同批写全**并断言逐项相等，R19-5 / PRE-36 第 2 款）＋ flash_share 程序化重算（无新样本 ⇒ 三比值逐项不变，两项护栏仍**双双未达标**如实报）
+fe3bed7 chore(R19-predispatch-S5): M2-01/S5 派单文入库（`tests/domain/activity/**` **只新建 9 件** · flash/medium/8k/loop2 · critical=false/slack=4）＋ **兑现 R19 的 7 处哨兵**（PRE-35 全量普查：`round19_self_corrections[R19-1/R19-2]` 的 4 处 ＋ `round19_resume` 的 2 处 ＋ `commit_backfill_pending_R19.status` ⇒ 全部回填为 **0765099**，普查前后集合相等、零陈旧）＋ 终裁 **A262–A268** ＋ dispatch_log 17→**18** ＋ in_flight_agents 10→**11**（**PRE-31 双键**：仓内已有 `lane=='S5'` 属 **M0-04**／昵称 Kierkegaard，本条由 (S5, M2-01) 唯一定位；preflight 把「干扰条实存」本身也做成断言）＋ dispatched 0→**1**（PRE-13：**spawn 排在本提交之后**，agent_id 由第③步纯台账批回填，现值一律 None）＋ **自纠 R19-3**（`S5PD_SITES` 少枚举 2 处 **task 级镜像键** ⇒ 真值 15 而非 13；由 `mut()` 的**末断言**在**提交前**拦下，`git reset` ＋ 台账 `checkout` 已还原、HEAD 未动、**零副作用零数据损失**；根因＝按记忆罗列清单而未回源到「mut 内每一处哨兵赋值点」，与 PRE-30 同族）＋ 自纠 **R19-4**（R19-3 的修正版把两个哨兵字面量**原样**写进 `sites_expected_breakdown.sentinel_literal` 作说明 ⇒ 被全量普查误计为 2 处**不可回填的伪哨兵**，实测 19 vs 期望 17；同一道末断言**提交前**拦下、零副作用。**风险等级高于 R19-3**：漏登记的真哨兵下一批实扫就能补，而伪哨兵一旦入库就**永久**留在台账里污染此后每次普查）＋ 新立 **PRE-37**（第 1 款＝哨兵清单的**赋值点回源义务**，清单与赋值点一一对应、禁「无源之条」也禁「无条之源」；第 2 款＝**哨兵字面量的污染性约束**，禁把字面量原样写进任何描述性字段，指称时一律用「含子串但不相等」的形态或指向源码常量名；机器化归 FU-62 同族）＋ 自纠 **R19-5**（`counts` 的 `in_scope_py`/`in_scope_md`/`total` 存在**双份镜像**：top-level 与 `ruff_formatted_files_composition` 内同名键；沿用的既有辅助函数 `set_counts_view` 只写 top-3 ＋ composition、**从不写 top-level 那三项** ⇒ 214 只落进一半，被 run_commit 的 **drift 门**判红 `{'in_scope_md': (213, 214)}`。四门全绿**之后**才判 ⇒ 白跑 ≈2.9 分钟；仍**零副作用**。修正＝显式补写 top-level ＋ 双镜像自洽断言 ＋ preflight P16g/P16h/P16i）＋ **PRE-36 增补第 2 款**（镜像读数的**全键显式赋值**义务；复用辅助函数前必须 `inspect.getsource` 回源核对它**实际写了哪些键**）＋ counts 328/113/750(115py+213md)→**329/113/750(115py+214md)**（只 +1 md，py/mypy/pytest 三项**逐字不变**；**两处镜像同批写全**并断言逐项相等）＋ flash_share 程序化重算（PRE-36：subtask_log 保持 49 条、无新样本 ⇒ 三比值逐项不变，两项护栏仍**双双未达标** 0.5862<0.60 ／ 0.6655>0.35 如实报，**禁为凑配比降档**）
+0765099 chore(R19-resume+backfill): 纯台账批 —— 双 sha 回填（S8=5416990 **迟回填 2 个提交** / S4=4514de4 按时）⇒ 28 处哨兵清零 ＋ 护栏比值纠错（**R19-1**：`flash_share_tasks` 0.5789→**0.5862**、`flash_share_dev_lanes` 0.4→**0.4167**、`flash_share_detail` 47/57/33→**48/58/34**；两项护栏**仍未达标**如实报）＋ **R19-2** ＋ 新立 **PRE-35/PRE-36** ＋ **FU-62** 立单（P1，wave-3 开闸前必须落地）＋ Round 19 断点恢复自证（**零数据损失**：接管时 HEAD==origin==4514de4、工作树 0 条）＋ counts 五项**逐字不变** 328/113/750(115py+213md)
+== V0m 4050852 是纯台账批的实证（numstat 应只含 orchestrator/state.json）
+40508529f8d11c823cede3e947dd9972022e50d5 chore(R19-resume-S5spawn): **人类「开工」授权的续跑第①批 · 纯台账**（`ADD=[]`，零文件改动 ⇒ counts 五项**逐字不变** 330/113/750(115py+215md)）—— `dag_paused` True→**False** ＋ **兑现 `d976974` 的 10 处哨兵**（PRE-35 全量普查：**8 处彻底清掉**、2 处 `baseline_authoritative.current.head/.head_full` 因本批推进 HEAD 而改写为本批哨兵并如实留痕）＋ **PRE-13 第③步落地 `spawn_agent` 的真实返回值**（agent_id `01a1e4e1-ecc2-7dc1-b31c-c05b9b18524b` / nickname `Sagan`；**PRE-31 双键** (lane='S5', task='M2-01') 定位，仓内另有 lane=='S5' 属 **M0-04**／昵称 Kierkegaard ⇒ preflight 把「干扰条实存」本身也做成断言）＋ 三处 status `PREDISPATCH_COMMITTED_AWAITING_SPAWN`→**IN_FLIGHT**（`dispatch_log[17]` · `in_flight_agents[(S5,M2-01)]` · `tasks['M2-01'].s5_predispatch_R19`）＋ `spawned_after_predispatch` False→**True** ＋ `tier_used`=`qwen3.8-flash`（**显式**指定 model，未静默继承父模型；手册 §15.1 / A234）＋ **三个 pending 键全部 DONE、不再递延**（`_R19_S5` 由中间态 `SHA_BACKFILLED__AGENT_ID_PENDING_SPAWN` 收尾；`_R19_S5_spawn` 的 7 项义务逐条兑现；`_R19_checkpoint` 的 4 项兑现）＋ 终裁 **A269**（**U-BASELINE 的派单时预裁**：派单文 §4.1 把基线锚在 `0765099`、§8 规定 HEAD 不等于它即停手上报，但 `0765099` 之后的两次推进 `fe3bed7`/`d976974` **全是编排器自己的纯文档提交**、零 `src/**` 零 `tests/**` 零配置改动 ⇒ 让 lane 走完整上报纯属空转、还要白烧它只有 2 的 loop 帽；本裁定以 spawn 前**亲自实测**的权威基线全表取代 §4.1 的 HEAD/counts 行与 §2 的「ruff 328→337」为 **330→339**，并明确 §4.2/§4.3/§4.4 的**被测符号面分母不受影响、一律照原文**；**如实登记副作用**：这把「lane 自行发现并上报 U」的交叉验证换成了编排器自证 ⇒ 已要求 lane 仍须自行复测全表并贴命令原文、回收时按 PRE-29 独立复验，交叉验证只是**换了时点没有取消**；派单文本体**未改**——它已被 sha256 锚定，改它会破坏 `brief_face` 三件套与 `fe3bed7` 的归属实证，故取代关系只存在于本裁定与 spawn message，lane 必须同时读两者，这是**已知的一致性风险点**、由回执 `MEASURED_DELTAS` 兜底）＋ 自纠 **R19-6**（`commit_backfill_pending_R19_S5_spawn.precondition_carried` 残留「普查基线＝**8** 处」而真值是 **10**，少计 `checkpoint_R19.commit/.commit_full` 2 处；根因＝驱动里 `checkpoint_R19` 键的写入顺序**晚于**该清单常量，`d976974` 批的末断言已把实测 10 条回写进**机器可读**的 `sites_expected_after_mut`、文档 §5/§6 也都写 10，但**同一常量的另一处出口——人类可读的描述串——没被一起改**，即「一个事实写两个位点、只修了机器那个」；**如实区分发现时点、禁美化**：R19-3/R19-4 是**提交前**被末断言拦下（HEAD 未动、零副作用），本条是 `d976974` **已入库并已 push 之后**在停机自检与续跑第 0 步复核中**迟发现**的 ⇒ 只能按 D-011 append-only 更正，原值**原样保留**于 `precondition_carried_superseded_R19_6`；**影响如实**：零数据损失、零错误动作——PRE-35 本身要求义务方**全量 walk 实测**而非读常量，故正确的义务方不会被误导，残余风险仅是「偷懒把 8 当期望值去断言会判红」，等级**低于** R19-4 的伪哨兵永久污染、**高于**纯文字笔误；修正＝append-only 更正 ＋ preflight P17/P17b/P17c 把「靶点实存／尚无更正痕迹／权威清单确为 10 条」做成前置断言（已被人改过则判红不执行，幂等）＋ 新 pending 键的描述字段一律**指向** `sites_expected_after_mut` 而**不再复述数字**，并由 mut 末断言用**窄口径正则**机器守护（只禁「普查基线/基线/合计/残留/恰 ＋ 数字 ＋ 处」这一种可陈旧形态，**不做裸子串匹配**——裸匹配会把 sha `d976974`、日期、`R19`、`§9` 无辜命中而误判红，这是本批写驱动时自查抓出的第 3 个 bug）＋ **PRE-37 增补第 3 款**（同一事实若同时存在于机器可读位点与人类可读描述，二者必须由**同一赋值点**派生；历史上已写两遍的，末断言除比对实测集合外还须扫描描述字段里该事实的所有数字并要求一致）＋ 机器化归**既有 FU-62** 追加用例「描述性字段里的数字与其权威位点不一致即判红」，**不新立单**以免单号通胀）＋ `dag_resume_authorization_R19` / `dag_resume_evidence_R19`（续跑第 0 步 **17/17 全绿**的机器断言证据：HEAD==origin==`d976974`、工作树 0 行、四门 rc=0、counts 双镜像逐项相等 115/215/330、哨兵恰 10、账规模 18/11/49/52(末 D-052)/62(末 FU-62)/5/7(A262–A268)/21、`checkpoint_R19` 32 keys、flash_share 三比值与 `recompute_flash_share` 逐项相等、两份文档 face 三件套未变）＋ `dag_pause_reason_R19_resolved`（原文按 D-011 保留不改）＋ `baseline_authoritative` current 推进到本提交（写新哨兵）＋ history 追加第 **21** 条（快照 counts 与 current 逐字相同）＋ 新建 `commit_backfill_pending_R19_resumeS5spawn`（义务方＝下一次纯台账提交，或 S5 的入库批同批做）＋ counters **活指针**另立 `resume.counters_next`（A269→**A270** · R19-6→**R19-7** · baseline_history_index 21→**22**；dispatch_log/in_flight/subtask_log 三个索引**未消耗**——本批只就地更新、未新增条目；D/PRE/FU 三号**未消耗**）而 `checkpoint_R19.counters_next` **冻结保留**为 checkpoint 时点快照 ＋ 自纠 **R19-7**（本批驱动的 preflight `P04` 原样照抄了**停机 checkpoint 批**的「工作树 0 行」判据，但续跑第 1 步一 spawn、lane S5 立刻在 `tests/domain/**` 落了**恰 9 件**未跟踪 .py ⇒ 判据的**适用前提已变**；preflight **提交前拦下**、零副作用零数据损失，**且失败方向是安全侧**——过严只白跑一轮，反之写松就可能把在飞件误 stage 进纯台账批、违反 D-046 并让 counts 与 A269 的期望值全部错位；修正＝P04 拆成 5 条并照 `r17_backfill_agentid.py` 的既有写法实现「零 tracked 改动／未跟踪件全部落在写权面内／⊆ 冻结的 9 件（多一件即越权）／索引为空／直接调 `classify_untracked` 断言 outside 为空」，把 A144(c) 的判定**提前到 preflight** 而不是等 run_commit 第 6 步才回滚；**同批修掉同源的第二处错误**——`OWNER_MAP` 原写成 `{路径: (lane, task)}` 而 `classify_untracked` 的签名是 `Mapping[lane_descriptor, Sequence[prefix]]`、**键值方向写反**，若不修 A144(c) 会把 9 件全判越界；已回源既有惯例改为 `{"lane-S5(M2-01/S5)-IN_FLIGHT-Sagan": [9 件]}`，并按 **PRE-31** 在描述符里同时带 task 与 nickname（仓内 lane 名 `S5` 与 M0-04 的 S5／Kierkegaard 同形，只写 "S5" 会歧义）；**新立 PRE-38**＝preflight 判据的**适用时点声明**义务：凡涉及工作树／索引／在飞件形态的断言必须声明适用时点、禁跨批复用断言文本而不复核前提，必须**同时**断言「允许的」与「禁止的」两侧，凡 harness 已提供判定函数的必须直接调用它而禁另写近似逻辑（口径分叉＝陈旧度温床，与 R19-6 的「一个事实两个位点」同族），复用任何辅助函数或既有断言前按 PRE-36 第 2 款 `inspect.getsource` 回源核对其**签名与副作用面**；机器化归既有 **FU-62** 追加用例，不新立单）＋ `preconditions_added_R19_resumeS5spawn` 登记 **PRE-38** 与 **PRE-37 第 3 款** ＋ flash_share **程序化重算**（无新样本 ⇒ 三比值与 9 个聚合键逐项不变，两项护栏仍**双双未达标** 0.5862<0.60 ／ 0.6655>0.35 且仅 10/48 条有计量句柄 ⇒ 统计上不可判、**FU-61 保持 OPEN**，如实报、**禁**为凑配比降档）＋ 末断言 `sentinel_paths(state)` **恰 11 处**且由**赋值点反推**、实测集合**回写** `sites_expected_after_mut`（PRE-37 第 1 款），8 处已清掉的**零残留**
+
+359	41	orchestrator/state.json
+
+===== A2 · counts 口径回源（台账逐字 reproduce 命令，禁自创口径） =====
+# 如实登记：编排器先用自己猜测的命令跑 md 分母得 217，与台账 215 不符；
+#           回源台账 ruff_formatted_files_composition.reproduce_md 的逐字命令后实跑得 215，与台账一致。
+#           差异根因：猜测命令少了 -z 与 ^"? 的引号形态容许 ⇒ 2 个非 ASCII 路径的 spec 件未被排除。
+#           结论：台账口径正确，编排器猜测口径错误（PRE-29 的现场印证）。
+=== RUN reproduce_py verbatim: git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l
+   rc= 0  stdout= 115  stderr= 
+=== RUN reproduce_md verbatim: git ls-files -z '*.md' | tr '\0' '\n' | grep -vE '^"?(spec|prototype|web)/' | wc -l
+=== RUN reproduce_md verbatim: git ls-files -z '*.md' | tr '\0' '\n' | grep -vE '^"?(spec|prototype|web)/' | wc -l
+   rc= 0  stdout= 215  stderr= 
+
+
+===== B · 交付面 face 三件套（编排器实测，9 件逐件；与 lane 自报逐字一致） =====
+=== FACE TRIPLES of the 9 files ===
+  tests/domain/__init__.py  lines=1 bytes=79 sha12=d4c9e96acb93
+  tests/domain/activity/__init__.py  lines=1 bytes=97 sha12=d903691e61e7
+  tests/domain/activity/test_bindings.py  lines=117 bytes=4981 sha12=fc5d94cdbd3c
+  tests/domain/activity/test_checks.py  lines=207 bytes=7599 sha12=dc24c777b4e1
+  tests/domain/activity/test_clause_gate.py  lines=264 bytes=10796 sha12=23add408478c
+  tests/domain/activity/test_diff.py  lines=115 bytes=4821 sha12=3de150ac749d
+  tests/domain/activity/test_digest.py  lines=110 bytes=4352 sha12=6e41aeb5961f
+  tests/domain/activity/test_layering.py  lines=134 bytes=4817 sha12=5fbd5bdcacf8
+  tests/domain/activity/test_states.py  lines=163 bytes=6878 sha12=3c9ce991f2e1
+=== HARD-DENY SURFACE: any diff vs HEAD? (must be empty) ===
+===== B2 · 硬禁面零改动（tracked 改动必须为空） =====
+=== TRACKED MODIFICATIONS (must be none) ===
+(none)
+=== UNTRACKED LIST ===
+tests/domain/__init__.py
+tests/domain/activity/__init__.py
+tests/domain/activity/test_bindings.py
+tests/domain/activity/test_checks.py
+tests/domain/activity/test_clause_gate.py
+tests/domain/activity/test_diff.py
+tests/domain/activity/test_digest.py
+tests/domain/activity/test_layering.py
+tests/domain/activity/test_states.py
+=== FACE TRIPLES of the 9 files ===
+=== HARD-DENY SURFACE: any diff vs HEAD? (must be empty) ===
+=== git diff --numstat (all, must be empty) ===
+
+===== C · §6.1 用例清单 vs AST 实取（40 名逐字对撞） =====
+=== SET COMPARISON ===
+  brief-only (in §6.1 but NOT implemented): []
+  actual-only (implemented but NOT in §6.1): []
+  intersection size: 40
+  duplicates in actual: []
+--- AST 实取的逐文件函数名 ---
+=== AST actual test_* per file ===
+  test_states.py (7): ['test_activity_state_machine_a1_a2_a3_are_exactly_the_registered_rows', 'test_rule_state_machine_r1_r4_are_exactly_the_registered_rows', 'test_archived_activity_is_immutable_and_rejects_every_mutation', 'test_confirmed_rule_version_is_immutable_on_update', 'test_confirmed_rule_version_is_immutable_on_reconfirm', 'test_successor_draft_does_not_touch_the_confirmed_parent', 'test_transition_tables_have_teeth_positive_control']
+  test_clause_gate.py (10): ['test_clause_gate_blocks_when_a_required_key_is_missing', 'test_clause_gate_blocks_when_a_required_key_is_open', 'test_clause_gate_blocks_on_duplicate_key', 'test_clause_gate_blocks_on_missing_or_unregistered_evidence', 'test_clause_gate_blocks_on_empty_decision', 'test_clause_gate_six_by_three_matrix', 'test_clause_gate_warning_requires_note', 'test_clause_gate_digest_mismatch_is_reported', 'test_clause_gate_required_keys_are_the_spec_nine', 'test_clause_gate_rejects_unsupported_schema_version']
+  test_digest.py (4): ['test_rule_digest_projection_is_content_sorted_terms_and_source_version', 'test_rule_digest_ignores_label_and_confirmation', 'test_rule_digest_is_stable_across_key_order', 'test_rule_digest_matches_stored_column']
+  test_bindings.py (6): ['test_binding_interval_is_start_inclusive_end_exclusive', 'test_binding_empty_interval_is_rejected', 'test_binding_overlap_is_rejected', 'test_binding_duplicate_key_is_rejected', 'test_binding_evidence_must_be_registered', 'test_binding_sort_key_is_frozen']
+  test_checks.py (7): ['test_check_framework_registers_every_check_id_exactly_once', 'test_check_framework_five_ac004_categories_all_have_teeth', 'test_check_state_needs_confirmation_on_unconfirmed_clause', 'test_boundary_cases_cover_the_spec_counterexamples_per_template', 'test_boundary_case_inputs_validate_against_contract', 'test_boundary_cases_are_deterministic_without_clock', 'test_boundary_case_count_never_exceeds_contract_max']
+  test_diff.py (4): ['test_rule_diff_paths_are_frozen_and_sorted', 'test_rule_diff_excludes_non_projection_fields', 'test_rule_diff_renders_values_as_strings', 'test_rule_diff_cp_v1_to_cp_v2_is_refund_policy_only']
+  test_layering.py (2): ['test_domain_activity_has_no_runtime_import_edge_to_api_infra_application', 'test_domain_activity_layering_scanner_has_teeth']
+  TOTAL functions: 40
+
+===== C2 · 0765099 的真值 sha（判 R19-8 的依据） =====
+=== TRUE full sha of 0765099 ===
+0765099006544b72de505ea18258159443ff7349
+=== length of brief's literal ===
+40
+=== brief V5 block (lines 328-340) ===
+
+===== D · 静态门与用例门（编排器独立重跑，全部 rc=0） =====
+=== G1 ruff format --check . (expect 339) ===
+339 files already formatted
+rc=0
+=== G2 ruff check . ===
+All checks passed!
+rc=0
+=== G3 mypy (expect 122) ===
+Success: no issues found in 122 source files
+rc=0
+=== G4 collect whole repo (expect 798) ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+798 tests collected in 0.81s
+=== G5 collect tests/domain/activity (expect 48) ===
+
+48 tests collected in 0.22s
+=== V5-a -k immutable ===
+...                                                                      [100%]
+3 passed, 45 deselected in 0.21s
+rc=0
+=== V5-b -k clause_gate ===
+..................                                                       [100%]
+18 passed, 30 deselected in 0.23s
+rc=0
+=== V5-c -k state_machine ===
+..                                                                       [100%]
+2 passed, 46 deselected in 0.21s
+rc=0
+=== V5-d -k 'check_framework or boundary_case' ===
+......                                                                   [100%]
+6 passed, 42 deselected in 0.27s
+rc=0
+=== V8 layering alone ===
+..                                                                       [100%]
+2 passed in 0.04s
+rc=0
+=== G6 FULL pytest (expect 798 passed / 0 failed) ===
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+798 passed, 6 warnings in 158.84s (0:02:38)
+rc=0
+=== G7 counts reproduce (verbatim ledger cmds) ===
+115
+215
+
+===== E · 阳性对照 PC-A/PC-B/PC-D/PC-E —— 编排器**自己重做**（不采信 lane 的仿真） =====
+# 方法：四个变异点全在 S5 的**未跟踪**测试文件里 ⇒ git checkout 救不回来，
+#       故一律「先备份(按相对路径扁平化命名＋MANIFEST) → 变异(断言靶点命中恰 1 处) →
+#       跑对应测试取 rc → 立即复原 → sha256 双证」，外层 bash trap EXIT 再兜底一次。
+# PRE-34：区分 rc=4（收集期错）与 rc=1（断言红）—— 四条全部 rc=1，无一 rc=4。
+BACKUP: 9 件已按扁平化路径名备份到 /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/pc_backup ＋ MANIFEST.json
+======================================================================
+PC-A: 变异生效=True（靶点命中 1 处，已替换）
+PC-A: rc=1
+       =========================== short test summary info ============================
+       FAILED tests/domain/activity/test_states.py::test_transition_tables_have_teeth_positive_control
+       1 failed in 0.05s
+PC-A: 断言红(rc=1)=True 非收集期错(rc!=4)=True 证据含断言/FAILED=True
+PC-A: 复原 sha256 双证=True
+======================================================================
+PC-B: 变异生效=True（靶点命中 1 处，已替换）
+PC-B: rc=1
+       =========================== short test summary info ============================
+       FAILED tests/domain/activity/test_layering.py::test_domain_activity_layering_scanner_has_teeth
+       1 failed in 0.02s
+PC-B: 断言红(rc=1)=True 非收集期错(rc!=4)=True 证据含断言/FAILED=True
+PC-B: 复原 sha256 双证=True
+======================================================================
+PC-D: 变异生效=True（靶点命中 1 处，已替换）
+PC-D: rc=1
+       =========================== short test summary info ============================
+       FAILED tests/domain/activity/test_digest.py::test_rule_digest_ignores_label_and_confirmation
+       1 failed in 0.27s
+PC-D: 断言红(rc=1)=True 非收集期错(rc!=4)=True 证据含断言/FAILED=True
+PC-D: 复原 sha256 双证=True
+======================================================================
+PC-E: 变异生效=True（靶点命中 1 处，已替换）
+PC-E: rc=1
+       =========================== short test summary info ============================
+       FAILED tests/domain/activity/test_checks.py::test_boundary_case_inputs_validate_against_contract
+       1 failed in 0.23s
+PC-E: 断言红(rc=1)=True 非收集期错(rc!=4)=True 证据含断言/FAILED=True
+PC-E: 复原 sha256 双证=True
+======================================================================
+FINAL 9-FILE SHA256 INTEGRITY:
+  [OK ] tests/domain/__init__.py d4c9e96acb93
+  [OK ] tests/domain/activity/__init__.py d903691e61e7
+  [OK ] tests/domain/activity/test_states.py 3c9ce991f2e1
+  [OK ] tests/domain/activity/test_clause_gate.py 23add408478c
+  [OK ] tests/domain/activity/test_digest.py 6e41aeb5961f
+  [OK ] tests/domain/activity/test_bindings.py fc5d94cdbd3c
+  [OK ] tests/domain/activity/test_checks.py dc24c777b4e1
+  [OK ] tests/domain/activity/test_diff.py 3de150ac749d
+  [OK ] tests/domain/activity/test_layering.py 5fbd5bdcacf8
+ALL_RESTORED: True
+
+SUMMARY:
+  PC-A: rc=1 mutated_and_restored=True | 1 failed in 0.05s
+  PC-B: rc=1 mutated_and_restored=True | 1 failed in 0.02s
+  PC-D: rc=1 mutated_and_restored=True | 1 failed in 0.27s
+  PC-E: rc=1 mutated_and_restored=True | 1 failed in 0.23s
+PC_VERDICT: ALL_HAVE_TEETH_AND_RESTORED
+
+===== E2 · 阳性对照 PC-C（零变异：环境旗标形态） =====
+=== PC-C (env flag, zero mutation) expect 9 failed / 9 deselected, rc=1 ===
+FAILED tests/domain/activity/test_clause_gate.py::test_clause_gate_six_by_three_matrix[callback_priority-same_day_scope]
+FAILED tests/domain/activity/test_clause_gate.py::test_clause_gate_six_by_three_matrix[callback_priority-priority]
+FAILED tests/domain/activity/test_clause_gate.py::test_clause_gate_six_by_three_matrix[callback_priority-daily_cap]
+9 failed, 9 deselected in 0.07s
+rc=1
+=== PC-C control: same test WITHOUT flag expect rc=0 ===
+.........                                                                [100%]
+9 passed, 9 deselected in 0.03s
+rc=0
+=== locate _table_diff ===
+
+===== F · U-1 事实面独立核实（裁定 A270 的依据；禁采信 lane 自报） =====
+=== U1-fact1: evaluate_clause_gate signature ===
+(*, template: 'str', terms: 'Sequence[Mapping[str, Any]]', registered_evidence_ids: 'Collection[str]') -> 'tuple[GateIssue, ...]'
+=== U1-fact2: SCHEMA_VERSION_UNSUPPORTED emission sites in src/ (excluding registration) ===
+src/campaignlab/application/activity_service.py:218:_SCHEMA_VERSION_CODE: Final = "SCHEMA_VERSION_UNSUPPORTED"
+src/campaignlab/domain/activity/clauses.py:64:#: ＋ design §4.2 第 5 / 6 / 8 条的三个（``SCHEMA_VERSION_UNSUPPORTED`` 的**判定**在 api／service
+src/campaignlab/domain/activity/clauses.py:73:    "SCHEMA_VERSION_UNSUPPORTED",
+--- in domain/activity only ---
+src/campaignlab/domain/activity/clauses.py:64:#: ＋ design §4.2 第 5 / 6 / 8 条的三个（``SCHEMA_VERSION_UNSUPPORTED`` 的**判定**在 api／service
+src/campaignlab/domain/activity/clauses.py:73:    "SCHEMA_VERSION_UNSUPPORTED",
+=== U1-fact3: CLAUSE_ISSUE_CODES registration ===
+    dict.fromkeys(key for keys in REQUIRED_CLAUSE_KEYS.values() for key in keys)
+)
+
+#: 本文件产出的全部 ``Issue.code`` 标签：design §4.3 的 G1–G6 六个
+#: ＋ design §4.2 第 5 / 6 / 8 条的三个（``SCHEMA_VERSION_UNSUPPORTED`` 的**判定**在 api／service
+#: 层，标签冻结在这里，使 M2-01 的 ``Issue.code`` 登记面有唯一出处）。
+CLAUSE_ISSUE_CODES: Final[tuple[str, ...]] = (
+    "CLAUSE_MISSING",
+    "CLAUSE_UNCONFIRMED",
+    "CLAUSE_DUPLICATE",
+    "CLAUSE_EVIDENCE_MISSING",
+    "CLAUSE_EVIDENCE_UNREGISTERED",
+    "CLAUSE_DECISION_EMPTY",
+    "SCHEMA_VERSION_UNSUPPORTED",
+    "CONFIRMATION_DIGEST_MISMATCH",
+    "CONFIRMATION_NOTE_REQUIRED",
+)
+
+#: design §4.2 第 8 条冻结的文案（同时用作 ``Problem.detail`` 与 ``Issue.message``：
+#: 二者语义完全重合，写两份必然漂移）。
+_NOTE_REQUIRED_TEXT: Final = "存在需审核备注的警告，请在确认备注中记录判断"
+
+#: 契约 ``Issue.message`` 的 maxLength（``components.schemas.Issue.properties.message``）。
+=== U1-fact4: domain-reachable entry -> TEMPLATE_CONST_MISMATCH on schema_version ===
+125:        ("schema_version", 1),
+131:        ("schema_version", 1),
+298:        "schema_version": 1,
+320:        "schema_version": 1,
+=== U1-fact5: what S5 actually asserts in test_clause_gate_rejects_unsupported_schema_version ===
+236:def test_clause_gate_rejects_unsupported_schema_version() -> None:
+237-    """``SCHEMA_VERSION_UNSUPPORTED`` 标签登记在门禁码面（单一出处），但领域层门禁函数
+238-    不接 ``schema_version``；实测的领域入口是 ``run_checks`` 的 ``TEMPLATE_CONST_MISMATCH``
+239-    （``_CONST_BY_TEMPLATE`` 含 ``("schema_version", 1)``）。⇒ 已按 §8 上报 U 项。
+240-    """
+241-    assert "SCHEMA_VERSION_UNSUPPORTED" in clauses.CLAUSE_ISSUE_CODES
+242-    assert _gate("coupon_threshold", COUPON_TERMS) == ()
+243-    assert all(item.code != "SCHEMA_VERSION_UNSUPPORTED" for item in _gate("zzz", ()))
+244-    from campaignlab.domain.activity import checks
+245-
+246-    base = json.loads(_RULES_PATH.read_text(encoding="utf-8"))["CP-V1"]
+247-    bad = {**base, "schema_version": 2}
+248-    ctx_bad = checks.RuleContext(
+249-        rule_id="R-schema", template="coupon_threshold", content=bad, terms=(), sibling_confirmed=()
+250-    )
+251-    ctx_ok = checks.RuleContext(
+252-        rule_id="R-schema",
+253-        template="coupon_threshold",
+254-        content=base,
+255-        terms=(),
+256-        sibling_confirmed=(),
+257-    )
+258-    bad_codes = [
+259-        (item.code, item.location, item.severity) for item in checks.run_checks(ctx_bad).issues
+260-    ]
+261-    ok_codes = {item.code for item in checks.run_checks(ctx_ok).issues}
+262-    assert ("TEMPLATE_CONST_MISMATCH", "/content/schema_version", "ERROR") in bad_codes
+263-    assert "TEMPLATE_CONST_MISMATCH" not in ok_codes
+264-    assert "SCHEMA_VERSION_UNSUPPORTED" not in {code for code, _, _ in bad_codes}
+
+===== G · scratch 命名碰撞取证（R19-9 / PRE-39 / FU-63 的事实依据） =====
+############################################################
+# scratch 命名碰撞取证（R19-9 / PRE-39 / FU-63 的事实依据）
+# at: 2026-11-17T00:29:46+08:00
+############################################################
+== C1 · 编排器与在飞 lane **共用同名** scratch 文件的实测后果 ==
+-- 被覆盖的 3 个编排器取证文件（现为 lane 写入的 UTF-16LE，PowerShell '>' 默认编码）--
+  r19s5_baseline.out         Unicode text, UTF-16, little-endian text, with very long lines (1802), with CRLF line terminators
+  r19s5_gates.out            Unicode text, UTF-16, little-endian text, with very long lines (522), with CRLF line terminators
+  r19s5_lint.out             Unicode text, UTF-16, little-endian text, with CRLF line terminators
+-- r19s5_baseline.out 的现内容（已不是编排器的基线实测，而是 lane 的 V0a HEAD 探针）--
+    ﻿== V0a HEAD
+    d976974158390e1ce917d1a9fbb1cb0f2f4cc484
+    rc=0
+    == V0b porcelain
+    0
+    == V0c tests/domain exists
+-- 同族的 lane 侧 UTF-16LE 探针件（命名前缀相同 ⇒ 碰撞面）--
+  r19s5_probe1.out           Unicode text, UTF-16, little-endian text, with very long lines (32674), with CRLF line terminators
+  r19s5_probe2.out           Python script, Unicode text, UTF-16, little-endian text executable, with very long lines (860), with CRLF line terminators
+  r19s5_probe3.out           Unicode text, UTF-16, little-endian text, with CRLF line terminators
+  r19s5_probe4.out           Unicode text, UTF-16, little-endian text, with CRLF line terminators
+  r19s5_probe5.out           Unicode text, UTF-16, little-endian text, with very long lines (860), with CRLF line terminators
+  r19s5_probe6.out           Unicode text, UTF-16, little-endian text, with CRLF line terminators
+  r19s5_probe7.out           Python script, Unicode text, UTF-16, little-endian text executable, with very long lines (447), with CRLF line terminators
+
+== C2 · 混合编码污染的取证日志（首版 V-independent-reverify.log）==
+  file -b  : data
+  file -bi : application/octet-stream; charset=binary
+  bytes    : 25323
+  python utf-8 严格解码：
+    DECODE FAIL: 'utf-8' codec can't decode byte 0xff in position 919: invalid start byte
+    首个非法字节偏移 919，上下文 hex: e3 80 8c 72 75 66 66 20 33 32 38 e2 86 92 33 33 37 e3 80 8d e3 80 82 0a ff fe 3d 00 3d 00 20 00 56 00 30 00 61 00 20 00 48 00 45 00 41 00 44 00
+    ⇒ 0xff 0xfe 是 UTF-16LE 的 BOM，证明该处被 cat 进来的源文件是 UTF-16LE
+
+== C3 · 处置（本批实际执行的动作）==
+  ① 编排器取证一律改用 orch_ 前缀（本批已落 orch_r19s5_baseline.out / orch_r19s5_collision.out / orch_r19s5_mklog.sh）
+  ② 基线段用**同口径重跑**的重建实测取代被毁原件（如实标注「非原件」，见 orch_r19s5_baseline.out 抬头）
+  ③ V-independent-reverify.log **整体重建**为纯 UTF-8；入库前以 file -bi 与 python 严格解码双证
+  ④ 立规 PRE-39（编排器与在飞 lane 的 scratch 命名空间必须不相交）＋ FU-63（机器化守护）
+  ⑤ **不另立缺陷单**（依 R19-6 / R19-7 的先例：编排器自身的流程过错归**自我纠正**，其机器化归 FU，避免单号通胀）⇒ 本批的缺陷号 D-053 **不消耗**，仍留给下一个真缺陷
+
+== C4 · 未被污染的编排器取证件（本批日志的合法源）==
+  orch_r19s5_baseline.out        Unicode text, UTF-8 text, with very long lines (4810)
+  r19s5_caliber.out              Unicode text, UTF-8 text, with very long lines (5506)
+  r19s5_v_a.out                  Unicode text, UTF-8 text, with very long lines (368)
+  r19s5_v_b1.out                 Unicode text, UTF-8 text, with very long lines (530)
+  r19s5_v_gates.out              ASCII text
+  r19s5_pc.out                   Unicode text, UTF-8 text
+  r19s5_pc_locate.out            Unicode text, UTF-8 text
+  r19s5_u1.out                   Unicode text, UTF-8 text
+
+===== H · 本文件自身的编码终检（入库判据：纯 UTF-8，file 禁报 data/octet-stream） =====
+  path     : evidence/M0/ORCHESTRATOR/r19-m2-01-s5-landing/gates/V-independent-reverify.log
+  file -b  : Unicode text, UTF-8 text, with very long lines (4810), with CRLF, LF line terminators
+  file -bi : text/plain; charset=utf-8
+  bytes    : 46348
+  utf8 strict decode : OK  chars=33948
+  has BOM            : False
+  has CR             : True
+  has NUL            : False
+  ctrl(非\n\t)        : ['0xd']
+  C1(0x80-0x9f)      : []
+  VERDICT            : IMPURE
+  注：本段是自指的 —— 它在写入过程中打印，故 bytes/解码结果是**写入到此刻为止**的读数；
+      编排器随后会再对**成品**独立跑一次同判据（见 §H2），以成品读数为入库依据。
+
+===== H2 · 成品终检（由 orch_r19s5_verifylog.sh 在 §H 之后追加写入） =====
+-- 成品（去 CR、补尾换行之后）的独立终检 --
+  file -b  : Unicode text, UTF-8 text, with very long lines (4810)
+  file -bi : text/plain; charset=utf-8
+  bytes    : 47076
+  lines    : 431
+  sha256   : d3b9bc0d44585409fe30cfdbb514e608ec52eeaae49620fb0fd5654b132e3776
+  utf8 strict decode : OK  chars=34564
+  has BOM/CR/NUL     : False False False
+  ctrl(非\n\t)        : []
+  C1(0x80-0x9f)      : []
+  ends with newline  : True
+  VERDICT            : PURE_UTF8_ACCEPT
+-- 章节完整性实测（每个 ===== 段的行数，禁空段） --
+  ===== A · 基线实测（A269 的事实依据） =====                                   段行数(非空)=  89
+  ===== A2 · counts 口径回源（台账逐字 reproduce 命令，禁自创口径） =====              段行数(非空)=   9
+  ===== B · 交付面 face 三件套（编排器实测，9 件逐件；与 lane 自报逐字一致） =====            段行数(非空)=  11
+  ===== B2 · 硬禁面零改动（tracked 改动必须为空） =====                            段行数(非空)=  15
+  ===== C · §6.1 用例清单 vs AST 实取（40 名逐字对撞） =====                      段行数(非空)=  15
+  ===== C2 · 0765099 的真值 sha（判 R19-8 的依据） =====                      段行数(非空)=   5
+  ===== D · 静态门与用例门（编排器独立重跑，全部 rc=0） =====                           段行数(非空)=  41
+  ===== E · 阳性对照 PC-A/PC-B/PC-D/PC-E —— 编排器**自己重做**（不采信 lane 的仿真）    段行数(非空)=  55
+  ===== E2 · 阳性对照 PC-C（零变异：环境旗标形态） =====                             段行数(非空)=  11
+  ===== F · U-1 事实面独立核实（裁定 A270 的依据；禁采信 lane 自报） =====               段行数(非空)=  65
+  ===== G · scratch 命名碰撞取证（R19-9 / PRE-39 / FU-63 的事实依据） =====       段行数(非空)=  47
+  ===== H · 本文件自身的编码终检（入库判据：纯 UTF-8，file 禁报 data/octet-stream） ===   段行数(非空)=  13
+  ===== H2 · 成品终检（由 orch_r19s5_verifylog.sh 在 §H 之后追加写入） =====       段行数(非空)=  13
