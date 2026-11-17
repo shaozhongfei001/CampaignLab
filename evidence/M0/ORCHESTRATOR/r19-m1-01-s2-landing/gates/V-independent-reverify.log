@@ -1,0 +1,53 @@
+PASS [V] V1 __init__.py face == lane 自报 (1 行 / 73 B / 2ad44a31e52d) | 实测 1 / 73 / 2ad44a31e52d
+PASS [V] V2 __init__.py 编码四判据（utf8 可解码 / BOM=False / CR=0 / 尾恰一个换行） | BOM=False CR=0 ENDNL=True
+PASS [V] V1 limits.py face == lane 自报 (39 行 / 1544 B / b98965d4d621) | 实测 39 / 1544 / b98965d4d621
+PASS [V] V2 limits.py 编码四判据（utf8 可解码 / BOM=False / CR=0 / 尾恰一个换行） | BOM=False CR=0 ENDNL=True
+PASS [V] V1 model.py face == lane 自报 (198 行 / 5563 B / 62518861e62a) | 实测 198 / 5563 / 62518861e62a
+PASS [V] V2 model.py 编码四判据（utf8 可解码 / BOM=False / CR=0 / 尾恰一个换行） | BOM=False CR=0 ENDNL=True
+PASS [V] V1 states.py face == lane 自报 (242 行 / 9848 B / e941d047c5b8) | 实测 242 / 9848 / e941d047c5b8
+PASS [V] V2 states.py 编码四判据（utf8 可解码 / BOM=False / CR=0 / 尾恰一个换行） | BOM=False CR=0 ENDNL=True
+PASS [V] V2b `file -bi` 4 件全数含 charset=utf-8（**重跑**：lane 自报的 BOM/CR 探针跑于最后一次 sed 之前） | text/plain; charset=utf-8 ; text/plain; charset=utf-8 ; text/plain; charset=utf-8 ; text/plain; charset=utf-8
+PASS [V] V10 `__init__.py` A276 形态：非零字节 ＋ 单行 docstring（禁零字节空文件） | 73 B / '"""三格式接入的纯领域层（M1-01 · S2；design §11.1）。"""'
+PASS [V] V3 porcelain 命中集 == 允许集（lane 交付目录 ＋ 编排器自办取证目录），**允许集之外零命中**（R19-31e 同口径重派生） | ["?? evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/", "?? src/campaignlab/domain/ingest/"]
+PASS [V] V3b `git diff --numstat` 与 `--cached --numstat` **均为空** ⇒ 零 tracked 改动（4 件纯追加面 added=deleted=0） | wt=[] idx=[]
+PASS [V] V3c 硬禁面 `tests/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `evidence/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | ["?? evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/"]
+PASS [V] V3c 硬禁面 `orchestrator/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `spec/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `contracts/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `scripts/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `web/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `src/campaignlab/api/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `src/campaignlab/application/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `src/campaignlab/infra/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `src/campaignlab/worker/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3c 硬禁面 `migrations/` porcelain 为空（`evidence/` 一项按 R19-31e 排除编排器自办取证目录） | []
+PASS [V] V3d **排除面不过宽**（R19-31e 的防牙判据）：`evidence/` 下被排除的命中项**非空**且**全部**落在编排器自办取证目录 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/` 内；且该目录下的命中项数 == 1（git 折叠为单条目录项） | ["?? evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/"]
+PASS [V] V11 4 件全部落在台账 `in_flight_agents[13].write_set` 的前缀面内
+PASS [V] V4 上行依赖零命中（`campaignlab.api` / `sqlalchemy` / `conn.begin`；含 docstring 散文面） | {}
+design §11.1 解析到的符号清单： {"model": 16, "states": 11, "limits": 5, "locate": 4, "digests": 7, "normalize": 1, "validate": 2, "parse": 4, "api": 2}
+PASS [V] V6 `limits.py` §11.1 清单 5 个符号**全数落地**（AST 实取，missing 为空） | missing=[]
+     └ `limits.py` 实取 6 名 / 清单 5 名；清单外**公开**名=[]；私有名 1 个
+PASS [V] V6 `model.py` §11.1 清单 16 个符号**全数落地**（AST 实取，missing 为空） | missing=[]
+     └ `model.py` 实取 20 名 / 清单 16 名；清单外**公开**名=["DedupMode", "MappingLayout", "SourceMoneyUnit"]；私有名 1 个
+PASS [V] V6 `states.py` §11.1 清单 11 个符号**全数落地**（AST 实取，missing 为空） | missing=[]
+     └ `states.py` 实取 19 名 / 清单 11 名；清单外**公开**名=[]；私有名 8 个
+PASS [V] V7 A115＋A292 元守护：4 件里 `len(*.__all__) == <整数>` 形态钉桩 **上限制 == 0** | {"src/campaignlab/domain/ingest/__init__.py": [], "src/campaignlab/domain/ingest/limits.py": [], "src/campaignlab/domain/ingest/model.py": [], "src/campaignlab/domain/ingest/states.py": []}
+PASS [V] V5 符号面 == 派单基线：`common.__all__`=80(uniq80) / `deps.__all__`=13 / `repositories.__all__`=16 / `PROBLEM_CODES`=20 / DomainError 子类=14（§11.2 未交付 ⇒ 三值必须**逐字不变**） | {"common_all": 80, "common_all_uniq": 80, "deps_all": 13, "repos_all": 16, "problem_codes": 20, "domain_error_subclasses": 14}
+PASS [V] V8 `Finding` 四字段名与顺序 == 实测 `Issue.model_fields`（U-2 的裁定面：实测序优先于 §4.1 代码块） | Issue=['code', 'location', 'message', 'severity'] Finding=['code', 'location', 'message', 'severity']
+PASS [V] V9 `ImportTransition` 的 8 个字段名逐字对齐实测 `worker/states.py::Transition` | Transition=['id', 'sources', 'target', 'trigger', 'spec_ref', 'guard', 'transaction', 'creates_new_row'] ImportTransition=['id', 'sources', 'target', 'trigger', 'spec_ref', 'guard', 'transaction', 'creates_new_row']
+PASS [V] V9b `IMPORT_TRANSITIONS` 只注册 I1–I7（§3.3：I8–I10 不注册），且每条的 8 字段齐备 | count=7 type=tuple
+PASS [PC] PC-A 阳性对照：V1 的 face 谓词在 `lines` 被篡改 +1 时**必须判红**（证明 V1 有牙、非恒真） | untampered=True tampered_lines=False
+PASS [PC] PC-B 阳性对照：V2 的编码谓词在注入 BOM 时**必须判红** | untampered=True bom_injected=False
+PASS [PC] PC-C 阳性对照：V5 的符号面谓词在 `common_all` 80->81 时**必须判红** | untampered=True common_all_81=False
+PASS [PC] PC-D 阳性对照：V8 的字段序谓词在顺序被反转时**必须判红** | untampered=True reversed=False
+PASS [PC] PC-E 阳性对照：V3c 的硬禁面谓词在 `evidence/` 下出现**取证目录之外**的命中时**必须判红**（证明 R19-31e 的排除面没有把判据削成无牙） | inside_orch_ev=True outside_orch_ev=False
+PASS [NC] NC-A 阴性对照：未篡改时 V1/V2/V5/V8 四谓词**全部通过**（证明对照非恒红型假牙） | all_four_predicates_true
+PASS [NC] NC-B 阴性对照：**判据计数器自证**（R19-31a 的回归防线）—— `N_PASS >= 34` 且 `N_PASS + N_FAIL >= 38`（v1 的汇总恒报 0，本条即可当场逮住该缺陷） | N_PASS=41 N_FAIL=0
+PASS [NC] NC-C 阴性对照：V3c 的硬禁面谓词在**空命中**时通过（证明其非恒红） | empty_input=True
+------------------------------------------------------------------------------
+独立复验判据条数：43 ｜ PASS 43 ｜ FAIL 0
+JUDGES: 43 PASS: 43 FAIL: 0
+FAILED_ITEMS: []
+VERIFY RESULT: GREEN
+MEASURED -> /mnt/d/ws/codex_rd/ss_campaignlab/.orch_tmp/orch_vS2p2_measured.json

@@ -2,11 +2,11 @@
   "schema": "1.0",
   "phase": "M0",
   "wave": 2,
-  "updated_at": "2026-11-18T05:15:44+08:00",
+  "updated_at": "2026-11-18T07:50:13+08:00",
   "budget": {
     "phase_quota": 100,
     "phase_used": 0,
-    "flash_share_tasks": 0.5902,
+    "flash_share_tasks": 0.5806,
     "flash_share_tokens": 0.6655,
     "phase_quotas": {
       "M0": 100,
@@ -1943,12 +1943,73 @@
         "commit_full": "d382f851f4576d5505d6950212a178fc3da0cac5",
         "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S1land`），禁写猜测值（PRE-13 第三步 / A183）。 || 回填（R19-backfill-S1landBF，2026-11-18T00:39:53+08:00）：sha = **d382f85**（全 d382f851f4576d5505d6950212a178fc3da0cac5），＝ tag `R19-landS1` 的入库提交；该批的入库前 HEAD = `98426fd`（全 98426fd5da538faa43ea7c412cfc46a313a752a5，已用 `git rev-parse d382f85^` 同源断言，禁凭记忆）。",
         "commit_backfilled_at": "2026-11-18T00:39:53+08:00"
+      },
+      {
+        "round": 19,
+        "returned_round": 19,
+        "lane": "S2",
+        "task": "M1-01",
+        "nickname": "Epicurus",
+        "agent_id": "01a1eb34-3545-7a30-886d-b03d3f36165e",
+        "subtask": "S2（卡片档位表 `orchestrator/tasks/M1-01.md:40` 原文冻结 **qwen3.8-max` high / 45k**）：**负例与边界矩阵实现 ＋ 文件接入底座** —— 重复切片 / 负人数 / 层级倒置 / 错误行长 / 重复码 / 孤立切片 / > 8 MiB 七类负例，宽表 A・长表 B・六行 CSV・等价 SOURCE_JSON **四入口同一套规范**的校验与行列定位结构落地。写权面＝design §11.1（纯领域层 `src/campaignlab/domain/ingest/**`，**新建**）＋ §11.3（应用层 G3/G4 最小例外）＋ §11.2（**G1** `api/common.py` 纯追加）＋ `src/campaignlab/infra/files.py` 等 **4 件纯追加**；派单文 §1.1/§1.2 实测 **新建 13 件**、§1.3 **纯追加 4 件**（`git diff --numstat` 的 `deleted` 列必须全 0）。**零测试、零证据、零 SQL、零事务、零 `import campaignlab.api`**（派单文 §7 的 V8/V9 两门）。",
+        "tier": "qwen3.8-max",
+        "tier_used": "qwen3.8-max",
+        "reasoning": "high",
+        "tier_match": true,
+        "tier_note": "档位以卡片档位表**原文冻结**为准（`orchestrator/tasks/M1-01.md:40`，S2 行＝`qwen3.8-max` high / 45k / loop_cap 2），命中手册 **§6.3 强制 max 硬规则**（金额分与口径语义）⇒ `tier_used == tier_planned == qwen3.8-max`，**未降档未升档**（C10：禁为凑 flash 配比降档；护栏①② 双双未达标**亦不得**以降档或改口径「改善」读数 —— 手册 §6.6 / A234）。lane 自陈「无法自证实际路由模型」⇒ 编排器**不采信自报**（PRE-29），以 `tier_ruling` 原文为准。",
+        "result": "PARTIAL",
+        "attempt": 1,
+        "loop_cap": 2,
+        "loop_rounds_used": 2,
+        "over_cap": false,
+        "over_cap_caliber": "`loop_cap=2`、实耗 **2/2** ⇒ **用尽但未超帽**（`over_cap=false`：超帽的定义是**超过**上限，用尽上限不算超）。第 2 轮用于修复 lane 自报的 2 处自纠（`limits.py:1` 多行 docstring 开引号被整行替换毁语法、docstring 里写点号全路径导致 V9 假命中）⇒ 轮次被**返工**吃掉，这是 `RESULT: PARTIAL` 的**次要**成因（主因是 U-5 的档位/预算不足）。",
+        "over_input_cap": true,
+        "over_input_cap_caliber": "**token 超档，如实登记不抹平（C10）**：档位预算 **45k**，而本棒**权威规范面**实测 design 1393 行/167927 B ＋ `M1-01.slice.json` 2875 行/60641 B ＋ 派单文 615 行/72533 B （含 §5.2 的 A277–A292 约 36 KB 逐字正文）≈ **291 KB** ⇒ 单轮上下文即已远超档位，只能交付 **4/13** 件。依 **A183** 记 `tokens=null`（本环境不暴露计量句柄，`get_goal` 返回 null）⇒ **禁**把估算值当实测填入护栏分母。**根因归编排器的派单文体量**（A295 已把「逐字携带」收窄为三段式），**禁**记成 lane 的能力缺陷。",
+        "tokens": null,
+        "tokens_estimated": true,
+        "tokens_note": "lane 回执逐字报 `TOKENS_SELF_ESTIMATE: null`（无计量句柄）⇒ 依 **A183** 记 `tokens=null` ＋ `tokens_estimated=true`，**不入** `flash_share_tokens` 分母（`token_entries_null` 41→**42**，`token_entries_known` 与 `tokens_known_*` 逐项**不变**）。**FU-61 保持 OPEN**（token 计量面在本环境**结构性不可测**，与档位无关）。",
+        "returned_at": "2026-11-18T07:50:13+08:00",
+        "subtask_count": 1,
+        "deliverable": "**交付 4 件新建**（design §11.1 的**结构面**，编排器**一字未改**）：`src/campaignlab/domain/ingest/__init__.py`（1L/73B/2ad44a31e52d）· `limits.py`（39L/1544B/b98965d4d621）· `model.py`（198L/5563B/62518861e62a）· `states.py`（242L/9848B/e941d047c5b8）。**未交付 12 项**（lane 原文 `[GAPS]`，禁由下游 lane 代为发明）：§11.1 剩 7 件：`locate.py`、`digests.py`、`normalize.py`、`validate.py`（N1–N18）、`parse.py`（含 `legacy_mapping_to_source_mapping`）、`api.py`、`infra/files.py`；§11.2 全部：`api/common.py` 的 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`；`tests/unit/test_domain_errors.py` 两行钉桩改实取对撞；§11.3 全部：`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加。**4 件纯追加面零改动**的机器证据＝`git diff --numstat` 与 `--cached --numstat` **输出均为空**（preflight P04 实测）。",
+        "adjudicated": "**6 条裁定 A296–A301**（一一覆盖 lane 回执 §U 的 **U-1…U-6**）已由编排器终裁（手册 §6.4：**禁**让 lane 自行裁定）；`counters_next.adjudication` A296 → **A302**。",
+        "u_items_adjudicated": [
+          "U-1",
+          "U-2",
+          "U-3",
+          "U-4",
+          "U-5",
+          "U-6"
+        ],
+        "by_orchestrator_same_batch": [
+          "**3 件取证件（编排器自办，同批入库）**：`evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md`（117L/15703B/bab326b8f075）· `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）· `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`（53L/7633B/dedd225dde38 —— `.log` **不入** ruff/mypy 分母但**会入库**：`.gitignore` 的 `!evidence/**/*.log` 反排除）。",
+          "**零编排器代工件**：S2 的 4 件交付件由 lane 自产、编排器**一字未改**（与 `R19-landS1` / `R19-landS6` 同口径）；其写权面全在 `src/campaignlab/domain/ingest/**`，与编排器的守护面/取证件面**不相交**（PRE-5）。**与 S1 的差异**：S2 是 `RESULT: PARTIAL`，故本键另需承载「独立复验脚本**改过一版**」的事实（v1 缺陷版留档 `.orch_tmp/orch_vS2p_v1_defective.py`，终版 `orch_vS2p2.py`）⇒ 见 `honesty_notes` 与自纠 **R19-31**。"
+        ],
+        "defects_raised": [],
+        "followups_closed": [],
+        "followups_created": [
+          "FU-70（按 **A300** 拆两棒续派 M1-01/S2 的未交付 12 项：棒甲＝§11.1 剩 7 件、棒乙＝§11.2＋§11.3 共 6 项；两棒派单文**只携带自己那一刀的规范面摘录** —— PRE-15/PRE-19，禁再整包携带 291 KB）"
+        ],
+        "honesty_notes": [
+          "**`RESULT: PARTIAL` 予以追认**：交付面经编排器**独立复验**全绿后入库；未交付的 12 项按派单文 §8 授权的降级选项**退回编排器**，拆两棒续派（**禁**把 PARTIAL 粉饰为 DONE，C10）。",
+          "**token 超档属档位/预算不足、非档位错配** ⇒ **不计为浪费**，但如实登记 `over_input_cap=true` 与超档驱动因子（291 KB 规范面 vs 45k 档）。",
+          "**U-6（lane 未逐字通读派单文全文）如实登记、不予免责亦不加重**：未读面属**规范面重复携带**（§5.2 的 36 KB 裁定正文）⇒ 根因归编排器的派单文体量；但**禁**把该回执当作「已全读」采信。",
+          "**编排器未采信交接摘要的「34 PASS / 0 FAIL」结论**，而是重跑复验脚本实测 ⇒ 当场发现 v1 的 **5 处判据缺陷** ＋ 取证件 **1 处把计划写成事实**（自纠 **R19-31**），同批修好后终判 **GREEN 43/43**（含 5 阳 3 阴对照）。",
+          "**护栏①② 双双未达标如实报**：本批 +1 个 **max** 档样本 ⇒ `flash_share_tasks` 0.5902→**0.5806**（进一步远离 0.60 目标）、`flash_share_dev_lanes` 0.4359→**0.425**；`flash_share_tokens` **0.6655 不变**（tokens=null 不入分母）。**禁**降档或改口径「改善」读数。",
+          "**`flash_share_detail` 不可由 `subtask_log` 逐条求和复现**（实测 sum=54 vs detail 61）⇒ 该三面是**增量维护**而非全量重算，属既有口径事实；本批只做 +1 增量并如实登记，机器化归口 **FU-62**。**禁**为「让账面自洽」回填历史条目（违反 D-011 与 C10）。"
+        ],
+        "orchestrator_reverification": "**VERIFY RESULT: GREEN（`JUDGES: 43 PASS: 43 FAIL: 0`）** —— 脚本 `.orch_tmp/orch_vS2p2.py`（340L/18904B/9101cf05179c，只读零副作用），逐字日志已归档为 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`（53L/7633B/dedd225dde38）。含 **5 阳 3 阴**对照（PRE-44⑤）。",
+        "positive_controls": "**PC-A** face 谓词篡改 `lines` 判红 · **PC-B** 注入 BOM 判红 · **PC-C** `common_all` 80→81 判红 · **PC-D** 字段序反转判红 · **PC-E** `evidence/` 下取证目录**之外**的命中判红；**NC-A** 未篡改时四谓词全通过 · **NC-B** 判据计数器自证（`N_PASS>=34`，即 v1「汇总恒报 0」缺陷的回归防线）· **NC-C** 空命中时硬禁面谓词通过。⇒ 判据**有牙且不恒红**（PRE-44⑤）。",
+        "verified_by_orchestrator": "编排器实测（PRE-29 禁采信自报）：4 件 face **三向对撞**（本批实测 × lane 自报 × 独立复验实测）逐字相符 · 编码四判据**重跑**（lane 自报的 BOM/CR 探针跑于最后一次 `sed`/`ruff format` **之前** ⇒ 禁沿用）· `porcelain` 命中集 == 允许集且允许集之外零命中 · `git diff --numstat` 与 `--cached --numstat` **均为空**（零 tracked 改动）· 12 个硬禁面目录逐目录为空（`evidence/` 一项按 R19-31e 显式排除编排器自办取证目录，并以 **V3d** 断言排除面不过宽）· 上行依赖零命中（`campaignlab.api`/`sqlalchemy`/`conn.begin`，含 docstring 散文面）· 符号面 `common.__all__`=**80**(uniq80)/`deps`=**13**/`repos`=**16**/`PROBLEM_CODES`=**20**/DomainError 子类=**14**（§11.2 未交付 ⇒ 三值逐字不变）· design **§11.1 符号清单（从原文程序化解析）× AST 实取**双向差集为零缺失（`limits` 5/5、`model` 16/16、`states` **11/11** —— lane 自报「10 个」属**自报少数**，实取 11 个全数落地）· `model.py` 清单外公开名恰为 **U-3** 的 3 枚 Literal · **PRE-40 冻结面 8 件 DRIFT_COUNT=0** · 权威四门由 `run_commit` 在**冻结索引树**上重跑并与 `expect_counts` 逐条对账。",
+        "why_now": "M1-01 是 wave-4 **关键路径**（`slack=0`）的第二棒，S3–S8 六棒全部依赖 S2 的负例矩阵与文件接入底座。S2 回传 PARTIAL 后**结构面 4 件已入库** ⇒ 下游可 `import` 该包，但 **S6 的负例矩阵依赖面部分缺失**（`validate.py` 未交付）⇒ 派 S6 前**必须重测**依赖是否齐备（禁凭计划表推断）。本批先把已验证的结构面入库，避免「槽位已释放但交付未入库」的不可恢复态。",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。`commit_backfilled_at` 痕迹键依既有体例（`s1_landing_R19` / `subtask_log` S1 样本）由**回填批**写入 ⇒ 本批**刻意不写**。"
       }
     ],
     "accounting_rule": "手册 15.5：每次子智能体回收后必须写回 tier_planned/tier_used/tokens/attempt/escalated/escalate_reason，并向 budget.subtask_log 追加 {task, subtask, tier, tokens, attempt, result}；flash_share_tasks 与 flash_share_tokens 必须由 subtask_log 程序化重算，口径为子任务级，禁止手填。",
     "accounting_status": "PARTIAL：subtask_log 2 条真值（Q/collect=flash DONE、M0-02/S1=max DONE），flash_share_tasks=0.5（目标 >=0.60）；tokens 均未回传故 flash_share_tokens=null。M0-02 剩余 S3/S4/S5 三个子任务均为 flash（3/5=60%），M0-03 为 flash 6/10，后续占比会回升；若到 wave2 出口仍 <0.60，必须把可降档子任务改派 flash 并在 budget 记明理由",
-    "dispatched_not_yet_returned": 1,
-    "flash_share_dev_lanes": 0.4359,
+    "dispatched_not_yet_returned": 0,
+    "flash_share_dev_lanes": 0.425,
     "flash_share_口径": {
       "all_lanes": "19/31=0.6129",
       "dev_lanes_only_excl_Q": "4/15=0.2667",
@@ -1965,21 +2026,21 @@
         "recomputed_at": "2026-11-13T10:49:12+08:00"
       }
     },
-    "flash_share_recomputed_at": "2026-11-18T05:15:44+08:00",
+    "flash_share_recomputed_at": "2026-11-18T07:50:13+08:00",
     "flash_share_detail": {
-      "subtask_entries": 51,
-      "subtask_units_total": 61,
+      "subtask_entries": 52,
+      "subtask_units_total": 62,
       "subtask_units_flash": 36,
       "token_entries_known": 10,
-      "token_entries_null": 41,
+      "token_entries_null": 42,
       "tokens_known_total": 1190000,
       "tokens_known_flash": 792000,
-      "dev_lane_units_total": 39,
+      "dev_lane_units_total": 40,
       "dev_lane_units_flash": 17
     },
     "guardrail_status": {
       "target": "手册 6.6：flash 承担 >=60% 子任务数、token 占比 <=35%",
-      "actual_tasks": 0.5902,
+      "actual_tasks": 0.5806,
       "actual_tokens": 0.6655,
       "tasks_target_met": false,
       "tokens_target_met": false,
@@ -1990,7 +2051,7 @@
       "round4_update": "【2026-11-13T06:55:00+08:00 Round 4 回收后重算】flash_share_tasks 0.4444->0.5（+4 flash 子任务单位来自 Archimedes 批次2），flash_share_tokens 0.4356->0.441（Heisenberg 56k 为 max 档入账，Archimedes 50k 为 flash 档入账；Gauss 与 Aquinas 记 null 不入分母）。两项护栏仍未达标，如实上报不粉饰。tasks 占比由 0.4444 升至 0.5，方向正确；tokens 占比小幅上升系 max 档设计任务的 56k 进入已知分母所致，非降档失控。批次2 单卡成本 12.5k（批次1 为 22.6k/卡），纠正措施实测有效，批次3 沿用。",
       "batch3_status": "RETURNED_VERIFIED_OVER_CAP",
       "corrective_action_next": "批次 4 起：① 每批降到 2-3 张卡（批次3 的 4 卡正文 96231 B 是主因，单卡 20-28 KB）；② 把「卡正文生成量」显式计入预算而非只算输入侧；③ context 分节交付（按卡拆成 4 个小节文件，让 lane 只读自己那节）；④ 沿用定点抽取配方与预生成切片。批次演进：181k/8卡(22.6k每卡,越限3.02×) -> 50k/4卡(12.5k每卡) -> 批次3 越限(自陈,无计量值)",
-      "updated_at": "2026-11-17T06:03:27+08:00",
+      "updated_at": "2026-11-18T07:50:13+08:00",
       "round5_update": "【2026-11-13T09:03:26+08:00 Round 5 回收后重算】subtask_log 11->13 条（+Pasteur/F flash、+Hilbert/S max；Locke/T flash 已于本轮入账）。flash_share_tasks 8->0.5、flash_share_tokens 0.441->0.441、dev lane 2->0.2。两项护栏仍未达标，如实上报不粉饰。Hilbert 与 Locke 的 tokens 均记 null（无计量句柄），故 tokens 分母只含 known 条目，占比对 null 条目不敏感——这是口径缺陷而非达标，已在 tokens_coverage 注明。Round 6 计划 S3d(max) ∥ D-016 批次4(flash)，flash 单位数 +3；禁为凑配比降档（S3d 属手册 §6.3 强制 max）。",
       "round6_batch4_update": "【2026-11-13T10:30:54+08:00 Round 6 批次4 回收后重算】subtask_log 13->14 条（+Planck/T flash，subtask_count=3）。flash_share_tasks 0.5->0.5714（12/21）、flash_share_tokens 0.441->0.441（Planck tokens 记 null 不入分母，故不变）、dev lane 0.2 不变（D-016 属 T lane 非 dev）。两项护栏仍未达标，如实上报不粉饰：tasks 0.5714 < 0.60（差 0.0286，即再 1 个 flash 单位或减 1 个 max 单位即达标）、tokens 0.441 > 0.35（分母只含 7 条 known，其中两条历史越限 264k 是主因，剔除后为 0.195）。禁为凑配比降档：S3d 属手册 6.3 强制 max（应用服务与仓储、并发与租约），Round 7 的 S3b 与批次5 均为 flash，占比将自然回升。检查点仍为 wave2 出口。",
       "round6_s3d_update": "【2026-11-13T10:49:12+08:00 Round 6 S lane 回收后重算】subtask_log 14->15 条（+Godel/S max，subtask_count=1）。flash_share_tasks 0.5714->0.5455（12/22，方向下降系 S3d 属手册 6.3 强制 max：应用服务与仓储、并发与租约）、tokens 0.441 不变（Godel 无计量句柄记 null）、dev lane 0.2->0.1818（2/11）。两项护栏仍未达标，如实上报不粉饰。**禁为凑配比降档**：S3d 是强制 max 项。回补路径＝Round 7 起 S3b(flash 14k) + 批次5(flash) + M0-04/S4-S8(5 个 flash) + S4/S5(flash)，按 projection 在 wave2 出口前回升至 >=0.60。检查点仍为 wave2 出口，未达则按手册 6.6 升级给项目负责人。",
@@ -2006,7 +2067,7 @@
         "actual_tasks": 0.6129,
         "actual_tokens": 0.441
       },
-      "recomputed_at": "2026-11-17T06:03:27+08:00",
+      "recomputed_at": "2026-11-18T07:50:13+08:00",
       "verdict_R10": "护栏① flash_share_tasks 0.6364 >= 0.60 -> 达标；护栏② flash_share_tokens 0.5086 <= 0.35 -> 未达标。tasks 侧因 Bohr（flash）入账由 0.6250 升至 0.6364；tokens 侧由 0.4658 升至 0.5086，主因是 Bohr 自报 65k（flash 越限第 3 条）。如实上报不粉饰，不为凑配比降档。",
       "previous_actual_R10A": {
         "actual_tasks": 0.6364,
@@ -2025,7 +2086,7 @@
         "tasks_target_met": true,
         "tokens_target_met": false
       },
-      "actual_dev_lanes": 0.4359,
+      "actual_dev_lanes": 0.425,
       "verdict_note_R13": "R13 追加（append-only，不改上文历史 verdict 与 diagnosis）：flash_share_tasks 0.6341 → 0.6047（lane W 与 lane X 两条均为 max/FU 面，只加分母不加 flash 分子，故占比回落但仍 >= 0.60 达标）；flash_share_dev_lanes 0.381 → 0.3636；flash_share_tokens 保持 0.6655（两条 token 均为 estimated:true，按 A183 不入分母）。护栏② 仍未达标（0.6655 > 0.35），如实上报不粉饰。回升依赖：M0-04 剩余 S4/S5/S6/S8 四个 flash 子任务、M2-01 的 S3–S7 五个 flash 子任务（见 tasks.M0-04.remaining_sequence_R12 与 M2-01 卡的档位表），以及 wave3 起 D lane 的量产型子任务严格按 §6.3 强制 flash 清单派 flash。",
       "previous_actual_R13V": {
         "actual_tasks": 0.6047,
@@ -2110,7 +2171,16 @@
         "tasks_target_met": true,
         "tokens_target_met": false
       },
-      "actual_reconciled_note_R19_S1land": "**R19-11 fix ② ＋ FU-65 闭合口径的延续**：`actual_tasks` / `actual_tokens` / `actual_dev_lanes` 三键与两个 `*_target_met` 一律由 `flash_share_detail` **程序化派生**（本批：0.6→**0.5902**、0.6655→**0.6655**（不变）、0.4474→**0.4359**），**禁手工拷贝**。前值已存 `actual_previous_values_R19_S1land`（D-011 留痕）。既有 `verdict` / `actual_dev_lanes_caliber_note_R19_S6land` / `actual_dev_lanes_converged_note_R19_S6landBF` / `actual_reconciled_note_R19_ckS1pause` 按 **D-011 留档不改写**。**护栏① 由达标转未达标**（余量本已为 0.0，max 档样本入账即跌破）⇒ 如实报、留归因，**禁为凑配比降档或改写口径**（手册 §6.6 / C10 / A234）。"
+      "actual_reconciled_note_R19_S1land": "**R19-11 fix ② ＋ FU-65 闭合口径的延续**：`actual_tasks` / `actual_tokens` / `actual_dev_lanes` 三键与两个 `*_target_met` 一律由 `flash_share_detail` **程序化派生**（本批：0.6→**0.5902**、0.6655→**0.6655**（不变）、0.4474→**0.4359**），**禁手工拷贝**。前值已存 `actual_previous_values_R19_S1land`（D-011 留痕）。既有 `verdict` / `actual_dev_lanes_caliber_note_R19_S6land` / `actual_dev_lanes_converged_note_R19_S6landBF` / `actual_reconciled_note_R19_ckS1pause` 按 **D-011 留档不改写**。**护栏① 由达标转未达标**（余量本已为 0.0，max 档样本入账即跌破）⇒ 如实报、留归因，**禁为凑配比降档或改写口径**（手册 §6.6 / C10 / A234）。",
+      "actual_previous_values_R19_S2land": {
+        "actual_tasks": 0.5902,
+        "actual_tokens": 0.6655,
+        "actual_dev_lanes": 0.4359,
+        "tasks_target_met": false,
+        "tokens_target_met": false
+      },
+      "actual_reconciled_note_R19_S2land": "**程序化重算（禁手填）**：本批 `subtask_log` 新增 **1** 条样本（第 **53** 条，`tier_used=qwen3.8-max`、`result=PARTIAL`、`tokens=null`）⇒ `subtask_units_total` 61→**62**、`subtask_units_flash` **36 不变**（max 档）、`dev_lane_units_total` 39→**40**、`dev_lane_units_flash` **17 不变**、`token_entries_null` 41→**42**（`token_entries_known` 与 `tokens_known_*` 逐项不变 —— A183 估算值不入分母）。三键由 `flash_share_detail` **精确派生**（`round(x,4)`）：tasks=36/62=**0.5806**、tokens=792000/1190000=**0.6655**、dev_lanes=17/40=**0.4250**。",
+      "actual_dev_lanes_caliber_note_R19_S2land": "**口径（沿 `_R19_S6land` / `_R19_S6landBF` 的既有收敛口径）**：dev lane ＝ **开发棒**（M*-* 任务的 S* 棒），**排除** Q lane（`Q-VERIFY-*`）与编排器自办条目（`tier_used=orchestrator-self-served`）。M1-01/S2 属**开发棒** ⇒ 计入分子分母；其 `tier_used=qwen3.8-max` ⇒ **不计入** flash 分子。"
     },
     "dispatched_not_yet_returned_note_R15": "2→1：Y2 已 RETURNED_LANDED（关账）；A1b 因 429 消亡、回执丢失，其磁盘产出已核验但**尚未入库** ⇒ 仍未关账，计 1。该 1 在 M2-01/S2a 入库提交里归零。",
     "dispatched_not_yet_returned_note_R15_S2a": "1→0：R15 派出的两条 lane 全部关账 —— Y2（M0-04/S2c）于 1d9bcb0 RETURNED_LANDED；A1b（M2-01/S2a）因 429 消亡后由编排器自办入库，本提交后转为 RETURNED_ERRORED_LANDED。下一次 spawn 时该值重新起算。",
@@ -2144,14 +2214,14 @@
     "dispatched_not_yet_returned_note_R18_S4": "0 → **1**（本提交内）：口径沿 R15 —— 本计数器语义是「已派单且**尚未回传**」。本批只派 M2-01/S4 一棒 ⇒ 置 1。`agent_id` 由 spawn 之后的**纯台账提交**回填（PRE-13 第三步）；若 spawn 失败，该提交必须把本键回退并如实登记（禁留假在飞计数）。M0-04/S8 已于 5416990 关账、Planck 已 close_agent ⇒ 本批派单前在飞为 0。**并行说明**：S4 与 wave-3 的后续棒次写权面须逐个对撞后方可并行；本批派单时仓内**无其它在飞件**。",
     "flash_share_note_R18_S4predispatch": "**本批不入 subtask_log**（S4 尚未回传，PRE-13 的第二／三步才有回执）⇒ `flash_share_tasks` / `_dev_lanes` / `_tokens` 三项与 5416990 **相同**（程序化重算复核一致，非手填）。S4 回传入库时该棒（flash）才计入分子分母；届时护栏① 预计 33/57 → 34/58 ≈ 0.5862，**仍未达标**（目标 ≥0.60），如实报、禁降档凑数。",
     "dispatched_not_yet_returned_note_R18_S4land": "1→**0**：S4（Wegener）已回传并随 R18-landS4 入库、槽位已 close_agent 释放。当前无在飞 lane。",
-    "subtask_entries": 51,
-    "subtask_units_total": 61,
+    "subtask_entries": 52,
+    "subtask_units_total": 62,
     "subtask_units_flash": 36,
     "token_entries_known": 10,
-    "token_entries_null": 41,
+    "token_entries_null": 42,
     "tokens_known_total": 1190000,
     "tokens_known_flash": 792000,
-    "dev_lane_units_total": 39,
+    "dev_lane_units_total": 40,
     "dev_lane_units_flash": 17,
     "flash_share_guardrail_report_R18_S4land": {
       "at": "2026-11-16T06:17:17+08:00",
@@ -2355,7 +2425,33 @@
     "flash_share_guardrail_report_R19_wave4pd": "护栏①（flash 承担 ≥60% 子任务数）与②（token 占比 ≤35%）**双双未达标**，如实报（`guardrail_status.tasks_target_met` / .tokens_target_met` 均 **false**，preflight **P53** 已断言）。**禁降档改口径**（C10 / 手册 §6.6 / A234）：本批 S2 依卡片档位表原文冻结 `qwen3.8-max` high ⇒ **不得**为凑配比降档；改善路径只能是**后续低复杂度棒（S3–S8 六棒全为 flash 档）如实入算**，而非改写分母。",
     "flash_share_note_R19_wave4pd_spawn": "程序化重算（口径逐字同 `flash_share_detail.recomputed_by`）：本批**零新样本** —— 依 `budget.accounting_rule` 原文「每次子智能体**回收后**必须写回 tier_planned/tier_used/tokens/attempt/escalated 并向 `budget.subtask_log` 追加」⇒ **spawn 时点不入账**（沿 `round19_predispatch_S5`/`_wave3`/`_wave4` 的先例）。三项比值**逐项不变**：tasks **0.5902** / tokens **0.6655** / dev_lanes **0.4359**；`subtask_log` 仍 **52** 条（入算 51 条）。`guardrail_status.actual_*` 与两个 `*_target_met` 由同一 detail **派生**（R19-11 fix ② 口径），禁手工拷贝 ⇒ 本批不改。",
     "flash_share_guardrail_report_R19_wave4pd_spawn": "**两项均未达标，如实上报不粉饰、禁降档改口径（C10 / 手册 §6.6 / A234）**：① `flash_share_tasks` = **0.5902** < 0.60 ⇒ **FAIL**（缺口 0.0098）；② `flash_share_tokens` = **0.6655** > 0.35 ⇒ **FAIL（不可判）**：10 条已知 / 41 条 null-or-estimated，按 **A183** 估算值不入分母（**FU-61 保持 OPEN**：token 计量句柄缺失）；③ `flash_share_dev_lanes` = **0.4359**（参考项，无阈值）。**本批 spawn 的 1 棒＝max（`S2`/Epicurus，命中手册 §6.3 强制 max 硬规则 ⇒ 禁降档）**；其回传入账后 tasks 预计 36/62 = **0.5806**（仍 < 0.60，如实报）。**回升路径**：wave-4 之后的棒序以 flash 为主（M1-01 的 **S3–S8 六棒全 flash**、`M2-01/S7` flash、治理簇 FU-50/52/53/58/62/63/64 flash）；若全部如期以 flash 交付，units 将达 ≈37/62≈**0.597**、继续逼近 0.60 —— **禁为凑数发明 flash 工作、禁把 max 档改标为 flash**（C10）。",
-    "dispatched_not_yet_returned_note_R19_wave4pd_spawn": "**维持 1**（(`S2`,`M1-01`)/**Epicurus**）。本批只把 PRE-13 的**第②③步**落地（`agent_id` 回填 ＋ `status`→IN_FLIGHT），**不递减** —— 递减只发生在 lane **回传并入库**时（R15 口径：回执 ＋ 终裁 ＋ 入库三者齐备才关账）。回收义务（`accounting_rule`）：该棒回收后必须写回 `tier_planned`/`tier_used`/`tokens`/`attempt`/`escalated` 并向 `budget.subtask_log` 追加**一条**样本；本批**零新样本**（仍 52 条）。"
+    "dispatched_not_yet_returned_note_R19_wave4pd_spawn": "**维持 1**（(`S2`,`M1-01`)/**Epicurus**）。本批只把 PRE-13 的**第②③步**落地（`agent_id` 回填 ＋ `status`→IN_FLIGHT），**不递减** —— 递减只发生在 lane **回传并入库**时（R15 口径：回执 ＋ 终裁 ＋ 入库三者齐备才关账）。回收义务（`accounting_rule`）：该棒回收后必须写回 `tier_planned`/`tier_used`/`tokens`/`attempt`/`escalated` 并向 `budget.subtask_log` 追加**一条**样本；本批**零新样本**（仍 52 条）。",
+    "dispatched_not_yet_returned_previous_R19_S2land": 1,
+    "dispatched_not_yet_returned_note_R19_S2land": "**1 → 0**（R15 口径：回执 ＋ 编排器终裁 ＋ **入库**三者齐备才关账）。S2（Epicurus / `01a1eb34-3545-7a30-886d-b03d3f36165e`）已于本批**入库**（tag `R19-landS2partial`）、槽位已 `close_agent` 释放（`returned_status=completed`，落盘件 `.orch_tmp/orch_S2_close_agentret.txt`）⇒ 关账。**当前无在飞 lane** ⇒ 本批 `run_commit` 的 `untracked_owner_map` 传**空映射**（在飞污染防护的**收紧**形态：任何残留未跟踪 in-scope 件都会判「越界」而拒绝提交）。",
+    "flash_share_guardrail_report_R19_S2land": {
+      "at": "2026-11-18T07:50:13+08:00",
+      "batch": "R19-landS2partial",
+      "new_samples": 1,
+      "tasks": "36/62=0.5806",
+      "tokens": "792000/1190000=0.6655",
+      "dev_lanes": "17/40=0.4250",
+      "tasks_target_met": false,
+      "tokens_target_met": false,
+      "verdict": "**护栏①② 双双未达标，如实报（C10 / 手册 §6.6 / A234）**：① tasks **0.5806 < 0.60**（本批 +1 个 max 档样本 ⇒ 由 0.5902 **进一步下降**）；② tokens **0.6655 > 0.35** 且**统计上不可判** —— `token_entries_known` **10** / `subtask_entries` **52** ⇒ **42** 条 `tokens=null`（本环境不暴露计量句柄，A183 禁估算入分母），**FU-61 保持 OPEN**；③ dev_lanes **0.4250**。**禁**以降档或改口径的方式「改善」读数。**结构性事实**：M1-01/S2 命中手册 §6.3 **强制 max 硬规则**（金额分与口径语义）⇒ 本棒**本就不该**是 flash，配比下降是**规则正确执行的必然结果**，不是浪费。回补路径＝FU-70 的棒甲/棒乙与 M1-01 的 S3–S8 六棒（卡片 `orchestrator/tasks/M1-01.md:41-46` 原文**全 flash**）。",
+      "accounting_irreproducibility_honest": "**如实登记（本批实测）**：`budget.flash_share_detail` 的九个读数**不可**由 `budget.subtask_log` 逐条求和复现 —— 实测 `sum(subtask_count)`=**54** vs detail `subtask_units_total`=**61**；`tokens` 非空条目 **17** 条 / 求和 **5913000** vs detail `token_entries_known`=**10** / `tokens_known_total`=**1190000**。⇒ 该三面是**增量维护**而非**全量重算**，属**既有口径事实**（非本批引入）。本批只按既有体例做 **+1 增量**，并把该不可复现性如实登记、机器化归口 **FU-62**（禁为「让账面自洽」而回填历史条目 —— 那会违反 D-011 append-only，也违反 C10 如实报）。",
+      "previous_detail": {
+        "subtask_entries": 51,
+        "subtask_units_total": 61,
+        "subtask_units_flash": 36,
+        "token_entries_known": 10,
+        "token_entries_null": 41,
+        "tokens_known_total": 1190000,
+        "tokens_known_flash": 792000,
+        "dev_lane_units_total": 39,
+        "dev_lane_units_flash": 17
+      }
+    },
+    "flash_share_note_R19_S2land": "本批 +1 样本（M1-01/S2 · qwen3.8-max · PARTIAL · tokens=null）⇒ 三键程序化重算为 **0.5806 / 0.6655 / 0.4250**（tasks / tokens / dev_lanes）。**如实报**：①② 双双未达标，禁降档改口径（C10 / §6.6 / A234）。`accounting_rule` 不变：subtask_log 于**回收**时追加。"
   },
   "tasks": {
     "M0-01": {
@@ -3721,7 +3817,8 @@
       "fu59_gate_cleared_R19": "**门控已清偿**（2026-11-17T02:17:16+08:00，tag `R19-FU59-thawIfMatch`）：M1-01/S1 的前置阻塞项 FU-59（`api/common.py` 的 If-Match 正则收敛）已由编排器自办解冻批完成 ⇒ `slack=0` 关键路径解锁。S1 派单文**必携 PRE-40**（冻结面 sha 新基线：`api/common.py` `b2908617d193`）＋ **PRE-41**（前提哨兵普查口径）＋ **PRE-39**（scratch 命名空间 ＋ 取证件编码四判据）。`api/common.py` 现含 `IF_MATCH_PATTERN`（已在 `__all__` 内，运行期实测 `len(common.__all__) == 80`），S1 起 16 个 If-Match op 一律 import 该常量、**禁内联第二份正则**（守护＝`tests/unit/test_if_match_pattern_single_source.py`）。",
       "status_note_R19_wave3pd": "TODO → **IN_PROGRESS**（2026-11-17T03:53:54+08:00，tag `R19-predispatch-wave3-S1-S6`）：wave-3 开闸，S1（关键路径 `slack=0`、tier `qwen3.8-max` high）已派单入库。**门控 FU-59 已于 `4637a5b` 清偿**、dep `M0-04.status` 实测 **DONE**、卡片 `:58` 的派单前置已做（`pytest -q tests/unit/test_task_cards.py` = **5 passed**，rc=0）。`tier_used` 与 `attempt` 于 S1 回传时按 `accounting_rule` 回填，本批**禁填猜测值**。",
       "subtask_progress": {
-        "S1": "**DONE**（`R19-landS1` 入库；编排器独立复验 **GREEN** 37 判据 / 0 FAIL）：交付件 `orchestrator/handoff/M1-01-design.md` 1301L/159632B/`99dd191f43b3` **一字未改**入库；design §12 的 **U-1…U-15** 已由编排器**全部裁毕**（A277–A291）⇒ `RESULT = DONE_WITH_GAP` 的 GAP 已闭合；loop 实耗 **1 / 2**（未超帽）；token 自估 ≈105k vs 55k 档 ⇒ 依 A183 记 `tokens=null`。详见 `resume.round19_lane_S1_return` 与 `tasks['M1-01'].s1_landing_R19`。"
+        "S1": "**DONE**（`R19-landS1` 入库；编排器独立复验 **GREEN** 37 判据 / 0 FAIL）：交付件 `orchestrator/handoff/M1-01-design.md` 1301L/159632B/`99dd191f43b3` **一字未改**入库；design §12 的 **U-1…U-15** 已由编排器**全部裁毕**（A277–A291）⇒ `RESULT = DONE_WITH_GAP` 的 GAP 已闭合；loop 实耗 **1 / 2**（未超帽）；token 自估 ≈105k vs 55k 档 ⇒ 依 A183 记 `tokens=null`。详见 `resume.round19_lane_S1_return` 与 `tasks['M1-01'].s1_landing_R19`。",
+        "S2": "**PARTIAL → 结构面已入库**（`R19-landS2partial`；编排器独立复验 **GREEN** `JUDGES: 43 PASS: 43 FAIL: 0`，含 5 阳 3 阴对照）：交付件 `src/campaignlab/domain/ingest/` 的 `__init__.py`(1L/73B/2ad44a31e52d) / `limits.py`(39L/1544B/b98965d4d621) / `model.py`(198L/5563B/62518861e62a) / `states.py`(242L/9848B/e941d047c5b8) **4 件新建、编排器一字未改**入库；design §11.1 的**结构面**已闭合，**行为面剩 7 件** ＋ **§11.2 全部** ＋ **§11.3 全部**共 **12 项未交付** ⇒ 依 **A300** 拆两棒续派（**FU-70**：棒甲＝§11.1 剩 7 件、棒乙＝§11.2＋§11.3 共 6 项，**串行**）。lane 回执 §U 的 **U-1…U-6** 已由编排器**全部裁毕**（**A296–A301**）；loop 实耗 **2 / 2**（用尽未超帽）；token 自报 **null**（无计量句柄）⇒ 依 A183 记 `tokens=null`、不入护栏分母。详见 `resume.round19_lane_S2_return` 与 `tasks['M1-01'].s2_landing_R19`。"
       },
       "s1_predispatch_R19": {
         "at": "2026-11-17T03:53:54+08:00",
@@ -3986,7 +4083,142 @@
         "S6（卡片 `orchestrator/tasks/M1-01.md:44` 原文：`qwen3.8-flash` / 7k ⇒ 产出 `tests/domain/ingest/**`）",
         "S7（卡片 `orchestrator/tasks/M1-01.md:45` 原文：`qwen3.8-flash` / 5k ⇒ 产出 `tests/golden/ingest/**`）",
         "S8（卡片 `orchestrator/tasks/M1-01.md:46` 原文：`qwen3.8-flash` / 6k ⇒ 产出 `evidence/M1/M1-01/**`、`evidence/M1/summaries/M1-01.md`）"
-      ]
+      ],
+      "s2_landing_R19": {
+        "round": 19,
+        "wave": 4,
+        "lane": "S2",
+        "task": "M1-01",
+        "nickname": "Epicurus",
+        "agent_id": "01a1eb34-3545-7a30-886d-b03d3f36165e",
+        "tier_used": "qwen3.8-max",
+        "reasoning": "high",
+        "budget_k": 45,
+        "critical": true,
+        "slack": 0,
+        "at": "2026-11-18T04:20:53+08:00",
+        "landed_at": "2026-11-18T07:50:13+08:00",
+        "result": "PARTIAL",
+        "loop_cap": 2,
+        "loop_rounds_used": 2,
+        "over_cap": false,
+        "over_input_cap": true,
+        "adjudications": [
+          "A296",
+          "A297",
+          "A298",
+          "A299",
+          "A300",
+          "A301"
+        ],
+        "u_items": [
+          "U-1",
+          "U-2",
+          "U-3",
+          "U-4",
+          "U-5",
+          "U-6"
+        ],
+        "self_corrections": [
+          "R19-31",
+          "R19-32"
+        ],
+        "preconditions_added": [
+          "PRE-48"
+        ],
+        "followups_created": [
+          "FU-70"
+        ],
+        "followups_closed": [],
+        "defects_raised": [],
+        "defect_number_not_consumed": "**D-053 不消耗**（依 R19-6 / R19-7 先例：编排器自身的判据失真归**自我纠正** R19-31/R19-32、机器化归 **FU-62**，避免单号通胀）。**lane 侧零缺陷**：交付的 4 件**面 100% 逐字相符**、零回归、零越界、`git diff --numstat` **输出为空**（零修改既有件）；未交付的 12 项属**档位/预算不足**（U-5 / A300）而非质量缺陷 ⇒ 归 **FU-70** 续派，**不记缺陷**。",
+        "dispatch_log_drift_fixed": [],
+        "faces_delivered": {
+          "src/campaignlab/domain/ingest/__init__.py": "1L/73B/2ad44a31e52d（**新建**，编排器**一字未改**）",
+          "src/campaignlab/domain/ingest/limits.py": "39L/1544B/b98965d4d621（**新建**，编排器**一字未改**）",
+          "src/campaignlab/domain/ingest/model.py": "198L/5563B/62518861e62a（**新建**，编排器**一字未改**）",
+          "src/campaignlab/domain/ingest/states.py": "242L/9848B/e941d047c5b8（**新建**，编排器**一字未改**）"
+        },
+        "faces_by_orchestrator": {
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md": "117L/15703B/bab326b8f075",
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md": "63L/10634B/5917772f9759",
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log": "53L/7633B/dedd225dde38（`.log` **不入** ruff 分母但**会入库**）"
+        },
+        "by_orchestrator_same_batch": [
+          "3 件取证件（编排器自办）：`evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md`（117L/15703B/bab326b8f075，**含 R19-31 的 5 处判据缺陷订正与 §6 时点事实订正**）· `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759，字节级 cat 原始回执 ＋ PRE-43 链 ＋ 与 `.orch_tmp/orch_S2_receipt.md` **字节同一**）· `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`（53L/7633B/dedd225dde38，**v2** 修订版复验日志，`VERIFY RESULT: GREEN`）。",
+          "**零编排器代工件**：4 件 `.py` 全由 lane 自产、编排器**零改动**（与 `R19-landS1` / `R19-landS6` 同口径）。编排器本批**未动** design、**未动** `tests/**`（A245/A248）、**未动** PRE-40 冻结面（DRIFT=0）。"
+        ],
+        "evidence": [
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md（117L/15703B/bab326b8f075）",
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md（63L/10634B/5917772f9759）",
+          "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log（53L/7633B/dedd225dde38）"
+        ],
+        "counts_before": {
+          "ruff_formatted_files": 359,
+          "mypy_source_files": 130,
+          "pytest_passed": 852,
+          "in_scope_py": 132,
+          "in_scope_md": 227,
+          "total": 359
+        },
+        "counts_after": {
+          "ruff_formatted_files": 365,
+          "mypy_source_files": 134,
+          "pytest_passed": 852,
+          "in_scope_py": 136,
+          "in_scope_md": 229,
+          "total": 365
+        },
+        "expected_red_closed": [],
+        "expected_red_note": "派单文 §5 的预期红清单**只有 1 条**＝ **A294 授权红**（`tests/unit/test_domain_errors.py` 的 `COMMON_ALL_NAMES` 钉桩在 §11.2 纯追加后必然判红，授权由 FU-69 同批再生）。**该红未被触发** —— 因 §11.2 **未交付**，编排器实测 `only_runtime=[]`/`only_pinned=[]`、`len(common.__all__)` 仍 **80**、PRE-40 八件 **DRIFT_COUNT=0** ⇒ **本批无预期红需闭合**，A294 授权红与 FU-69 的再生义务**一并改挂**到 A300 棒乙的 landing 批。",
+        "gate_readings": {
+          "verify_result": "VERIFY RESULT: GREEN",
+          "judges": 43,
+          "n_pass": 43,
+          "n_fail": 0,
+          "controls": "5 阳 3 阴（PC-A..PC-E / NC-A..NC-C），PRE-44⑤",
+          "ruff_format_worktree_at_verify": "365 files already formatted（台账 359 ＋ 未跟踪 in-scope 6，R11-3 恒等式）",
+          "ruff_check": "All checks passed! (rc=0)",
+          "mypy_worktree": "Success: no issues found in 134 source files",
+          "pytest": "**本批零新测试文件** ⇒ 冻结树 pytest 读数不变；权威值由 `run_commit` 的 `expect_counts` 逐条对账（`pytest_passed` 852）",
+          "numstat": "`git diff --numstat` 与 `--cached --numstat` **输出均为空**（零修改既有件）",
+          "frozen_face_8": "PRE-40 冻结面 8 件以 `git show HEAD:<rel>` 复测 ⇒ DRIFT_COUNT=0",
+          "encoding_4": "7 件全数：UTF-8 可解码 · 无 BOM · CR=0 · 无 NUL · 无 C0C1（**码点**口径，R19-32a）· 尾恰一个换行",
+          "worktree_untracked": "porcelain 命中集 == 允许集（lane 交付目录 ＋ 编排器取证目录），允许集之外**零命中**；V3d 断言排除面不过宽",
+          "contract_gate": "**NOT_APPLICABLE**（本棒零改动 `contracts/**`/`spec/**`/`scripts/**`）",
+          "card_gates": "4 条 **NOT_APPLICABLE_YET**（`tests/golden|domain/ingest` 派单时点 ABSENT）＋ 1 条 **NO_TEETH**（`-k validate_import`，FU-67 未闭合前禁标 PASS）⇒ **禁谎报 PASS**",
+          "symbols": "common.__all__=80(uniq80) · deps=13 · repos=16 · PROBLEM_CODES=20 · DomainError 子类=14（§11.2 未交付 ⇒ 逐字不变）"
+        },
+        "window_risk_honest": "**如实登记窗口期风险**：① `AC-005`/`AC-006` 的判定**尚未做出**（归 **S8**）⇒ 本批入库后 M1-01 的验收面仍为「设计已冻结、**结构面**已入库、行为面/接入面/证据面**零行**」，S8 入库前 **禁判 DONE**。② **关键路径 `slack=0` 进一步吃紧**：S2 只交 4/13 件 ⇒ 原「S2 一棒」变成「棒甲 ＋ 棒乙 ＋ 原 S3–S8」共 **8** 棒串行；其中棒乙含 PRE-40 冻结件的授权纯追加 ＋ A294 授权红处置，是本任务**剩余最高风险面**。③ **S6 依赖缺口**：负例矩阵依赖 `validate.py`（N1–N18）而该件属**棒甲**范围 ⇒ S6 的派单必须排在棒甲入库之后，且派单前**重测**依赖（禁凭 `remaining_sequence` 推断）。④ **design §14 追记未落地**（A297/A298/A299 三项）⇒ 在追记批入库前，S6 的 AST 守护会把 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 判成「越出符号清单」而**假红** ⇒ 追记批必须**先于**棒甲/S6 的派单批。",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。`commit_backfilled_at` 痕迹键依 `s1_landing_R19` 的既有体例由**回填批**写入 ⇒ 本批 **40** 键（＝S1 的 41 键减 1）。**PRE-46④**：本键**不复述**哨兵原串。"
+      },
+      "subtask_progress_S1_previous_R19_S2land": "**DONE**（`R19-landS1` 入库；编排器独立复验 **GREEN** 37 判据 / 0 FAIL）：交付件 `orchestrator/handoff/M1-01-design.md` 1301L/159632B/`99dd191f43b3` **一字未改**入库；design §12 的 **U-1…U-15** 已由编排器**全部裁毕**（A277–A291）⇒ `RESULT = DONE_WITH_GAP` 的 GAP 已闭合；loop 实耗 **1 / 2**（未超帽）；token 自估 ≈105k vs 55k 档 ⇒ 依 A183 记 `tokens=null`。详见 `resume.round19_lane_S1_return` 与 `tasks['M1-01'].s1_landing_R19`。",
+      "subtask_progress_note_R19_S2land": "`subtask_progress` 现有 **2** 键（S1 / S2）。**口径**：S1 ＝ **DONE**（设计面全交付）；S2 ＝ **PARTIAL**（结构面已入库、12 项改挂 FU-70）⇒ **S2 不得视为已完成**，其剩余面由棒甲/棒乙承接；棒甲/棒乙入库后**不新建** `subtask_progress` 键，而是在 S2 键**尾部延长**登记（D-011 append-only，禁改写既有进度语义）。",
+      "remaining_sequence_R19_post_S2pd_previous_R19_S2land": [
+        "S3（卡片 `orchestrator/tasks/M1-01.md:41` 原文：`qwen3.8-flash` / 12k ⇒ 产出 `src/campaignlab/domain/ingest/**`）",
+        "S4（卡片 `orchestrator/tasks/M1-01.md:42` 原文：`qwen3.8-flash` / 10k ⇒ 产出 `src/campaignlab/domain/ingest/**`）",
+        "S5（卡片 `orchestrator/tasks/M1-01.md:43` 原文：`qwen3.8-flash` / 8k ⇒ 产出 `src/campaignlab/api/imports.py`）",
+        "S6（卡片 `orchestrator/tasks/M1-01.md:44` 原文：`qwen3.8-flash` / 7k ⇒ 产出 `tests/domain/ingest/**`）",
+        "S7（卡片 `orchestrator/tasks/M1-01.md:45` 原文：`qwen3.8-flash` / 5k ⇒ 产出 `tests/golden/ingest/**`）",
+        "S8（卡片 `orchestrator/tasks/M1-01.md:46` 原文：`qwen3.8-flash` / 6k ⇒ 产出 `evidence/M1/M1-01/**`、`evidence/M1/summaries/M1-01.md`）"
+      ],
+      "remaining_sequence_R19_post_R19_S2land": [
+        "**design §14 追记批（三项同批）**：A297 订正 §4.1 代码块的 `Finding` 字段序 ＋ A298 把 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 补进 §11.1 清单 ＋ A299 冻结 `InputTooLarge(detail)` 文案 —— design 是 PRE-40 冻结面 ⇒ 锁值 sha **会变**，必须写新锁值并留 `previous` 痕迹（D-011）；**必须排在棒甲/S6 派单之前**（否则 S6 的 AST 守护假红）",
+        "**棒甲（FU-70 / A300）**：design §11.1 剩 **7** 件行为面（`locate.py`/`digests.py`/`normalize.py`/`validate.py`(N1–N18)/`parse.py`(含 `legacy_mapping_to_source_mapping`)/`api.py`/`infra/files.py`）—— 派单文**只带自己那一刀的规范面摘录**（PRE-15/PRE-19，禁整包 291 KB）",
+        "**棒乙（FU-70 / A300）**：§11.2（`api/common.py` 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`；`tests/unit/test_domain_errors.py` 两行钉桩改实取对撞）＋ §11.3（`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加）—— 其 landing 批**同批**闭合 FU-69 ①②③④ ＋ A294 授权红；派单前**重测 PRE-40**",
+        "S3（卡片 `orchestrator/tasks/M1-01.md:41` 原文：`qwen3.8-flash` / 12k）",
+        "S4（卡片 `:42`：`qwen3.8-flash` / 10k）",
+        "S5（卡片 `:43`：`qwen3.8-flash` / 8k ⇒ `src/campaignlab/api/imports.py`）",
+        "S6（卡片 `:44`：`qwen3.8-flash` / 7k ⇒ `tests/domain/ingest/**`）—— **依赖棒甲的 `validate.py`，派单前必须重测依赖是否齐备（禁凭本表推断）**",
+        "S7（卡片 `:45`：`qwen3.8-flash` / 5k ⇒ `tests/golden/ingest/**`）—— 依赖 S6",
+        "S8（卡片 `:46`：`qwen3.8-flash` / 6k ⇒ `evidence/M1/M1-01/**`、`evidence/M1/summaries/M1-01.md`）—— **判 AC-005/AC-006**；FU-67 未闭合前 `-k validate_import` 一律标 `NO_TEETH`",
+        "**`M2-01/S7` predispatch**（`qwen3.8-flash`，判 AC-002/003/004）—— 依 A293 排在上述之后，且派单前**必须重测 PRE-40**（用届时的锁值）",
+        "**治理簇未清项**：FU-25/26/27/28/30/31/34/36/37/38/39/58/61/62/63/64/66/67/68/69 ＋ 本批新增 **FU-70**（实测 OPEN 清单，禁凭记忆）"
+      ],
+      "status_note_R19_S2land": "**保持 `IN_PROGRESS`**（禁判 DONE）：`acs` 实测 `[AC-005, AC-006]` 的判定归 **S8**；S2 只交**结构面**（4/13 件），行为面/接入面/证据面**零行**。`critical=true`/`slack=0`/`lane=D` 逐项不变。`scope` **17** 项不变（本批**未扩围**：4 件全在原 scope 的 `src/campaignlab/domain/ingest/**` 内）。",
+      "remaining_sequence_order_fix_note_R19_S2land": "**R19-33 的机器化 fix (b)（本批同批订正，零副作用）**：`remaining_sequence_R19_post_R19_S2land` 是**键名即语义的有序面**，其初版把「棒甲」排在第 1 项、「design §14 追记批」排在第 2 项，而第 2 项**自身正文**却写着「**必须排在棒甲/S6 派单之前**」⇒ 序与正文自相矛盾，且与 `FU-70.ordering_note` 的初版主张（wave-5 predispatch 排在最前）互相冲突。订正方式＝在 `mut()` 内**运行时规范化**（先有牙断言改前序、再交换第 1/2 项、再断言改后序与正文一致），**不改写段文件里的列表字面量** ⇒ 过程可回放、判据有牙。**唯一权威面** ＝ `resume.next_actions` 末条 ㉒（其余节点禁复述序 —— PRE-46③ 的排序专用款）。被交换前的原序由本键正文如实描述；上一批的列表按 D-011 原样留档于 `remaining_sequence_R19_post_S2pd_previous_R19_S2land`。"
     },
     "M1-02": {
       "status": "TODO",
@@ -8991,7 +9223,8 @@
       "⑱ **wave-4 开闸（predispatch ＋ spawn 两棒）**：(a) **M2-01/S7** —— `qwen3.8-flash`（判 **AC-002 / AC-003 / AC-004**），档位依据＝任务卡档位表原文冻结；(b) **M1-01/S2** —— `qwen3.8-max` **high**（关键路径棒，`slack=0`），spawn message **必须携带 A277–A291 全部裁定原文**（禁只给编号；lane 无权读编排器的裁定上下文）。**并行前置**：先做 **PRE-5 三判据**实测两棒写权面**不相交**（① 路径前缀集交集为空 ② 无共享包标记 `__init__.py` ③ 无共享冻结面/分母交叉）**才可并行**，否则**串行优先**（429 缓解，文档 §9）。**同批落地两件事**：**O-8** ＝ `orchestrator/handoff/M1-01-design.md` 的 **§14 文末追记**承载 A280（删 `SOURCE_MAPPING_ID_PREFIX`）/ A283（取值来源）/ A285（口径），走 **A214 窄豁免**（只追加、`git show --numstat` 的 `deleted` 列必须为 **0**、追加前后做前 N 行拼接 `sha256[:12]` 的**双向核验**）；**A281** ＝ `tests/unit/test_domain_errors.py:176/:177` 的**实取对撞改造**由**编排器同批**做（`tests/**` 是 lane 硬禁面）。**PRE-40**：派单前必须**重测**冻结面 8 件 sha，禁沿用本批 preflight 读数；**A269**：派单文 §0 与 spawn message 的基线读数必须用**最新权威 counts 358/130/852(132py+226md)**；**PRE-43**：两棒的 `spawn_agent` 返回必须**即时落盘** `.orch_tmp/orch_<lane>_spawnret.txt` 再写台账；**PRE-47**：predispatch 批的 preflight 必须程序化判读顶层 `$.updated_at` 陈旧度。随后按 ⑯⑰ 继续治理簇 **FU-50/52/53/58/61/62/63/64/66/67/68**（**FU-67 必须在 S8 入库批之前闭合**，否则 S8 的 `-k validate_import` 门只能标 `NO_TEETH`、禁标 PASS；**FU-61 保持 OPEN**），循环直至 **29 任务 / 11 波 / 47 AC** 全部交付并留证 —— **未全部完成不得停**（用户死命令）。",
       "⑲ **wave-4 开闸（predispatch ＋ spawn 两棒）** —— ⑱ 里「同批落地两件事」的义务（**O-8** ＝ `M1-01-design.md` §14 文末追记；**A281** ＝ `test_domain_errors.py:176/:177` 的实取对撞改造）**已由 `R19-A292-O8` 批核销**（A281 经实测订正为 **A292**：其 `fact`「保留一处即可满足下界」不成立，元守护同批迁移为**上限制 ＋ 实取对撞下界制**），故本条只余**派单本体**：(a) **M2-01/S7** —— `qwen3.8-flash`（判 **AC-002 / AC-003 / AC-004**，档位依据＝任务卡档位表原文冻结）；(b) **M1-01/S2** —— `qwen3.8-max` **high**（关键路径棒，`slack=0`），spawn message **必须携带 A277–A292 全部裁定原文**（禁只给编号；lane 无权读编排器的裁定上下文；注意上界已由 A291 扩到 **A292**）。**并行前置**：先做 **PRE-5 三判据**实测两棒写权面**不相交**（① 路径前缀集交集为空 ② 无共享包标记 `__init__.py` ③ 无共享冻结面/分母交叉）**才可并行**，否则**串行优先**（429 缓解，文档 §9）。**PRE-40**：派单前必须**重测**冻结面 8 件 sha，禁沿用任何历史批的 preflight 读数；**A269**：派单文 §0 与 spawn message 的基线读数必须用**最新权威 counts 358/130/852(132py+226md)**；**PRE-43**：两棒的 `spawn_agent` 返回必须**即时落盘** `.orch_tmp/orch_<lane>_spawnret.txt` 再写台账；**PRE-47**：predispatch 批的 preflight 必须程序化判读顶层 `$.updated_at` 陈旧度（Δ 与阈值 600s 对账）；**PRE-46③**：predispatch 批的 MSG 承诺面必须与 `mut()` 实现面逐条对撞。随后按 ⑯⑰ 继续治理簇 **FU-50/52/53/58/61/62/63/64/66/67/68**（**FU-67 必须在 S8 入库批之前闭合**，否则 S8 的 `-k validate_import` 门只能标 `NO_TEETH`、禁标 PASS；**FU-61 保持 OPEN**：token 计量句柄缺失 41/51 null），循环直至 **29 任务 / 11 波 / 47 AC** 全部交付并留证 —— **未全部完成不得停**（用户死命令）。",
       "⑳ **wave-4 单棒（`M1-01/S2`）的义务链** —— ⑲ 的「并行前置」已由 **A293** 裁定为**判据③命中交叉**（S2 纯追加 PRE-40 冻结面 `src/campaignlab/api/common.py` ＋ 两棒共享 `ruff_formatted_files` 分母）⇒ **串行优先**：`R19-predispatch-wave4-S2` 只派 **S2** 一棒，`M2-01/S7` **递延**。接续次序（**PRE-13 三段式**，禁跳步）：**(0)** 紧接本批的**纯台账批** `R19-backfill-wave4pd-spawn` —— 执行 `spawn_agent`（`qwen3.8-max` / `high`；spawn message **必须逐字携带 A277–A294 全部 18 条裁定原文** ＋ A269 取代后 counts **359/130/852(132py+227md)** ＋ PRE-40 重测读数；**PRE-29 禁只给编号**），返回值**即时落盘** `.orch_tmp/orch_S2_spawnret.txt`（**PRE-43**），回填 `dispatch_log[20]` 与 `in_flight_agents[13]` 的 `agent_id`/`nickname`/`tier_used`/`spawned_at`、`spawned_after_predispatch` False → **True**、`status` → **IN_FLIGHT**，并**同批兑现本批 16 处哨兵**（PRE-35 全量普查）。**(1)** S2 的 landing 批必须**同批**闭合 **FU-69**（P1）：用回执 **R-A294** 的 `only_runtime` **程序化再生** `tests/unit/test_domain_errors.py:33` 的 `COMMON_ALL_NAMES`（PRE-37 禁手打）、复核 `only_pinned` **为空**、**更新 PRE-40 锁值**（`api/common.py` 的已授权漂移 ＋ `previous` 留痕，D-011）、在**冻结索引树**上重跑四门背书 counts。**(2)** `M2-01/S7` 的 predispatch 批（`qwen3.8-flash`，判 **AC-002/003/004**）—— **必须排在 (1) 之后**，且该批**重测 PRE-40**（否则会把 (1) 的已授权漂移误判为未授权漂移）。**(3)** M1-01 的剩余棒序 **S3 → S4 → S5 → S6 → S7 → S8**（档位表 `orchestrator/tasks/M1-01.md:41-46` 原文：六棒全为 `qwen3.8-flash`；S6 依赖 S2 的矩阵、S7 依赖 S6、**S8 判 AC-005/AC-006**），逐棒走 predispatch → spawn → landing。**(4)** 治理簇未清项：**FU-50 / FU-52 / FU-53 / FU-58 / FU-61（OPEN）/ FU-62 / FU-63 / FU-64 / FU-66 / FU-67 / FU-68 / FU-69**，按各自 `ordering_note` 排程；护栏①② 双双未达标（tasks **0.5902** < 0.60、tokens **0.6655** > 0.35）**如实报**，**禁**以降档或改口径「改善」读数（**C10** / 手册 §6.6 / **A234**）。**(5)** 用户死命令：**29 任务 / 11 波 / 47 AC 未全部交付前不得停**（`dag_paused` 必须保持 **False**）。",
-      "㉑ **wave-4 棒 `S2`（`M1-01` / **Epicurus** / `agent_id` `01a1eb34-3545-7a30-886d-b03d3f36165e`）已回传 `RESULT: PARTIAL` ⇒ 回收与**拆棒续派**义务链** —— 本条由纯台账批 `R19-backfill-wave4pd-spawn` 写入（PRE-13 第②③步已落地：`dispatch_log[20]` 与 `in_flight_agents[13]` 的 `agent_id`/`nickname`/`tier_used`/`spawned_at` 已回填、`spawned_after_predispatch` False→**True**、`status`→**IN_FLIGHT**；`9c7fd59` 的 **18** 处哨兵已**零残留**兑现；**A295** 与 **R19-30** 已入册 ⇒ 下一个 **A296** / **R19-31**）。**回执实况（PRE-43 双落盘：`orch_S2_receipt.md` 63 行 / 10634 B ＋ 工具返回正文；下列读数一律为 **lane 自报**，按 PRE-29 属**二手**，入库前必须由编排器**独立复验**）：`loop 2/2` 用尽、`tokens` 自报 null（无计量句柄，FU-61 同族）；**交付 4 件新建**（`src/campaignlab/domain/ingest/` 的 `__init__.py`/`limits.py`/`model.py`/`states.py`），**§11.1 剩 7 件 ＋ §11.2 全部 ＋ §11.3 全部共 12 项未交付**（4 件纯追加面 `git diff --numstat` **输出为空** ⇒ 零改动）；自报四门 `ruff check` 绿、`ruff format --check` **363** files、`mypy` **134** source files、`pytest` **852 passed / 0 failed**（**A294 授权红未触发**，因 §11.2 未交付 ⇒ `only_runtime=[]`/`only_pinned=[]`，**FU-69 的再生义务随 §11.2 一并退回**）；硬禁面零改动、`tests/**` 零改动、**PRE-40 八件 DRIFT_COUNT=0**；**U-5 为阻塞项**（45k 档位 vs 实测权威规范面 design 1393 行/167927 B ＋ slice 2875 行/60641 B ＋ 派单文 615 行/72533 B ≈ 291 KB ⇒ 只能交 4/13 件）。接续次序（**PRE-13 三段式**，禁跳步）：**(0)** `close_agent(01a1eb34-3545-7a30-886d-b03d3f36165e)` 释放槽位并按 PRE-43 落盘返回值。**(1)** 编排器**独立复验**（禁采信自报）：把 4 件 `git add` 后在**冻结索引树**上重跑四门、核 `git diff --numstat` 的 `deleted` 列全 0、硬禁面零改动、编码四判据（lane 自报 BOM/CR 探针跑于最后一次 `sed`/`ruff format` **之前** ⇒ **必须重跑**，禁沿用）、符号面 `common.__all__`=80 / `deps.__all__`=13 / `repositories.__all__`=16。**(2)** **S2 partial-landing 批（内容面）**：入库 4 件 ⇒ counts 五项按冻结树实测推进（预期 `ruff` 359→**363**、`mypy` 130→**134**、`in_scope_py` 132→**136**、`pytest` 仍 **852**，**一切以实测为准禁写死**）、**追加 history 条目并推进权威基线**（`baseline_history_index` 30→**31**）、`in_flight_agents[13]` 回填 `returned_at`/`result=PARTIAL`/`landing_tag`/`slot_closed_at` 并保留 `status_previous_*` 留痕、`budget.dispatched_not_yet_returned` 1→**0** ＋ 追加 `subtask_log` 第 **53** 条样本（`tier_used=qwen3.8-max`、`result=PARTIAL`、`tokens=null` ⇒ 护栏三项比值届时**程序化重算**）、同批兑现 `commit_backfill_pending_R19_wave4pd_spawnBF`（其 `obligor` 的宽松措辞）、同批裁定 **U-1…U-6**（U-1 `trigger` 存 token 的 A 案追认、U-2 `Finding` 字段序按实测 `code/location/message/severity` 并**订正 design §4.1 代码块**、U-3 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 落 `model.py` 并**补进 §11.1 清单**以免 S6 的 AST 守护误判、U-4 `InputTooLarge(detail)` 文案冻结、U-5 拆棒方案、U-6 lane 未全读派单文的协议偏差如实登记）与 lane 自报的 **2 条自纠**（`limits.py:1` 多行 docstring 开引号被整行替换毁语法、docstring 里写点号全路径导致 V9 假命中）。**(3)** **拆两棒续派**（U-5 的 A 案，关键路径 `slack=0` ⇒ 串行）：棒甲＝§11.1 剩 **7** 件（`locate.py`/`digests.py`/`normalize.py`/`validate.py`（N1–N18）/`parse.py`（含 `legacy_mapping_to_source_mapping`，需 legacy 内嵌映射真实形状）/`api.py`/`infra/files.py`）；棒乙＝§11.2 ＋ §11.3 共 **6** 项（`api/common.py` 的 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`、`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加）。**档位裁定**：棒甲/棒乙均需**只带自己那一刀的规范面摘录**（PRE-15 预抽设计文摘要 ＋ PRE-19 检索限定），禁再整包携带 291 KB；命中手册 **§6.3** 者仍**强制 max**、其余按实测复杂度定档（**C10 禁为凑配比降档**）。**棒乙必须重测 PRE-40 用 (2) 更新后的锁值**，且 **A294 授权红**与 **FU-69** 的 `COMMON_ALL_NAMES` 程序化再生义务在棒乙的 landing 批同批闭合（**禁拖批/拆批**）。**(4)** `M2-01/S7` predispatch（`qwen3.8-flash`，判 **AC-002/003/004**）—— 排在 (3) 之后。**(5)** M1-01 剩余棒序 **S3 → S4 → S5 → S6 → S7 → S8**（档位表 `orchestrator/tasks/M1-01.md:41-46` 原文：六棒**全 `qwen3.8-flash`**；S6 依赖 S2 的矩阵、S7 依赖 S6、**S8 判 AC-005/AC-006**）—— **注意**：S6 的负例矩阵依赖面因 S2 只交结构面而**部分缺失**，派单前必须重测依赖是否齐备（禁凭计划表推断）。**(6)** 治理簇未清项：**FU-50 / FU-52 / FU-53 / FU-58 / FU-61（OPEN）/ FU-62 / FU-63 / FU-64 / FU-66 / FU-67 / FU-68 / FU-69**。**(7)** 护栏①② **双双未达标**（tasks **0.5902** < 0.60、tokens **0.6655** > 0.35）**如实报**，**禁**以降档或改口径「改善」读数（**C10** / 手册 §6.6 / **A234**）；本棒 `result=PARTIAL` 属**档位/预算不足**而非档位错配 ⇒ **不计为浪费**，但必须如实登记 `overrun_ratio`/`overrun_drivers`（沿 `subtask_log` 既有体例）。**(8)** 用户死命令：**29 任务 / 11 波 / 47 AC 未全部交付前不得停**（`dag_paused` 必须保持 **False**）。"
+      "㉑ **wave-4 棒 `S2`（`M1-01` / **Epicurus** / `agent_id` `01a1eb34-3545-7a30-886d-b03d3f36165e`）已回传 `RESULT: PARTIAL` ⇒ 回收与**拆棒续派**义务链** —— 本条由纯台账批 `R19-backfill-wave4pd-spawn` 写入（PRE-13 第②③步已落地：`dispatch_log[20]` 与 `in_flight_agents[13]` 的 `agent_id`/`nickname`/`tier_used`/`spawned_at` 已回填、`spawned_after_predispatch` False→**True**、`status`→**IN_FLIGHT**；`9c7fd59` 的 **18** 处哨兵已**零残留**兑现；**A295** 与 **R19-30** 已入册 ⇒ 下一个 **A296** / **R19-31**）。**回执实况（PRE-43 双落盘：`orch_S2_receipt.md` 63 行 / 10634 B ＋ 工具返回正文；下列读数一律为 **lane 自报**，按 PRE-29 属**二手**，入库前必须由编排器**独立复验**）：`loop 2/2` 用尽、`tokens` 自报 null（无计量句柄，FU-61 同族）；**交付 4 件新建**（`src/campaignlab/domain/ingest/` 的 `__init__.py`/`limits.py`/`model.py`/`states.py`），**§11.1 剩 7 件 ＋ §11.2 全部 ＋ §11.3 全部共 12 项未交付**（4 件纯追加面 `git diff --numstat` **输出为空** ⇒ 零改动）；自报四门 `ruff check` 绿、`ruff format --check` **363** files、`mypy` **134** source files、`pytest` **852 passed / 0 failed**（**A294 授权红未触发**，因 §11.2 未交付 ⇒ `only_runtime=[]`/`only_pinned=[]`，**FU-69 的再生义务随 §11.2 一并退回**）；硬禁面零改动、`tests/**` 零改动、**PRE-40 八件 DRIFT_COUNT=0**；**U-5 为阻塞项**（45k 档位 vs 实测权威规范面 design 1393 行/167927 B ＋ slice 2875 行/60641 B ＋ 派单文 615 行/72533 B ≈ 291 KB ⇒ 只能交 4/13 件）。接续次序（**PRE-13 三段式**，禁跳步）：**(0)** `close_agent(01a1eb34-3545-7a30-886d-b03d3f36165e)` 释放槽位并按 PRE-43 落盘返回值。**(1)** 编排器**独立复验**（禁采信自报）：把 4 件 `git add` 后在**冻结索引树**上重跑四门、核 `git diff --numstat` 的 `deleted` 列全 0、硬禁面零改动、编码四判据（lane 自报 BOM/CR 探针跑于最后一次 `sed`/`ruff format` **之前** ⇒ **必须重跑**，禁沿用）、符号面 `common.__all__`=80 / `deps.__all__`=13 / `repositories.__all__`=16。**(2)** **S2 partial-landing 批（内容面）**：入库 4 件 ⇒ counts 五项按冻结树实测推进（预期 `ruff` 359→**363**、`mypy` 130→**134**、`in_scope_py` 132→**136**、`pytest` 仍 **852**，**一切以实测为准禁写死**）、**追加 history 条目并推进权威基线**（`baseline_history_index` 30→**31**）、`in_flight_agents[13]` 回填 `returned_at`/`result=PARTIAL`/`landing_tag`/`slot_closed_at` 并保留 `status_previous_*` 留痕、`budget.dispatched_not_yet_returned` 1→**0** ＋ 追加 `subtask_log` 第 **53** 条样本（`tier_used=qwen3.8-max`、`result=PARTIAL`、`tokens=null` ⇒ 护栏三项比值届时**程序化重算**）、同批兑现 `commit_backfill_pending_R19_wave4pd_spawnBF`（其 `obligor` 的宽松措辞）、同批裁定 **U-1…U-6**（U-1 `trigger` 存 token 的 A 案追认、U-2 `Finding` 字段序按实测 `code/location/message/severity` 并**订正 design §4.1 代码块**、U-3 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 落 `model.py` 并**补进 §11.1 清单**以免 S6 的 AST 守护误判、U-4 `InputTooLarge(detail)` 文案冻结、U-5 拆棒方案、U-6 lane 未全读派单文的协议偏差如实登记）与 lane 自报的 **2 条自纠**（`limits.py:1` 多行 docstring 开引号被整行替换毁语法、docstring 里写点号全路径导致 V9 假命中）。**(3)** **拆两棒续派**（U-5 的 A 案，关键路径 `slack=0` ⇒ 串行）：棒甲＝§11.1 剩 **7** 件（`locate.py`/`digests.py`/`normalize.py`/`validate.py`（N1–N18）/`parse.py`（含 `legacy_mapping_to_source_mapping`，需 legacy 内嵌映射真实形状）/`api.py`/`infra/files.py`）；棒乙＝§11.2 ＋ §11.3 共 **6** 项（`api/common.py` 的 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`、`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加）。**档位裁定**：棒甲/棒乙均需**只带自己那一刀的规范面摘录**（PRE-15 预抽设计文摘要 ＋ PRE-19 检索限定），禁再整包携带 291 KB；命中手册 **§6.3** 者仍**强制 max**、其余按实测复杂度定档（**C10 禁为凑配比降档**）。**棒乙必须重测 PRE-40 用 (2) 更新后的锁值**，且 **A294 授权红**与 **FU-69** 的 `COMMON_ALL_NAMES` 程序化再生义务在棒乙的 landing 批同批闭合（**禁拖批/拆批**）。**(4)** `M2-01/S7` predispatch（`qwen3.8-flash`，判 **AC-002/003/004**）—— 排在 (3) 之后。**(5)** M1-01 剩余棒序 **S3 → S4 → S5 → S6 → S7 → S8**（档位表 `orchestrator/tasks/M1-01.md:41-46` 原文：六棒**全 `qwen3.8-flash`**；S6 依赖 S2 的矩阵、S7 依赖 S6、**S8 判 AC-005/AC-006**）—— **注意**：S6 的负例矩阵依赖面因 S2 只交结构面而**部分缺失**，派单前必须重测依赖是否齐备（禁凭计划表推断）。**(6)** 治理簇未清项：**FU-50 / FU-52 / FU-53 / FU-58 / FU-61（OPEN）/ FU-62 / FU-63 / FU-64 / FU-66 / FU-67 / FU-68 / FU-69**。**(7)** 护栏①② **双双未达标**（tasks **0.5902** < 0.60、tokens **0.6655** > 0.35）**如实报**，**禁**以降档或改口径「改善」读数（**C10** / 手册 §6.6 / **A234**）；本棒 `result=PARTIAL` 属**档位/预算不足**而非档位错配 ⇒ **不计为浪费**，但必须如实登记 `overrun_ratio`/`overrun_drivers`（沿 `subtask_log` 既有体例）。**(8)** 用户死命令：**29 任务 / 11 波 / 47 AC 未全部交付前不得停**（`dag_paused` 必须保持 **False**）。",
+      "㉒ **`R19-landS2partial` 已入库 ⇒ wave-5 硬序义务链（**本条为全项目排序的唯一权威面**：R19-33 已订正 `resume.followups` 末条 `FU-70.ordering_note` 与 `tasks['M1-01'].remaining_sequence_R19_post_R19_S2land` 的初版矛盾主张，两处一律以本条为准）** —— **①** **wave-5 predispatch 的准备面**：为 **棒甲**（design §11.1 剩 **7** 件行为面：`locate.py`/`digests.py`/`normalize.py`/`validate.py`(N1–N18)/`parse.py`(含 `legacy_mapping_to_source_mapping`)/`api.py`/`infra/files.py`）与 **棒乙**（§11.2 ＋ §11.3 共 **6** 项接入面）按 **PRE-15/PRE-19** 各自预抽「自己那一刀」的规范面摘录、按**实测复杂度**定档（判据＝写权面件数 / 新建·纯追加件数 / 携带裁定条数 / 预期红条数），**禁再整包携带 ≈291 KB**（＝S2 只交 4/13 件的根因，U-5 / A300）；两棒**串行**（棒甲 → 棒乙；关键路径 `critical=true`/`slack=0`，PRE-5 三判据未过禁并行）。**硬约束：①的 predispatch 提交与 spawn 一律排在 ② 之后。** **②** **design §14 追记批（A297 ＋ A298 ＋ A299 三项同批；必须最先入库）**：A297 订正 §4.1 代码块的 `Finding` 字段序、A298 把 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 补进 §11.1 清单、A299 冻结 `InputTooLarge(detail)` 文案。design 是 **PRE-40 冻结面** ⇒ 锁值 sha **会变**，必须写新锁值并留 `previous` 痕迹（D-011）；走 **A214 窄豁免**（只追加、`git diff --numstat` 的 `deleted` 列必须为 **0**、追加前后做前 N 行拼接 `sha256[:12]` 的**双向核验**）。**排在最前的技术理由**：棒甲的派单文要逐字引用 §11.1 清单，② 未入库就派棒甲＝按**过期**规范实现；S6 的 AST 守护亦会**假红**。**③** **M1-01 剩余棒序 S3→S4→S5→S6→S7→S8**（卡片 `orchestrator/tasks/M1-01.md:41-46` 原文**全 `qwen3.8-flash`**）—— **S6 派单前必须重测依赖是否齐备**（其负例矩阵依赖 `validate.py`，而 S2 只交结构面 ⇒ 依赖面部分缺失，禁凭计划表推断）；**S8 判 AC-005/AC-006**，且 **FU-67 未闭合前 `-k validate_import` 一律标 `NO_TEETH`、禁标 PASS**。**④** **`M2-01/S7` predispatch**（`qwen3.8-flash`，判 AC-002/003/004）排在 ②③ 之后（A293），**派单前必须用届时的锁值重测 PRE-40**（禁沿用本批 preflight 的读数）。**⑤** **治理簇**：**FU-25 / 26 / 27 / 28 / 30 / 31 / 34 / 36 / 37 / 38 / 39 / 58 / 61 / 62 / 63 / 64 / 66 / 67 / 68 / 69 / 70**（本串由台账 `status=='OPEN'` **程序化派生**、禁凭记忆 —— PRE-37 第 1 款）；**FU-61 保持 OPEN**（token 计量句柄缺失 ⇒ 护栏② 统计上不可判）。**⑥** **本批新哨兵链 `resume.commit_backfill_pending_R19_S2land` 的回填义务**由**下一次提交**兑现（位点面逐字见该键 `sites_expected_after_mut`，由本批 mut 末断言的**实测集合回写**；PRE-35 全量普查 ＋ PRE-37 第 1 款 sha 程序化派生 ＋ PRE-46②③④ ＋ PRE-47 ＋ PRE-48③）。**⑦** **护栏如实报**：① tasks **0.5806**（目标 >= 0.60）、② tokens **0.6655**（目标 <= 0.35，且 `token_entries_known`/`subtask_entries` 实测 ⇒ **统计上不可判**）、③ dev_lanes **0.4250** ⇒ `tasks_target_met=False` / `tokens_target_met=False`，**双双未达标**。**禁**以降档或改口径的方式「改善」读数（C10 / 手册 §6.6 / A234）；**结构性事实**：M1-01/S2 命中手册 **§6.3 强制 max 硬规则**（金额分与口径语义）⇒ 本棒**本就不该**是 flash，配比下降是**规则正确执行的必然结果**、不是浪费（A301）。回补路径＝③④⑤ 的 flash 棒。权威读数面＝`budget.flash_share_guardrail_report_R19_S2land`。**⑧** **循环直至 29 任务 / 11 波 / 47 AC 全部交付并留证 —— 未全部完成不得停**（用户死命令；`dag_paused` 恒 `False`）。每批入库后刷新 `counters_next` 活指针并留 `previous_values_*` 痕迹（D-011）；判据一律**同口径派生 ＋ 配阳性/阴性对照**（PRE-44）；停机/交接一律**程序化枚举漂移面 ＋ 重跑 preflight 实测**（PRE-45）；入库批一律**闭合哨兵链 ＋ MSG 与 `mut()` 逐条对撞**（PRE-46）；**合片前固定跑一次跨节点排序对撞**（R19-33 的 prevention ②，归口 FU-62）。"
     ],
     "in_flight_agents": [
       {
@@ -9730,7 +9963,7 @@
         "agent_id": "01a1eb34-3545-7a30-886d-b03d3f36165e",
         "nickname": "Epicurus",
         "spawned_after_predispatch": true,
-        "status": "IN_FLIGHT",
+        "status": "RETURNED_PARTIAL_LANDED",
         "round": 19,
         "wave": 4,
         "dag_lane": "D",
@@ -9796,7 +10029,51 @@
         "spawned_at_caliber": "**口径如实登记**：本值 ＝ **回填批写入时点**（2026-11-18T05:15:44+08:00），非 `spawn_agent` 的独立时钟读数 —— 工具返回值只含 `agent_id` 与 `nickname`，不含时间戳（落盘件 `.orch_tmp/orch_S2_spawnret.txt` 可复核）。真实 spawn 时刻落在「`9c7fd59` 入库之后、本批 `R19-backfill-wave4pd-spawn` 之前」的**同一编排回合**内（分钟级），先后顺序事实已由 `spawned_after_predispatch` False→**True** 与本键共同钉住（PRE-13 第①②③步的顺序不可逆）。**禁**把回填时点冒充为 spawn 时点。",
         "spawned_after_predispatch_note": "PRE-13 三步：① predispatch 提交（`R19-predispatch-wave4-S2` ＝ `9c7fd59`：派单文 ＋ dispatch/in_flight 记录先入库，`agent_id` 一律 `null`、本键 `false`）→ ② `spawn_agent`（**显式**指定 model=`qwen3.8-max` / reasoning_effort=`high`，禁省略 model —— 手册 §15.1 / A234）→ ③ 纯台账批（本批 `R19-backfill-wave4pd-spawn`）回填 `agent_id`/`nickname`/`tier_used`/`spawned_at` 并把本键 false→**true**、`status`→**IN_FLIGHT**、`commit`/`commit_full` 兑现为 `9c7fd59`。",
         "agent_id_backfill_note_R19_wave4pd_spawn": "回填（`R19-backfill-wave4pd-spawn`，2026-11-18T05:15:44+08:00）：`agent_id` = **01a1eb34-3545-7a30-886d-b03d3f36165e**、`nickname` = **Epicurus**、`tier_used` = **`qwen3.8-max`**（== `tier_planned`，**未降档亦未升档** ⇒ `tier_match` 为真；档位依据＝卡片 `orchestrator/tasks/M1-01.md:40` 原文冻结 ＋ 手册 §6.3 强制 max 硬规则，**C10** 禁为凑 flash 配比降档）、`spawned_at` = 本批写入时点（口径见 `spawned_at_caliber`）。**身份真值源**＝**PRE-43 落盘件** `.orch_tmp/orch_S2_spawnret.txt`，本批由 `json.loads` **程序化解析**后写入（preflight P28/P28b/P28c：JSON 可解析 ＋ UUID 形态 ＋ lane/task/wave/model/effort/loop 六项同源），**禁**凭会话记忆手打（PRE-37 第 1 款 / A183；R19-18 的既成事故）。**PRE-31 双键**：本条由 (`lane`=`S2`, `task`=`M1-01`) 双键唯一确定，禁按 lane 单键。",
-        "commit_backfilled_at": "2026-11-18T05:15:44+08:00"
+        "commit_backfilled_at": "2026-11-18T05:15:44+08:00",
+        "status_previous_R19_S2land": "IN_FLIGHT",
+        "status_note_R19_S2land": "**新增枚举值 `RETURNED_PARTIAL_LANDED`（如实登记，禁静默复用旧值 —— C10）**：既有面实测只有 `RETURNED_LANDED` / `RETURNED_ERRORED_LANDED` / `RETURNED_DONE_WITH_GAP` 三种回收态。本棒 `RESULT: PARTIAL`（4/13 件）**既不是** `DONE_WITH_GAP`（该值的既有语义＝交付面 **100%**、只差裁定，见 `[7]`/`[11]`），**也不是** `ERRORED`（四门全绿、零缺陷、零越界件）⇒ 沿「`RETURNED_<结果>_LANDED`」的既有构词法新增值，语义＝「**已回传、已入库、但交付面不足**」。前值 `IN_FLIGHT` 按 D-011 留痕于 `status_previous_R19_S2land`（只追加，禁改写既有 34 键）。",
+        "returned_at": "2026-11-18T05:03:56+08:00",
+        "returned_at_caliber_R19_S2land": "**口径如实登记**：本值 ＝ lane 回执落盘件 `.orch_tmp/orch_S2_receipt.md` 的 `stat().st_mtime`（程序化派生，禁手打 —— PRE-37 第 1 款）。工具返回**不含时间戳**（A183 禁猜测值），而 PRE-43 要求回传后**即时落盘** ⇒ 该 mtime 是回传时刻的**实测上界**（误差＝落盘延迟）。同批的 `slot_closed_at` / `slot_close_confirmed_at` 另有各自口径，见其 `*_caliber` 键。",
+        "result": "PARTIAL",
+        "result_note_R19_S2land": "**PARTIAL**（**结构面 100% / 全刀 4/13 件**）：交付 `src/campaignlab/domain/ingest/` 的 `__init__.py`（1L/73B/2ad44a31e52d）/ `limits.py`（39L/1544B/b98965d4d621）/ `model.py`（198L/5563B/62518861e62a）/ `states.py`（242L/9848B/e941d047c5b8）共 **4 件新建**，face 与 lane 自报**三向逐字对撞一致**（编排器独立复验 `JUDGES: 43 PASS: 43 FAIL: 0` / `VERIFY RESULT: GREEN`，含 5 阳 3 阴对照 —— PRE-29 禁采信自报、PRE-44⑤）；`git diff --numstat` 输出为空 ⇒ **零 tracked 改动**（＝§11.2/§11.3 未交付的机器证据）。**12 项未交付**（§11.1 剩 7 ＋ §11.2 全部 ＋ §11.3 全部）⇒ 依 **A300** 拆两棒续派（**FU-70**，串行）。loop 实耗 **2 / 2**（用尽未超帽，`over_cap=false`）；**token 超档**（45k 档 vs 实测权威规范面 ≈291 KB）⇒ 依 **A183** 记 `tokens=null` ＋ `tokens_estimated=true`、**不入护栏分母**，事实照记不抹平（C10）；**A301** 裁定该超支**根因归编排器的派单文体量**、不记为 lane 的诚信缺陷。",
+        "landing_tag": "R19-landS2partial",
+        "landing_note_R19_S2land": "随 `R19-landS2partial` 入库（**内容面批** ⇒ 依 PRE-36 / A261 同批追加 `baseline_authoritative.history` 条目并推进权威基线）。编排器**独立复验 GREEN**（43 判据 / 0 FAIL，逐字日志入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`，脚本 `.orch_tmp/orch_vS2p2.py`）。本批**零编排器代工件**：S2 的写权面全在 `src/campaignlab/domain/ingest/**`（4 件全新建），与编排器的守护面/取证件面**不相交**（PRE-5）。**与 S1 的体例差异（如实登记）**：S1 的 landing 批**刻意不写** `close_agent_returned` / `slot_close_confirmed_*`（那次 `close_agent` 排在 push 之后，由 `R19-landS1BF` 回填）；本棒的 `close_agent` **已在本批之前调用且返回已即时落盘**（PRE-43 三步齐备）⇒ 四键**同批写入**，无需再发一批回填。`RESULT: PARTIAL` 的处置面见 `resume.round19_lane_S2_return` 与 `tasks['M1-01'].s2_landing_R19`；未交付 12 项的续派义务见 **FU-70** ＋ `next_actions` ㉒。",
+        "slot_closed_at": "2026-11-18T07:50:13+08:00",
+        "slot_closed_at_caliber": "**如实登记口径差异**（沿 `in_flight_agents[10]/[11]/[12].slot_closed_at_caliber` 的既有体例）：本字段写的是 `R19-landS2partial` 批 `mutate` 的执行时点（「**已回传且已入库**」口径），而 `close_agent` 的工具调用发生在**本批之前**（其返回落盘件 `.orch_tmp/orch_S2_close_agentret.txt` 的 mtime ＝ 调用时点的实测**上界** 2026-11-18T05:20:30+08:00；下界 ＝ 被兑现提交 `5745cb0` 的作者时点 2026-11-18T05:18:56+08:00，由 `git log -1 --pretty=%aI` 程序化派生）。故本批的时序与 S1/S6 **相反**：`slot_close_confirmed_at`（工具已返回）**早于** `slot_closed_at`（入库）。二者相差一个以上的提交间隔，属**已登记的口径差异**、非缺陷。",
+        "close_agent_returned": {
+          "tool": "close_agent",
+          "agent_id": "01a1eb34-3545-7a30-886d-b03d3f36165e",
+          "nickname": "Epicurus",
+          "lane": "S2",
+          "task": "M1-01",
+          "wave": 4,
+          "tier_used": "qwen3.8-max",
+          "reasoning": "high",
+          "returned_status": "completed",
+          "result_self_reported": "PARTIAL",
+          "loop_used": "2 / 2",
+          "previous_status_completed_landed_at": ".orch_tmp/orch_S2_close_agentret.txt",
+          "previous_status_completed_face": {
+            "lines": 63,
+            "bytes": 10634,
+            "sha256": "5917772f975978daba750d0617a705a592765d19a48bf345246602f0a57357a5",
+            "sha256_12": "5917772f9759"
+          },
+          "verbatim_body_copied": false,
+          "called_at_lower_bound": "2026-11-18T05:18:56+08:00",
+          "called_at_upper_bound": "2026-11-18T05:20:30+08:00",
+          "landed_receipt_face": {
+            "lines": 63,
+            "bytes": 10634,
+            "sha256_12": "5917772f9759",
+            "sha256": "5917772f975978daba750d0617a705a592765d19a48bf345246602f0a57357a5"
+          },
+          "note": "**PRE-43 三步齐备（先落盘 → 再写台账 → 台账只引锚点）**：`close_agent` 的 `previous_status.completed` 正文与 lane 自行双落盘的回执 `.orch_tmp/orch_S2_receipt.md` 是**逐字同一份**（sha256 对撞一致）⇒ 依 **PRE-46③**（同一事实禁两处各写一版）**不复制第二份正文**，只登记锚点（路径 ＋ 行数/字节/sha256）。`verbatim_body_copied=false` 即该裁定的机器可读标记。对照 **R19-18**（`[12]`/Beauvoir：未落盘 ＋ 模型切换 ⇒ 正文永久不可复得、只能置 null）与 `[11]`/Peirce（首次调用即得 `not found` 并当场落盘）⇒ 本条是 PRE-43 立规后**第二次**被完整遵守。槽位已释放 ⇒ 并发额度回收，wave-5 可安全 spawn（硬序见 `next_actions` ㉒）。"
+        },
+        "slot_close_confirmed_at": "2026-11-18T05:20:30+08:00",
+        "slot_close_confirmed_by": "close_agent(target=01a1eb34-3545-7a30-886d-b03d3f36165e)",
+        "slot_close_confirmed_at_caliber": "**口径如实登记**（沿 `in_flight_agents[11]/[12].slot_close_confirmed_at_caliber` 的既有体例）：本值 ＝ `close_agent` 返回**落盘件**的 `stat().st_mtime`（实测**上界**），**非**工具调用的 wall-clock —— 后者无机器句柄可测（A183）⇒ 只登记实测上下界于 `close_agent_returned.called_at_lower_bound` / `.called_at_upper_bound`。**与 S1/S6 的时序相反**：本棒的 `close_agent` 排在入库批**之前**，故本值**早于** `slot_closed_at`（详见 `slot_closed_at_caliber`）。",
+        "slot_close_confirmed_note_R19_S2land": "**本批同批写入四键的依据**：`close_agent` 已调用、返回已落盘、槽位已释放 ⇒ 无「槽位已释放但交付未入库」的不可恢复态风险（该风险正是 S1/S6 把关槽排到 push 之后的理由）。四键＝`close_agent_returned` / `slot_close_confirmed_at` / `_by` / `_at_caliber`，与 `[10]`/`[11]`/`[12]` 的键名逐字同构。"
       }
     ],
     "dispatch_requirements": [
@@ -10326,8 +10603,8 @@
       },
       "counts": {
         "pytest_passed": 852,
-        "mypy_source_files": 130,
-        "ruff_formatted_files": 359,
+        "mypy_source_files": 134,
+        "ruff_formatted_files": 365,
         "contract_registered_nodes": 13,
         "acceptance_denominator": 47,
         "acceptance_resolvable": 47,
@@ -10336,15 +10613,15 @@
         "live_openapi_info_version": "1.0.1",
         "ruff_formatted_files_composition": {
           "cmd": "uv run --no-sync ruff format --check .",
-          "total": 359,
-          "in_scope_py": 132,
-          "in_scope_md": 227,
+          "total": 365,
+          "in_scope_py": 136,
+          "in_scope_md": 229,
           "reproduce_py": "git ls-files '*.py' | grep -vE '^(spec|prototype|web)/' | wc -l",
           "reproduce_md": "git ls-files -z '*.md' | tr '\\0' '\\n' | grep -vE '^\"?(spec|prototype|web)/' | wc -l",
           "why_md_counted": "ruff 0.17.4 的 format 作用域含 .md；探针实测：docs/ 内加 1 个 .py -> 计数 +1，加 .txt 或无扩展名文件 -> 计数不变；docs/ 下 8 个 .md 即报 8。",
           "exclusions_verified": "printf 'x = 1' 探针写入 spec/ prototype/ .venv/ web/ 后计数均不变 -> extend-exclude 与默认排除生效。",
           "historical_value": "全表重跑当时实测 37；此前记为 35 但未记构成、当前树不可复现，已由本条取代（见 D-006）",
-          "measured_after": "2026-11-18T04:20:53+08:00",
+          "measured_after": "2026-11-18T07:50:13+08:00",
           "drift_rule": "md 分母随每次证据/文档提交增长属预期；**稳定分母是 ruff_lint_scope_files（纯 Python，现 9）**，Q 复核以它为准；引用时禁写死数字，一律指向本键（依 D-012/D-014）；v1.7 复述：稳定分母为 ruff_lint_scope_files（纯 Python），本轮 9→18",
           "identity": "A101 恒等式（R11V，**冻结索引树口径**，R11-3）：待提交树 tracked 225（py 81 + md 144）+ 冻结树内 untracked 0 == ruff 在冻结树上自己的报数 225。**双时点**：add 前 HEAD(cf6dda1) tracked 222（py 80 + md 142）。工作树侧 untracked = 0（R11 三条 lane 全部入库，已无在飞件），故工作树侧恒等式 81 + 144 + 0 == 225 亦成立。 || R12 追加（append-only，不改上文）：待提交树 tracked 229（py 82 + md 147），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 229 于冻结索引树上成立；本次新增 scripts/orch_harness.py（编排器提交工装，1 py）+ 两份 R12 派单文 + D-042（3 md）。 || R12-W 追加（append-only，不改上文）：待提交树 tracked 230（py 82 + md 148），恒等式 tracked(py+md) + untracked(lane X 在飞件，不计入分母) == ruff format --check 报数 230 于**冻结索引树**上成立（R11-3）。本次新增 evidence/M0/FU-29/commands.md（1 md）；同目录的 positive-control.log / symbols.txt / diff-stat.txt 三个非 py/md 后缀**不入分母**；4 个 .py 均为**修改**既有文件，故 py 分母 82 不变、mypy 80 不变、pytest 490 不变（test_layering_edges.py 用例数 8→8）。 || R13 追加（append-only，不改上文）：待提交树 tracked 234（py 82 + md 152），恒等式 tracked(py+md) + untracked(lane X/Y/Z 在飞件，不计入分母) == ruff format --check 报数 234 于**冻结索引树**上成立（R11-3）。本次新增 4 件 .md（1 份公共纪律段 + 2 份派单文 + 1 份原始回执归档），零 .py，故 mypy 80 / pytest 490 不变。 || R13-X 追加（append-only，不改上文）：待提交树 tracked 240（py 83 + md 157），恒等式 tracked(py+md) + untracked(lane Y/Z 在飞件，不计入分母) == ruff format --check 报数 240 于**冻结索引树**上成立（R11-3）。本次新增 5 md（3 卡 + commands.md + lane X 原始回执归档）+ 1 py（tests/unit/test_task_cards_complete.py）；evidence/M0/FU-33/ 下另 4 个 .txt/.log 后缀不在 ruff 作用域，其中两个 .log 因 .gitignore:18 的 !evidence/**/*.log 反排除规则而**会**入库（lane X 实测的口径事实，编排器用 git check-ignore -v 独立复核吻合）。 || R13-V 追加（append-only，不改上文）：待提交树 tracked 245（py 84 + md 161），恒等式 tracked(py+md) + untracked(lane Y/Z 在飞件，不计入分母) == ruff format --check 报数 245 于**冻结索引树**上成立（R11-3）。本次新增 1 py + 4 md。 || R13-Z 追加（append-only，不改上文）：待提交树 tracked 247（py 84 + md 163），恒等式 tracked(py+md) + untracked(lane Y 在飞 7 件，不计入分母) == ruff format --check 报数 247 于**冻结索引树**上成立（R11-3）。本次新增 M2-01 设计冻结件 + lane Z 回执归档件（2 md）。 || R13-Y 追加（append-only，不改上文）：待提交树 tracked 255（py 88 + md 167），恒等式 tracked(py+md) + untracked(0，本提交把 lane Y 的全部在飞件入库) == ruff format --check 报数 255 于**冻结索引树**上成立（R11-3）。本提交后工作树 == HEAD（无在飞件），故该值同时是工作树全表真值。 || R14 追加（append-only，不改上文）：待提交树 tracked 256（py 88 + md 168），恒等式 tracked(py+md) + untracked(0) == ruff format --check 报数 256 于冻结索引树上成立（R11-3）。本次只新增 1 份 M2-01/S2a 派单文（1 md）。 || R15-Y2（M0-04/S2c）追加（append-only，不改上文）：待提交树 tracked in-scope = 268（py 90 + md 178），恒等式 tracked(py+md) + untracked(0：本提交把 lane Y2 的全部在飞件入库，lane A1b 的件已按 PRE-12 泊出工作树) == ruff format --check 在**冻结索引树**上的报数 268（R11-3）。本次新增 2 py（worker/service.py、tests/unit/test_worker_service.py）+ 5 md（evidence/M0/M0-04/{s2c-worker-service.md,commands-s2c.md}、orchestrator/defects/{D-044.md,D-045.md,D-046.md}）；positive-control-s2c.log 为 .log 后缀，不在 ruff 作用域（虽因 .gitignore:18 的 !evidence/**/*.log 反排除规则而**会**入库）。D-044.md 属 lane A1b（M2-01/S2a），依 **A224** 强制并入本提交以满足 D-* 连续性守护；其代码面仍随下一提交入库。 || R15-S2a（M2-01/S2a · 编排器自办入库）追加（append-only，不改上文）：待提交树 tracked in-scope = 276（py 97 + md 179），恒等式 tracked(py+md) + untracked(0：本提交把 lane A1b 的全部在飞件与编排器补出的两件取证件一并入库，工作树在 PRE-12 断言下恰为 ADD 集) == ruff format --check 在**冻结索引树**上的报数 276（R11-3）。本次新增 7 py（src/campaignlab/domain/activity/**）+ 1 md（evidence/M0/ORCHESTRATOR/r15-m2-01-s2a-landing/00-index.md）；同目录 commands-and-outputs.log 为 .log 后缀，不在 RUFF_SUFFIXES=('.py','.md')，虽会入库但不入分母。api/common.py 与 tests/unit/test_domain_errors.py 为修改既有文件，故 py/md 分母不因其而变；mypy 分母 88→95 恰为 7 个新增 mypy 域文件。 || R16（D-046 根治批）追加（append-only，不改上文）：待提交树 tracked 277（py 97 + md 180），恒等式 tracked(py+md) + untracked(在飞件，不计入分母) == ruff format --check 报数 277 于**冻结索引树**上成立（R11-3）。本次新增 1 md（evidence/M0/ORCHESTRATOR/r16-d046-frozen-isolation/00-index.md）；同目录的 commands-and-outputs.log 为 .log 后缀，不在 ruff 作用域；零新增 .py ⇒ mypy 分母仍 95； tests/unit/test_orch_harness.py 用例 20→23 ⇒ pytest 615→618。 || R16-S4 追加（append-only，上文一字不改）：待提交树 tracked in-scope 284（py 99 + md 185），冻结树内 untracked 0；add 前 HEAD(2010d57) tracked 277（py 97 + md 180）⇒ 增量 +7 与 counts 逐项对账相符。**工作树侧**另有 lane S2b-1（M2-01，agent_id 01a1db55-3aec-7093-9f55-785932c63478，Hooke，max/high）在飞的 untracked in-scope 件（src/campaignlab/application/activity_service.py、tests/unit/test_s2b_activity_surface.py、tests/unit/test_s2b_activity_repositories.py）与其对被跟踪件的纯追加（infra/db/repositories.py、api/deps.py）⇒ 工作树侧恒等式**不成立且不应成立**，依 A144(c) 由 untracked_owner_map 归属登记承担、依 D-046 的 frozen_env 保证门禁读数只来自冻结索引树（阳性对照见 evidence/M0/ORCHESTRATOR/r16-d046-frozen-isolation/）。故本提交的权威分母一律取**冻结索引树口径**（R11-3），活动树读数 281/97/646+3failed 只作归因用、不入账。 || R18-S3 追加（append-only，不改上文）：待提交树 tracked **311**（py **112** + md **199**），恒等式 tracked(py+md) + untracked(lane S6 在飞 2 件，已由 untracked_owner_map 归属、不计入分母) == ruff format --check 报数 **311** 于**冻结索引树**上成立（R11-3）。**交叉验证**：工作树侧 ruff format --check 实测 **313** = 311 + 2（S6 在飞 py）⇒ 两口径自洽。本次新增 3 py + 3 md + 1 log（log 不入分母）。 || R18-S6 追加（append-only，不改上文）：待提交树 tracked **316**（py **114** + md **202**），恒等式 tracked(py+md) + untracked(0 件；本批**无其他 lane 在飞**，git status -uall 实测恰为 ADD 的 6 件) == ruff format --check 报数 **316** 于**冻结索引树**上成立（R11-3）。**交叉验证**：工作树侧 ruff format --check 实测 **316** files、mypy 实测 **112** source files （r18_fmt_s6.out）⇒ 本批工作树与冻结树**同值**（因无在飞件，IN_FLIGHT_CONTAMINATION 为零，与 R18-landS3 批的 313/311 双口径不同）。本次新增 2 py + 3 md + 1 log（log 不入分母）。 || R18-predispatch-S8 追加（append-only，不改上文）：待提交树 tracked **317**（py **114** + md **203**），恒等式 tracked(py+md) + untracked(0 件) == ruff format --check 报数 **317** 于**冻结索引树**上成立（R11-3）。**交叉验证**：工作树侧 ruff format --check 实测 **317 files**、ruff check 实测 rc=0 「All checks passed!」⇒ 两口径同值（本批无在飞件，IN_FLIGHT_CONTAMINATION 为零）。本次新增 1 md（派单文），零 py。",
           "identity_cmd": "git ls-files -z '*.py' '*.md' | tr '\\0' '\\n' | grep -vE '^[\\\"]?(spec|prototype|web)/' | wc -l ；git ls-files --others --exclude-standard -z '*.py' '*.md' | 同样过滤 | wc -l ；两者之和必须等于 ruff format --check . 报的 N",
@@ -10356,7 +10633,7 @@
           "assert_in_place": "counts 写入前必须通过 tracked+untracked==ruff_total 断言，否则禁止提交（本次已拦下一次 47!=48 的错账）",
           "untracked_component_note": "post-add untracked in-scope .py/.md = **0**：R10-D 台账里预告的「在飞 Q lane 4 件」已全部随本提交入库，加上编排器自产的 D-039/D-040 两件，md 分母 129→135。工作树侧再无未入库 in-scope 件，A101 恒等式退化为 tracked == ruff 报数。",
           "counting_method": "手册 15.10：-z NUL 与 -c core.quotepath=false 双口径互验，本次 tracked 64==64、untracked 23==23 逐项全等",
-          "prev_total": 355,
+          "prev_total": 359,
           "untracked_component_sum_check": "post-add（索引）: 79 py + 138 md = 217 ；+ 工作树 untracked 8 = 225 ；工作树侧 ruff 报数 225（rc=0）；**冻结索引树侧 ruff 报数 217 == 索引 tracked 217**（untracked 0）✔",
           "untracked_not_ignored_in_scope": 0,
           "ruff_check_visible_composition": "ruff check --show-files = 25 = 24 个在域 .py + pyproject.toml（ruff 亦纳管该文件）。故 Gauss Q5 观察到的「25 vs 99/101」差异是 lint 与 format 作用域不同所致，属正常口径而非缺陷。",
@@ -10969,8 +11246,8 @@
         },
         "ruff_lint_scope_files": 75,
         "ruff_format_check_rc_after_governance_files": 0,
-        "counts_refreshed_at": "2026-11-18T04:20:53+08:00",
-        "counts_refresh_reason": "wave-4 predispatch 批（tag `R19-predispatch-wave4-S2`）：入库 **1 件新 .md**（派单文 `orchestrator/handoff/R19-lane-M1-01-S2.md`）⇒ `ruff_formatted_files` 358 → **359**、`in_scope_md` 226 → **227**；`in_scope_py`(132)/`mypy_source_files`(130)/`pytest_passed`(852) **三项不变**（本批零 `.py`）。**期望值程序化派生**（preflight P09/P10：`h.tracked_in_scope()` ＋ `ADD` 分类实测），禁手打。",
+        "counts_refreshed_at": "2026-11-18T07:50:13+08:00",
+        "counts_refresh_reason": "**S2 partial-landing 批**（tag `R19-landS2partial`）：入库 **4 件新 `.py`**（`src/campaignlab/domain/ingest/` 的 `__init__.py`/`limits.py`/`model.py`/`states.py` —— design §11.1 的**结构面**）＋ **2 件新 in-scope `.md`**（取证件 `00-index.md` / `lane-receipt-S2-raw.md`）＋ **1 件 `.log`**（`gates/V-independent-reverify.log`，靠 `.gitignore` 的 `!evidence/**/*.log` 反排除**入库**、但**不入** ruff 的 py+md 作用域）⇒ `ruff_formatted_files` **359 → 365**、`in_scope_py` **132 → 136**、`in_scope_md` **227 → 229**、`mypy_source_files` **130 → 134**（4 件均在 `src/` mypy 域）；`pytest_passed` **852 不变**（本批**零新测试文件**；lane 硬禁面 `tests/**` —— A245/A248）。**期望值一律程序化派生**（preflight P11/P11b 口径甲＝`h.tracked_in_scope()` ＋ `ADD` 分类；P11c/P11d 口径乙＝工作树 `ruff format --check` / `mypy` 实测报数互验），禁手打 —— PRE-37。权威背书仍由 `run_commit` 在**冻结索引树**上重跑四门并与 `expect_counts` 逐条对账，不符即 `git reset` ＋ 台账回滚。",
         "live_openapi_bytes": 443309,
         "frontend_vitest_passed": 104,
         "frontend_vitest_files": 7,
@@ -11346,9 +11623,9 @@
           "as_of": "2026-11-16T04:53:10+08:00"
         },
         "pytest_passed_note_R18_S4predispatch": "本提交**零 .py 改动** ⇒ pytest_passed 沿用 **748**（冻结树实跑 727 ＋ GIT_ENV_IGNORES 静态收集 21）不变；run_commit 仍在冻结索引树上实跑全表并与该值对账（不符即 git reset ＋ 台账 checkout 回滚），沿用值由实测背书、非假设（PRE-15）。",
-        "total": 359,
-        "in_scope_py": 132,
-        "in_scope_md": 227,
+        "total": 365,
+        "in_scope_py": 136,
+        "in_scope_md": 229,
         "previous_values_R18_S4land": {
           "ruff_formatted_files": 325,
           "mypy_source_files": 112,
@@ -11609,7 +11886,51 @@
           "in_scope_py": 132,
           "in_scope_md": 223,
           "total": 355
-        }
+        },
+        "previous_values_R19_S2land": {
+          "ruff_formatted_files": 359,
+          "mypy_source_files": 130,
+          "pytest_passed": 852,
+          "in_scope_py": 132,
+          "in_scope_md": 227,
+          "total": 359,
+          "head": "9c7fd59",
+          "head_full": "9c7fd5986496364a087c491f0c9c8a2e8e61021c",
+          "commit_tag": "R19-predispatch-wave4-S2",
+          "counts_refreshed_at": "2026-11-18T04:20:53+08:00",
+          "counts_refresh_reason_head": "wave-4 predispatch 批（tag `R19-predispatch-wave4-S2`）：入库 **1 件新 .md**（派单文 `orchestrator/handoff/R19-lane-M1-01-S2.md`）⇒ `ruff_formatted_files` 358 → **359**、`in_scope_md` 226 → **227**；`in_scope_py`(13"
+        },
+        "composition_delta_R19_S2land": {
+          "at": "2026-11-18T07:50:13+08:00",
+          "previous": {
+            "total": 359,
+            "in_scope_py": 132,
+            "in_scope_md": 227
+          },
+          "current": {
+            "total": 365,
+            "in_scope_py": 136,
+            "in_scope_md": 229
+          },
+          "delta_py": [
+            "src/campaignlab/domain/ingest/__init__.py",
+            "src/campaignlab/domain/ingest/limits.py",
+            "src/campaignlab/domain/ingest/model.py",
+            "src/campaignlab/domain/ingest/states.py"
+          ],
+          "delta_md": [
+            "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md",
+            "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md"
+          ],
+          "not_counted": [
+            "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log（`.log` **不入** ruff 的 py+md 作用域，但**会入库**：`.gitignore` 的 `!evidence/**/*.log` 反排除 —— D-003）",
+            "orchestrator/state.json（`.json` 既不入 ruff 的 py+md 作用域，也不入 mypy 域）"
+          ],
+          "identity_check": "A101 恒等式（**冻结索引树**口径，R11-3）：136 py + 229 md == 365 == `ruff format --check` 报数；由 `run_commit` 的 `expect_counts` 逐条对账，不符即 `git reset` ＋ 台账回滚。**R19-29③ 的机器化 prevention**：文本类计数的期望值**必须**把「编排器自办取证件」一并计入 —— 上一棒 ㉑ 的散文预测只数了 4 件 `.py`（⇒ 359→**363**），漏了 2 件取证 `.md`（正确值 **365**）；本批一律以 `ADD` 分类程序化派生，禁沿用散文数字。",
+          "measured_by": "`run_commit` 在冻结树上实跑 `ruff format --check .` 取报数（非推算、非沿用，PRE-15）；`in_scope_py`/`in_scope_md` 由 `h.tracked_in_scope(from_index=True)` 实取。"
+        },
+        "counts_double_mirror_note_R19_S2land": "**R19-5 / PRE-36 第 2 款的固化执行**：`in_scope_py`/`in_scope_md`/`total` 存在**两份镜像** —— top-level 与 `ruff_formatted_files_composition` 内的同名键；`run_commit` 的 drift 门读 **top-level**，而 `tests/unit/test_counts_freshness.py` 读 **composition**（其 `test_committed_tree_denominator_matches_authoritative_counts` 以 HEAD 树实测 py/md 对撞 composition 三键，并断言 `composition.total == counts.ruff_formatted_files`）。⇒ 本批**同批写全两处**并当场断言三键逐项相等（136 / 229 / 365）。**第三处镜像** `resume.baseline_authoritative.current.counts` 与其**扁平五键**由 ③ 段从**同一** `COUNTS` 常量派生写入（R19-11 fix ①）⇒ 三处同源、零手抄。机器化归 **FU-62** 同族。",
+        "counts_unrefreshed_note_R19_S2land": "**如实登记：本批刻意未刷新的两个 counts 键** —— `ruff_lint_scope_files`（现 **75**）与 `ruff_check_visible_files`（现 **42**）。理由：① 二者**不受任何门禁或守护断言约束**（实测 `grep -rn` 于 `tests/**` 与 `scripts/**` 零命中；`run_commit` 的 `expect_counts` 只对账五项）；② 其**口径未在本批重新派生**，若按「+4 件 src/.py」直接推算即属 PRE-37 所禁的**手打期望值**；③ 沿 `composition_delta_R19_wave3pd` 的既有先例（该批同样只写五项 ＋ composition 三键）。⇒ **宁缺勿造**：留待有明确口径派生的批次刷新，并在此如实留痕（C10 禁粉饰）。"
       },
       "denominator_history": [
         {
@@ -13439,7 +13760,7 @@
         "spawned_at": "2026-11-18T05:15:44+08:00",
         "spawned_at_caliber": "**口径如实登记**：本值 ＝ **回填批写入时点**（2026-11-18T05:15:44+08:00），非 `spawn_agent` 的独立时钟读数 —— 工具返回值只含 `agent_id` 与 `nickname`，不含时间戳（落盘件 `.orch_tmp/orch_S2_spawnret.txt` 可复核）。真实 spawn 时刻落在「`9c7fd59` 入库之后、本批 `R19-backfill-wave4pd-spawn` 之前」的**同一编排回合**内（分钟级），先后顺序事实已由 `spawned_after_predispatch` False→**True** 与本键共同钉住（PRE-13 第①②③步的顺序不可逆）。**禁**把回填时点冒充为 spawn 时点。",
         "tier_used": "qwen3.8-max",
-        "status": "IN_FLIGHT",
+        "status": "RETURNED_PARTIAL_LANDED",
         "commit": "9c7fd59",
         "commit_full": "9c7fd5986496364a087c491f0c9c8a2e8e61021c",
         "commit_note": "本条由哪个提交入库，其 sha 在 `mutate_ledger` 执行时**尚不存在**（先写台账后 commit）⇒ 依 **PRE-13 第三步 / A183** 写哨兵、由 **spawn 之后的纯台账批**回填真值（`resume.commit_backfill_pending_R19_wave4pd`）。**PRE-46 第 ④ 款**：本键**不复述**哨兵原串。",
@@ -13449,7 +13770,12 @@
         "tier_ruling": "**卡片档位表原文冻结**（`orchestrator/tasks/M1-01.md:40`，S2 行）＝ ``qwen3.8-max` high` / reasoning `high` / 预算 `45k` / `loop_cap: 2`（卡片原文）。命中手册 **§6.3 强制 max 硬规则** —— 该行原文即写明「硬规则 6.3：金额分与口径语义强制 max」，且本棒含**负例/边界矩阵设计** ＋ **四入口统一规范**的口径语义 ＋ 跨文件（domain/infra/api）推断 ⇒ **禁降档**（**C10**：禁为凑 flash 配比把本应 max 的子任务降档；护栏①② 双双未达标**亦不得**以降档或改口径的方式「改善」读数 —— 手册 §6.6 / A234）。**实测复杂度判据**（PRE-37：程序化派生，禁手打）：写权面 **17** 项、新建 **13** 件 ＋ 纯追加 **4** 件、携带裁定 **18** 条（A277–A294）、预期红 **1** 条（A294 授权红）⇒ 属**高复杂度**档。",
         "spawned_after_predispatch_note": "PRE-13 三步：① predispatch 提交（`R19-predispatch-wave4-S2` ＝ `9c7fd59`：派单文 ＋ dispatch/in_flight 记录先入库，`agent_id` 一律 `null`、本键 `false`）→ ② `spawn_agent`（**显式**指定 model=`qwen3.8-max` / reasoning_effort=`high`，禁省略 model —— 手册 §15.1 / A234）→ ③ 纯台账批（本批 `R19-backfill-wave4pd-spawn`）回填 `agent_id`/`nickname`/`tier_used`/`spawned_at` 并把本键 false→**true**、`status`→**IN_FLIGHT**、`commit`/`commit_full` 兑现为 `9c7fd59`。",
         "agent_id_backfill_note_R19_wave4pd_spawn": "回填（`R19-backfill-wave4pd-spawn`，2026-11-18T05:15:44+08:00）：`agent_id` = **01a1eb34-3545-7a30-886d-b03d3f36165e**、`nickname` = **Epicurus**、`tier_used` = **`qwen3.8-max`**（== `tier_planned`，**未降档亦未升档** ⇒ `tier_match` 为真；档位依据＝卡片 `orchestrator/tasks/M1-01.md:40` 原文冻结 ＋ 手册 §6.3 强制 max 硬规则，**C10** 禁为凑 flash 配比降档）、`spawned_at` = 本批写入时点（口径见 `spawned_at_caliber`）。**身份真值源**＝**PRE-43 落盘件** `.orch_tmp/orch_S2_spawnret.txt`，本批由 `json.loads` **程序化解析**后写入（preflight P28/P28b/P28c：JSON 可解析 ＋ UUID 形态 ＋ lane/task/wave/model/effort/loop 六项同源），**禁**凭会话记忆手打（PRE-37 第 1 款 / A183；R19-18 的既成事故）。**PRE-31 双键**：本条由 (`lane`=`S2`, `task`=`M1-01`) 双键唯一确定，禁按 lane 单键。",
-        "commit_backfilled_at": "2026-11-18T05:15:44+08:00"
+        "commit_backfilled_at": "2026-11-18T05:15:44+08:00",
+        "status_previous_R19_S2land": "IN_FLIGHT",
+        "returned_at": "2026-11-18T05:03:56+08:00",
+        "result": "PARTIAL",
+        "landing_tag": "R19-landS2partial",
+        "landing_note_R19_S2land": "回收面与 `in_flight_agents[13]` **同源同批**写入（PRE-31 双键精确相等定位，两容器的 `status`/`returned_at`/`result`/`landing_tag` 四键取值逐字一致 ⇒ 本段末有牙断言背书）。**详面不复制**（PRE-46③）：口径、时点上下界、`close_agent_returned` 锚点一律只在 `in_flight_agents[13]` 写一版；本条只承载「派单→回收」的闭环状态。随 `R19-landS2partial` 入库（**内容面批** ⇒ 依 PRE-36 / A261 同批追加 `baseline_authoritative.history` 条目并推进权威基线）。编排器**独立复验 GREEN**（43 判据 / 0 FAIL，逐字日志入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`，脚本 `.orch_tmp/orch_vS2p2.py`）。本批**零编排器代工件**：S2 的写权面全在 `src/campaignlab/domain/ingest/**`（4 件全新建），与编排器的守护面/取证件面**不相交**（PRE-5）。**与 S1 的体例差异（如实登记）**：S1 的 landing 批**刻意不写** `close_agent_returned` / `slot_close_confirmed_*`（那次 `close_agent` 排在 push 之后，由 `R19-landS1BF` 回填）；本棒的 `close_agent` **已在本批之前调用且返回已即时落盘**（PRE-43 三步齐备）⇒ 四键**同批写入**，无需再发一批回填。`RESULT: PARTIAL` 的处置面见 `resume.round19_lane_S2_return` 与 `tasks['M1-01'].s2_landing_R19`；未交付 12 项的续派义务见 **FU-70** ＋ `next_actions` ㉒。"
       }
     ],
     "q_verify": {
@@ -16045,7 +16371,36 @@
           "FU-67"
         ],
         "ordering_note": "**硬序**：必须在 S2 的 landing 批**同批**闭合（① 与 ③ 同批，禁拆批）；且**先于** `M2-01/S7` 的 predispatch 批 —— **A293** 已裁定 S7 的 predispatch 批必须**重测 PRE-40**，届时 `api/common.py` 的锁值必须已是本项 ③ 更新后的新值，否则 S7 会把「已授权漂移」误判为「未授权漂移」。",
-        "cost_note": "低复杂度（机械再生名单 ＋ 锁值刷新，无设计裁量、无新算法）⇒ 依手册 §6.3 判 **flash** 档；但**执行主体是编排器自身**（`tests/**` 硬禁面）⇒ **不派 lane**、不计入 flash_share 的 lane 分母（`accounting_rule`：subtask_log 于**回收**时追加）。"
+        "cost_note": "低复杂度（机械再生名单 ＋ 锁值刷新，无设计裁量、无新算法）⇒ 依手册 §6.3 判 **flash** 档；但**执行主体是编排器自身**（`tests/**` 硬禁面）⇒ **不派 lane**、不计入 flash_share 的 lane 分母（`accounting_rule`：subtask_log 于**回收**时追加）。",
+        "status_before_R19_S2land": "OPEN",
+        "rescope_note_R19_S2land": "**本批改挂（保持 OPEN，禁闭合）**：FU-69 的四项义务（① 用 S2 回执 `R-A294` 项的 `only_runtime` 逐字排序清单程序化再生 `tests/unit/test_domain_errors.py:33` 的 `COMMON_ALL_NAMES`；② 复核 `only_pinned` 必须为空；③ 更新 PRE-40 里 `src/campaignlab/api/common.py` 的锁值；④ 冻结索引树重跑四门）的**前提**＝「`api/common.py` 已按 G1 授权**纯追加**」，而该前提因 **§11.2 未交付**（`RESULT: PARTIAL`）而**不成立**。编排器本批实测背书：`only_runtime=[]`、`only_pinned=[]`、`len(common.__all__)` 仍 **80**（uniq 80）、**PRE-40 冻结面 8 件 DRIFT_COUNT=0**（preflight P14 ＋ 独立复验 V5/P20c）⇒ **锁值无需更新**、`api/common.py` 的锁值仍为 `b2908617d193`。**处置**：四项义务整体**改挂到 A300 的棒乙（§11.2）的 landing 批同批闭合**（禁拖批/拆批），并由 **FU-70** 的 `what` 段承载该附加义务。**ordering_note 的硬序不变**：仍必须**先于** `M2-01/S7` 的 predispatch 批（届时 PRE-40 的 `api/common.py` 锁值必须已是更新后的新值，否则 S7 会把「已授权漂移」误判为「未授权漂移」）。**原文一字不改**（D-011），本键为**追加**痕迹。"
+      },
+      {
+        "id": "FU-70",
+        "open": "PENDING",
+        "status": "OPEN",
+        "priority": "P1",
+        "created_at": "2026-11-18T07:50:13+08:00",
+        "owner": "**编排器派单**（两棒各自独立 spawn；棒乙含 `tests/unit/test_domain_errors.py` 的编排器自办面 —— A245/A248）",
+        "what": "**A300 的落地义务：把 M1-01/S2 未交付的 12 项拆两棒续派**（串行，禁并行 —— 关键路径 `slack=0`）。**棒甲** ＝ design §11.1 剩 **7** 件（行为面）：`locate.py`、`digests.py`、`normalize.py`、`validate.py`（N1–N18）、`parse.py`（含 `legacy_mapping_to_source_mapping`，需 legacy 内嵌映射的真实形状）、`api.py`、`infra/files.py`。**棒乙** ＝ §11.2 ＋ §11.3 共 **6** 项（接入面）：`api/common.py` 的 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`、`tests/unit/test_domain_errors.py` 两行钉桩改实取对撞、`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加。**硬约束（本单的立单理由）**：两棒的派单文**只携带自己那一刀的规范面摘录**（**PRE-15** 预抽设计文摘要 ＋ **PRE-19** 检索限定），**禁再整包携带 291 KB** —— 这正是 S2 只能交付 4/13 件的**根因**（U-5 / A300）。**档位裁定**：命中手册 **§6.3** 硬规则者仍**强制 max**，其余按**实测复杂度**定档（写权面件数 / 新建·纯追加件数 / 携带裁定条数 / 预期红条数），**C10 禁为凑 flash 配比降档**。**棒乙的附加义务**：① 派单前**重测 PRE-40** 冻结面 8 件（用届时锁值，禁沿用）；② 其 landing 批**同批**闭合 **FU-69** 的 `COMMON_ALL_NAMES` 程序化再生 ＋ PRE-40 锁值更新 ＋ **A294 授权红**的处置（禁拖批/拆批）。",
+        "source": "**A300**（本批新裁，`resume.round19_adjudications` 末 6 条之一）＋ lane S2 回执的 `[GAPS]` 段（落盘件 `orch_S2_receipt.md`，入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`）＋ 取证索引 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md` §3/§5 ＋ `next_actions` ㉑ 的第 (3) 项",
+        "related": [
+          "A300",
+          "A301",
+          "A295",
+          "A294",
+          "A292",
+          "PRE-15",
+          "PRE-19",
+          "PRE-40",
+          "PRE-48",
+          "FU-66",
+          "FU-67",
+          "FU-69",
+          "C10"
+        ],
+        "ordering_note": "**硬序（`next_actions` ㉒ 为**唯一权威面**；本键初版的序号语义已由 R19-33 订正）**：① **wave-5 predispatch 的**准备面**（按 PRE-15/PRE-19 为棒甲/棒乙各自预抽「自己那一刀」的规范面摘录 ＋ 按实测复杂度定档）—— **其 predispatch 提交与 spawn 一律排在 ② 之后**（棒甲的派单文要逐字引用 design §11.1 的清单，而 A298 正是往该清单补 3 个名字 ⇒ ② 未入库就派棒甲＝按过期规范实现）；② design **§14 追记批**（A297 订正 §4.1 代码块 ＋ A298 补 3 名字进 §11.1 清单 ＋ A299 冻结 `InputTooLarge(detail)` 文案）**三项同批**做 —— **必须最先入库**（否则棒甲按过期 §11.1 清单实现、S6 的 AST 守护假红），且三项同批可避免 PRE-40 里 design 的锁值连续多批漂移；③ M1-01 剩余棒序 **S3→S4→S5→S6→S7→S8**（卡片 `:41-46` 原文**全 flash**）—— **注意**：S6 的负例矩阵依赖面因 S2 只交结构面而**部分缺失**（`validate.py` 未交付）⇒ 派 S6 前**必须重测**依赖是否齐备（禁凭计划表推断）；④ `M2-01/S7` predispatch 排在 ②③ 之后（A293 已裁定其必须重测 PRE-40）。",
+        "cost_note": "**棒甲**：写权面 7 件全新建、零修改既有件、需 legacy 映射真实形状推断 ⇒ 中高复杂度；§11.1 的 N1–N18 校验矩阵含**金额分与口径语义** ⇒ 若命中手册 §6.3 硬规则则**强制 max**，否则按实测复杂度可判 **flash**。**棒乙**：含 `api/common.py` 的 DTO 契约面（PRE-40 冻结件的授权纯追加）＋ 跨层（application/infra/api）接入 ＋ A294 授权红的处置 ⇒ **大概率命中 §6.3 强制 max**。**两棒都必须先按 PRE-15/PRE-19 预抽摘录再定档** —— 规范面从 291 KB 降到各棒自己那一刀后，实际所需档位会显著下降（这正是 A300 拒 B 案的理由④：根因是携带量、不是档位）。"
       }
     ],
     "commit_backfill_round6": {
@@ -21835,19 +22190,19 @@
         "interpreter": "uv run --no-sync python（3.14.10）；系统 python3（3.12.3）禁用于探针（R14-1：会对 PEP 758 假报 SyntaxError）"
       },
       "current": {
-        "head": "9c7fd59",
-        "head_full": "9c7fd5986496364a087c491f0c9c8a2e8e61021c",
-        "head_before": "8a12228",
-        "head_note": "本提交（tag `R19-landS1`）的 sha 在 `mutate_ledger` 执行时**尚不存在** ⇒ 依 PRE-13 第三步 / A183 写哨兵、由下一次提交回填（`resume.commit_backfill_pending_R19_S1land`）。入库前 HEAD = `98426fd`（全 98426fd5da538faa43ea7c412cfc46a313a752a5）。读数 **358/130/852（132 py ＋ 226 md）** 由本提交的**冻结索引树四门**实测背书（`run_commit` 的 `expect_counts` 逐条对账，不符即回滚）。",
-        "ruff_formatted_files": 359,
-        "mypy_source_files": 130,
+        "head": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "head_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "head_before": "5745cb0",
+        "head_note": "本提交（tag `R19-landS2partial`）的 sha 在 `mutate_ledger` 执行时**尚不存在** ⇒ 依 PRE-13 第三步 / A183 写哨兵、由下一次提交回填（`resume.commit_backfill_pending_R19_S2land`）。入库前 HEAD = **5745cb0**（全 `5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af`）。读数 **365/134/852（136 py ＋ 229 md）** 由本提交的**冻结索引树四门**实测背书（`run_commit` 的 `expect_counts` 逐条对账，不符即回滚）。",
+        "ruff_formatted_files": 365,
+        "mypy_source_files": 134,
         "pytest_passed": 852,
-        "in_scope_py": 132,
-        "in_scope_md": 227,
-        "as_of": "2026-11-18T04:20:53+08:00",
-        "commit_tag": "R19-predispatch-wave4-S2",
-        "caliber_note": "**权威基线口径**：以 **sha** 为锚（A261，禁写 tag）；counts 五项由 `run_commit` 的**冻结索引树四门**实测背书（`ruff format --check` 报数 / `mypy` 报数 / 冻结树 pytest passed ＋ GIT_ENV_IGNORES 静态收集 / `h.tracked_in_scope(from_index=True)` 实取的 py·md）。**本批的 sha 是哨兵**（mutate 时尚不存在，PRE-13 第三步 / A183 禁猜测值）⇒ 由下一次纯台账提交回填。上一权威值 ＝ `89b013a`（tag R19-backfill-S5land，counts 341/122/798·124py+217md），其哨兵已在**本批 ① 段**兑现。",
-        "prev_head_carried": "e00159b",
+        "in_scope_py": 136,
+        "in_scope_md": 229,
+        "as_of": "2026-11-18T07:50:13+08:00",
+        "commit_tag": "R19-landS2partial",
+        "caliber_note": "**权威基线口径**：以 **sha** 为锚（A261，禁写 tag）；counts 五项由 `run_commit` 的**冻结索引树四门**实测背书（`ruff format --check` 报数 / `mypy` 报数 / 冻结树 pytest passed ＋ GIT_ENV_IGNORES 静态收集 / `h.tracked_in_scope(from_index=True)` 实取的 py·md）。**本批的 sha 是哨兵**（mutate 时尚不存在，PRE-13 第三步 / A183 禁猜测值）⇒ 由下一次提交回填。上一权威值 ＝ **9c7fd59**（tag `R19-predispatch-wave4-S2`，counts 359/130/852·132py+227md），其 sha 已在 `R19-backfill-wave4pd-spawn` 批兑现、本批 ② 段核销其 pend 键。**本批是内容面批**（+4 py +2 md）⇒ 依 PRE-36 / A261 **必须**追加 history 条目并推进基线。",
+        "prev_head_carried": "9c7fd59",
         "in_flight_note_R18_S4": "**S4 在飞期间的口径提醒（R18-backfill-S4agentid 登记）**：S4（昵称 Wegener）会在 `src/campaignlab/api/rules.py` 新建文件、并修改 `src/campaignlab/api/app.py`（≤3 行）。这两件**未 add 即不入索引** ⇒ **冻结树口径不变**：本键 current 仍是下一棒派单文 §0 的权威基线（325/112/748）。**禁**用在飞工作树的读数覆盖它（D-046 IN_FLIGHT_CONTAMINATION 口径）。另：`rules.py` 落盘后会使工作树的 ruff 分母与 in_scope_py 暂时各 +1，其真实增量在 S4 **入库批**由 run_commit 的冻结树实测计入，禁提前采信。",
         "in_flight_note_R18_S4land": "**当前无在飞 lane**（S4/Wegener 已回传入库、槽位已 close_agent 释放；`budget.dispatched_not_yet_returned` = 0）⇒ 提交后工作树应为**干净**，下一棒（M2-01/S5）派单时可直接以本键 current 为权威基线，无 D-046 在飞污染之虞。",
         "prev_head_carried_note_R19": "本键在 5416990 / b510b33 / cf29fc9 三批里连续为哨兵（陈旧 3 个提交）⇒ R19 批一并核销。取值依据：R18-landS4 批 mutate 时被本键 displacing 的 `current.head` 实测值 = `b510b33`（由 cf29fc9 回填的 R18-predispatch-S4 入库 sha；`git show cf29fc9:orchestrator/state.json` 可复现）。mutate 当时读到的哨兵值 = 'PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT'（如实留档，不改写）。",
@@ -21864,12 +22219,12 @@
         "backfill_note_R19_S5land": "哨兵 → **4050852**（全 40508529f8d11c823cede3e947dd9972022e50d5，tag `R19-resume-S5spawn`）。由本批（tag `R19-landS5`，**入库批**）同批回填 —— 依 `commit_backfill_pending_R19_resumeS5spawn.obligor` 原文：「若下一批是 S5 的**入库批**（带文件改动），则 sha 回填随该批同批做，无需单独发一批」。",
         "at": "2026-11-18T04:20:53+08:00",
         "counts": {
-          "ruff_formatted_files": 359,
-          "mypy_source_files": 130,
+          "ruff_formatted_files": 365,
+          "mypy_source_files": 134,
           "pytest_passed": 852,
-          "in_scope_py": 132,
-          "in_scope_md": 227,
-          "total": 359
+          "in_scope_py": 136,
+          "in_scope_md": 229,
+          "total": 365
         },
         "in_flight_note_R19_S5land": "**当前无在飞 lane**（S5/Sagan 已回传入库；`budget.dispatched_not_yet_returned` = 0）。**如实登记顺序事实**：本批 `mutate` 执行时 `close_agent` 尚未调用（工具调用排在提交成功之后，避免提交失败时槽位已释放而无法重试）⇒ 槽位释放由下一次纯台账提交回填实证。提交后工作树应为**干净**（12 件全部入库、零遗留未跟踪件）⇒ 下一棒（M1-01/S1 或 M2-01/S6）派单时可直接以本键 current 为权威基线，无 D-046 在飞污染之虞。",
         "backfilled_at_R19_S5landBF": "2026-11-17T00:58:57+08:00",
@@ -21975,7 +22330,22 @@
         "head_sentinel_note_R19_wave4pd": "**PRE-46 第 ① 款**：入库批推进权威基线时，`current.head`/`.head_full` **必须**写哨兵（本提交自身 sha 尚不存在），且该哨兵**必须**同批登记到 `commit_backfill_pending_R19_wave4pd.sites_expected_after_mut`（由本段 mut 的**末断言实测集合回写**，禁手打 —— PRE-37 第 1 款）。",
         "head_backfill_note_R19_wave4pd_spawn": "回填（`R19-backfill-wave4pd-spawn`，2026-11-18T05:15:44+08:00）：`current.head`/`.head_full` 两处哨兵兑现为 **9c7fd59**（全 `9c7fd5986496364a087c491f0c9c8a2e8e61021c`）＝ tag `R19-predispatch-wave4-S2` 的入库提交，由 `git rev-parse` **程序化派生**（PRE-37 第 1 款，禁手打）。**PRE-46 第 ④ 款**：本描述性键**不复述**哨兵原串。**纯台账批 ⇒ 不推进权威基线**（PRE-36 / A261：判据＝是否改动内容面；本批 `ADD=[]` 零文件改动）⇒ `counts` 五项、`as_of`、`commit_tag`、`head_before`（8a12228）一律**逐字不动**，且**不追加** `history` 条目（仍 30 条）。",
         "backfilled_at_R19_wave4pd_spawn": "2026-11-18T05:15:44+08:00",
-        "in_flight_note_R19_wave4pd_spawn": "**当前 1 条在飞 lane**：(`S2`,`M1-01`) / 昵称 **Epicurus** / `agent_id` 真值源＝`.orch_tmp/orch_S2_spawnret.txt`（PRE-43 落盘件）/ 档位 **qwen3.8-max** `high`（卡片 `orchestrator/tasks/M1-01.md:40` 原文冻结，命中手册 §6.3 强制 max 硬规则）。**D-046 在飞污染口径**：该棒正在工作树内新建/纯追加（写权面 17 项前缀，见 `resume.in_flight_agents[13].write_set`），其未 `git add` 的件**不入索引** ⇒ **冻结树口径不变**：本键 `current`（9c7fd59 / counts 359/130/852）仍是下一棒派单文 §0 的**权威基线**，禁用工作树读数覆盖。`budget.dispatched_not_yet_returned` **维持 1**（R15 口径：回执＋终裁＋入库三者齐备才关账，到 S2 的 landing 批才归零）。"
+        "in_flight_note_R19_wave4pd_spawn": "**当前 1 条在飞 lane**：(`S2`,`M1-01`) / 昵称 **Epicurus** / `agent_id` 真值源＝`.orch_tmp/orch_S2_spawnret.txt`（PRE-43 落盘件）/ 档位 **qwen3.8-max** `high`（卡片 `orchestrator/tasks/M1-01.md:40` 原文冻结，命中手册 §6.3 强制 max 硬规则）。**D-046 在飞污染口径**：该棒正在工作树内新建/纯追加（写权面 17 项前缀，见 `resume.in_flight_agents[13].write_set`），其未 `git add` 的件**不入索引** ⇒ **冻结树口径不变**：本键 `current`（9c7fd59 / counts 359/130/852）仍是下一棒派单文 §0 的**权威基线**，禁用工作树读数覆盖。`budget.dispatched_not_yet_returned` **维持 1**（R15 口径：回执＋终裁＋入库三者齐备才关账，到 S2 的 landing 批才归零）。",
+        "flat_fields_previous_values_R19_S2land": {
+          "ruff_formatted_files": 359,
+          "mypy_source_files": 130,
+          "pytest_passed": 852,
+          "in_scope_py": 132,
+          "in_scope_md": 227
+        },
+        "flat_fields_previous_as_of_R19_S2land": "2026-11-18T04:20:53+08:00",
+        "head_backfill_previous_R19_S2land": "**描述性留痕（PRE-46④：禁存哨兵原值）**：被本批 displacing 的 `current.head` 实测值 = **9c7fd59**（全 `9c7fd5986496364a087c491f0c9c8a2e8e61021c`），tag `R19-predispatch-wave4-S2`。该值是**真 sha、非哨兵**（已由 `R19-backfill-wave4pd-spawn` 回填），故此处按 D-011 如实留档。语义＝「上一权威 HEAD」。",
+        "prev_head_carried_note_R19_S2land": "本键原值 `9c7fd59`（＝上一个**内容面**批 `R19-predispatch-wave4-S2` 的入库 sha）被本批 displacing；如实留档不改写（D-011）。**注意口径（R19-32c 的实测订正）**：中间那一批 `R19-backfill-wave4pd-spawn`（5745cb0）是**纯台账批**，依 PRE-36 / A261 **不推进**权威基线、**不**追加 history 条目 ⇒ 本键承接的是 `9c7fd59` 而非 `5745cb0`。",
+        "head_note_pre_R19_S2land": "本提交（tag `R19-landS1`）的 sha 在 `mutate_ledger` 执行时**尚不存在** ⇒ 依 PRE-13 第三步 / A183 写哨兵、由下一次提交回填（`resume.commit_backfill_pending_R19_S1land`）。入库前 HEAD = `98426fd`（全 98426fd5da538faa43ea7c412cfc46a313a752a5）。读数 **358/130/852（132 py ＋ 226 md）** 由本提交的**冻结索引树四门**实测背书（`run_commit` 的 `expect_counts` 逐条对账，不符即回滚）。",
+        "head_before_note_R19_S2land": "语义＝「`current.head` 所指提交的 **git 父提交**」。本批 `current.head` 指本提交自身（mut 时尚不存在 ⇒ 哨兵），其 git 父提交实测 = **5745cb0**（`git rev-parse --short HEAD`，禁凭记忆）。与 `prev_head_carried`（语义＝上一权威 HEAD = 9c7fd59）**取值不同、语义位点不同** ⇒ 分设两键并各自断言，禁合并（R19-12/13/14 的机器化 prevention）。",
+        "head_sentinel_note_R19_S2land": "**PRE-46① / PRE-13 第三步 / A183**：本批（tag `R19-landS2partial`）自身的 sha 在 `mutate_ledger` 执行时**尚不存在** ⇒ `head`/`head_full` 一律写哨兵，由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`）。**PRE-46④**：本键**不复述**哨兵原串。",
+        "flat_fields_reconciled_note_R19_S2land": "**第三处镜像同批核对（R19-11 fix ①）**：`current.counts` 五键 ＋ `total` 与**扁平五键**（`ruff_formatted_files`/`mypy_source_files`/`pytest_passed`/`in_scope_py`/`in_scope_md`）均由**同一** `COUNTS` 常量派生写入，并当场断言逐项相等（365/134/852·136py+229md）⇒ 三处镜像（counts top-level / composition / baseline current）同源零手抄。",
+        "in_flight_note_R19_S2land": "**本批入库后无在飞 lane**：S2（Epicurus / `01a1eb34-3545-7a30-886d-b03d3f36165e`）已回传 **PARTIAL**、槽位已 `close_agent` 释放（落盘件 `.orch_tmp/orch_S2_close_agentret.txt`，`returned_status=completed`），`budget.dispatched_not_yet_returned` 本批 1→**0**。⇒ 提交后工作树应为**干净**（`run_commit` 的 A144(c) `untracked_owner_map` 传**空映射**，任何残留未跟踪 in-scope 件都会判「越界」而拒绝提交 —— 这正是在飞污染防护的**收紧**形态）。下一棒（FU-70 的棒甲/棒乙）派单时可直接以本键 `current` 为权威基线。**PRE-40 提醒**：派单前必须**重测**冻结面 8 件 sha（本批 preflight P14 实测 DRIFT_COUNT=0，锁值**未更新** —— 因 §11.2 未交付、`api/common.py` 零漂移；FU-69 的锁值更新义务随之**改挂**到棒乙的 landing 批）。"
       },
       "history": [
         {
@@ -22559,6 +22929,23 @@
           "note": "**内容面批 ⇒ 必须追加 history 条目并推进权威基线**（PRE-36 / A261：判据＝是否改动内容面）。本批入库 **1 件新 .md**（派单文 `orchestrator/handoff/R19-lane-M1-01-S2.md`）⇒ counts 由 **358/130/852(132py+226md)** 变为 **359/130/852(132py+227md)**（`in_scope_py`/`mypy`/`pytest` 三项**不变**：本批零 `.py`）。本提交自身 sha 在 `mutate_ledger` 时**尚不存在** ⇒ `head`/`head_full` 与 `counts_snapshot.head`/`.head_full` **四处一律写哨兵**（PRE-13 第三步 / A183 禁猜测值），由 **spawn 之后的纯台账批**回填（`resume.commit_backfill_pending_R19_wave4pd`）。**四门背书**：`run_commit` 在**冻结索引树**上重跑四门并与 `expect_counts` 逐条对账，不符即回滚。",
           "backfilled_at_R19_wave4pd_spawn": "2026-11-18T05:15:44+08:00",
           "backfill_note_R19_wave4pd_spawn": "回填（`R19-backfill-wave4pd-spawn`，2026-11-18T05:15:44+08:00）：本条目的 4 处 sha 哨兵（`head` / `head_full` / `counts_snapshot.head` / `counts_snapshot.head_full`）一律兑现为 **9c7fd59**（全 `9c7fd5986496364a087c491f0c9c8a2e8e61021c`）。`counts_snapshot` 的**五项读数不改**（359/130/852·132py+227md 由该提交自身的**冻结索引树四门**背书）。**PRE-46 第 ④ 款**：本键不复述哨兵原串。体例镜像 `history[24]` 的 `backfilled_at_R19_wave3pd_spawn` 双痕迹键。"
+        },
+        {
+          "head": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+          "head_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+          "commit_tag": "R19-landS2partial",
+          "at": "2026-11-18T07:50:13+08:00",
+          "counts_snapshot": {
+            "ruff_formatted_files": 365,
+            "mypy_source_files": 134,
+            "pytest_passed": 852,
+            "in_scope_py": 136,
+            "in_scope_md": 229,
+            "total": 365,
+            "head": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+            "head_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT"
+          },
+          "note": "**内容面批 ⇒ 必须追加 history 条目并推进权威基线**（PRE-36 / A261：判据＝是否改动内容面）。本批入库 **4 件新 `.py`** ＋ **2 件新 in-scope `.md`** ＋ **1 件 `.log`**（入库但不入 ruff 分母）⇒ counts 由 **359/130/852(132py+227md)** 变为 **365/134/852(136py+229md)**。本提交自身 sha 在 `mutate_ledger` 时**尚不存在** ⇒ `head`/`head_full` 与 `counts_snapshot.head`/`.head_full` **四处一律写哨兵**（PRE-13 第三步 / A183 禁猜测值），由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`）。**四门背书**：`run_commit` 在**冻结索引树**上重跑四门并与 `expect_counts` 逐条对账，不符即回滚。**交付性质**：lane S2 回传 `RESULT: PARTIAL` —— design §11.1 的**结构面 4 件**入库，**12 项未交付**（§11.1 剩 7 ＋ §11.2 全部 ＋ §11.3 全部）⇒ 拆两棒续派（**FU-70** / 裁定 **A300**）。"
         }
       ],
       "current_previous_R19_wave4pd": {
@@ -26407,9 +26794,167 @@
           "R19-29",
           "FU-62"
         ],
+        "commit": "5745cb0",
+        "commit_full": "5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af",
+        "commit_note": "本条在 `mut()` 执行时点**拿不到本提交 sha**（先写台账后 commit）⇒ 依 **PRE-13 第三步 / A183** 写哨兵、由**下一次提交**回填真值（`resume.commit_backfill_pending_R19_wave4pd_spawnBF`）。**PRE-46 第 ④ 款**：本键**不复述**哨兵原串。回填体例沿 `[26]`（R19-27，由 `R19-backfill-A292O8BF2` 回填）、`[27]`（R19-28，由 `R19-predispatch-wave4-S2` 回填）与 `[28]`（R19-29，由**本批**回填）。 || 回填（`R19-landS2partial`，2026-11-18T07:50:13+08:00）：sha = **5745cb0**（全 `5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af`），＝ tag `R19-backfill-wave4pd-spawn` 的入库提交；该批的入库前 HEAD = `9c7fd59`（全 `9c7fd5986496364a087c491f0c9c8a2e8e61021c`，已用 `git rev-parse 5745cb0^` 同源断言，禁凭记忆）。",
+        "commit_backfilled_at": "2026-11-18T07:50:13+08:00",
+        "commit_backfilled_by_tag": "R19-landS2partial",
+        "commit_note_backfill_R19_S2land": "沿 `[26]`/`[27]`/`[28]` 的既有回填体例：`commit`/`commit_full` 兑现为真 sha，`commit_note` **只在尾部延长**（A214 窄豁免，D-011 append-only），并补 `commit_backfilled_at` / `commit_backfilled_by_tag` / `commit_note_backfill_R19_S2land` 三痕迹键（18 键 → **21** 键）。**PRE-46④**：本键与 `backfill_note` 一律**不复述**哨兵原串，只指向机器可读位点。"
+      },
+      {
+        "id": "R19-31",
+        "round": 19,
+        "severity": "P1",
+        "rule_violated": "**PRE-44**（判据同口径 ＋ 阴阳性对照）第 **11** 次同族复发 · **PRE-45③**（批级冻结探针的期望值随边界推进必然过期 ⇒ 复跑判红必须先做同口径归因）· **PRE-46③**（同一事实禁两处各写一版）· **A183**（禁猜测值，**文档面**同族形态）· **PRE-29**（禁采信自报）",
+        "discovered_at": "本批 preflight 之前（编排器**未采信**交接摘要的「34 PASS / 0 FAIL」结论、而是**重跑**复验脚本实测时）",
+        "discovery_caliber": "**实测口径**：重跑 `.orch_tmp/orch_vS2p.py`（v1）并逐行解析其日志；再对 v1 日志做 `grep -c '^FAIL'` / `grep -c '^PASS '` 双口径对撞。**禁**沿用交接摘要的结论（PRE-29 在**编排器自身**产出面上的同族适用）。",
+        "fact": "S2 的**独立复验面**（v1 脚本 `orch_vS2p.py` ＋ 其日志，已由 `orch_s2l_ev.py` 归档为 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`）存在 **5 处判据缺陷 ＋ 取证件 1 处事实错误**：(a) 汇总行 `独立复验判据条数` 写成 `len(fails) + sum(1 for _ in ())`，**恒为 0** —— PASS 从未累加；(b) 缺 `JUDGES: n PASS: n FAIL: n` 与 `VERIFY RESULT: GREEN|RED` 两行 ⇒ 台账 `verdict_source` 要求的**文本双判**无锚点；(c) 汇总行以 `FAILS:` 开头 ⇒ 任何 `grep -c '^FAIL'` 口径都会把它**自身**数成 1 条 FAIL（假阳性）；(d) **零对照** ⇒ 违反 PRE-44⑤（判据无从自证有牙、亦无从自证不恒红）；(e) `V3`/`V3c` 的期望值派生于「**编排器自办取证件尚未落盘**」的时点 ⇒ 复跑必然判红；(f) 取证索引 §6 写「`close_agent` 在**本批** push 成功之后才调用」，而**实测时点**是上一批 `R19-backfill-wave4pd-spawn` 入库之后、本 content-face 批之前 ⇒ **把计划写成事实**。",
+        "measured": "(a) v1 日志实测 `PASS ` 前缀行 **34** 条，而汇总行逐字为 `独立复验判据条数：0 ｜ FAIL 0`（preflight **P21e** 机器断言）；(b) `grep -n 'JUDGES\\|VERIFY RESULT'` 于 v1 日志**零命中**；(c) `grep -c '^FAIL'` = **1** 而真实 FAIL = **0**（P21e 实测）；(d) v1 日志**无任何** `PC-*`/`NC-*` 条目；(e) 修好 (a)-(d) 后的 **v2-run1** 实测 **RED 38/40**，2 条 FAIL **全为** V3 族（`V3 porcelain 唯一命中` ＋ `V3c 硬禁面 evidence/ porcelain 为空`），其命中项的**唯一**内容＝编排器自己的取证目录（留档 `.orch_tmp/orch_vS2p2_run1_stale.log`，preflight **P21f** 机器断言）；(f) 落盘件 mtime 实测：`orch_S2_close_agentret.txt` = **05:20:30**，晚于 `orch_bfw4_commit.log` 的 **05:18:56**、早于取证目录生成的 **05:28**（preflight P28b 断言取证索引已含订正句与该 mtime）。",
+        "root_cause": "**(a)-(d) 同族根因**：复验脚本是**一次性手写**的，汇总面与对照面**没有模板约束** —— 既有体例（`round19_lane_S1_postverify_independent`）明确要求 `JUDGES/PASS/FAIL` 三行 ＋ `VERIFY RESULT` ＋ 阴阳性对照，但**没有机器判据**强制新写的复验脚本遵守 ⇒ 手写时漏项无人拦截。**(a) 的直接根因**是一处**恒零表达式**（`sum(1 for _ in ())` 对空元组求和），属笔误级，但因**缺对照**（NC-B 型自证）而**静默通过**了一整个回合。**(e) 根因**＝批级探针的期望值**冻结在写作时点**，而编排器自己的取证件在其后才落盘（PRE-45③ 的教科书形态）。**(f) 根因**＝取证索引由生成器一次性写就，其中「执行顺序」句是**按计划**而非**按落盘件 mtime** 生成 ⇒ A183 在文档面的同族形态。",
+        "fix": "**同批全部修好**：v1 原件留档 `.orch_tmp/orch_vS2p_v1_defective.{py,log}`、v2-run1 留档 `.orch_tmp/orch_vS2p2_run1_stale.{py,log}`（**均只在暂存区、不入库**；权威面以入仓的 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log` 为准 —— PRE-46③）。修订版 `.orch_tmp/orch_vS2p2.py`（**340L/18904B/9101cf05179c**）：(a) 引入 `N_PASS`/`N_FAIL` 全局计数器；(b) 补齐 `JUDGES: 43 PASS: 43 FAIL: 0` 与 `VERIFY RESULT: GREEN` 两行；(c) 汇总键改名 `FAILED_ITEMS:`（实测 `grep -c '^FAIL '` = **0**）；(d) 新增 **5 阳 3 阴**对照（PC-A face 篡改 / PC-B 注入 BOM / PC-C `common_all` 80→81 / PC-D 字段序反转 / PC-E 取证目录**之外**的 `evidence/` 命中；NC-A 未篡改时四谓词全通过 / NC-B **判据计数器自证** / NC-C 空命中时硬禁面谓词通过）；(e) 按 **PRE-45③** 做同口径归因后重派生 V3 族为「**显式允许集** ＋ 允许集之外零命中」，并新增 **V3d**（断言被排除项**恰 1 条且全在**取证目录内 ⇒ 排除面不过宽）；(f) 取证索引 §6 订正为实测时点 ＋ 如实登记顺序瑕疵与其**缓解事实**（回执已双落盘并字节级入仓 ⇒ 零信息损失）。**终判 GREEN 43/43**。",
+        "impact": "**若不修的实际影响**：(a)(b) ⇒ 台账 `verdict_source` 会引用一个**不存在**的文本锚点，续跑方无法用文本双判复核 GREEN，只能采信散文结论（违反 PRE-29）；(c) ⇒ 任何用 `grep -c '^FAIL'` 的自动化都会把**全绿**批判成**有 1 条 FAIL**，在无人值守长程里会造成**误停**或**误回滚**；(d) ⇒ 判据可能恒真（假绿）而无人知晓 —— 这是无人值守长程里最危险的**静默腐化**形态；(e) ⇒ 复跑恒红会让续跑方误判为**完整性缺口**从而重做已完成的验收；(f) ⇒ 取证面记载了**未发生**的执行顺序，一旦事后追责「槽位释放 vs 交付入库」的先后，该件会给出**错误证词**。",
+        "prevention": "**机器化 prevention**：① 复验脚本的汇总面与对照面**必须由模板生成**，禁一次性手写 —— 模板须内含 `N_PASS`/`N_FAIL` 计数器、`JUDGES:`/`VERIFY RESULT:` 两行、`FAILED_ITEMS:`（**禁以 `FAIL` 开头**的键名）、以及 ≥1 条「计数器自证」型阴性对照（NC-B 形态）；② **PRE-48③**（本批新立）：取证件里凡描述「执行顺序/时点」的句子，必须由落盘件 mtime 或台账时间戳**程序化背书**；③ 批级探针的期望值随边界推进必然过期 ⇒ 复跑判红**一律**先做同口径归因（PRE-45③），归因结论必须落盘留档（本批的 `run1_stale` 两件即此）；④ 归口 **FU-62**（把「判据期望值必须由同口径测量函数程序化派生」＋「汇总面模板化」机器化）。",
+        "related": [
+          "PRE-44",
+          "PRE-45",
+          "PRE-46",
+          "PRE-29",
+          "PRE-48",
+          "A183",
+          "A159",
+          "C10",
+          "FU-62",
+          "A296",
+          "A301"
+        ],
+        "owner": "编排器（自纠，禁委 lane）",
+        "at": "2026-11-18T07:50:13+08:00",
         "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
         "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
-        "commit_note": "本条在 `mut()` 执行时点**拿不到本提交 sha**（先写台账后 commit）⇒ 依 **PRE-13 第三步 / A183** 写哨兵、由**下一次提交**回填真值（`resume.commit_backfill_pending_R19_wave4pd_spawnBF`）。**PRE-46 第 ④ 款**：本键**不复述**哨兵原串。回填体例沿 `[26]`（R19-27，由 `R19-backfill-A292O8BF2` 回填）、`[27]`（R19-28，由 `R19-predispatch-wave4-S2` 回填）与 `[28]`（R19-29，由**本批**回填）。"
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。"
+      },
+      {
+        "id": "R19-32",
+        "round": 19,
+        "severity": "P2",
+        "rule_violated": "**PRE-44**（判据同口径 ＋ 阴阳性对照）同族第 **12** 次复发 · **PRE-37**（期望值程序化派生，禁手打/禁凭记忆）· **PRE-36 / A261**（权威基线推进的判据＝是否改动内容面）· **PRE-46④**（描述性键禁存哨兵原值；同族：禁自指）",
+        "discovered_at": "本批 preflight **第 1 次实跑**（`--preflight-only`）当场判红 ⇒ 实测 **68 PASS / 6 FAIL**",
+        "discovery_caliber": "**实测口径**：`bash run_pf.sh` 的日志 `.orch_tmp/orch_s2l_pf.log` 逐行解析（`grep -c '^FAIL '` = 6），并对每条 FAIL 打印其 `extra` 实测面后逐条归因。**禁**靠人工核对。",
+        "fact": "本批 preflight **初版**有 **5 处判据缺陷**（外加 1 处由编排器自己的补丁引入的交付件缺陷）：(a) **P13** 的 `enc4()` 在**原始字节**上扫 C0/C1（`0x7F..0x9F`）⇒ UTF-8 多字节序列里每个汉字的**后续字节**都落在 `0x80..0xBF`，正常中文被全判成 C1 控制符；(b) **P15b/P16b** 断言「同 lane 异 task 的干扰条 >= 1」；(c) **P27/P27c** 假设 `baseline_authoritative.current.head` == 本批入库前 HEAD（`5745cb0`）；(d) **P28** 要求取证索引含**它自己的** sha256；(e) 编排器给取证索引打补丁时**丢/多了尾换行**（实测 `endnl=False`，因文件尾为 `\\n\\n`）；(f) 另有 **2 条判据写成无牙形态**（`... or True`），在合片前自查时发现并同批改为真断言。",
+        "measured": "(a) 初版实测 `__init__.py` 报 `c0c1=[128,130,132,133,134,136,137,142,143,154,155,159]` 共 **12** 个假命中（该件仅 73 B、内容为 1 行中文 docstring）；(b) 实测 `exact=[]`（**精确** lane 干扰条为 **0**：历史 S2 行的 `lane` 字面量是 `S2b-1`/`S2b-2`，**不等于** `S2`），而 `prefix`（`S2*`）干扰条 **>= 1**；(c) 实测 `current.head` = **`9c7fd59`**、`commit_tag` = `R19-predispatch-wave4-S2`；(d) 逻辑上不可能（文件无法含自身 sha）；(e) 实测 `before: B=15704 endnl=True enddbl=True` ⇒ 修为 `L=117 B=15703 sha12=bab326b8f075 endnl=True`，修后 `ruff format --check` 仍绿；(f) 实测 `grep -c 'or True' orch_s2l_p2.py` 修订后 = **0**。**终判**：修好后 preflight **GREEN 74/74**（`.orch_tmp/orch_s2l_pf.log`）。",
+        "root_cause": "**(a)** 混淆了「**字节**面的 C1」与「**码点**面的 C1」—— UTF-8 是变长编码，C1 控制符（U+0080..U+009F）只能在**解码后**判定；**(b)** 沿用了 `dispatch_log[20].mapping_verified_by` 里的**干扰条数目说法**，而该说法**正是 R19-30 的缺陷①**（已裁定为不实）⇒ 属「凭记忆/凭旧散文」而非实测（PRE-37 第 1 款）；**(c)** 忘了 PRE-36/A261 的判据是「是否改动**内容面**」—— 上一批是**纯台账批**，本就**不推进**权威基线；**(d)** 自指要求（同 PRE-46④ 的思维定式：以为「留痕就要写 sha」）；**(e)** 补丁的替换文本未保留原文件的尾换行形态；**(f)** 为图快把「暂不确定期望值」的判据先写成恒真占位 —— 这正是 PRE-44 所禁的**无牙判据**。",
+        "fix": "**同批全部修好**（补丁 `.orch_tmp/patch_p2.py` / `patch_p2b.py`，均留档）：(a) `enc4()` 改为先 `decode('utf-8')` 再在**码点**上扫 C0/C1（`ord(c) < 0x20 and c not in '\\t\\n\\r'` 或 `0x7F <= ord(c) <= 0x9F`）；(b) 同口径重派生为「**精确** lane 干扰条 == 0（如实）**且** **前缀** `S2*` 干扰条 >= 1」—— 后者才是「单键定位不安全」的**真实**机器依据（`startswith` 型匹配会错条），并在判据正文里点名 R19-30 缺陷① 以断绝再次沿用；(c) 改为断言 `current.head == '9c7fd59'` ＋ `commit_tag == 'R19-predispatch-wave4-S2'`，并把「纯台账批不推进基线」写进判据正文；(d) 去掉自指要求，改为断言索引含 v2 的实测面（`JUDGES: 43 PASS: 43 FAIL: 0` / `VERIFY RESULT: GREEN` / `R19-31` / 脚本与日志的新 sha12 / `5 阳 3 阴`）；(e) 规范化尾换行为**恰一个** `\\n` 并复验 `ruff format --check` 绿；(f) 两条 `or True` 改为真断言（P24d 改为「41 键模板含本批必需的 13 个结构键」、P28 改为真 `all(...)`）。",
+        "impact": "**若不修的实际影响**：(a) 会让**任何含中文的交付件**判红 ⇒ 本仓几乎所有取证件都无法入库（或被迫放宽判据 ⇒ 假绿）；(b) 会让「双键定位」的**理由**站不住，续跑方可能改回单键定位从而错条；(c) 会导致 ③ 段**先断言旧值**断言失败（`assert OLD_HEAD == '9c7fd59'`）或更糟 —— 若把断言写宽，会把权威基线**静默错位一个提交**；(d) 恒红、无法闭合；(e) 交付件尾换行不合规会被 `run_commit` 的文本卫生步骤**改写**，导致台账记录的 face 与入库件不一致；(f) 无牙判据在无人值守长程里＝**假绿**，是最危险的静默腐化。",
+        "prevention": "**机器化 prevention**：① 编码判据**必须**在解码后的码点上做（把 `enc4()` 收进 `scripts/orch_harness.py` 或复验模板，禁每批重写）；② **凡引用既有台账散文里的数目/事实，一律先实测对撞**，且若该说法曾被裁定为缺陷（如 R19-30①）则**必须在判据正文点名**以断绝再次沿用；③ 权威基线类判据必须**从台账实读**旧值再断言，禁按「上一批的 sha」推断（PRE-36 的判据是**内容面**，不是**提交序号**）；④ **禁自指断言**（文件不可能含自身 sha）；⑤ 补丁类脚本改完交付件后**必须**复跑编码四判据 ＋ `ruff format --check`；⑥ **禁 `or True` 型占位判据** —— 合片前固定 `grep -c 'or True'` 必须为 **0**（本批已执行）。归口 **FU-62**。",
+        "related": [
+          "PRE-44",
+          "PRE-37",
+          "PRE-36",
+          "PRE-46",
+          "A261",
+          "A183",
+          "R19-30",
+          "R19-31",
+          "FU-62",
+          "C10"
+        ],
+        "owner": "编排器（自纠，禁委 lane）",
+        "at": "2026-11-18T07:50:13+08:00",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。"
+      },
+      {
+        "id": "R19-33",
+        "round": 19,
+        "severity": "P2",
+        "rule_violated": "**PRE-46③**（同一事实禁两处各写一版）· **PRE-46②**（承诺面必须与 `mut()` 实现面同语义）· **D-011**（append-only 的前提＝入库前先把节点写对）",
+        "discovered_at": "编写 `orch_s2l_p5b.py`（⑪ 段 `next_actions` ㉒）时做**合片前跨节点对撞**当场发现",
+        "discovery_caliber": "**实测口径**：`grep -n` 逐字取出 `orch_s2l_p4b.py` 的 `FU-70.ordering_note` 与 `orch_s2l_p5a.py` 的 `remaining_sequence_R19_post_R19_S2land` 两处**原文**对撞（禁凭记忆）",
+        "fact": "本批驱动**内部**对同一件事实（design §14 追记批 与 棒甲 predispatch 的先后）写了**两个互相矛盾的硬序**：① `FU-70.ordering_note` 原文「**硬序（`next_actions` ㉒）**：① wave-5 predispatch（棒甲 → 棒乙，串行）**排在最前**；② design §14 追记批…」⇒ 主张**棒甲先**；② `remaining_sequence_R19_post_R19_S2land` 的第 **2** 项原文「design §14 追记批…**必须排在棒甲/S6 派单之前**（否则 S6 的 AST 守护假红）」⇒ 主张**§14 先**，而该项在**有序**列表里却排在棒甲（第 1 项）**之后**，与自身正文自相矛盾。",
+        "measured": "实测：两处原文逐字取出对撞，对「§14 vs 棒甲」的先后给出**相反**结论；`remaining_sequence` 是**键名即语义**的有序面（`sequence`），其序与自身正文冲突。**另实测**：p4b 与 p5a **各自独立**交叉引用「`next_actions` ㉒ 的第 ② 项」＝design §14 追记批 ⇒ ㉒ 的 ② 号位已被两处钉死、**不可改派**（改派会让两处交叉引用同时失真）。",
+        "root_cause": "写 ⑤⑥ 段（裁定/立规/新单）与 ⑨ 段（任务面）时**分头**引用了同一件排序事实，各自按当时的局部理解措辞，**没有在合片前做跨节点对撞** —— 与 **R19-23**（MSG 承诺面 vs `mut()` 实现面分叉）**同族**，只是分叉面从「MSG vs mut」变成「台账节点 vs 台账节点」。",
+        "fix": "**同批全部修好、零副作用**（发现于任何 `git add` / 台账落盘 / HEAD 变动之前；补丁 `.orch_tmp/patch_p5b_prep.py` 留档可回放）：**(a)** 订正 `FU-70.ordering_note` —— ① 收窄为「wave-5 predispatch 的**准备面**（预抽摘录 ＋ 定档）」并显式写明「其 predispatch 提交与 spawn **一律排在 ② 之后**」，② 补「**必须最先入库**」及其技术理由；①②③④ 的**号位一律不变**（p4b/p5a 两处交叉引用「㉒ 的第 ② 项」仍然成立）。**(b)** `remaining_sequence_R19_post_R19_S2land` 的**有序面**在 `mut()` 内规范化：先有牙断言改前序为「棒甲、design §14」，再交换第 1/2 项，并追加 `remaining_sequence_order_fix_note_R19_S2land` 留痕（禁改段文件里的列表字面量 ⇒ 改为运行时规范化 ＋ 断言，可回放）。**(c)** `next_actions` ㉒ 写成**唯一权威硬序面**并在正文点名本条 R19-33。",
+        "impact": "**若不修的实际影响**：长程无人值守的续跑方会以 `ordering_note`（主张棒甲先）为准 ⇒ 在 design §14 追记批**未入库**时就派棒甲，棒甲按**过期**的 §11.1 清单实现（缺 `MappingLayout`/`SourceMoneyUnit`/`DedupMode` 三个名字、`Finding` 字段序错）⇒ 交付件与契约不符、S6 的 AST 守护**假红**；更糟的是两处矛盾会让续跑方**无法判断哪个是权威**，只能停下来问人 —— 直接违反「无人值守」前提。",
+        "prevention": "**机器化 prevention**：① 凡**同一排序/优先级事实**出现在两个及以上台账节点时，一律指定**唯一权威面**（本例＝`next_actions` 末条 ㉒），其余节点只写「见 ㉒」而**禁复述序**（PRE-46③ 的排序专用款）；② **合片前固定跑一次跨节点对撞** —— 把所有 `ordering_note` / `*sequence*` / `next_actions` 末条抽出，两两比对「同一对事件的先后主张」，出现相反结论即判红（归口 **FU-62** 机器化）；③ 键名含 `sequence`/`order` 的**有序面**，其**序**必须与自身正文的先后主张一致，写入后立即断言（禁只断言长度）。",
+        "related": [
+          "PRE-46",
+          "D-011",
+          "R19-23",
+          "R19-30",
+          "R19-32",
+          "A297",
+          "A298",
+          "A299",
+          "A300",
+          "FU-62",
+          "FU-70",
+          "C10"
+        ],
+        "owner": "编排器（自纠，禁委 lane）",
+        "at": "2026-11-18T07:50:13+08:00",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。"
+      },
+      {
+        "id": "R19-34",
+        "round": 19,
+        "severity": "P2",
+        "rule_violated": "**PRE-44**（判据必须有牙；禁 `or True` 型占位）· **R19-32(f) 的清查作用域过窄** · **PRE-44 第 ①/② 款**（同口径 —— 本次错在**作用域**而非取值口径）",
+        "discovered_at": "**合片后**（p1+p2+p3+p4a+p4b+p5a+p5b → `orch_s2l.full.py`）首次跑 **AST 精确门**时当场发现",
+        "discovery_caliber": "**实测口径**：`ast.walk` 扫全文件里 `BoolOp(Or)` 且某操作数为 `Constant(True)` 的节点（**禁** `grep` 文本匹配 —— 文本匹配既会漏（跨行拼接的字符串）也会误报（散文里的「`or True`」字样，实测本文件散文命中 7 处））；作用域**固定为合片后的全文件**，禁按段文件分别扫。",
+        "fact": "**R19-32 的 fix ⑥** 声称「合片前固定 `grep -c 'or True'` 必须为 **0**（本批已执行）」，但那次 `grep` 的**作用域只有 `orch_s2l_p2.py` 一个段文件**；本批驱动实际由 **7 个段文件**拼成 ⇒ 清查口径过窄。合片后用 AST 门扫**全文件**，实测 `orch_s2l_p3.py` 的 `sec2_fulfil` 里仍残留 **1 条** `assert OLDP[\"parent\"] == \"9c7fd59\" or True`（附注释「语义见下断言」）⇒ 该判据**恒真、无牙**。",
+        "measured": "AST 门实测：`or_True_code=[723]`（合片后全文件的**唯一**命中；行号 723 落在 p3 的 `sec2_fulfil` 段内）；修好后复扫 = `[]`。另**实测**该 `or True` 的左操作数本身为真（台账实读 `commit_backfill_pending_R19_wave4pd_spawnBF.parent` == `9c7fd59`）⇒ 去掉 `or True` 后判据成立且**有牙**（篡改 `parent` 即判红）。**零副作用**：发现于 preflight 之前，未 stage、未改台账、HEAD 未动（仍 `5745cb0`）。",
+        "root_cause": "① 写 `sec2_fulfil` 时把「真断言在下一行」当成了「本行可先占位」的理由 —— 正是 R19-32(f) 所禁的**无牙占位**思维定式；② R19-32 的 fix ⑥ 把清查动作写成「grep 某个段文件」而**没有绑定到合片后的全文件** ⇒ 门的**作用域**与被保护对象的**作用域**不一致（PRE-44「同口径」的又一次违反，只是这次错在**作用域**而不是**取值口径**）。",
+        "fix": "**同批全部修好**（补丁 `.orch_tmp/patch_p5b_r34.py` ＋ AST 门 `.orch_tmp/orch_astgate.py`，均留档）：① p3 该条改为真断言 `assert OLDP[\"parent\"] == \"9c7fd59\"`（保留其后的 `git rev-parse ^` 同源断言，两条各有独立牙口）；② 把「无牙判据门」从 `grep` 文本匹配升级为 **AST 精确门**（同时扫「被 `%` 运算的字符串里的裸 `%`」—— 本批已由该门抓出 2 处：`100%` 与 `--pretty=%aI`）；③ 该门写进 `run_s2l.sh`，**每次运行前必跑**，非 0 即拒。",
+        "impact": "**若不修的实际影响**：`sec2_fulfil` 的「旧 pend 键 `parent` 同源」这一条会**恒过** ⇒ 若续跑时 HEAD 被移动/回滚（本项目已多次发生自动更新重启），驱动会拿**错误的父提交**去回填 sha，把台账里 3 处哨兵兑现成**错位的 sha**，而四门全绿、无人察觉 —— 属最危险的**静默腐化**。另：R19-32 的 fix ⑥ 若继续以「grep 单段文件」为口径，则**每新增一个段文件都会重新打开这个缺口**（本批就有 7 段）。",
+        "prevention": "**机器化 prevention**：① **无牙判据门必须是 AST 级、作用域必须是合片后的全文件**（禁 `grep` 文本匹配、禁按段文件分别扫）；② 门的**作用域**必须与被保护对象的作用域**同口径**登记（写进判据正文，禁只写「已执行」）；③ 凡注释里出现「见下断言」「暂放」「占位」字样的 `assert`，一律视为可疑、必须当场改成真断言或删掉（禁留恒真式）；④ 格式化串里的裸 `%` 由同一 AST 门覆盖（扫 `BinOp(Mod)` 左操作数的字符串常量）。本条与 R19-32(f) 一并归口 **FU-62**（判据失真同族：R19-31＝第 11 次、R19-32＝第 12 次 ⇒ 本条为第 **13** 次复发）。",
+        "related": [
+          "PRE-44",
+          "PRE-37",
+          "R19-23",
+          "R19-32",
+          "R19-33",
+          "FU-62",
+          "C10"
+        ],
+        "owner": "编排器（自纠，禁委 lane）",
+        "at": "2026-11-18T07:50:13+08:00",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。"
+      },
+      {
+        "id": "R19-35",
+        "round": 19,
+        "severity": "P2",
+        "rule_violated": "**PRE-44**（判据必须有牙 ＋ 阴阳性对照；**对照判据自身也需对照**）第 **14** 次同族复发 · **PRE-37 第 2 款**（期望值/键集/实参个数必须程序化派生，禁凭记忆手打）· **PRE-13**（语义位点分离：`parent` 与 `prev_head_carried` 禁同源）· **PRE-46②③**（MSG 承诺面 == mut 实现面；同一事实禁两处各写一版）· **D-011**（append-only）",
+        "discovered_at": "`--dry-mut` 阶段（在 `copy.deepcopy(state)` 上跑完整 `mut()` 的 ①–⑬ 段；磁盘台账未改、索引未动、HEAD 未动），**第 1–5 轮迭代**逐轮暴露 —— 每轮修好后重跑，共 **5** 处缺陷（(a)(b)(c) 落在第 1/2/3 轮，(d)(e) 落在第 4/5 轮）",
+        "discovery_caliber": "**实测口径**：`run_s2l.sh --dry-mut` → 由 7 段重建 `orch_s2l.full.py` → **AST 精确门**（G1/G2/G4/G5）→ `py_compile` → `mut(deepcopy(state))` → 逐字解析 `orch_s2l_drymut.log` 的 `PASS`/`FAIL`/`PROMISE FAIL` 计数与 traceback。**禁**以 preflight GREEN 推断 dry-mut GREEN —— 两者**作用域不同**（preflight 只读 74 条判据；dry-mut 才真正执行 mut 的 13 段），本批 5 处缺陷**全部**只在 dry-mut 暴露、preflight 一律 GREEN（PRE-44 第 1 款：同口径）。",
+        "fact": "**5 处缺陷逐项枚举（全部在编排器驱动侧，交付件与台账数据零涉及）**：**(a)** `sec2_fulfil`（p3）：PRE-13「语义位点分离」的断言**写反** —— 初版 `assert OLDP[\"parent\"] == PARENT`，而该键的 `parent` 与本批兑现的 `PARENT` **必须不同源**；此缺陷被 R19-34 拆掉同行的 `or True` 恒真占位后**才浮出**（说明无牙占位不仅掩盖「恒真」、也掩盖「恒假」）。**(b)** `sec4_budget`（p4a）：`subtask_log` 第 **53** 条样本的键集与 S1 模板（第 52 条，**40** 键）**不同构** —— 多写 `wave`/`tier_planned` 两键、漏写 `by_orchestrator_same_batch` 一键。**(c)** `sec5_adjudications`（p4b）：**6** 处 `mk_adj(...)` 调用**全部**只传 **5** 个实参，而 `def mk_adj` 需 **6** 个（漏第 2 位的 `source`）⇒ `TypeError`，A296–A301 一条也建不出来。**(d)** `sec11_next_actions`（p5b）：`txt = (A + \"…%.4f…\" + B % (5 个实参))` —— **`%` 的优先级高于 `+`** ⇒ 实际解析为 `A + (…) + (B % tuple)`；最右那一个字面量（⑧ 段，**323** 字符）恰含 **0** 个转换符却喂了 **5** 个实参 ⇒ `TypeError: not all arguments converted during string formatting`；**且** ⑦ 段的 **5** 个 `%.4f`/`%s` 位于 `Add` **左枝** ⇒ 即使不崩也**永不被替换**（护栏读数会以字面 `%.4f` 写进排序唯一权威面）。**同一表达式内两处缺陷**。**(e)** `sec11_next_actions`（p5b）：治理簇串的阴性对照 `assert (\"FU-\" + 前 n−1 项串) not in txt` 是**假对照（恒不成立、断言无解）** —— 在 `\" / \"` 连接下去掉末项所得串**必为**全串的**前缀子串**，故该断言**永远判红**。",
+        "measured": "**(d) 的机器实测**（AST 逐字定位，禁凭肉眼）：`ast.parse` 后 `txt` 赋值节点顶层是 `BinOp(Add)` **L2092-2131**，其 `.right` 才是 `BinOp(Mod)` **L2124-2131**；该 Mod 的左常量 `len=323 pct=0`、右 `Tuple(5)` ⇒ **槽位 0 vs 实参 5**。`Add` 链的字符串常量叶子共含 **5** 个格式符（全在 ⑦ 段那一片：`len=574 pct=5`）⇒ **孤儿格式符 = 5 − 0 = 5**。加固后的 AST 门在**修复前**的同一文件上实测 `orphan_spec=[(2092, 5, 0, 5, [2124])]`、`arg_mismatch=[(2124, 0, 5)]`（**RED，留档**）；修复后复扫 `orphan_spec=[] arg_mismatch=[]`（**GREEN**）。**(e) 的机器实测**：以台账实测 OPEN 清单（**21** 项，FU-25…FU-70）构造同形态串 ⇒ `_TRUNC in txt` == `True`（**实证原判据恒假**）、`(_TRUNC + \"**\") not in txt` == `True`（证新判据既**可满足**又**有牙**）、`FU_TXT.split(\" / \") == 台账派生清单` == `True`。**(a)(b)(c) 的实测**：第 1/2/3 轮 traceback 逐字落在 `sec2_fulfil` / `sec4_budget` / `sec5_adjudications`。**(d) 的文案不变性实测**：以「旧模板 `%` 渲染结果」对撞「新拼接结果」⇒ 两侧均 **244** 字符、`BYTE-EXACT EQUAL = True`。**最终实测**：`--dry-mut` `EXITCODE=0`、`PASS_COUNT=74`、`FAIL_COUNT=0`、`PROMISE_FAIL_COUNT=0`；counts = ruff **365** / mypy **134** / pytest **852** / in_scope_py **136** / in_scope_md **229**（total **365**），与本批 `EXPECT_AFTER` 逐字相等；哨兵位点 **23** 处（自纠 5 条 × 2 = 10 ＋ 其余 13）。**零副作用**：5 处全部发现于 `run_commit` **之前**、且在 `deepcopy` 上执行 ⇒ 未 stage、未改台账、未动索引、HEAD 仍 `5745cb0`。",
+        "root_cause": "① **`%` 与 `+` 的优先级**是最易踩的坑：`A + B % t` 读起来像「拼好再格式化」，实际是 `A + (B % t)`；写长中文散文串时习惯性把 `% tuple` 甩到最后一行 ⇒ 只对**最右一个**字面量生效，而最右那一片**恰好没有转换符** ⇒ 崩在毫不相关的位置，traceback 只指向 `%` 那一行，看不出「左枝还有 5 个孤儿槽位」。② **AST 门的判据覆盖面不足**：R19-34 建的门只扫 `BinOp(Mod)` 左常量里的**裸 `%`**，既不比对**槽位数 vs 实参数**、也不递归收集 `BinOp(Add)` 链里的字符串常量 ⇒ 这一整类缺陷门**看得见却放过**。③ **阴性对照自身没做过「可满足性」验证**：(e) 的对照是凭直觉写的（直觉认为「少一项就不该出现」），忽略了 `\" / \"` 连接下截断串必为前缀子串 ⇒ **对照判据本身也需要对照**。④ **签名/模板同构靠记忆而非程序化派生**：(b)(c) 都是「照印象写键集/实参个数」⇒ 违反 PRE-37 第 2 款。⑤ (a) 说明**无牙占位会双向掩盖**：既掩盖恒真、也掩盖恒假。",
+        "fix": "**5 处同批全部修好**（补丁 `.orch_tmp/patch_dm1.py`…`patch_dm5.py` ＋ AST 门加固，均留档可回放；每处修改前先 `shutil.copy2` 留 `.bak_dmN`/`.bak_r35`）：**(a)** 改为 `assert OLDP[\"parent\"] != PARENT` ＋ 补 `assert OLDP[\"parent_full\"] == full_sha(OLDP[\"parent\"])` 的同源断言（两条各有独立牙口；**刻意不**直接比 `FULL_PARENT` —— 后者是 `PARENT` 的全 sha，语义不同）。**(b)** 删去 `wave`/`tier_planned` 两键（该两面由 `in_flight_agents[13]` 承载，禁两处各写一版 —— PRE-46③）、补回 `by_orchestrator_same_batch`（面值由 `fstr(FACES[...])` **程序化派生**）⇒ 键集与 S1 模板 **40** 键**同构**，由 `sec13` 的 `len(...) == 40` 断言背书。**(c)** 新增 DRY 助手 `adj_source(n, u)`，把 `adj_source(i, \"U-i\")` 作为**第 2 个**实参插进 A296–A301 全部 **6** 处调用 ⇒ 与 `def mk_adj` 的 6 参签名一致。**(d)** 把护栏 5 个读数**先格式化为独立字符串**（`_G_TASKS`/`_G_TOKENS`/`_G_DEV`/`_G_TM`/`_G_TK`，各自 `\"%.4f\" % (单值,)` 形态：1 槽位 vs 1 实参）再用 `+` 拼进 ㉒，**整段删除末尾的 `% tuple`**；并以「旧模板 `%` 渲染 == 新拼接」做**逐字节相等**证明 ⇒ 入库文案一字不改。**(e)** 阴性对照改为**带尾界符**形态：先 `assert _TRUNC in txt`（**实证**原判据恒假这一事实），再 `assert (\"FU-\" + FU_TXT + \"**\") in txt` 与 `assert (_TRUNC + \"**\") not in txt`（txt 中该串之后紧跟 ` / <末项>**`，故「少一项＋尾界符」必不出现 ⇒ 既**可满足**又**有牙**）；另加 `FU_TXT.split(\" / \") == 台账实测 OPEN 清单派生` 的**逐字有序相等**真值判据（PRE-37 第 1 款）。",
+        "impact": "**若不修的实际影响**：**(d)** 会让 `--dry-mut` 直接崩在 ⑪ 段 ⇒ 本批**根本无法入库**（长程无人值守下＝流程卡死、只能等人）；**更隐蔽的是**：假如最右那一片**恰好带了**转换符，则不会崩、而 ⑦ 段的 5 个 `%.4f`/`%s` 会以**字面量**写进 `next_actions` ㉒（全项目排序的**唯一权威面**）⇒ 护栏读数**永久丢失**且四门全绿、无人察觉，属**静默腐化**。**(e)** 会让 ⑪ 段断言**永远判红** ⇒ 与 (d) 叠加后续跑方无法区分「真缺陷」与「假对照」，只能整段跳过判据 ⇒ 治理簇「与台账实测 OPEN 清单同源」这条**彻底失去背书**（可能被写成凭记忆的旧清单）。**(a)** 若留恒假断言，则 PRE-13 的语义位点分离失去机器背书 ⇒ `parent` 与 `prev_head_carried` 可能被写成同源，回填批就会拿**同一个 sha** 兑现两个语义不同的位点。**(b)(c)** 会破坏 `subtask_log` 的 40 键同构体例与 A296–A301 的可建性 ⇒ 护栏重算与裁定入册双双失败。",
+        "prevention": "**机器化 prevention（本条的核心产出）**：把 AST 门从 **2** 类判据扩到 **4** 类（`.orch_tmp/orch_astgate.py`，写进 `run_s2l.sh` **每次必跑、非 0 即拒**）：**G1** 无牙判据（`BoolOp(Or)`+`Constant(True)`）· **G2** 格式化串裸 `%` ＋ dict 右操作数必须带 `(key)` 映射键 · **G4（新增）** 对**极大 `Add` 链**递归收集全部字符串常量叶子的格式符总数 `total`，减去链内各 `BinOp(Mod)` 左常量已消耗的 `consumed`，`orphan = total − consumed > 0` ⇒ 判红（正是 (d) 的形态）· **G5（新增）** `BinOp(Mod)` 左为字符串常量时，其合法格式符折算的实参需求（`*` 宽度/精度各额外吃 **1** 个）必须与右操作数供给数**逐一相等**；右含 `*` 解包或为 dict 时**放弃判据、禁假红**。门自身带 **5 阳 1 阴**对照（PRE-44⑤），其中 G4/G5 的阳性对照**逐字复刻 (d) 的原型**（`A + \"护栏 ① **%.4f**、② **%.4f** ⇒ \" + \"tail\" % (2 个实参)` ⇒ 必须报 `orphan=2` 且 `arg_mismatch=(0,2)`），阴性对照覆盖「括号内 `%` 再相加」与「最右操作数 `%`」两种**正当写法** ⇒ **零误报**。**另立两条体例**：① 长散文串**禁**在拼接末尾用 `% tuple`，一律**先格式化为独立字符串再 `+` 拼接**（(d) 的直接免疫）；② 凡「少一项/多一项即判红」型阴性对照，**必须自带可满足性实证**（先断言「不加界符时确为子串」以证明原判据恒假，再断言加界符后的形态），禁凭直觉写对照（(e) 的直接免疫）。归口 **FU-62**（判据失真同族：R19-31＝11、R19-32＝12、R19-34＝13 ⇒ 本条为第 **14** 次复发）。",
+        "related": [
+          "PRE-44",
+          "PRE-37",
+          "PRE-46",
+          "PRE-13",
+          "D-011",
+          "R19-23",
+          "R19-32",
+          "R19-34",
+          "FU-62",
+          "C10"
+        ],
+        "owner": "编排器（自纠，禁委 lane）",
+        "at": "2026-11-18T07:50:13+08:00",
+        "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+        "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。**PRE-46④**：本键**不复述**哨兵原串。"
       }
     ],
     "preconditions_added_R19_backfill": [
@@ -27099,6 +27644,84 @@
         "ruling": "① 「逐字携带」口径**收窄为三段式**且以**机器可核对撞面**为唯一真值源：(a) 派单文 **§5** 为 18 条裁定原文的**唯一真值源**（spawn message 内给出该文件的**路径 ＋ 行区间**，lane 侧依 **PRE-29** 回源自读原文）；(b) **A293 / A294 两条全文内联**进 message （二者是本批新立、尚未进入任何已入库派单文的行区间索引，无回源锚点）；(c) **A277–A292 十六条给出行号回源锚点**（派单文 §5 的 `:307-452`，每条 9 行）。② `status` 的**字面量以台账既有词 `PREDISPATCHED_NOT_SPAWNED` 为准**；A293 的原文按 **D-011（append-only，原文不改写、不删除）**保持不动，其差异由本条 A295 的 `fact`② 如实留痕。回填目标字面量为 **`IN_FLIGHT`**（与 `dispatch_log[18..19]` 的既有回填体例逐字一致）。",
         "basis": "**PRE-46 第 ③ 款**（同一事实禁两处各写一版；描述性键禁复述机器可读位点的原值）· **PRE-29**（禁采信二手复述，一律回源到路径/行号自读原文）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-37**（期望值程序化派生，禁手打）· **D-011**（台账 append-only，原文不改写）· **A261**（以 sha 为锚，禁写 tag）· **A183**（禁猜测值）· **R19-18**（工具返回未落盘 ＋ 模型切换 ⇒ 正文永久不可复得的既成事故）· 手册 **§15.1 / §6.3**（spawn 显式指定 model；强制 max 硬规则）",
         "action_taken": "① 本批（tag `R19-backfill-wave4pd-spawn`）把上述两项裁定入册为 **A295**，`counters_next.adjudication` 由 `A295` 推进为 **`A296`**（其余 8 个活指针逐项不动，`preflight` 与 `PROMISES` 双向断言）。② 已实际执行的 `spawn_agent` 之 message 构造与 (a)(b)(c) 三段式**逐字一致**（A293/A294 全文内联、A277–A292 给 `:307-452` 行号回源、§5 为唯一真值源）；**PRE-43** 的返回值落盘件 `.orch_tmp/orch_S2_spawnret.txt` 为 `agent_id`/`nickname` 的**唯一真值源**，本批一律从该件**程序化解析**回填，禁凭会话记忆手打。③ 差异面如实登记：A293 原文的 `PREDISPATCH_COMMITTED_AWAITING_SPAWN` **不改写**，台账实测字面量 `PREDISPATCHED_NOT_SPAWNED` → **`IN_FLIGHT`** 的回填由本批执行。"
+      },
+      {
+        "id": "A296",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 1 项（**U-1**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-1**（lane S2/Epicurus 回执 §U 第 1 项，落盘件 `orch_S2_receipt.md`）：`ImportTransition.trigger` 存 operationId **token** 还是整段散文？",
+        "fact": "design §3.3 的 I1–I7 七条转移在正文里以**散文**描述触发条件，而 `worker/states.py::Transition` 的实测 `trigger` 字段承载的是 **operationId token**（如 `VALIDATE_IMPORT`）。lane 交付的 `states.py` 采 **A 案**：只存 operationId token，I5/I6/I7 **共用** `VALIDATE_IMPORT`、以 `target` 相区分，I6 的 `guard` 由散文**机械展开**。编排器独立复验 **V9**（8 字段名逐字对齐实测 `Transition`）与 **V9b**（`IMPORT_TRANSITIONS` 只注册 I1–I7，count=7）双双 **PASS**。",
+        "ruling": "**追认 A 案**：`trigger` 只存 operationId **token**；I5/I6/I7 共用 `VALIDATE_IMPORT`、以 `target` 相区分；I6 的 `guard` 机械展开**合规**。理由：① 与既有 `worker/states.py::Transition` 的**实测形态同源**（PRE-29：以实测为权威，禁以散文为准）；② token 形态可被契约门与状态机守护**机器对撞**，散文不可；③ 存散文会造成同一事实两处可写副本（**PRE-46③** 所禁）。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A296**（`round19_adjudications` 34→**40**，`counters_next.adjudication` A296→**A302**）。**无需改交付件**（lane 现实现已合规，V9/V9b 实测背书）。design §3.3 **无需追记**（散文与 token 是同一事实的两种表述面，token 面为权威）。"
+      },
+      {
+        "id": "A297",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 2 项（**U-2**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-2**（回执 §U 第 2 项）：`Finding` 的字段序以 design **§4.1 代码块**为准，还是以**正文实测序**为准？",
+        "fact": "design §4.1 的代码块与 §4 正文对 `Finding` 四字段顺序的表述**不一致**。编排器独立复验 **V8** 实测：`Issue.model_fields` == `['code','location','message','severity']`，而 lane 交付的 `model.py::Finding` 的 `dataclasses.fields` 序 == **同一序** ⇒ **V8 PASS**。`api/common.py::Issue` 是**已入库冻结件**（PRE-40 面之一，锁值 `b2908617d193`，本批 DRIFT=0）。",
+        "ruling": "**以实测 `Issue.model_fields` 序为准**（`code/location/message/severity`）。design §4.1 的**代码块**属失真面 ⇒ 按 **A214 窄豁免**走 **§14 文末追记**订正（只文末追加、`numstat` 的 `deleted` 列必须为 **0**、追加前后做前 N 行拼接 `sha256[:12]` 的**双向核验**），**禁改写**已冻结正文（D-011）。理由：`Issue` 是已入库的**权威契约面**，`Finding` 必须与之同序才能做逐字对撞；文档代码块不是可执行面。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A297**。**落地义务**：design §14 追记批（`next_actions` ㉒ 的第 ② 项）同批订正 §4.1 代码块 —— design 是 **PRE-40 冻结面**，故其锁值 sha **会变**，必须写入新锁值并留 `previous` 痕迹（D-011）。**本批不动 design**（本批只做 S2 交付面入库，禁夹带）。"
+      },
+      {
+        "id": "A298",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 3 项（**U-3**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-3**（回执 §U 第 3 项）：`MappingLayout` / `SourceMoneyUnit` / `DedupMode` 三枚 Literal 的**落点**在 design §11.1 清单里未点名，应落何处？",
+        "fact": "编排器独立复验 **V6** 实测（design §11.1 符号清单**从原文程序化解析** × AST 实取的**双向差集**）：`model.py` 的 `missing=[]`、`extra_public` **恰为** `['DedupMode','MappingLayout','SourceMoneyUnit']` 三枚（`count=20` vs `spec_count=16`），`limits.py` 5/5、`states.py` **11/11** 均零差集。⇒ 三枚确为**清单外**的公开名。",
+        "ruling": "**追认 A 案**：三枚落 `model.py`（与 `Finding`/`ImportTransition` 同模块，属**领域模型**的取值域，落点正确）。**同批义务**：把三名字**补进 design §11.1 清单**（走 §14 文末追记），否则 **S6** 的 AST 守护会把它们判成「越出符号清单」而**假红**。理由：清单是守护的**判据源**，判据源滞后于实现即产生假红（PRE-44① 同口径要求）。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A298**。**落地义务**：随 **A297** 的 design §14 追记批**同批**把三名字补进 §11.1 清单（两项追记同批做，避免 design 锁值连续两批漂移）。**本批不动 design**。"
+      },
+      {
+        "id": "A299",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 4 项（**U-4**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-4**（回执 §U 第 4 项）：`InputTooLarge(detail)` 的 `detail` **文案**在 design 里无冻结原文，以何为准？",
+        "fact": "design 只规定了 > 8 MiB 必须拒绝并返回具体行列/原因（卡片 `orchestrator/tasks/M1-01.md:15` 的 gate「大于 8MiB 拒绝」），但**未冻结** `detail` 的字面文案。lane 在 `limits.py` / `states.py` 里已给出实现文案（`_BUSY_DETAIL` 等私有常量的同族形态）。",
+        "ruling": "**冻结 lane 现文案为准**：S6 若对 `detail` 做断言，**以本批入库的实现文案为权威**（PRE-29：以在仓可执行面为准，禁以未冻结的文档散文为准）。同批把该文案写入 design **§14 文末追记**，使其成为**冻结面**，避免 S6/S7 各自发明期望串。理由：文案一旦有测试断言就成为契约面，必须先冻结再断言，否则 S6 会写出与实现不一致的期望（假红）。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A299**。**落地义务**：随 **A297/A298** 的 design §14 追记批**同批**写入文案冻结（三项追记同批）。**本批不动 design**。"
+      },
+      {
+        "id": "A300",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 5 项（**U-5**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-5（阻塞项）**（回执 §U 第 5 项）：档位/预算不足 —— 45k 档 vs 实测权威规范面 ≈ **291 KB**，只能交付 4/13 件。采 **A 案拆两棒续派**，还是 **B 案**把本卡档位提到 ≥120k 后重派全量？",
+        "fact": "实测规范面：design **1393 行 / 167927 B** ＋ `M1-01.slice.json` **2875 行 / 60641 B** ＋ 派单文 **615 行 / 72533 B**（含 §5.2 的 A277–A292 约 **36 KB** 逐字正文）≈ **291 KB**。档位 **45k** ⇒ lane 自陈无法在单轮内既通读规范面又产出 13 件。已交付的 4 件是 §11.1 的**结构面**（`__init__`/`limits`/`model`/`states`），下游**可 import**；未交付的 12 项里 §11.1 剩 7 件属**行为面**（`locate`/`digests`/`normalize`/`validate`(N1–N18)/`parse`/`api` ＋ `infra/files.py`），§11.2/§11.3 属**接入面**（DTO 再导出 ＋ 应用层 ＋ 3 件纯追加）。M1-01 是**关键路径** `slack=0`。",
+        "ruling": "**采 A 案：拆两棒续派**（串行，禁并行）。**棒甲** ＝ §11.1 剩 **7** 件（行为面）；**棒乙** ＝ §11.2 ＋ §11.3 共 **6** 项（接入面）。**禁** B 案（提档到 ≥120k 重派全量），理由：① 关键路径 `slack=0`，串行两棒的**单棒失败面**更小、可分别验收；② 结构面**已入库**⇒ 棒甲/棒乙都能 `import campaignlab.domain.ingest` 做真实对撞，比一次性全量更可验证；③ 提档重派全量会**丢弃**已验证的 4 件（重复劳动，违反禁重复劳动原则）；④ **根因不是档位太低，而是派单文携带了 291 KB 规范面** ⇒ 提档治标不治本。**硬约束**：两棒的派单文**只携带自己那一刀的规范面摘录**（**PRE-15** 预抽设计文摘要 ＋ **PRE-19** 检索限定），**禁再整包携带 291 KB**。**档位裁定**：命中手册 **§6.3** 硬规则者仍**强制 max**（棒乙含 `api/common.py` 的 DTO 契约面与金额分口径语义 ⇒ 大概率命中），其余按**实测复杂度**定档（写权面件数 / 新建·纯追加件数 / 携带裁定条数 / 预期红条数），**C10 禁为凑配比降档**。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A300** ⇒ 新建 **FU-70**（P1）承载拆两棒的派单义务；`next_actions` ㉒ 把「wave-5 predispatch（棒甲/棒乙）」列为**第 ① 项硬序**。**棒乙必须重测 PRE-40**（用届时的锁值），且 **A294 授权红**与 **FU-69** 的 `COMMON_ALL_NAMES` 程序化再生义务在**棒乙的 landing 批同批闭合**（禁拖批/拆批）。"
+      },
+      {
+        "id": "A301",
+        "round": 19,
+        "at": "2026-11-18T07:50:13+08:00",
+        "lane": "orchestrator",
+        "task": "M1-01",
+        "source": "**来源**：lane **S2**/Epicurus 回执 §U 第 6 项（**U-6**）。回执**双落盘**：`.orch_tmp/orch_S2_receipt.md`（63L/10634B/5917772f9759）与入仓件 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md`（63L/10634B/5917772f9759）—— 两者**字节同一**（preflight P21c 背书）。**裁定权归编排器**（手册 §6.4：**禁**让 lane 自裁）；lane 自陈的倾向只作**输入**、不作结论（PRE-29 禁采信二手复述）。",
+        "question": "**U-6**（回执 §U 第 6 项，lane **自报**的协议偏差）：lane 未逐字通读派单文全文（§5.2 的 36 KB 裁定正文未读）。应否记为 lane 的诚信缺陷？",
+        "fact": "lane 在回执里**主动自报**该偏差（未等编排器发现）。未读面的**内容**＝design §12 的 A277–A292 十六条裁定正文，其**唯一真值源**是派单文 §5（**A295** 已裁定：spawn message 只给「路径 ＋ 行区间」回源锚点，禁内联全文，以避免 PRE-46③ 的两处可写副本）。派单文本体 **615 行 / 72533 B**，其中 §5.2 约 **36 KB** 是**规范面的重复携带**。",
+        "ruling": "**如实登记、不予免责亦不加重**：① **根因归编排器的派单文体量**（把 36 KB 裁定正文整包塞进派单文，本身就与 A295 的三段式收窄相悖）⇒ **禁**把它记成 lane 的诚信缺陷；② 但**禁**把该回执当作「已全读」采信（PRE-29：一切以编排器实测为准，lane 的自报只作对撞靶子）；③ lane **主动自报**符合 A159 期望的行为（不自罪删产物、不偷偷放宽判据，而是如实上报）⇒ 记为**正例**。**处置**：把「派单文禁整包携带规范面」机器化为 **PRE-48 第 ② 款**的同族约束，并由 **FU-70** 的两棒派单文实际执行（只带自己那一刀的摘录）。",
+        "basis": "**手册 §6.4**（U 项一律由编排器终裁，**禁**让 lane 自裁）· **PRE-29**（禁采信 lane 自报，一律回源实测）· **PRE-37**（期望值程序化派生，禁手打）· **PRE-44**（判据同口径 ＋ 阴阳性对照）· **PRE-15 / PRE-19**（派单文预抽设计文摘要 ＋ 检索限定，禁整包携带）· **A214**（窄豁免：冻结件只能文末追记，`numstat` 的 `deleted` 列必须为 0）· **A183**（禁猜测值）· **D-011**（台账 append-only）· **A261**（以 sha 为锚）· **C10**（如实报，禁粉饰/禁为凑配比降档）· **A245 / A248**（`tests/**` 是 lane 硬禁面，改动一律编排器自办）· **A292 / A115**（名单对撞改造与元守护上限制）· **PRE-40**（冻结面 8 件锁值）",
+        "action_taken": "已入册为 **A301**。**不新建缺陷号**（依 R19-6 / R19-7 先例：根因在编排器侧的规范面重复携带，归 **PRE-48** 立规 ＋ **FU-70** 执行，避免单号通胀）。**D-053 不消耗**。"
       }
     ],
     "in_flight_agents_note_round19_S5": "第 [10] 条（0-based）＝本棒 (lane=S5, task=M2-01)，**全新构造**（PRE-32：禁深拷贝既有条目再改字段 —— R18-10 的 4 处克隆残留就是这么来的）。agent_id/nickname/tier_used/result/spawned_at/slot_closed_at 一律先置 **None**（禁填猜测值），由第③步纯台账批按 spawn_agent 的返回值回填。",
@@ -27487,16 +28110,16 @@
       "PRE-37 **第 3 款**（同一事实若同时存在于机器可读位点与人类可读描述，二者必须由**同一赋值点**派生；全文见 round19_self_corrections[R19-6].prevention）"
     ],
     "counters_next": {
-      "adjudication": "A296",
-      "self_correction_R19": "R19-31",
+      "adjudication": "A302",
+      "self_correction_R19": "R19-36",
       "defect": "D-053",
-      "precondition": "PRE-48",
-      "followup": "FU-70",
+      "precondition": "PRE-49",
+      "followup": "FU-71",
       "dispatch_log_index": 21,
       "in_flight_agents_index": 14,
-      "subtask_log_index": 52,
-      "baseline_history_index": 30,
-      "at": "2026-11-18T05:15:44+08:00",
+      "subtask_log_index": 53,
+      "baseline_history_index": 31,
+      "at": "2026-11-18T07:50:13+08:00",
       "supersedes": "`resume.counters_next` 的前一版（`465282f` / tag `R19-backfill-S6landBF` 写入的活指针）—— 该版**不冻结保留**，因为 `counters_next` 本身就是活指针（语义＝「下一个可用号」）；其**取值快照**已存进本键的 `previous_values_R19_ckS1pause`（D-011 append-only：留痕可追溯）。**注意 `resume.checkpoint_R19_S1pause.counters_next` 是另一回事**：那是 checkpoint 时点的**冻结快照**，按先例（`checkpoint_R19.counters_next` 的 `commit_backfill_note_R19_resumeS5spawn` 原文「本键的 `counters_next` 保持冻结不改」）**保持冻结不改**，二者并存、以活指针为准。",
       "previous_values": {
         "adjudication": "A277",
@@ -27705,7 +28328,34 @@
         "subtask_log_index": "**不消耗**（仍 **52**）：依 `budget.accounting_rule`，样本在**回收入库批**才追加；**spawn 时点不入账**（沿 `round19_predispatch_S5`/`_wave3`/`_wave4` 先例）⇒ `budget.subtask_log` 仍 **52** 条、零新样本。",
         "baseline_history_index": "**不消耗**（仍 **30**）：**纯台账批不推进权威基线、不追加 history 条目**（PRE-36 / A261：判据＝是否改动内容面）。",
         "next": "**下一步（无需人类介入，长程无人值守续跑）**：① `wait_agent(01a1eb34-3545-7a30-886d-b03d3f36165e)` / 轮询 `.orch_tmp/orch_S2_receipt.md`，回执**即时落盘**（PRE-43）→ ② 编排器**独立复验**（重跑四门、核写权面、`git diff --numstat` 的 `deleted` 列全 0、硬禁面零改动、`only_runtime`/`only_pinned`）→ ③ **S2 landing 批（内容面）同批闭合 FU-69**：用 `only_runtime` **程序化再生** `tests/unit/test_domain_errors.py:33` 的 `COMMON_ALL_NAMES`（PRE-37 禁手打）＋ 复核 `only_pinned` 为空 ＋ **更新 PRE-40 锁值**（`api/common.py` 已授权漂移，新锁值 ＋ `previous` 留痕 D-011）＋ 冻结树四门背书 counts ＋ 兑现本批 `commit_backfill_pending_R19_wave4pd_spawnBF` → ④ `M2-01/S7` predispatch（`qwen3.8-flash`，**必须用新锁值重测 PRE-40**）→ ⑤ M1-01 剩余棒 **S3→S4→S5→S6→S7→S8**（全 flash，卡片 `:41-46`）→ ⑥ 治理簇 **FU-50/52/53/58/61/62/63/64/66/67/68/69** → **29 任务 / 11 波 / 47 AC** 全交付。**未全部完成不得停**（`dag_paused` 恒 False）。"
-      }
+      },
+      "previous_values_R19_S2land": {
+        "adjudication": "A296",
+        "self_correction_R19": "R19-31",
+        "defect": "D-053",
+        "precondition": "PRE-48",
+        "followup": "FU-70",
+        "dispatch_log_index": 21,
+        "in_flight_agents_index": 14,
+        "subtask_log_index": 52,
+        "baseline_history_index": 30,
+        "at": "2026-11-18T05:15:44+08:00",
+        "note": "被 `R19-landS2partial` 批 displacing 的前值（活指针不冻结保留，逐项留痕，D-011）"
+      },
+      "caliber_note_R19_S2land": "**权威面＝带 `R19_S2land` 后缀的键**（`previous_values_R19_S2land` / `consumed_by_this_batch_R19_S2land` / `supersedes_R19_S2land`）。无后缀的 `previous_values` / `consumed_by_this_batch` / `supersedes` 分别是更早批次的**留档**，依 **D-011 一律不改写、不删除**；`*_R19_S1land` / `*_R19_S1landBF` / `*_R19_wave4pd_spawnBF` 等同理留档。**`resume.checkpoint_R19_S1pause` 里的 counters 快照是另一回事**：那是 checkpoint 时点的**冻结快照**，按先例（`checkpoint_R19` 原文「本键的 `counters_next` 保持冻结不改」）保持冻结、本批不动。",
+      "consumed_by_this_batch_R19_S2land": {
+        "adjudication": "**消耗 6 个位**（A296 → **A302**）：lane S2 回执 §U 的 **U-1…U-6** 由编排器**全部裁毕** ⇒ `resume.round19_adjudications` 34 → **40**（手册 §6.4：**禁**让 lane 自裁）。",
+        "self_correction_R19": "**消耗 5 个位**（R19-31 → **R19-36**）：**R19-31**（独立复验脚本 v1 的 4 处判据缺陷 ＋ V3 族期望值过期 ＋ 取证件把计划写成事实）、**R19-32**（本批 preflight 初版 5 处判据缺陷 ＋ 1 处补丁引入的交付件尾换行缺陷 ＋ 2 条 `or True` 无牙判据）、**R19-33**（本批驱动的**跨节点硬序矛盾**，编写 ⑪ 段时合片前对撞发现）、**R19-34**（R19-32(f) 的「无牙判据清查」**作用域过窄** —— 只 `grep` 了 p2 一个段文件，而本批驱动由 **7** 段拼成；合片后改用 **AST 精确门**扫全文件，实测 p3 的 `sec2_fulfil` 仍残留 1 条 `assert ... or True` 恒真占位）、**R19-35**（`--dry-mut` 阶段 **5** 处缺陷 (a)–(e)：PRE-13 断言写反（恒假）、`subtask_log` 第 53 条样本键集与 S1 模板不同构、`mk_adj` 全部 **6** 处调用漏第 2 位实参 `source`、**`%` 优先级高于 `+`** ⇒ ⑧ 段 0 槽位喂 5 实参 ⇒ `TypeError` 且 ⑦ 段 5 个格式符成**孤儿**、治理簇阴性对照**恒不成立**；同批把 AST 门扩到 **G1/G2/G4/G5** 四类并带 5 阳 1 阴对照）。⇒ `resume.round19_self_corrections` 30 → **35**。**五者均为改判据/改脚本/改驱动文本、台账数据零改动**，且全部在 `run_commit` **之前**被拦下 ⇒ 零副作用、零数据损失。",
+        "defect": "**不消耗**（下一个仍是 **D-053**）。lane S2 侧**零缺陷**（4 件 face 三向对撞一致、四门全绿、零越界件、`tests/**` 与硬禁面零改动）；编排器侧的问题**全归自纠**（R19-31/32/33/34/35），机器化统一归口 **FU-62**（沿 R19-6 / R19-7 / R19-32 先例，避免单号通胀）。实测 `state.defects` 长度未变。",
+        "precondition": "**消耗 1 个位**（PRE-48 → **PRE-49**）：新立 **PRE-48**（3 款：① 多行 docstring 禁整行替换开引号；② docstring 内禁写点号全路径；③ 取证面「时点/顺序」句必须附机器可核背书）⇒ 全文落在 `resume.preconditions_added_R19_S2land`（**恰 1 处**，⑥ 段已做全树 walk 断言 —— PRE-46③）。",
+        "followup": "**消耗 1 个位**（FU-70 → **FU-71**）：新建 **FU-70**（P1，A300 的落地义务＝把 S2 未交付的 12 项拆两棒续派，并承载棒乙对 **FU-69** 四项义务的同批闭合）。**FU-69 保持 OPEN**、只**改挂**（追加 `status_before_R19_S2land` / `rescope_note_R19_S2land` 两痕迹键，原文一字不改 —— D-011）⇒ `resume.followups` 69 → **70**。",
+        "dispatch_log_index": "**不消耗**（仍 **21**）：本批只**回收** lane S2、不派新棒 ⇒ `resume.dispatch_log` 长度实测未变；`[20]` 由 **IN_FLIGHT → RETURNED_PARTIAL_LANDED**（PRE-31 双键精确相等定位，只追加 5 键、既有 31 键一字不改）。",
+        "in_flight_agents_index": "**不消耗**（仍 **14**）：本批不新增在飞条目；`[13]`（S2/M1-01/Epicurus）由 **IN_FLIGHT → RETURNED_PARTIAL_LANDED**（只追加 15 键、既有 34 键一字不改）。**与 S1 的差异**：`close_agent` 已在本批**之前**调用且返回已落盘 ⇒ `close_agent_returned` / `slot_close_confirmed_*` 四键**同批写入**，无需再发一批回填（S1 是由 `R19-landS1BF` 回填的）。",
+        "subtask_log_index": "**消耗 1 个位**（52 → **53**）：依 `budget.accounting_rule`，样本在**回收入库批**才追加 ⇒ S2 的第 53 条样本已入账（40 键体例与 S1 样本逐字同构，减去由回填批写入的 `commit_backfilled_at`）；`budget.subtask_entries` 51 → **52**；护栏三键同批**程序化重算**（① 0.5902 → **0.5806** 仍 FAIL，如实报、禁降档 C10）。",
+        "baseline_history_index": "**消耗 1 个位**（30 → **31**）：本批**内容面变更**（+4 py / +2 md / +1 log）⇒ 依 **PRE-36 / A261** **必须**追加 `baseline_authoritative.history` 条目并推进权威基线（与纯台账批相反 —— R19-32c 已把该判据订正为「是否改动**内容面**」）。",
+        "next": "**下一步（长程无人值守已恢复，无需再等人类指令）**：① push 本批；② 独立 post-verify（判据一律**同口径派生 ＋ 阴阳性对照**，PRE-44）；③ 兑现 `resume.commit_backfill_pending_R19_S2land` 的 19 处哨兵回填；④ 按 `next_actions` ㉒ 的硬序推进 —— **② design §14 追记批最先入库**，然后 ① 棒甲/棒乙 predispatch（串行）、③ S3→S8、④ M2-01/S7、⑤ 治理簇；⑤ 循环直至 **29 任务 / 11 波 / 47 AC** 全部交付并留证 —— **未全部完成不得停**（用户死命令）。"
+      },
+      "supersedes_R19_S2land": "`resume.counters_next` 的前一版（`5745cb0` / tag `R19-backfill-wave4pd-spawn` 写入的活指针）—— 该版**不冻结保留**，因为 `counters_next` 本身就是活指针（语义＝「下一个可用号」）；其**取值快照**已存进本键的 `previous_values_R19_S2land`（D-011 append-only：留痕可追溯）。无后缀的 `supersedes` 与 `supersedes_R19_S1land` 等是更早批次的留档、不改写。"
     },
     "round19_resume_S5spawn": {
       "at": "2026-11-16T23:30:59+08:00",
@@ -29936,7 +30586,7 @@
       ]
     },
     "commit_backfill_pending_R19_wave4pd_spawnBF": {
-      "status": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "status": "DONE",
       "at": "2026-11-18T05:15:44+08:00",
       "commit_tag": "R19-backfill-wave4pd-spawn",
       "parent": "9c7fd59",
@@ -29955,7 +30605,149 @@
         "$.resume.round19_self_corrections.[29].commit",
         "$.resume.round19_self_corrections.[29].commit_full"
       ],
-      "sites_expected_note": "**严格执行 R19-6 的 fix ③ 与 PRE-37 第 3 款：描述性字段一律指向机器可读位点、不复述数字。** 权威值 ＝ 本键的 `sites_expected_after_mut`（由本段 mut 的**末断言实测集合回写**，禁手打）。续跑义务方**必须**以 `sentinel_paths(state)` 全量 walk 的实测集合与本键做**逐字集合相等**对撞（多一处、少一处都判红）。"
+      "sites_expected_note": "**严格执行 R19-6 的 fix ③ 与 PRE-37 第 3 款：描述性字段一律指向机器可读位点、不复述数字。** 权威值 ＝ 本键的 `sites_expected_after_mut`（由本段 mut 的**末断言实测集合回写**，禁手打）。续跑义务方**必须**以 `sentinel_paths(state)` 全量 walk 的实测集合与本键做**逐字集合相等**对撞（多一处、少一处都判红）。",
+      "backfilled_commit": "5745cb0",
+      "backfilled_commit_full": "5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af",
+      "backfilled_at": "2026-11-18T07:50:13+08:00",
+      "backfilled_by_tag": "R19-landS2partial",
+      "backfill_note": "兑现（`R19-landS2partial`，2026-11-18T07:50:13+08:00）：本键 `sites_expected_after_mut` 所列的 **3** 处哨兵全量回填为 **5745cb0**（全 `5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af`）＝ tag `R19-backfill-wave4pd-spawn` 的入库提交。**PRE-35 全量普查**已在 mut 首行以 `sentinel_paths(st)` walk 整个 `state.json` 并与本键的 `sites_expected_after_mut` 做**逐字集合相等**断言（相等才继续）；本段末再做**中点普查**断言「旧哨兵零残留」。`to_backfill` 四项逐一兑现：① 本键自身 5 个 `backfilled_*` 痕迹键；② `round19_backfill_wave4pd_spawn` 无 sha 字段 ⇒ **不**在他处重复登记（PRE-46③）；③ `round19_self_corrections[29]`（R19-30）的 `commit`/`commit_full` ＋ 3 个痕迹键；④ PRE-13 语义分设常量 ＋ `git rev-parse ^` 同源断言（本批两语义**不重合**：`parent`=9c7fd59、被兑现提交=5745cb0）。**obligor 的宽松措辞已兑现**：本批正是其原文所指的「S2 的 landing 批」。"
+    },
+    "preconditions_added_R19_S2land": [
+      "**PRE-48（既有文件编辑的「行号替换前置义务」＋ 领域层 docstring 的点号全路径禁令 ＋ 取证面「时点/顺序」句的背书义务，3 款）**：① **行号整行替换的前置义务** —— 编辑既有文件时，任何「按行号整行替换」（`sed -i 'Ns|...|...|'` 及其同族）**必须先打印该行原文**并确认其是否为**多行结构的边界行**（docstring 的开/闭引号行、括号未闭合行、Markdown 代码围栏行），**禁凭记忆构造替换文本**。判据：替换后必须立即过 `python -m py_compile`（或该文件类型的等价语法门）再继续；不过即**当场回滚**，禁带着语法破损进入下一轮 loop（否则 loop 帽会被返工吃光 —— 本棒 `LOOP_USED 2/2` 的**次要**成因正是此）。② **领域层 docstring 禁写点号全路径** —— 纯领域层（`src/campaignlab/domain/**`）的 docstring 与注释里**禁**出现上层模块的点号全路径（如 `campaignlab.api`、`campaignlab.infra`），以免 `grep` 类**分层判据假命中**（本棒 lane 自报的第 2 条自纠即此：V9 的「上行依赖零命中」判据被 docstring 里的散文面假命中）。且此类 grep 判据**必须固定带 `--include`**（限定文件类型），禁裸 grep 扫全仓 —— 否则会同时扫到 `.venv`/`node_modules`/`spec` 而产生不可复现的读数。③ **取证面「时点/顺序」句的背书义务（本批新增，源自 R19-31f）** —— 取证件（`evidence/**`）里凡描述「**执行顺序 / 时点**」的句子，必须由**落盘件的 mtime** 或**台账时间戳**程序化背书，**禁把计划写成既成事实**（A183 禁猜测值在**文档面**的同族形态）。本批实测命中：取证索引初版写「`close_agent` 在**本批** push 成功之后才调用」，而落盘件 mtime 实测为 **05:20:30**（晚于上一批 `orch_bfw4_commit.log` 的 05:18:56、早于本取证目录生成的 05:28）⇒ 该句把**计划**当成了**事实**，已同批订正并留 R19-31f 痕迹。本规由 lane S2 自报的 **2 条自纠**（`limits.py:1` 多行 docstring 开引号被整行替换毁语法 ＋ docstring 里写点号全路径导致 V9 假命中）与编排器自纠 **R19-31f** 共同触发；机器化归口 **FU-62**。"
+    ],
+    "round19_lane_S2_return": {
+      "round": 19,
+      "wave": 4,
+      "lane": "S2",
+      "task": "M1-01",
+      "subtask": "S2（卡片档位表 `orchestrator/tasks/M1-01.md:40` 原文冻结 **qwen3.8-max` high / 45k**）：**负例与边界矩阵实现 ＋ 文件接入底座** —— 重复切片 / 负人数 / 层级倒置 / 错误行长 / 重复码 / 孤立切片 / > 8 MiB 七类负例，宽表 A・长表 B・六行 CSV・等价 SOURCE_JSON **四入口同一套规范**的校验与行列定位结构落地。写权面＝design §11.1（纯领域层 `src/campaignlab/domain/ingest/**`，**新建**）＋ §11.3（应用层 G3/G4 最小例外）＋ §11.2（**G1** `api/common.py` 纯追加）＋ `src/campaignlab/infra/files.py` 等 **4 件纯追加**；派单文 §1.1/§1.2 实测 **新建 13 件**、§1.3 **纯追加 4 件**（`git diff --numstat` 的 `deleted` 列必须全 0）。**零测试、零证据、零 SQL、零事务、零 `import campaignlab.api`**（派单文 §7 的 V8/V9 两门）。",
+      "nickname": "Epicurus",
+      "agent_id": "01a1eb34-3545-7a30-886d-b03d3f36165e",
+      "lane_brief": "orchestrator/handoff/R19-lane-M1-01-S2.md",
+      "brief_face": {
+        "lines": 615,
+        "bytes": 72533,
+        "sha256_12": "543e774617b5",
+        "sha256": "543e774617b5e06be3e984d3b7a3c576f0b1ebea29c76d5d147217c43f0355ae"
+      },
+      "tier_used": "qwen3.8-max",
+      "reasoning": "high",
+      "tier_note": "档位以卡片档位表**原文冻结**为权威（`orchestrator/tasks/M1-01.md:40`，S2 行＝`qwen3.8-max` high / 45k / loop_cap 2），命中手册 **§6.3 强制 max 硬规则** ⇒ `tier_used == tier_planned == qwen3.8-max`，**未降档未升档**（C10）。lane 自陈「无法自证实际路由模型」⇒ 编排器**不采信自报**、以 `dispatch_log[20].tier_ruling` 原文为准（PRE-29）。",
+      "at": "2026-11-18T04:20:53+08:00",
+      "landed_at": "2026-11-18T07:50:13+08:00",
+      "result": "PARTIAL",
+      "loop_cap": 2,
+      "loop_rounds_used": 2,
+      "over_cap": false,
+      "loop_note": "`loop_cap=2`、lane 回执逐字报 `LOOP_USED: 2 / 2` ⇒ **用尽但未超帽**（`over_cap=false`：超帽＝**超过**上限，用尽不算超）。第 2 轮被 lane 自报的 **2 处自纠返工**吃掉（`limits.py:1` 多行 docstring 开引号被整行替换毁语法 ＋ docstring 里写点号全路径导致 V9 假命中）⇒ 已机器化为 **PRE-48①②**。",
+      "over_input_cap": true,
+      "over_cap_note": "**token 超档，如实登记不抹平（C10）**：档位 **45k**，而本棒**权威规范面**实测 design 1393 行/167927 B ＋ `M1-01.slice.json` 2875 行/60641 B ＋ 派单文 615 行/72533 B（含 §5.2 的 A277–A292 约 36 KB 逐字正文）≈ **291 KB** ⇒ 只能交付 **4/13** 件（`RESULT: PARTIAL`）。依 **A183** 记 `tokens=null`（本环境不暴露计量句柄）⇒ **禁**把估算值当实测填入护栏分母。**根因归编排器的派单文体量**（A295 已把「逐字携带」收窄为三段式，但派单文本体仍整包携带了 36 KB 裁定正文）⇒ **A301** 裁定**不记为 lane 的诚信缺陷**；档位预算复核归 **FU-66**，拆两棒续派归 **FU-70 / A300**。",
+      "tokens": null,
+      "tokens_estimated": true,
+      "tokens_note": "lane 回执逐字报 `TOKENS_SELF_ESTIMATE: null`（无计量句柄）⇒ 依 **A183** 记 `tokens=null` ＋ `tokens_estimated=true`，**不入** `flash_share_tokens` 分母（`token_entries_null` 41→**42**，`token_entries_known`/`tokens_known_*` 逐项不变）。**FU-61 保持 OPEN**（token 计量面在本环境**结构性不可测**，与档位无关 —— 这是本仓第 **3** 条 `tokens=null` 的 flash/max 无关样本）。",
+      "face": {
+        "src/campaignlab/domain/ingest/__init__.py": "1L/73B/2ad44a31e52d（**新建**，编排器**一字未改**；全 sha 2ad44a31e52d33eec7cec75b3385a93b133c93696c15b1a7060335a905c3042d）",
+        "src/campaignlab/domain/ingest/limits.py": "39L/1544B/b98965d4d621（**新建**，编排器**一字未改**；全 sha b98965d4d621b293fefe1830a0d598e373d53bd4a06d3b7774c8e9149816c2a5）",
+        "src/campaignlab/domain/ingest/model.py": "198L/5563B/62518861e62a（**新建**，编排器**一字未改**；全 sha 62518861e62a7fbf7daa14d022ea7881df7af687ce0feabc1a9ae32c8b4da50e）",
+        "src/campaignlab/domain/ingest/states.py": "242L/9848B/e941d047c5b8（**新建**，编排器**一字未改**；全 sha e941d047c5b8f6fb2b0704c31f41070459a64fa2b1ef5bb47290d30b6c67c6ae）"
+      },
+      "evidence": [
+        "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/00-index.md（117L/15703B/bab326b8f075）",
+        "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/lane-receipt-S2-raw.md（63L/10634B/5917772f9759）",
+        "evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log（53L/7633B/dedd225dde38；`.log` **不入** ruff 分母但**会入库**：`.gitignore` 的 `!evidence/**/*.log` 反排除）"
+      ],
+      "adjudication": "**6 条新裁定 A296–A301**（一一覆盖 lane 回执 §U 的 **U-1…U-6**）⇒ `counters_next.adjudication` A296 → **A302**。手册 §6.4：**禁**让 lane 自行裁定。其中 **U-5** 是**阻塞项**（档位/预算不足）⇒ **A300** 裁「拆两棒续派」并新建 **FU-70**；**U-2/U-3/U-4** 产生 design **§14 文末追记**义务（A214 窄豁免，`deleted` 列必须为 0）⇒ 归 `next_actions` ㉒ 第 ② 项**三项同批**做。",
+      "adjudications": [
+        "A296",
+        "A297",
+        "A298",
+        "A299",
+        "A300",
+        "A301"
+      ],
+      "u_items": [
+        "U-1",
+        "U-2",
+        "U-3",
+        "U-4",
+        "U-5",
+        "U-6"
+      ],
+      "defects_raised": [],
+      "followups_closed": [],
+      "followups_created": [
+        "FU-70"
+      ],
+      "followups_extended": [
+        "FU-69（**本批改挂、保持 OPEN**：其四项义务的前提「`api/common.py` 已按 G1 纯追加」因 §11.2 **未交付**而不成立 ⇒ 实测 `only_runtime=[]`/`only_pinned=[]`、`len(common.__all__)` 仍 **80**、**PRE-40 八件 DRIFT_COUNT=0** ⇒ 锁值**无需更新**；义务整体改挂到 **A300 棒乙**的 landing 批同批闭合。原文一字不改 —— D-011，只追加 `rescope_note_R19_S2land`）",
+        "FU-66（追加 **S2 的档位预算复核** —— 45k 档 vs 实测规范面 ≈291 KB；与 S1(55k vs 自估 ≈105k)/S5(8k)/S6(7k) 的同类自报并案。**A300 的关键结论**：根因是**携带量**而非档位 ⇒ 复核必须先按 PRE-15/PRE-19 重算「每棒实际需要的规范面摘录量」，再定档）",
+        "FU-62（把「判据期望值必须由同口径测量函数程序化派生」＋「复验脚本的汇总面/对照面必须模板化」机器化：**R19-31 / R19-32** 是同族第 **11 / 12** 次复发）"
+      ],
+      "preconditions_raised": [
+        "PRE-48"
+      ],
+      "self_corrections": [
+        "R19-31",
+        "R19-32",
+        "R19-33",
+        "R19-34",
+        "R19-35"
+      ],
+      "verification": "**VERIFY RESULT: GREEN（`JUDGES: 43 PASS: 43 FAIL: 0`）** —— 脚本 `.orch_tmp/orch_vS2p2.py`（340L/18904B/9101cf05179c，只读零副作用），逐字日志已归档为 `evidence/M0/ORCHESTRATOR/r19-m1-01-s2-landing/gates/V-independent-reverify.log`（53L/7633B/dedd225dde38）。含 **5 阳 3 阴**对照（PRE-44⑤）。**v1 的 5 处判据缺陷 ＋ 取证件 1 处事实错误已由 R19-31 同批修好**（v1 与 v2-run1 原件留档暂存区、不入库）。",
+      "verified_by_orchestrator": "编排器实测（PRE-29 禁采信自报）：4 件 face **三向对撞**（本批实测 × lane 自报 × 独立复验实测）逐字相符 · 编码四判据**重跑**（lane 自报的 BOM/CR 探针跑于最后一次 `sed`/`ruff format` **之前** ⇒ 禁沿用）＋ `file -bi` 4 件全数 `charset=utf-8` · `porcelain` 命中集 == **允许集**且允许集之外零命中（**V3d** 断言排除面不过宽）· `git diff --numstat` 与 `--cached --numstat` **均为空**（零 tracked 改动 ⇒ 4 件纯追加面 added=deleted=0）· 12 个硬禁面目录逐目录为空 · 上行依赖零命中（`campaignlab.api`/`sqlalchemy`/`conn.begin`，含 docstring 散文面）· 符号面 `common.__all__`=**80**(uniq80)/`deps`=**13**/`repos`=**16**/`PROBLEM_CODES`=**20**/DomainError 子类=**14**（§11.2 未交付 ⇒ 三值逐字不变）· design **§11.1 符号清单（从原文程序化解析）× AST 实取**的双向差集**零缺失**（`limits` 5/5、`model` 16/16、`states` **11/11** —— lane 自报「10 个」属**自报少数**，实取 11 个全数落地）· `model.py` 清单外公开名**恰为** U-3 的 3 枚 Literal · `Finding` 四字段名与顺序 == 实测 `Issue.model_fields`（**A297** 的裁定面）· `ImportTransition` 8 字段逐字对齐实测 `worker/states.py::Transition` ＋ `IMPORT_TRANSITIONS` 只注册 I1–I7（count=7）· `__init__.py` A276 形态（非零字节 ＋ 单行 docstring）· **A115＋A292 元守护**：4 件里 `len(*.__all__) == <整数>` 形态钉桩**上限制 == 0** · **PRE-40 冻结面 8 件 DRIFT_COUNT=0**（以 `git show HEAD:<rel>` 的**已提交态**复测，D-046 在飞污染防护）· 4 件全部落在 `in_flight_agents[13].write_set` 前缀面内（零越界）· 权威四门由 `run_commit` 在**冻结索引树**上重跑并与 `expect_counts` 逐条对账。",
+      "honesty": "① **`RESULT: PARTIAL` 予以追认、禁粉饰为 DONE**（C10）：交付面 §11.1 的**结构面 4 件**经独立复验全绿后入库；未交付的 **12 项**按派单文 §8 授权的降级选项**退回编排器**，拆两棒续派（**A300 / FU-70**）。② **token 超档属档位/预算不足、非档位错配** ⇒ 不计为浪费，但如实登记 `over_input_cap=true` 与超档驱动因子（291 KB vs 45k）。③ **U-6（lane 未逐字通读派单文）如实登记、不予免责亦不加重**（A301）：未读面属**规范面重复携带**，根因归编排器的派单文体量；但**禁**把该回执当作「已全读」采信。④ **编排器未采信交接摘要的「34 PASS / 0 FAIL」结论**，而是重跑复验脚本实测 ⇒ 当场发现 **5 处判据缺陷 ＋ 1 处把计划写成事实**（**R19-31**），同批修好后终判 **GREEN 43/43**。⑤ **本批 preflight 初版另有 5 处判据缺陷 ＋ 2 条无牙判据**（**R19-32**，第 1 次实跑 68 PASS / 6 FAIL 当场逮住），同批修好后 **GREEN 74/74**。⑥ **护栏①② 双双未达标如实报**：本批 +1 个 **max** 档样本 ⇒ tasks 0.5902→**0.5806**（**进一步远离** 0.60）、dev_lanes 0.4359→**0.425**、tokens **0.6655 不变**（tokens=null 不入分母）；**禁**降档或改口径「改善」读数（手册 §6.6 / A234）。⑦ **`flash_share_detail` 不可由 `subtask_log` 逐条求和复现**（实测 sum(`subtask_count`)=54 vs detail 61；tokens 非空 17 条/求和 5913000 vs detail 10 条/1190000）⇒ 属**增量维护**面而非全量重算，如实登记、机器化归口 FU-62；**禁**为「让账面自洽」回填历史条目（违反 D-011 与 C10）。",
+      "residual": "**AC 判定残留**：`tasks['M1-01'].acs` 实测 `[AC-005, AC-006]`，其**判定归 S8** ⇒ S8 入库前 M1-01 **禁判 DONE**（本批 `status` 保持 `IN_PROGRESS`）。**未交付 12 项**（`[GAPS]` 原文）：§11.1 剩 7 件：`locate.py`、`digests.py`、`normalize.py`、`validate.py`（N1–N18）、`parse.py`（含 `legacy_mapping_to_source_mapping`）、`api.py`、`infra/files.py`；§11.2 全部：`api/common.py` 的 11 DTO ＋ 2 Literal 再导出 ＋ `__all__`；`tests/unit/test_domain_errors.py` 两行钉桩改实取对撞；§11.3 全部：`application/import_service.py`、`application/import_jobs.py`、`repositories.py`/`deps.py`/`app.py` 三件纯追加。**下游依赖风险**：S6 的负例矩阵依赖 `validate.py`（N1–N18）而该件**未交付** ⇒ 派 S6 前**必须重测**依赖是否齐备（禁凭计划表推断）。**design §14 追记义务尚未落地**（A297 订正 §4.1 代码块 ＋ A298 补 3 名字进 §11.1 清单 ＋ A299 冻结 `InputTooLarge(detail)` 文案，**三项同批**）⇒ design 是 **PRE-40 冻结面**，其锁值 sha **会变**，必须写入新锁值并留 `previous` 痕迹（D-011）。**FU-67 未闭合前**，S8 采集 `-k validate_import` 一律标 `NO_TEETH`、禁标 PASS。**FU-69 保持 OPEN**（改挂棒乙）。**lane 侧契约门/卡片 gate 未执行**：契约门 lane 自报 `NOT_RUN`，但本棒**零改动** `contracts/**`/`spec/**`/`scripts/**` ⇒ 编排器判读 `NOT_APPLICABLE`；6 条卡片 gate 中 4 条判读 `NOT_APPLICABLE_YET`（`tests/golden/ingest`、`tests/domain/ingest` 派单时点实测 ABSENT）、1 条 `NO_TEETH`（`-k validate_import`，FU-67）⇒ **禁谎报 PASS**。",
+      "landing_tag": "R19-landS2partial",
+      "commit": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "commit_full": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "commit_note": "sha 由**下一次提交**回填（`resume.commit_backfill_pending_R19_S2land`），禁写猜测值（PRE-13 第三步 / A183）。`landing_commit` / `landing_commit_full` / `landing_commit_note_R19_S2land` 三键依 `round19_lane_S1_return` / `_S5_return` / `_S6_return` 的既有体例**由回填批写入**（入库批**刻意不预写**哨兵）⇒ 本批 43 键（＝S1 的 46 键减去这 3 键）。**PRE-46④**：本键**不复述**哨兵原串。"
+    },
+    "commit_backfill_pending_R19_S2land": {
+      "status": "PENDING_BACKFILL_BY_NEXT_LEDGER_ONLY_COMMIT",
+      "at": "2026-11-18T07:50:13+08:00",
+      "commit_tag": "R19-landS2partial",
+      "parent": "5745cb0",
+      "parent_full": "5745cb0a1c5bd0ca5f5d7a1d0ad2ea940b94d3af",
+      "why": "**PRE-13 第三步**：本批（tag `R19-landS2partial`）自身的 sha 在 `mutate_ledger` 执行时**尚不存在**（先写台账后 commit）⇒ 依 **A183 禁猜测值**写哨兵，由**下一次提交**回填真值。位点面**逐字**见本键 `sites_expected_after_mut`（由 mut **末断言的实测集合回写**，禁凭记忆枚举）。沿 `commit_backfill_pending_R19` / _R19_S5 / _R19_S5_spawn / _R19_checkpoint / _R19_resumeS5spawn / _R19_S5land / _R19_S5landBF / _R19_FU59 / _R19_FU59BF / _R19_wave3pd / _R19_wave3pd_spawn / _R19_S6land / _R19_S6landBF / _R19_ckS1pause / _R19_S1land / _R19_S1landBF / _R19_wave4pd / _R19_wave4pd_spawn / _R19_wave4pd_spawnBF 的既有惯例。**PRE-13 语义位点分离**（R19-12/13/14 的机器化 prevention）：本键 `parent` ＝「本批入库前的 HEAD」＝ 本批 §② **兑现**的那个提交（`5745cb0`），与 `baseline_authoritative.current.prev_head_carried`（语义＝上一**权威** HEAD ＝ `9c7fd59`）**取值不同、语义位点不同** ⇒ 分设两键并各自断言，禁合并。",
+      "to_backfill": [
+        "`resume.commit_backfill_pending_R19_S2land` 自身 `status` → **DONE** ＋ `backfilled_commit`/<sha> ＋ `backfilled_commit_full` ＋ `backfilled_at` ＋ `backfilled_by_tag`（沿 `commit_backfill_pending_R19_wave3pd` 体例）",
+        "`resume.baseline_authoritative.current.head` / `.head_full` ← 本提交 sha（**本批内容面变更 ⇒ 权威基线已推进到本提交**；PRE-46① 要求这两处必须是哨兵，故必须回填）",
+        "`resume.baseline_authoritative.history.[末条]` 的 `.head` / `.head_full` / `.counts_snapshot.head` / `.counts_snapshot.head_full` ← 本提交 sha（**4 处**；末条下标由容器实测长度派生，禁手打）",
+        "`resume.round19_self_corrections` 中本批新增条目（**R19-31 / R19-32 / R19-33 / R19-34 / R19-35**）的 `.commit` / `.commit_full` ← 本提交 sha（**10 处**），并按既有体例在 `.commit_note` **尾部延长**回填说明（A214 窄豁免：只追加、`deleted` 列 0）＋ 补 `commit_backfilled_at` / `commit_backfilled_by_tag` / `commit_note_backfill_<SUF>` 三痕迹键",
+        "`resume.round19_lane_S2_return` 的 `.commit` / `.commit_full` ← 本提交 sha；**另需补写** `.landing_commit` / `.landing_commit_full` / `.landing_commit_note_<SUF>` 三键（依 `round19_lane_S1_return` / `_S5_return` / `_S6_return` 的既有体例：**由回填批写入**，入库批刻意不预写 ⇒ 43 键 → 46 键）",
+        "`budget.subtask_log` 中本批新增样本（由 `lane=S2` / `task=M1-01` / `nickname=Epicurus` / `round=19` 四键唯一定位，**禁手打下标**）的 `.commit` / `.commit_full` ← 本提交 sha ＋ 补 `commit_backfilled_at`",
+        "`tasks.M1-01.s2_landing_R19` 的 `.commit` / `.commit_full` ← 本提交 sha；**另需补写** `.commit_backfilled_at`（依 `s1_landing_R19` 体例：41 键 ＝ 40 ＋ `commit_backfilled_at`，由回填批写入）",
+        "**PRE-46②③**：回填批的末断言必须**重新**做 `sentinel_paths(state)` 全量普查，并断言「旧哨兵**零残留**（除本批自己新登记的）」＋「新残留集合 == 本批新登记键的 `sites_expected_after_mut`」（**逐字集合相等**，PRE-35）；**禁**只回填不普查。**PRE-48③**：回填批若在取证件里写「时点/顺序」句，必须附**机器可核**的背书（落盘件 mtime / `git log --pretty=%aI`），禁把计划写成事实（R19-31f 的立规面）。"
+      ],
+      "obligor": "**本批之后的下一次提交**（纯台账批或带文件改动的入库批皆可）。计划中的下一批是「**独立 post-verify ＋ design §14 追记批（A297/A298/A299 三项同批）**」—— 依 `commit_backfill_pending_R19_wave4pd_spawnBF.obligor` 的**宽松措辞**先例，sha 回填随该批同批做、无需单独发一批。**若下一批改为 wave-5 的 predispatch 批**，同样随该批回填。**PRE-40 提醒**：design §14 追记批会**改变** design 的锁值 sha ⇒ 其后任何派单前必须**重测**冻结面 8 件（禁沿用本批 preflight 的读数）。**硬序以 `next_actions` ㉒ 为唯一权威面**（R19-33）。",
+      "precondition_carried": "**PRE-35 义务随键传递**：兑现本键的提交必须先做**全量哨兵普查**（`sentinel_paths(state)` walk 整个 `state.json`），断言「旧哨兵**零残留**（除本批自己新登记的）」＋「新残留集合与本键 `sites_expected_after_mut` **逐字集合相等**」；多一处即视为陈旧、必须同批清掉或显式递延。**PRE-37 第 1/3 款**：回填的 sha 必须由 `git rev-parse` **程序化派生**、禁手打；本键的描述性字段一律指向机器可读位点、**刻意不写数目字面量**（权威值 ＝ `sites_expected_after_mut`）。**PRE-39**：编排器写 `.orch_tmp/` 的 scratch 件一律 `orch_` 前缀；凡入库的 `.log`/`.md` 取证件必须过**编码四判据**，且 C0/C1 必须在**解码后的码点**上扫（R19-32a）。**PRE-40**：冻结面 sha 基线 **8 件**已于本批 preflight 复测 **DRIFT_HEAD=0**；续跑派单前须**重测**（本批**未更新**锁值 —— §11.2 未交付 ⇒ `api/common.py` 零改动，FU-69 的锁值更新义务已改挂棒乙的 landing 批）。**PRE-42①**：经传输层投递的 `bash -c` 载荷里**禁**半角双引号（一律走「PowerShell here-string → 去 CR → `[IO.File]::WriteAllText` UTF-8 无 BOM → `wsl` 执行脚本文件」范式）。**PRE-43**：`close_agent` / `spawn_agent` / `wait_agent` / `send_input` 的返回必须**即时落盘**再写台账（本批的 `close_agent_returned` 即该规的第二次完整遵守）。**PRE-44**：所有判据同口径派生 ＋ 配阳性/阴性对照。**PRE-45**：若本键兑现前又发生停机，交接文档必须**程序化枚举**漂移面并**重跑 preflight 实测**才可宣布闭合。**PRE-46**：入库批的哨兵链必须闭合、MSG 承诺面必须与 `mut()` 实现面同语义（①②③④ 四款）。**PRE-47**：顶层 `updated_at` 每批必刷 ＋ 末断言。**PRE-48**：① 多行 docstring 禁整行替换开引号；② docstring 内禁写点号全路径；③ 取证面「时点/顺序」句必须附机器可核背书。**A269**：派单文与 spawn message 里的基线读数必须用**最新权威 counts**，禁沿用旧值。",
+      "sites_expected_after_mut": [
+        "$.budget.subtask_log.[52].commit",
+        "$.budget.subtask_log.[52].commit_full",
+        "$.resume.baseline_authoritative.current.head",
+        "$.resume.baseline_authoritative.current.head_full",
+        "$.resume.baseline_authoritative.history.[30].counts_snapshot.head",
+        "$.resume.baseline_authoritative.history.[30].counts_snapshot.head_full",
+        "$.resume.baseline_authoritative.history.[30].head",
+        "$.resume.baseline_authoritative.history.[30].head_full",
+        "$.resume.commit_backfill_pending_R19_S2land.status",
+        "$.resume.round19_lane_S2_return.commit",
+        "$.resume.round19_lane_S2_return.commit_full",
+        "$.resume.round19_self_corrections.[30].commit",
+        "$.resume.round19_self_corrections.[30].commit_full",
+        "$.resume.round19_self_corrections.[31].commit",
+        "$.resume.round19_self_corrections.[31].commit_full",
+        "$.resume.round19_self_corrections.[32].commit",
+        "$.resume.round19_self_corrections.[32].commit_full",
+        "$.resume.round19_self_corrections.[33].commit",
+        "$.resume.round19_self_corrections.[33].commit_full",
+        "$.resume.round19_self_corrections.[34].commit",
+        "$.resume.round19_self_corrections.[34].commit_full",
+        "$.tasks.M1-01.s2_landing_R19.commit",
+        "$.tasks.M1-01.s2_landing_R19.commit_full"
+      ],
+      "sites_expected_note": "**严格执行 R19-6 的 fix ③ 与 PRE-37 第 3 款：描述性字段一律指向机器可读位点、不复述数字。** 权威值 ＝ 本键的 `sites_expected_after_mut`（由本段 mut **末断言的实测集合回写**，非凭记忆枚举 —— PRE-37 第 1 款）；续跑义务方**必须**以 `sentinel_paths(state)` 全量 walk 的实测集合与本键做**逐字集合相等**断言（多一处、少一处都判红），禁引用任何散文里的数目。期望集合的**结构**由容器实测下标派生（`history` 末条下标 / `subtask_log` 末条下标 / 本批新增自纠条目区间 `SC_IDX..SC_IDX+len-1`），禁手写下标字面量。",
+      "no_re_sentinelization_note_R19_S2land": "**与 `R19-landS1` 批的体例差异（如实登记）**：那一批的 `baseline_authoritative.current.head`/`.head_full` 在**上一批就是待兑现哨兵** ⇒ 先回填再重新哨兵化，两处出现在新旧两份清单的**交集**里属预期行为，需 `re_sentinelized_note_*` 显式登记。**本批相反**：`current.head` 的旧值实测为**真 sha `9c7fd59`**（纯台账批 `R19-backfill-wave4pd-spawn` 依 PRE-36/A261 不推进基线 ⇒ 基线仍停在上一个**内容面**批 `R19-predispatch-wave4-S2`），③ 段按 PRE-46① **先断言旧值为真 sha** 再写哨兵 ⇒ 新旧两份清单的交集**必须为空**，`_stale == []` 已加**严格**断言背书（比 s1l 更严）。被 displacing 的旧值按 D-011 留档于 `current.flat_fields_previous_values_R19_S2land` / `.head_backfill_previous_R19_S2land` / `.prev_head_carried_note_R19_S2land`。"
     }
   },
   "acceptance": {
