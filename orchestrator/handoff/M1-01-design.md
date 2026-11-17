@@ -1299,3 +1299,95 @@ def validation_digest(
 > 建议在 **S2 派单前**给出裁定；U-15 仅报备口径差异，不阻塞）。
 
 （本段暂无追记。）
+
+> **追记体例声明（A214 窄豁免）**：自本行起的全部内容均为**纯增量追加**。上一行「（本段暂无追记。）」
+> 是 S1 交付时点的占位符，依 A214「只追加、`git diff --numstat` 的 `deleted` 列必须为 **0**」
+> **逐字保留不改写**，其语义自本段起失效。§0–§13 一字未改：追加前后「前 1301 行拼接
+> `sha256[:12]`」双向核验相等（前值 `99dd191f43b3`，后值见 §14.6 与
+> `orchestrator/state.json` 的 `tasks.M1-01.design_doc_*` 痕迹键）。
+
+## 14.1 A280 · `SourceMapping.id` 的主键语义与冲突处理（裁定 §12 U-4）
+
+**裁定：rule A —— 客户端给的 `id` 即主键。**
+
+- 同 `id` ＋ **同 digest** ⇒ **幂等复用**既有行（**不 INSERT**）；
+- 同 `id` ＋ **异 digest** ⇒ **409 `VERSION_MISMATCH`**（复用 design 行 790 的既有语义，**禁**新增错误码，D-019）；
+- **§11.3 的 `SOURCE_MAPPING_ID_PREFIX` 常量自本追记起作废、禁在 S2–S8 落地**（服务端另发前缀主键与
+  「客户端 id 即主键」直接矛盾；契约切片实测 `SourceMapping.required` 含 `id` ⇒ 无兜底场景）。
+  §11.3 正文属 §0–§13 冻结面、依 A214 **不回改**，一律以本条为准。
+- 依据：`architecture/DOMAIN.md`「配置内容同 ID 变更要求新 ID」＋ `architecture/DATA.md`「每次映射实际变更
+  保存为新映射 ID」「相同银行和版本标签仅允许同摘要复用」。
+- **S2 落地义务**：幂等复用与 409 冲突各需具名用例；`content_json` 是 `SourceMapping` 的 canonical 投影，
+  **禁**出现「DTO 的 `id` ≠ 行主键」的双身份。
+
+## 14.2 A283 · `IngestLimits.max_slices` / `max_stage_items` 的取值来源（裁定 §12 U-7）
+
+**裁定：rule A —— 认定为「设计取值（spec 派生）」，以本追记说明来源，不另立 ADR。**
+
+- `max_slices = 10_000`、`max_stage_items = 90_000` **不是契约字面量**；来源＝`framework/DATA.md`
+  「分析基准先用甲乙各 510 切片，再生成 **1 万**聚合切片与 **10 万**事件的合成压力数据」＋ `OPERATIONS.md`
+  「10 万行导入 ≤ 60 秒」的工程目标。
+- **不设上限不可接受**：8 MiB 体积上限（413）只管字节数、管不了行数，病态密集 JSON（如 100 万行 × 1 列）
+  会在体积合规的前提下打穿 60 秒目标。
+- `max_findings = 1000` 是**契约字面量**（实测 `Import.issues.maxItems`），与上两个数**不同层级**，
+  引用时禁混为一谈（D-012 / D-014：每个数字都要给归因）。
+- 未达 ADR 门槛（非跨模块架构抉择）⇒ 不另立 ADR。
+
+## 14.3 A285 · AC-006「CSV/JSON 同值」的口径（裁定 §12 U-9）
+
+**裁定：rule A —— 同值 ＝ 归一化业务值 ＋ `metadata_digest`；明确排除 `validation_digest`。**
+
+- 实测并冻结：CSV 通道与 SOURCE_JSON 通道的**切片值**与 **`metadata_digest`** 相同，但
+  `validation_digest` 的 `files` 段含**原字节 SHA**，CSV 通道（2 个上传件）与 SOURCE_JSON 通道（1 个上传件）
+  **必然不同** ⇒ 要求 `validation_digest` 同值是**逻辑不可能**。
+- `architecture/DATA.md`「校验摘要覆盖**文件原始 SHA**、映射内容、元数据及解析器版本」是硬要求
+  ⇒ **否决**候选 B（把 `files` 段从投影里去掉）：那会直接违反 spec，且会毁掉「换文件必须重校验」的安全性。
+- **S8 判 AC-006 时一律按本口径**；design §10 的相关表述以本条为准（§0–§13 不回改）。
+
+## 14.4 A292 · G2 的实际改法 ＋ 元守护口径迁移（**订正 A281**）
+
+**裁定：G2 改为「显式名单实取对撞」，并**同批**迁移元守护的口径。A281 的 `fact` 实测不成立，本条订正之。**
+
+- **实测事实（A292 的依据）**：全仓 `len(<common 别名>.__all__) == <整数>` 形态的硬编码计数钉桩
+  **只有 2 处**，恰是 `tests/unit/test_domain_errors.py:176` 与 `:177`；而元守护
+  `test_all_common_surface_pins_agree_with_runtime` 的下界常量 `ALL_COUNT_PIN_SITES_FLOOR` 实测值 **2**。
+  ⇒ A281 的 `fact`「候选 B 保留 `len(set(...))` 那一处的钉桩形态即可满足下界」**不成立**：
+  保留一处 ⇒ 处数 1 < 下界 2 ⇒ 元守护仍判「denominator 塌陷」；两处都去 ⇒ 处数 0，同样判红。
+  **A115（禁写死符号面计数）与原下界制不可兼得**，故必须迁移元守护本身。
+- **G2 的改法（已由编排器落地，非 lane）**：`:176`/`:177` 两行替换为与 `COMMON_ALL_NAMES`
+  **显式名单**的对撞 ＋ 重复声明检查。名单由 `common.__all__` **程序化生成**（禁手打），
+  带标记串 `common-surface-live-collision` 供元守护定位。
+  - 为什么是「名单」而不是「与模块运行期公开名集对撞」：实测 `common.py` 顶层绑定的公开名有 **10** 个
+    **不在** `__all__` 内（`CURSOR_TAG_HEX_LENGTH` / `JobKind` / `JobState` / `NoteStr` / `ObjectKind` /
+    `REPLAYED_HEADERS` / `RevisionInt` / `Role` / `SourceClass` / `request_id_of`）⇒ 「顶层绑定 ⊆ `__all__`」
+    这个对撞口径**当下即不成立**，不可用。名单对撞钉的是「**已声明的公开面**」这一集合本身，
+    语义严格强于计数钉桩（钉名字集合而非其基数），且 diff 直接显示增删了**哪个符号**。
+- **元守护的迁移（同批、同一提交）**：`ALL_COUNT_PIN_SITES_FLOOR = 2`（下界制）→
+  `ALL_COUNT_PIN_SITES_CEILING = 0`（上限制，A115 机器化：全仓禁再出现硬编码计数钉桩）
+  ＋ 新增 `LIVE_COLLISION_MARKER` / `LIVE_COLLISION_SITES_FLOOR = 1`（下界制**保留原有的牙**：
+  禁靠删守护变绿）。标记串在本文件内**以拼接构造**，否则本文件会把自己扫成守护位点（自指 ⇒ 牙失效）。
+  阳性对照同步迁移：合成一处硬编码钉桩必须被上限判据扫出；另配阴性对照（不含标记串的源不得扫出位点）。
+- **无需开 CR**：A115 本就禁止硬编码计数，此改是**落实既有规则**；元守护的立法意图
+  （R19-10：禁多处各写一份导致静默分叉、禁靠删钉桩变绿）在迁移后**被更强地满足**
+  （名单是全仓单点 ⇒ 分叉面为 0；下界制换成对撞守护的下界 ⇒ 牙未减）。
+- **对 S2 的影响（写权面不变）**：`tests/unit/test_domain_errors.py` 已在 `tasks.M1-01.scope` 内（A277 的 G2）
+  ⇒ S2 追加 `common.__all__` 新名字时，**必须同批**在 `COMMON_ALL_NAMES` 名单里追加对应名字并给
+  D-012 / D-014 归因；`tests/unit/test_if_match_pattern_single_source.py` **不在** S2 写权面内、
+  且迁移后**无需再动**（上限制恒满足、下界由标记串守护）。
+
+## 14.5 A291 · fixtures 路径口径报备（裁定 §12 U-15，**不阻塞**）
+
+**裁定：rule A —— 卡片 `inputs:` 里的 `fixtures/...` 是**简写**，S2–S8 一律使用实测全路径
+`spec/CampaignLab-SDD-v1.0/fixtures/**`。** 仓库**没有**顶层 `fixtures/` 目录；`spec/**` 是只读硬禁面
+⇒ **否决**候选 B（新建顶层软链/副本）。派单文与 lane 回执一律写全路径（PRE-37 第 1 款）。
+
+## 14.6 本段追记的自检（命令 → 判据；均在 WSL 仓库根 `/home/szf/dev/CampaignLab` 执行）
+
+| # | 命令 | 判据（期望值一律**实取**，禁写死） |
+|---|---|---|
+| 1 | `git diff --numstat -- orchestrator/handoff/M1-01-design.md` | `deleted` 列 == **0**（A214 窄豁免：只追加） |
+| 2 | 追加前「前 1301 行拼接」的 `sha256[:12]` | == `99dd191f43b3`（**双向核验**的前值） |
+| 3 | 追加后取前 1301 行重算 `sha256[:12]` | 与第 2 行**逐字相等**（§0–§13 ＋ 占位行一字未改） |
+| 4 | `uv run --no-sync pytest -q tests/unit/test_domain_errors.py tests/unit/test_if_match_pattern_single_source.py` | rc == 0，且**用例数与迁移前相同**（零新增/零删除测试函数） |
+| 5 | `uv run --no-sync ruff format --check .` ／ `ruff check .` ／ `mypy` | 三门 rc == 0（冻结索引树口径，R11-3） |
+| 6 | `grep -rn "len(common.__all__) ==" --include=*.py tests/ src/ scripts/` | **零命中**（A115 上限制的实际形态；命中即判红） |

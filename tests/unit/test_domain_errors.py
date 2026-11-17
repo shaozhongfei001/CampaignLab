@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Final
 
 import pytest
 
@@ -23,6 +24,95 @@ from campaignlab.domain.errors import PROBLEM_CODES, DomainError
 REPO = Path(__file__).resolve().parents[2]
 API_MD = REPO / "spec" / "CampaignLab-SDD-v1.0" / "architecture" / "API.md"
 COMMON_PY = REPO / "src" / "campaignlab" / "api" / "common.py"
+
+#: common-surface-live-collision（A292 / A115）：公开面的**显式名单**，
+#: 由 `common.__all__` 实取生成（程序化派生，禁手打 —— PRE-37 第 1 款）。
+#: 以「名单对撞」替代 A115 禁止的「写死项数」：公开面任何增减都必须在本名单里增删对应名字，
+#: 于是 diff 直接显示**加了/删了哪个符号**，而不是只显示一个数字从 80 变 81；且全仓**单点**
+#: ⇒ 根除 R19-10 的「多处各写一份、只改了自己扫到的那一处」的分叉面。
+COMMON_ALL_NAMES: Final = (
+    "AccessDenied",
+    "Activity",
+    "ActivityCreate",
+    "ActivityPage",
+    "ActivityStatus",
+    "ActivityUpdate",
+    "Binding",
+    "BoundaryCase",
+    "CURSOR_MAX_LENGTH",
+    "CallbackCaseInput",
+    "CallbackEvent",
+    "CallbackRule",
+    "CaseInput",
+    "Confirmation",
+    "CouponCaseInput",
+    "CouponEvent",
+    "CouponRule",
+    "DomainError",
+    "FieldChange",
+    "Health",
+    "IDEMPOTENCY_KEY_HEADER",
+    "IDEMPOTENCY_KEY_MAX_LENGTH",
+    "IDEMPOTENCY_KEY_MIN_LENGTH",
+    "IF_MATCH_PATTERN",
+    "IdempotencyConflict",
+    "InputTooLarge",
+    "InternalFailure",
+    "InvalidScope",
+    "Issue",
+    "Job",
+    "JobCapacity",
+    "JobPage",
+    "ObjectRef",
+    "OriginDenied",
+    "OriginHostGuard",
+    "PROBLEM_CODES",
+    "PROBLEM_MEDIA_TYPE",
+    "PreconditionRequired",
+    "Problem",
+    "RESOURCE_ID_PATTERN",
+    "ResourceNotFound",
+    "RevisionConflict",
+    "RuleCheck",
+    "RuleCheckState",
+    "RuleContent",
+    "RuleCreate",
+    "RuleDiff",
+    "RuleState",
+    "RuleUpdate",
+    "RuleVersion",
+    "RuleVersionPage",
+    "Session",
+    "SessionExchange",
+    "SessionInvalid",
+    "StateConflict",
+    "TemplateId",
+    "Term",
+    "UNSAFE_METHODS",
+    "ValidationFailure",
+    "Workspace",
+    "WorkspaceCreate",
+    "WorkspacePage",
+    "X_REQUEST_ID_HEADER",
+    "accepted_response",
+    "canonical_json",
+    "check_if_match",
+    "decode_cursor",
+    "encode_cursor",
+    "etag",
+    "idempotency_envelope",
+    "install_error_handlers",
+    "loopback_allowlists",
+    "problem_response",
+    "problem_type",
+    "read_body_within_limit",
+    "replay_from_envelope",
+    "request_digest",
+    "request_id_middleware",
+    "status_to_code",
+    "validate_idempotency_key",
+)
+
 
 MOVED_PUBLIC = (
     "PROBLEM_CODES",
@@ -172,9 +262,26 @@ def test_common_public_surface_is_unchanged() -> None:
     ``tests/unit/test_if_match_pattern_single_source.py``。
     函数名沿用历史（初版语义＝「搬移前后不变」），现语义已升级为
     「公开面任何增减都必须在本用例显式过账」—— D-044 修正了原名/原 docstring 与断言体自相矛盾之处。
+
+    **A292 口径迁移（订正 A281）**：上文「78 / 79 → 80」的归因段是
+    **历史留档、逐字不改写**（D-011），
+    但其描述的「钉死项数」形态已**废止** —— A115 本就禁止写死符号面计数，而元守护
+    ``test_all_common_surface_pins_agree_with_runtime`` 的下界制（钉桩处数 >= 2）与 A115 不可兼得：
+    全仓硬编码计数钉桩实测**只有 2 处**、恰是本用例的这两行，去掉魔数即「分母塌陷」判红、
+    保留魔数即违 A115。故同批把元守护迁移为**上限制 ＋ 实取对撞下界制**（见
+    ``tests/unit/test_if_match_pattern_single_source.py`` 判据 4），
+    本用例改为与 ``COMMON_ALL_NAMES``
+    显式名单对撞。上文首句「``__all__`` 项数、全部可解析、20 码全在其中」里的「项数」一项，
+    自本迁移起读作「**名单**」（语义更强：钉的是名字集合而非其基数）。
     """
-    assert len(common.__all__) == 80
-    assert len(set(common.__all__)) == 80
+    # common-surface-live-collision（A292：实取对撞，禁写死项数 —— A115）
+    assert set(common.__all__) == set(COMMON_ALL_NAMES), (
+        "api/common.py 的公开面与本用例的显式名单分叉 —— 公开面任何增减都必须**同批**在"
+        " `COMMON_ALL_NAMES` 里过账（D-012 / D-014 归因）："
+        f"only_runtime={sorted(set(common.__all__) - set(COMMON_ALL_NAMES))} "
+        f"only_pinned={sorted(set(COMMON_ALL_NAMES) - set(common.__all__))}"
+    )
+    assert len(set(common.__all__)) == len(common.__all__), "__all__ 内有重复声明"
     for name in common.__all__:
         assert hasattr(common, name), f"__all__ 声明了但取不到：{name}"
     assert set(MOVED_PUBLIC) <= set(common.__all__)

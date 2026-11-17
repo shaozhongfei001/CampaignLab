@@ -306,17 +306,27 @@ def test_positive_control_contract_count_drift_would_be_caught() -> None:
 
 # ------------------------------------------------------- 判据 4（同族钉桩禁静默分叉）
 
-#: 钉住 ``api/common.py`` 公开面项数的**同族**判据分散在多个测试文件里（本批实测：
-#: ``tests/unit/test_domain_errors.py`` 与 ``tests/integration/jobs/test_jobs_router_s4.py``）。
-#: **R19-10 的教训**：同一事实被多处写死时，改动方只改了自己扫到的那一处 ⇒ 另一处静默陈旧，
-#: 而四门（ruff/mypy/pytest/counts）里只有 pytest 偶然能撞上。故这里加一条**元判据**：
-#: 全仓所有 ``len(<common 别名>.__all__) == <整数>`` 形态的钉桩，其整数必须两两相等且等于
-#: 运行期实测项数；钉桩处数还必须 >= 下界（禁靠「把钉桩删光」来变绿）。
+#: **A292 口径迁移（订正 A281）**：本判据原为「同族钉桩整数两两相等且处数 >= 下界 2」的**下界制**，
+#: 与 **A115**（禁写死符号面计数）**不可兼得** —— 全仓
+#: ``len(<common 别名>.__all__) == <整数>`` 形态的
+#: 硬编码计数钉桩实测**只有 2 处**、恰是 ``tests/unit/test_domain_errors.py:176/:177``，
+#: 去掉魔数即「分母塌陷」判红、保留魔数即违 A115（A281 的 ``fact`` 称「保留一处即可满足下界」，
+#: 实测不成立：保留一处 ⇒ 处数 1 < 下界 2，仍判红）。故迁移为：
+#:   · **上限制**：硬编码计数钉桩处数 <= ``ALL_COUNT_PIN_SITES_CEILING``（＝ 0，A115 机器化）；
+#:   · **下界制**（保留原有的牙）：带 ``LIVE_COLLISION_MARKER`` 的实取对撞守护处数 >=
+#:     ``LIVE_COLLISION_SITES_FLOOR``（＝ 1）⇒ **禁靠删守护变绿**，与原下界制的立法意图一致。
+#: **R19-10 的教训依然成立**且被更强地满足：名单对撞是**全仓单点**，不存在「多处各写一份、
+#: 只改了自己扫到的那一处」的分叉面。
 ALL_COUNT_PIN_RE: Final = re.compile(
     r"len\((?:set\()?(?P<obj>[A-Za-z_][\w.]*)\.__all__\)\)?\s*==\s*(?P<n>\d+)"
 )
 COMMON_ALIASES: Final = frozenset({"common", "common_module"})
-ALL_COUNT_PIN_SITES_FLOOR: Final = 2
+ALL_COUNT_PIN_SITES_CEILING: Final = 0
+
+#: 刻意以拼接构造：本文件若直接写出完整标记串，``live_collision_sites`` 会把自己扫成守护位点
+#: （自指 ⇒ 下界制失去牙：删掉 ``test_domain_errors.py`` 里的真守护也不会判红）。
+LIVE_COLLISION_MARKER: Final = "common-surface-live" + "-collision"
+LIVE_COLLISION_SITES_FLOOR: Final = 1
 
 
 def all_count_pins(sources: Mapping[str, str]) -> list[tuple[str, int, str, int]]:
@@ -331,24 +341,47 @@ def all_count_pins(sources: Mapping[str, str]) -> list[tuple[str, int, str, int]
     return out
 
 
+def live_collision_sites(sources: Mapping[str, str]) -> list[tuple[str, int]]:
+    """扫出带 ``LIVE_COLLISION_MARKER`` 的行 ＝ 替代硬编码计数钉桩的**实取对撞**守护位点。"""
+    out: list[tuple[str, int]] = []
+    for rel, text in sorted(sources.items()):
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if LIVE_COLLISION_MARKER in line:
+                out.append((rel, lineno))
+    return out
+
+
 def test_all_common_surface_pins_agree_with_runtime() -> None:
-    """判据 4：所有钉住 ``common.__all__`` 项数的整数必须与运行期实测逐字相等。"""
-    actual = len(common.__all__)
-    pins = all_count_pins(in_scope_sources())
-    assert len(pins) >= ALL_COUNT_PIN_SITES_FLOOR, (
-        f"denominator 塌陷：同族钉桩实测 {len(pins)} 处 < 下界 "
-        f"{ALL_COUNT_PIN_SITES_FLOOR}（{pins}）—— 禁靠删钉桩变绿"
+    """判据 4（A292 迁移后）：全仓零硬编码计数钉桩 ＋ 至少 1 处实取对撞守护 ＋ 名单本身自洽。
+
+    函数名沿用历史（D-044 体例：名称变更会打断 ``tests/integration/jobs/test_jobs_router_s4.py:346``
+    的交叉引用），语义已由「钉桩整数两两相等」升级为「禁钉桩 ＋ 必须有实取对撞守护」。
+    """
+    sources = in_scope_sources()
+    pins = all_count_pins(sources)
+    assert len(pins) <= ALL_COUNT_PIN_SITES_CEILING, (
+        f"A115 违规：仍有 {len(pins)} 处硬编码公开面计数钉桩（{pins}）—— "
+        "公开面计数一律改为实取对撞（A292），禁写死"
     )
-    stale = [p for p in pins if p[3] != actual]
-    assert stale == [], f"同族钉桩与运行期实测分叉（actual={actual}）：{stale}"
+    sites = live_collision_sites(sources)
+    assert len(sites) >= LIVE_COLLISION_SITES_FLOOR, (
+        f"denominator 塌陷：实取对撞守护实测 {len(sites)} 处 < 下界 "
+        f"{LIVE_COLLISION_SITES_FLOOR} —— 禁靠删守护变绿"
+    )
+    assert len(set(common.__all__)) == len(common.__all__), "common.__all__ 内有重复声明"
 
 
 def test_positive_control_a_stale_all_count_pin_would_be_caught() -> None:
-    """阳性对照⑥：合成一处陈旧钉桩喂给判据 4 的**同一函数**，必须被扫出来。
+    """阳性对照⑥（A292 迁移后）：合成一处硬编码计数钉桩喂给判据 4 的**同一函数**，必须被扫出来。
 
-    合成串刻意用拼接构造（``== `` 之后接 ``"79"``），否则本行自己就会被判据 4 扫成陈旧钉桩。
+    合成串刻意用拼接构造（``== `` 之后接 ``"79"``），否则本行自己就会被上限判据扫成钉桩。
+    同批配**阴性对照**：不含标记串的源里不得扫出任何实取对撞位点（防「恒判有」型假牙）。
     """
     synth = {"tests/unit/test_synth.py": "    assert len(common.__all__) == " + "79\n"}
     pins = all_count_pins(synth)
     assert pins == [("tests/unit/test_synth.py", 1, "common", 79)]
-    assert [p for p in pins if p[3] != len(common.__all__)] != []
+    assert len(pins) > ALL_COUNT_PIN_SITES_CEILING, "上限判据无牙：合成钉桩未被判为违规"
+    assert live_collision_sites({"tests/unit/test_synth.py": "x = 1\n"}) == [], (
+        "阴性对照失效：不含标记串的源被扫出了实取对撞位点"
+    )
+    assert live_collision_sites(synth) == [], "阴性对照失效：钉桩串被误认为对撞守护"
