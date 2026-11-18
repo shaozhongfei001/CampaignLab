@@ -1391,3 +1391,130 @@ def validation_digest(
 | 4 | `uv run --no-sync pytest -q tests/unit/test_domain_errors.py tests/unit/test_if_match_pattern_single_source.py` | rc == 0，且**用例数与迁移前相同**（零新增/零删除测试函数） |
 | 5 | `uv run --no-sync ruff format --check .` ／ `ruff check .` ／ `mypy` | 三门 rc == 0（冻结索引树口径，R11-3） |
 | 6 | `grep -rn "len(common.__all__) ==" --include=*.py tests/ src/ scripts/` | **零命中**（A115 上限制的实际形态；命中即判红） |
+
+## 14.7 A297 · `Finding` 四字段序（裁定 lane S2 回执 §U 的 U-2）
+
+**裁定：以实测 `Issue.model_fields` 的序为准 —— `code` / `location` / `message` / `severity`。**
+
+- **失真面**：§4.1 代码块第 **418** 行写作
+  `Finding            : (code: str, severity: str, location: str, message: str)`，
+  把 `severity` 与 `location` 的**位次互换**了，与同在 §4.1 的正文第 **432–434** 行（**已写对**：
+  「`Finding` 的四个字段名与顺序**逐字等于** `api/common.py::Issue` 的实测 `model_fields`
+  （`code` / `location` / `message` / `severity`）」）自相矛盾。§4.1 代码块属 §0–§13 冻结面，
+  依 **A214 窄豁免不回改**，**一律以本条为准**。
+- **实测定论**（本批 preflight 以 `uv run --no-sync python` 于项目 venv 的 **Python 3.14.10** 实取，
+  禁手打 —— PRE-37；**禁**用系统 `python3`＝3.12.3，PEP 758 口径不同）：
+  `Issue.model_fields` 的键序 == `dataclasses.fields(model.Finding)` 的名序
+  == `code, location, message, severity`，两者**逐字相等**；`api/common.py` 仍是 PRE-40 冻结面
+  锁值 `b2908617d193`（1186L/47180B，本批 `DRIFT_HEAD` 实测 **0**，该件零改动）。
+- **理由**：`Issue` 是**已入库的权威契约面**，`Finding` 必须与之同序才能做逐字对撞；
+  文档里的代码块不是可执行面（A297 `ruling` 原文口径）。
+- **S6 落地义务**：跨层对撞断言一律以本条的字段序为判据源。§4.1 正文第 **434** 行冻结的映射
+  `Issue(code=f.code, location=f.location, message=f.message, severity=f.severity)` **不受影响**
+  （它按**名**取值，与声明序无关）；§4.1 第 **439** 行要求的
+  `INGEST_SEVERITIES == tuple(get_args(Issue.model_fields["severity"].annotation))` 同样不受影响。
+
+## 14.8 A298 · 把三枚 `Literal` 补进 §11.1 的 `model.py` 符号清单（裁定 lane S2 回执 §U 的 U-3）
+
+**裁定：追认 A 案 —— `MappingLayout` / `SourceMoneyUnit` / `DedupMode` 三枚落 `model.py` 正确；
+本条把这三个名字补进 §11.1 的符号清单。**
+
+- **补全后的权威清单**（§11.1 第 **985** 行 `model.py:` 的原 **16** 名 ＋ 本条补入的 **3** 名
+  ＝ **19** 名，与 `model.py.__all__` **逐字集合相等**）：
+  - 原 16 名（第 985 行原文序）：`FileRef, RawTable, RawSource, SourceRow, NormalizedSlice,
+    MappingSpec, LongColumnSpec, Finding, SliceCounts, IngestResult, IngestLimits,
+    DEFAULT_LIMITS, UploadPayload, UploadedFile, SliceKey, INGEST_SEVERITIES`
+  - **本条补入 3 名**：`MappingLayout, SourceMoneyUnit, DedupMode`
+  - §11.1 第 985 行属 §0–§13 冻结面，依 **A214 不回改**，**一律以本条为准**。
+- **三枚的定义逐字**（实测 `model.py`，行号为实测值）：
+  - 第 **45** 行 `MappingLayout = Literal["wide", "long"]`
+  - 第 **46** 行 `SourceMoneyUnit = Literal["CNY_YUAN", "CNY_FEN"]`
+  - 第 **47** 行 `DedupMode = Literal["SYNTHETIC_INTERVAL", "DISTINCT_CUSTOMER", "AGGREGATE_ONLY"]`
+  三者均已被 §4.1 代码块第 **412–416** 行的 `MappingSpec` 字段注解引用
+  （`layout: MappingLayout` / `source_money_unit: SourceMoneyUnit` / `dedup_mode: DedupMode`），
+  只是**未列入** §11.1 的符号清单 ⇒ 属**清单滞后于实现**，不是实现越界。
+- **必要性**：符号清单是 **S6 的 AST 守护的判据源**；判据源缺名会把三枚**合法**公开名判成
+  「越出符号清单」而**假红**（PRE-44① 判据同口径要求）。
+- **口径对账（如实登记，禁静默「订正」A298 —— C10 / D-011）**：A298 登记的 `fact` 用 V6 口径记为
+  `count` **20** vs `spec_count` **16**；本批直接实测 `len(model.__all__)` == **19**。
+  **两个读数都对**，差别只在**是否把 `__all__` 自身计入顶层绑定**：实测 `model.py` 的**全部**
+  顶层绑定 == **20** 个（含 `__all__` 自身），其中 dunder/私有 == **1** 个（即 `__all__`），
+  公开名 == **19** 个，且 AST 公开名集合与 `__all__` 集合**双向差集均为空**。对账式：
+  **20（全部顶层绑定） − 16（§11.1 清单） − 1（`__all__` 自身） == 3 == `extra_public`**；
+  且 `extra_public` 实测恰为 `DedupMode, MappingLayout, SourceMoneyUnit` 三枚、
+  `missing`（清单有而实现无）实测为**空**。
+- **S6 落地义务**：AST 守护的判据源 ＝ 本条补全后的 **19** 名清单，且守护**必须显式排除
+  `__all__` 自身**，否则会重现同一口径分叉（本条已把该分叉的成因机器化写清）。
+  禁写死计数，一律 `inspect` / AST 实取（R8-1 / A115 / R12-4）。
+
+## 14.9 A299 · 冻结 `InputTooLarge(detail)` 的文案与体积上限的边界语义（裁定 lane S2 回执 §U 的 U-4）
+
+**裁定：冻结 lane 已入库的实现文案为权威（PRE-29：以在仓可执行面为准，禁以未冻结的文档散文为准）。
+本节是**补缺口**、不是裁冲突 —— design 此前只在 §5.2 冻结了阈值与错误码，从未冻结 `detail` 字面串。**
+
+- **权威原文**（`src/campaignlab/domain/ingest/limits.py` 第 **39** 行，该件 39L/1544B/`b98965d4d621`；
+  逐字抄录、**禁改一个字符**）：
+
+```python
+raise InputTooLarge(f"{location}：{size_bytes} 字节超过上限 {limit} 字节")
+```
+
+  ⚠ `{location}` 之后的分隔符是**全角冒号 U+FF1A**（实测 UTF-8 码元 `ef bc 9a`），**禁**改成半角；
+  实测该行含**恰 1 个** U+FF1A。该串是**内联 f-string**（需插值 `location` / `size_bytes` /
+  `limit` 三个运行期值），**不是**私有常量。
+- **运行期实证**（本批探针于 Python 3.14.10 **实跑**，非静态读码）：
+  `assert_within_size_limit(fmt="LEGACY_SYNTHETIC_JSON", size_bytes=8388608, location="/file")`
+  → **不抛**；`size_bytes=8388609` → 抛 `InputTooLarge`，其 `detail` 实测**逐字**为
+  `/file：8388609 字节超过上限 8388608 字节`（含全角冒号）⇒ 上行模板与运行期输出**双向对撞一致**。
+- **唯一性**（实测）：S2 交付面里 `InputTooLarge` 的 raise 点**恰 1 处**，即第 39 行。
+  `limits.py` 内 `raise InputTooLarge` 计数 == **1**、`from campaignlab.domain.errors import
+  InputTooLarge` 计数 == **1**（第 **12** 行，**禁新增异常类**）；`states.py` 内 `InputTooLarge`
+  出现次数 == **0**。
+- **边界语义（本条新冻结，S6/S7 的断言必须照此）**：`assert_within_size_limit` 用**严格大于**判定
+  （实测 `size_bytes > limit` 恰 **1** 处、`size_bytes >= limit` **0** 处）⇒
+  **恰好等于上限放行、严格大于上限才拒**。与 AC-005「大于 8MiB 拒绝」及 §9.1 第 **903** 行
+  「原型 v0.1 合成文件大于 8 MiB 拒绝」的口径一致。
+- **形参形态冻结**：`assert_within_size_limit(*, fmt, size_bytes, location)` —— 三个形参一律
+  **keyword-only**（实测签名带 `*`）。
+- **三档上限与 `format` 的对应**（阈值本身 §5.2 第 **677–679** 行已冻结，此处只登记实测的
+  **分派实现**，不重复裁定）：`SYNTHETIC_V01_MAX_BYTES: Final = 8 * 1024 * 1024`（实测 8388608）→
+  `fmt == "LEGACY_SYNTHETIC_JSON"`；`GENERIC_UPLOAD_MAX_BYTES: Final = 64 * 1024 * 1024`
+  （实测 67108864）→ 其余（实测 `SOURCE_JSON` 与 `SOURCE_CSV` 均取此值，即**每个**上传件）；
+  `MAX_FILES_PER_IMPORT: Final = 32`；分派函数 `max_bytes_for_format(fmt)`。1 MiB 的
+  `config.MAX_JSON_BODY_BYTES` **仅**用于 JSON 请求正文（`configureImport`），
+  **禁与文件上限混用**（ADR-005 §2.3）。三枚常量住 **`limits.py`**（**不住** `model.py`、
+  **不住** `config.py`）。
+- **范围界定（如实订正 A299 登记 `fact` 的措辞含糊处 —— D-011：原文不改写，只追加本条）**：
+  A299 的 `fact` 提到「`_BUSY_DETAIL` 等私有常量的同族形态」，但实测 `states.py` 第 **74–77** 行的
+  `_BUSY_DETAIL` / `_PUBLISHED_DETAIL` / `_NOT_CONFIGURED_DETAIL` / `_NOT_VALIDATING_DETAIL`
+  四枚抛的是 **`StateConflict`**、**不是** `InputTooLarge`；其 `detail` 的权威面是 design
+  **§3.4**（第 **350–375** 行「非法迁移的错误映射（**逐条冻结**）」），与本条**无关**。
+  精确计数：`states.py` 内 `raise StateConflict` 共 **7** 处（第 **222 / 224 / 235 / 237 / 239 /
+  241 / 242** 行），其中**消费上述四枚常量的只有 5 处**（第 **235 / 237 / 239 / 241 / 242** 行），
+  另 **2** 处（第 **222 / 224** 行）不消费它们。故「同族」只在**「中文 detail 文案已被实现面
+  冻结」**这一层成立，**不成立**于「同为私有常量」这一层，也**不成立**于「同一异常类」这一层。
+- **S6 落地义务**：**§5.1 负例矩阵**第 **667** 行点名的四条 `size_limit` 用例
+  （`test_size_limit_rejects_synthetic_over_8mib` / `test_size_limit_rejects_generic_over_64mib` /
+  `test_size_limit_leaves_no_partial_artifact` / `test_size_limit_problem_shape_is_413_input_too_large`）
+  的期望串**一律从 `limits.py` 实取**、禁手打；错误码与状态沿用 `domain/errors.py` 的
+  `"INPUT_TOO_LARGE": 413`（第 **75** 行）与摘要「输入体积超过上限」（第 **99** 行），
+  **禁新增错误码**（D-019）。
+
+## 14.10 本段追记（§14.7–§14.9）的自检（命令 → 判据；均在 WSL 仓库根 `/home/szf/dev/CampaignLab` 执行）
+
+| # | 命令 | 判据（期望值一律**实取**，禁写死） |
+|---|---|---|
+| 1 | `git diff --numstat -- orchestrator/handoff/M1-01-design.md` | `deleted` 列 == **0**（A214 窄豁免：只追加） |
+| 2 | 追加前「前 **1393** 行拼接」的 `sha256[:12]` | == `5616d7c4578c`（**双向核验**前值；该值同时是本批前的**全文件** sha） |
+| 3 | 追加后取前 **1393** 行重算 `sha256[:12]` | 与第 2 行**逐字相等** ⇒ §0–§13 ＋ §14.1–§14.6 一字未改 |
+| 4 | 追加前／后各取前 **1301** 行重算 `sha256[:12]` | 两次均 == `99dd191f43b3` ⇒ **§14.6 的第 2/3 行判据在本批之后继续成立** |
+| 5 | `uv run --no-sync python -c "import dataclasses,sys;sys.path.insert(0,'src');from campaignlab.api import common;from campaignlab.domain.ingest import model;print(list(common.Issue.model_fields)==[f.name for f in dataclasses.fields(model.Finding)])"` | 输出 `True`，且该序 == `code, location, message, severity`（§14.7） |
+| 6 | `uv run --no-sync python -c "import sys;sys.path.insert(0,'src');from campaignlab.domain.ingest import model;print(len(model.__all__))"` | 输出 **19**，且 `set(model.__all__)` == §14.8 补全后的 19 名（原 16 ＋ 3 枚 Literal） |
+| 7 | `grep -c 'raise InputTooLarge' src/campaignlab/domain/ingest/limits.py` | == **1**；且该行含**恰 1 个**全角冒号 U+FF1A |
+| 8 | 分别 `grep -c 'size_bytes > limit'` 与 `grep -c 'size_bytes >= limit'`（同一件） | 前者 == **1**、后者 == **0** ⇒ §14.9 的**严格大于**边界语义 |
+| 9 | `uv run --no-sync ruff format --check .` ／ `ruff check .` ／ `mypy` | 三门 rc == 0（冻结索引树口径，R11-3） |
+| 10 | `grep -rn "len(common.__all__) ==" --include=*.py tests/ src/ scripts/` | **零命中**（A115 上限制的实际形态；命中即判红） |
+| 11 | `grep -c 'MappingLayout = Literal' src/campaignlab/domain/ingest/model.py` | == **1**，且第 **45** 行逐字等于 §14.8 抄录的定义 |
+| 12 | `grep -c 'raise StateConflict' src/campaignlab/domain/ingest/states.py` | == **7**，且其中消费 `_BUSY_DETAIL` / `_PUBLISHED_DETAIL` / `_NOT_CONFIGURED_DETAIL` / `_NOT_VALIDATING_DETAIL` 的恰 **5** 处（§14.9 的范围界定） |
+| 13 | 章节归属复核（nearest-preceding-heading 口径）：L350 / L394 / L639 / L673 / L890 / L982 / L1384 | 依次为 §3.4 / §4.1 / §5.1 / §5.2 / §9.1 / §11.1 / §14.6 —— 本段所有「第 N 行」引用的归属**逐条实测为真** |
+| 14 | `uv run --no-sync python -c "print(open('orchestrator/handoff/M1-01-design.md',encoding='utf-8').read().count(chr(37)))"` | 输出 **0** ⇒ 全文件百分号字符计数为 0（本段维持该既有不变量；用 `chr(37)` 表述以免本行自己引入该字符） |
