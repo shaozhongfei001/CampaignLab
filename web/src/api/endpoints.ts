@@ -106,3 +106,101 @@ export function createWorkspace(
     accept: [201],
   });
 }
+
+/* ------------------------------------------------------------------ UI-02 活动列表（FR-02）
+ * operationId 逐字取自 contracts/pages.json 的 UI-02.operation_ids 与 contracts/operations.json：
+ *   listActivities / getActivity / createActivity（D-036 先例：禁自造 opId）。
+ * 后端路径原文 = /workspaces/{workspace_id}/activities（契约 path），与前端路由 /w/:workspace_id/activities
+ * 是两回事：前者是 HTTP 契约，后者是 contracts/pages.json 的 route 真值。
+ */
+
+export type Activity = components["schemas"]["Activity"];
+export type ActivityCreate = components["schemas"]["ActivityCreate"];
+export type ActivityPage = components["schemas"]["ActivityPage"];
+
+type ListActivitiesOp = operations["listActivities"];
+type CreateActivityOp = operations["createActivity"];
+
+/** GET 活动集合的查询参数（cursor/limit/q/status，逐字取契约，不重抄类型）。 */
+export type ListActivitiesQuery = NonNullable<ListActivitiesOp["parameters"]["query"]>;
+export type CreateActivityBody = CreateActivityOp["requestBody"]["content"]["application/json"];
+
+/** 契约 listActivities.limit 的 default=25；首屏与「加载更多」共用同一页长（COMMON.md:38）。 */
+export const ACTIVITY_PAGE_LIMIT = 25;
+/** 契约 listActivities.limit 的 minimum/maximum。 */
+export const ACTIVITY_PAGE_LIMIT_MIN = 1;
+export const ACTIVITY_PAGE_LIMIT_MAX = 100;
+/** 契约 q 参数的 minLength/maxLength。 */
+export const ACTIVITY_QUERY_MAX_LENGTH = 100;
+/** 契约 cursor 参数的 maxLength。 */
+export const ACTIVITY_CURSOR_MAX_LENGTH = 300;
+/** 契约 status 查询参数的 maxLength（取值口径见 features/activity/query.ts）。 */
+export const ACTIVITY_STATUS_MAX_LENGTH = 60;
+/** 契约 Activity.status 的枚举原文（唯一取值来源，禁自造状态词）。 */
+export const ACTIVITY_STATUSES: readonly Activity["status"][] = ["OPEN", "ARCHIVED"];
+
+/** 契约 path 参数原文拼接；标识符一律 encodeURIComponent，避免深链里的保留字符破坏路径。 */
+export function activityCollectionPath(workspaceId: string): string {
+  return "/workspaces/" + encodeURIComponent(workspaceId) + "/activities";
+}
+
+export function activityItemPath(workspaceId: string, activityId: string): string {
+  return activityCollectionPath(workspaceId) + "/" + encodeURIComponent(activityId);
+}
+
+/** GET /workspaces/{workspace_id}/activities —— 游标分页（items + next_cursor），limit 默认 25。 */
+export function listActivities(
+  workspaceId: string,
+  query: ListActivitiesQuery = {},
+  client: HttpClient = http,
+): Promise<ApiResult<ActivityPage>> {
+  const limit = query.limit ?? ACTIVITY_PAGE_LIMIT;
+  // 空值一律**不出现在 query 对象里**：http.ts 的 searchOf 虽然也会跳过 undefined/null，
+  // 但把「不发送该参数」写在绑定层，单测才能对请求形状做集合级断言（而不是依赖序列化实现细节）。
+  const effective: ListActivitiesQuery = { limit };
+  if (query.cursor !== undefined) effective.cursor = query.cursor;
+  if (query.q !== undefined) effective.q = query.q;
+  if (query.status !== undefined) effective.status = query.status;
+  return client.request<ActivityPage>({
+    method: "GET",
+    path: activityCollectionPath(workspaceId),
+    query: effective,
+    accept: [200],
+  });
+}
+
+/** GET /workspaces/{workspace_id}/activities/{activity_id} —— 活动原值（含 revision，供后续 If-Match）。 */
+export function getActivity(
+  workspaceId: string,
+  activityId: string,
+  client: HttpClient = http,
+): Promise<ApiResult<Activity>> {
+  return client.request<Activity>({
+    method: "GET",
+    path: activityItemPath(workspaceId, activityId),
+    accept: [200],
+  });
+}
+
+export interface CreateActivityOptions {
+  /** 必填：一次用户意图一个 key；409 重试沿原 key（不得重新生成）。 */
+  readonly idempotencyKey: string;
+  readonly client?: HttpClient | undefined;
+}
+
+/** POST /workspaces/{workspace_id}/activities —— 契约要求 Idempotency-Key（8..128）。 */
+export function createActivity(
+  workspaceId: string,
+  body: CreateActivityBody,
+  options: CreateActivityOptions,
+): Promise<ApiResult<Activity>> {
+  const client = options.client ?? http;
+  return client.request<Activity>({
+    method: "POST",
+    path: activityCollectionPath(workspaceId),
+    body,
+    idempotencyKey: options.idempotencyKey,
+    requireIdempotencyKey: true,
+    accept: [201],
+  });
+}
