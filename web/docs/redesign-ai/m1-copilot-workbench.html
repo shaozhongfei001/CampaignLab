@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M1 · 复盘对话工作台（AI Review Copilot）</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item" href="#a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item on" href="#a2" data-nav="a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item" href="#a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item" href="#a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item" href="#a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">浦发银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.1</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function tracebar(){
+  var N=["语义","规划","映射","SQL","校验","解释"];
+  return '<div class="tracebar"><span class="tb-t"><span class="aimark">AI</span>受控链路 6/6</span>'
+    +N.map(function(n,i){var now=i===5;return '<span class="nd'+(now?" now":"")+'"><i>'+(now?"●":(i+1))+'</i>'+n+'</span>'+(i<5?'<span class="ar">→</span>':"");}).join("")
+    +'<span class="exp">展开轨迹 ▾</span></div>';
+}
+function para(){
+  var G='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  var M=' style="margin-bottom:0"';
+  return '<div class="handoff">'
+   +'<div class="seg4 danger"><div class="h"><span class="n">1</span><span class="t">指标判断 · 发生了什么</span>'+stTag("WARN")+'</div><div class="b">'
+   +'本期有效触达 <b class="num">1,728</b>，基准 <b class="num">1,920</b>，差 <b class="num" style="color:var(--danger-700)">−192（−10.0%）</b><span class="ref">1</span>；'
+   +'有效触达率 <b class="num">15.0%</b>（基准 16.8%，<b style="color:var(--danger-700)">−1.8pp</b>），触发「降幅&gt;1.5pp」规则<span class="ref">3</span>。</div></div>'
+   +G
+   +'<div class="seg4"'+M+'><div class="h"><span class="n">2</span><span class="t">结构拆解 · 在哪些维度</span><span class="tag sys">结构</span></div><div class="b">'
+   +'客群：新客 41%→47% 下沉；渠道：企微恢复中（<b>部分可比</b>）；区域：华东 −0.9pp 最大。</div></div>'
+   +'<div class="seg4"'+M+'><div class="h"><span class="n">3</span><span class="t">归因分析 · 谁导致变化</span><span class="tag ai">归因</span></div><div class="b">'
+   +'主因 <b>名单执行率</b> 78%→71%（−0.8pp/44%）；次因 <b>客群下沉</b>（−0.6pp/33%）；<b>渠道覆盖</b>（−0.5pp/28%）；余量 +0.1pp<span class="ref">2</span>。</div></div>'
+   +'</div>'
+   +'<div class="seg4"><div class="h"><span class="n">4</span><span class="t">决策建议 · 回到业务动作</span><span class="tag ok">可执行</span></div><div class="b">'
+   +'① 补发 10/12 失败名单批次（渠道运营）；② 新客单设触达阈值；③ 华东恢复后按可比子集重算。</div></div>'
+   +'</div>';
+}function viewA2(){
+  return '<div class="screen" style="flex:1;min-height:0;display:block">'
+   +'<div class="ws-ai ws-ai--2">'
+   +'<div class="colx"><section class="card" style="flex:1;min-height:0;display:flex;flex-direction:column">'
+     +'<div class="cvhead"><span class="aimark">AI</span><span class="t">复盘对话 · 2026-10 月度复盘</span><span class="meta">上下文：期间 2026-10 · 机构 全行 · 口径 v3</span></div>'
+     +'<div class="feed thin">'
+       +'<div class="msg u"><div class="av">张</div><div class="bd"><div class="who">张三 · 分行运营 <span class="num">09:12</span></div><div class="bub">本月有效触达为什么下降？主要受哪个渠道和客群影响？</div></div></div>'
+       +'<div class="msg a"><div class="av">AI</div><div class="bd"><div class="who"><span class="aimark">AI</span>复盘智能体 · 命中指标对象 3 · 校验 PASS</div>'
+         +'<div class="bub">'+tracebar()+para()
+           +'<div class="follow"><span class="fq">那车贷渠道呢</span><span class="fq">只看华东分行</span><span class="fq">拆到支行层级</span><span class="fq">生成 10 月复盘报告</span></div>'
+         +'</div></div></div>'
+     +'</div>'
+     +'<div class="composer"><div class="cbox">'
+       +'<div class="ctx"><span class="chip info">期间 2026-10</span><span class="chip info">机构 全行</span><span class="chip info">口径 v3</span><span class="chip">快照 snap-20261031</span></div>'
+       +'<div class="in"><span class="ph">继续追问，或输入新的复盘问题…<span class="cur"></span></span></div>'
+       +'<div class="tools"><span class="tool" title="附件">⎘</span><span class="tool" title="指标对象">@</span><span class="tool" title="证据">◆</span>'
+         +'<span class="mode">◈ 深度复盘</span><span class="chip" style="height:24px">快速问数</span><span class="chip" style="height:24px">情景试算</span>'
+         +'<div class="sp"></div><button class="send">➤</button></div>'
+     +'</div></div>'
+   +'</section></div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">归因画布 · 有效触达率（pp）</span><span class="meta">2026-10 vs 基准 16.8%</span></div><div class="card-b">'
+       +AIC.waterfall([{l:"基准",sub:"16.8%",type:"tot",from:12,to:16.8,tot:"16.8"},
+                        {l:"名单执行",sub:"44%",type:"neg",from:16.8,to:16.0},
+                        {l:"客群结构",sub:"33%",type:"neg",from:16.0,to:15.4},
+                        {l:"渠道覆盖",sub:"28%",type:"neg",from:15.4,to:14.9},
+                        {l:"其他",sub:"−5%",type:"pos",from:14.9,to:15.0},
+                        {l:"本期",sub:"15.0%",type:"tot",from:12,to:15.0,tot:"15.0"}],{w:430,h:190,min:12,max:18})
+       +'<div class="chartcap">贡献瀑布：各因子对 −1.8pp 的拆解；「其他」为正向余量。观察结果不构成因果结论。</div>'
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">维度贡献 · 渠道（触达数）</span><span class="meta">零轴居中 · 负向左</span></div><div class="card-b">'
+       +AIC.divbars([{l:"企微",v:-96,t:"−96"},{l:"短信",v:-52,t:"−52"},{l:"外呼",v:-31,t:"−31"},{l:"App 推送",v:14,t:"+14"}],{w:430,rh:26,pl:70,pr:46,max:100})
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">查询计划</span><span class="meta">3 个分析任务 · 受控链路</span></div><div class="card-b">'
+       +'<div class="hi fact"><span class="ic">趋</span><div class="tx"><b>趋势任务</b>：确认是否真下降、下降多少、时间范围<div class="src"><span class="mono-s">M_REACH_RATE</span><span class="mono-s">snap-20261031</span></div></div><span class="go">完成</span></div>'
+       +'<div class="hi fact"><span class="ic">结</span><div class="tx"><b>结构任务</b>：客群 / 区域 / 渠道 三维拆解<div class="src"><span class="mono-s">dim=seg,region,channel</span></div></div><span class="go">完成</span></div>'
+       +'<div class="hi model"><span class="ic">归</span><div class="tx"><b>归因任务</b>：贡献度分解 + 余量校验<div class="src"><span class="mono-s">residual=+0.1pp</span></div></div><span class="go">完成</span></div>'
+     +'</div><div class="card-f"><span class="tiny">证据 snap-20261031 · 口径 v3 · 校验 PASS · 阈值 THR-07</span></div></section>'
+   +'</div>'
+   +'</div></div>';
+}
+YX.init({start:"a2",views:{a2:{title:"复盘对话 · 一句话问出完整归因",sub:"A2 · 对话驱动 + 右侧分析画布（Artifact）",group:"g1",segs:[["a2","A2","复盘对话"]],fn:viewA2}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>

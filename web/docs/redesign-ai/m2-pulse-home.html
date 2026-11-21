@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M2 · 今日复盘（AI 主动洞察）</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item on" href="#a1" data-nav="a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item" href="#a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item" href="#a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item" href="#a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item" href="#a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">浦发银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.1</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function viewA1(){
+  return '<div class="screen v2scroll"><div class="pg" style="display:flex;flex-direction:column;gap:12px">'
+   +'<div class="aisum"><div class="h"><span class="aimark">AI</span>2026-11-21 早间复盘已自动生成 · 覆盖 12 指标 / 4 产品 / 6 渠道<span style="margin-left:auto" class="num tiny">06:00 完成 · 耗时 41s</span></div>'
+     +'<div class="li"><span class="sv dg">高</span><div>有效触达率 <b class="num">15.0%</b>（−1.8pp）触发阈值，主因 <b>名单执行率</b> 跌破（贡献 44%），建议优先复核 10/12 下发失败批次。<span class="ref">1</span></div></div>'
+     +'<div class="li"><span class="sv wn">中</span><div>新客客群结构下沉（41%→47%）持续稀释触达率，建议为新客单设阈值，避免与存量混算。<span class="ref">2</span></div></div>'
+     +'<div class="li"><span class="sv ok">正</span><div>App 推送通道正向对冲 +14 触达，打开率环比 +2.3pp，可复制到短信通道做 A/B。</div></div>'
+   +'</div>'
+   +'<div class="kpirow" style="grid-template-columns:repeat(6,1fr)">'
+     +kpi("覆盖率",'<span style="color:var(--warn-700)">88%</span>',"环比 −4pp · 阈值 90%","")
+     +kpi("名单执行率",'<span style="color:var(--danger-700)">71%</span>',"环比 −7pp · 已触发","")
+     +kpi("有效触达数",'<span style="color:var(--danger-700)">1,728</span>',"基准 1,920 · 差 −192","")
+     +kpi("有效触达率",'<span style="color:var(--danger-700)">15.0%</span>',"基准 16.8% · −1.8pp","")
+     +kpi("参与度",'<span style="color:var(--ok-700)">62%</span>',"环比 +1.2pp","")
+     +kpi("执行效果",'<span>84%</span>',"持平 · 未触发","")
+   +'</div>'
+   +'<div style="display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:12px;align-items:start">'
+     +'<div style="display:flex;flex-direction:column;gap:12px">'
+       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+         +'<div class="ins dg"><div class="h"><span class="t">名单执行率跌破阈值</span>'+bandTag("HIGH")+'</div>'
+           +'<div class="b">10/12 企微批次下发失败，未补发。影响 <span class="imp" style="color:var(--danger-700)">−0.8pp / 44%</span>。归因置信度 高（规则 THR-07 命中）。</div>'
+           +'<div class="f"><button class="btn btn-sm">追问</button><button class="btn btn-sm btn-p">登记改进项</button><button class="btn btn-sm btn-g">证据</button></div></div>'
+         +'<div class="ins wn"><div class="h"><span class="t">新客客群结构下沉</span>'+bandTag("MID")+'</div>'
+           +'<div class="b">新客占比 41%→47%，其触达率低于存量 6.2pp。影响 <span class="imp" style="color:var(--warn-700)">−0.6pp / 33%</span>。</div>'
+           +'<div class="f"><button class="btn btn-sm">追问</button><button class="btn btn-sm btn-g">看客群拆解</button></div></div>'
+         +'<div class="ins wn"><div class="h"><span class="t">华东为最大单一区域降幅</span>'+bandTag("MID")+'</div>'
+           +'<div class="b">华东贡献 −0.9pp；企微覆盖恢复中，当前为<b>部分可比</b>，恢复后需重算。</div>'
+           +'<div class="f"><button class="btn btn-sm">追问</button><button class="btn btn-sm btn-g">看重算任务</button></div></div>'
+         +'<div class="ins ok"><div class="h"><span class="t">App 推送正向对冲</span>'+bandTag("LOW")+'</div>'
+           +'<div class="b">推送打开率 +2.3pp，贡献 <span class="imp" style="color:var(--ok-700)">+0.1pp</span>，建议复制到短信通道。</div>'
+           +'<div class="f"><button class="btn btn-sm">追问</button><button class="btn btn-sm btn-g">发起 A/B</button></div></div>'
+       +'</div>'
+       +'<section class="card"><div class="card-h"><span class="t">有效触达率 · 近六月趋势</span><span class="meta">阈值 16.5% 虚线</span></div><div class="card-b">'
+         +lineChart([{name:"有效触达率",color:"#0048d8",data:[17.4,17.1,16.9,16.8,16.8,15.0]}],["5月","6月","7月","8月","9月","10月"],{w:660,h:150,threshold:16.5,dec:1})
+         +'<div class="chartcap">趋势确认「真的下降」而非单期波动；10 月为首个跌破阈值期。</div></div></section>'
+       +'<section class="card"><div class="card-h"><span class="t">渠道触达结构 / 客群结构</span><span class="meta">本期占比</span></div><div class="card-b">'
+         +'<div style="display:flex;gap:16px;align-items:center">'
+           +'<div style="flex:none;width:132px">'+donut([{l:"企微",v:38,c:"#0048d8"},{l:"短信",v:27,c:"#3368e0"},{l:"外呼",v:21,c:"#18a890"},{l:"App",v:14,c:"#f39c12"}],{w:132,h:112,r:34,sw:12,center:"4",sub:"渠道"})+'</div>'
+           +'<div style="flex:1;min-width:0">'+stacked([{v:47,c:"#0048d8"},{v:53,c:"#60c0a8"}],{w:250,h:13})
+             +'<div class="tiny">客群结构：新客 47% / 存量 53%（上期 41 / 59），结构下沉是稀释主因之一。</div></div>'
+         +'</div></div></section>'
+     +'</div>'
+     +'<div style="display:flex;flex-direction:column;gap:12px">'
+       +'<section class="card"><div class="card-h"><span class="t">分析任务</span><span class="meta">智能体自动运行</span></div><div class="card-b">'
+         +'<div class="tl">'
+           +'<div class="tl-i done"><span class="d"></span><div class="h"><span class="ti">日复盘生成</span><span class="tm num">06:00</span></div><div class="m">12 指标 · 41s · 校验 PASS</div></div>'
+           +'<div class="tl-i done"><span class="d"></span><div class="h"><span class="ti">异常规则扫描</span><span class="tm num">06:04</span></div><div class="m">命中 3 条（THR-07 / THR-11）</div></div>'
+           +'<div class="tl-i warn"><span class="d"></span><div class="h"><span class="ti">华东归因重算</span><span class="tm num">06:12</span></div><div class="m">等待企微覆盖数据回流</div></div>'
+           +'<div class="tl-i trim"><span class="d"></span><div class="h"><span class="ti">报告签认</span><span class="tm num">—</span></div><div class="m">未到达，不预填时间</div></div>'
+         +'</div>'
+       +'</div></section>'
+       +'<section class="card"><div class="card-h"><span class="t">待签认改进项</span><span class="meta">2</span></div><div class="card-b">'
+         +'<div class="hi model"><span class="ic">!</span><div class="tx"><b>补发 10/12 名单批次</b> · 责任 渠道运营<div class="src"><span class="mono-s">ACT-2026-118</span></div></div><span class="go">签认</span></div>'
+         +'<div class="hi model"><span class="ic">!</span><div class="tx"><b>新客单设触达阈值</b> · 责任 指标负责人<div class="src"><span class="mono-s">ACT-2026-119</span></div></div><span class="go">签认</span></div>'
+       +'</div></section>'
+       +'<section class="card"><div class="card-h"><span class="t">继续追问</span></div><div class="card-b">'
+         +'<div class="follow" style="margin-top:0"><span class="fq">为什么名单执行率下降</span><span class="fq">华东重算何时完成</span><span class="fq">生成本月复盘报告</span></div>'
+       +'</div></section>'
+     +'</div>'
+   +'</div>'
+   +'</div></div>';
+}
+YX.init({start:"a1",views:{a1:{title:"今日复盘 · AI 主动推送洞察",sub:"A1 · 指标脉搏 + 自动归因 + 待办签认（Pulse 式）",group:"g1",segs:[["a1","A1","今日复盘"]],fn:viewA1}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>

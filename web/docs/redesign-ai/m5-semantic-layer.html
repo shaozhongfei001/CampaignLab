@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M5 · 指标语义层与本体（AI 的知识底座）</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item" href="#a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item" href="#a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item" href="#a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item" href="#a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item on" href="#a5" data-nav="a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">浦发银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.1</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function viewA5(){
+  return '<div class="screen" style="flex:1;min-height:0;display:block"><div class="p02" style="padding:12px;height:100%">'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">指标对象</span><span class="meta">128</span></div><div class="card-b">'
+       +'<input class="inp" style="width:100%;margin-bottom:8px" placeholder="搜索指标 / 别名 / 口径…">'
+       +'<table class="tbl"><tbody>'
+         +'<tr style="background:var(--brand-50)"><td><b>有效触达率</b><div class="tiny">M_REACH_RATE · v3</div></td><td style="text-align:right">'+stTag("PASS")+'</td></tr>'
+         +'<tr><td>有效触达数<div class="tiny">M_REACH_CNT · v3</div></td><td style="text-align:right">'+stTag("PASS")+'</td></tr>'
+         +'<tr><td>名单执行率<div class="tiny">M_EXEC_RATE · v2</div></td><td style="text-align:right">'+stTag("PASS")+'</td></tr>'
+         +'<tr><td>覆盖率<div class="tiny">M_COVER_RATE · v2</div></td><td style="text-align:right">'+stTag("PASS")+'</td></tr>'
+         +'<tr><td>参与度<div class="tiny">M_ENGAGE · v1</div></td><td style="text-align:right">'+stTag("REVIEW")+'</td></tr>'
+         +'<tr><td>首逾 30+ 率<div class="tiny">M_FPD30 · v4</div></td><td style="text-align:right">'+stTag("PASS")+'</td></tr>'
+       +'</tbody></table>'
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">术语别名归一</span></div><div class="card-b">'
+       +'<table class="tbl" style="table-layout:fixed"><thead><tr><th style="width:54%">业务说法</th><th>归一到</th></tr></thead><tbody>'
+         +'<tr><td>触达率 / 有效触达率</td><td class="mono">M_REACH_RATE</td></tr>'
+         +'<tr><td>首逾 30+ / 首逾率 / 30+ 首逾</td><td class="mono">M_FPD30</td></tr>'
+         +'<tr><td>执行率 / 名单执行</td><td class="mono">M_EXEC_RATE</td></tr>'
+       +'</tbody></table>'
+       +'<div class="tiny" style="margin-top:6px">同义问法先归一到指标对象，再取数 —— 保证换说法结果一致。</div>'
+     +'</div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">指标对象 · 有效触达率</span><span class="meta">M_REACH_RATE · v3</span></div>'
+       +'<div class="card-b" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+         +'<div><div class="sec">业务定义</div><div class="semkv" style="margin-top:6px"><dt>含义</dt><dd>名单中产生有效触达的占比</dd><dt>分子</dt><dd>reach_cnt（有效触达数）</dd><dt>分母</dt><dd>list_cnt（名单数）</dd></div></div>'
+         +'<div><div class="sec">统计口径</div><div class="semkv" style="margin-top:6px"><dt>时间基准</dt><dd>按申请时间 stat_month</dd><dt>口径版本</dt><dd>v3（2026-09 生效）</dd><dt>去重规则</dt><dd>同人同渠道按日去重</dd></div></div>'
+         +'<div><div class="sec">维度支持</div><div class="tagline" style="margin-top:6px"><span class="tag sys">渠道</span><span class="tag sys">客群</span><span class="tag sys">区域</span><span class="tag sys">支行</span><span class="tag" style="opacity:.45;text-decoration:line-through">风险事件</span></div><div class="tiny" style="margin-top:5px">划线=本体禁止组合</div></div>'
+         +'<div><div class="sec">SQL 映射</div><div class="semkv" style="margin-top:6px"><dt>表</dt><dd class="mono">dw.camp_reach_wide</dd><dt>聚合</dt><dd class="mono">SUM/SUM</dd><dt>过滤</dt><dd class="mono">caliber_ver=3</dd></div></div>'
+       +'</div>'
+       +'<div class="card-f"><span class="tiny">NLP→SQL 不直写：先识别指标对象，再由对象映射 SQL，可控可解释可校验</span></div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">三方分工与版本</span><span class="meta">业务定义 / 数据映射 / 技术实现</span></div><div class="card-b">'
+       +'<div class="hi fact"><span class="ic">业</span><div class="tx"><b>业务定义</b>：王五（分行运营）拍板口径边界<div class="src"><span class="mono-s">v3 · 2026-09-01</span></div></div><span class="go">已确认</span></div>'
+       +'<div class="hi fact"><span class="ic">数</span><div class="tx"><b>数据映射</b>：李四（数据）映射宽表字段<div class="src"><span class="mono-s">dw.camp_reach_wide</span></div></div><span class="go">已确认</span></div>'
+       +'<div class="hi fact"><span class="ic">技</span><div class="tx"><b>技术实现</b>：赵六（技术）语义解析与查询计划<div class="src"><span class="mono-s">svc/semantic</span></div></div><span class="go">已上线</span></div>'
+     +'</div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">本体关系</span><span class="meta">语义约束骨架</span></div><div class="card-b">'
+       +AIC.onto({w:352,h:196})
+       +'<div class="chartcap">绿=合法路径；红虚=禁止直连（客群→风险事件 须经 资产）。</div></div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">分析技能库</span><span class="meta">四类核心技能</span></div><div class="card-b">'
+       +'<div class="kpirow" style="grid-template-columns:1fr 1fr">'
+         +kpi("趋势分析","342 次","环比/同比/时间序列","")
+         +kpi("结构分析","287 次","客群/区域/渠道拆解","")
+         +kpi("归因分析","196 次","贡献分解 + 余量校验","")
+         +kpi("对比分析","121 次","统一口径下横比","")
+       +'</div>'
+       +'<div class="tiny" style="margin-top:6px">技能=业务规则+数据计算，不是 prompt 模板。</div>'
+     +'</div></section>'
+   +'</div>'
+   +'</div></div>';
+}
+YX.init({start:"a5",views:{a5:{title:"指标语义层 · AI 的知识底座",sub:"A5 · 指标对象 + 本体约束 + 别名归一 + 技能库",group:"g2",segs:[["a5","A5","指标语义层"]],fn:viewA5}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>

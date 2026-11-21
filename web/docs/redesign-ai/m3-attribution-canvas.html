@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M3 · 归因画布（受控链路透明化）</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item" href="#a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item" href="#a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item on" href="#a3" data-nav="a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item" href="#a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item" href="#a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">浦发银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.1</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function stepsFull(){
+  var S=[["语义解析","识别 指标=有效触达率 · 期间=2026-10 · 维度=渠道/客群/区域","done","0.4s"],
+         ["查询规划","拆为 趋势 / 结构 / 归因 三个有序分析任务","done","0.3s"],
+         ["指标映射","命中 M_REACH_RATE v3（按申请时间统计）","done","0.2s"],
+         ["SQL 生成","3 条 SQL · 由指标对象映射，非自然语言直写","done","0.6s"],
+         ["结果校验","口径一致 · 可比子集 98.2% · 阈值 THR-07","done","0.5s"],
+         ["分析解释","输出 结论 / 归因 / 建议 四段 + 画布","done","1.1s"]];
+  return '<div class="stepper ai2">'+S.map(function(s,i){
+    return '<div class="step '+s[2]+'"><div class="sh"><span class="no">'+(i+1)+'</span><span class="stt">'+s[0]+'</span><span class="ss">'+s[3]+'</span></div><div class="desc">'+s[1]+'</div></div>';
+  }).join("")+'</div>';
+}
+function viewA3(){
+  return '<div class="screen" style="flex:1;min-height:0;display:block"><div class="p02" style="padding:12px;height:100%">'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">拆解维度</span></div><div class="card-b">'
+       +'<div class="btnrow" style="margin:0"><button class="btn btn-sm btn-p">渠道</button><button class="btn btn-sm">客群</button><button class="btn btn-sm">区域</button><button class="btn btn-sm">支行</button></div>'
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">因子贡献 Top</span><span class="meta">对 −1.8pp</span></div><div class="card-b" style="display:flex;flex-direction:column;gap:8px">'
+       +objCard("01","名单执行率 78%→71%","−0.8pp · 44%",bandTag("HIGH"),"")
+       +objCard("02","客群结构下沉 41%→47%","−0.6pp · 33%",bandTag("MID"),"")
+       +objCard("03","渠道覆盖（企微）","−0.5pp · 28%",bandTag("MID"),"")
+       +objCard("04","余量（未解释）","+0.1pp · −5%",'<span class="tag ok">OK</span>',"")
+     +'</div><div class="card-f"><span class="tiny">余量 &lt; 0.2pp，归因闭合</span></div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">可比性</span></div><div class="card-b">'
+       +'<div class="hi fact"><span class="ic">✓</span><div class="tx">共同子集 <b>98.2%</b>，全渠道部分可比<div class="src"><span class="mono-s">企微恢复中</span></div></div></div>'
+       +'<div class="hi fact"><span class="ic">✓</span><div class="tx">口径版本 v3 与快照一致<div class="src"><span class="mono-s">snap-20261031</span></div></div></div>'
+     +'</div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">贡献瀑布 · 有效触达率（pp）</span><span class="meta">基准 16.8% → 本期 15.0%</span></div><div class="card-b">'
+       +AIC.waterfall([{l:"基准",sub:"16.8%",type:"tot",from:12,to:16.8,tot:"16.8"},
+                        {l:"名单执行",sub:"44%",type:"neg",from:16.8,to:16.0},
+                        {l:"客群结构",sub:"33%",type:"neg",from:16.0,to:15.4},
+                        {l:"渠道覆盖",sub:"28%",type:"neg",from:15.4,to:14.9},
+                        {l:"其他",sub:"−5%",type:"pos",from:14.9,to:15.0},
+                        {l:"本期",sub:"15.0%",type:"tot",from:12,to:15.0,tot:"15.0"}],{w:620,h:210,min:12,max:18})
+       +'<div class="chartcap">依次替换法：每次只换一个因子，其余固定；余量 +0.1pp 在可接受范围内。</div></div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">近六月趋势</span><span class="meta">阈值 16.5%</span></div><div class="card-b">'
+       +lineChart([{name:"有效触达率",color:"#0048d8",data:[17.4,17.1,16.9,16.8,16.8,15.0]}],["5月","6月","7月","8月","9月","10月"],{w:620,h:140,threshold:16.5,dec:1})
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">客群触达率对比</span><span class="meta">本期 vs 基准</span></div><div class="card-b">'
+       +columns([{l:"优客",v:21.4,c:"#0048d8",t:"21.4"},{l:"存量",v:18.2,c:"#3368e0",t:"18.2"},{l:"普客",v:12.6,c:"#18a890",t:"12.6"},{l:"新客",v:9.8,c:"#f39c12",t:"9.8"}],{w:620,h:120,max:24})
+       +'<div class="chartcap">新客触达率显著低于存量，结构占比上升即稀释整体。</div></div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">查询计划 · 受控链路</span><span class="meta">6/6 完成</span></div><div class="card-b">'+stepsFull()+'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">生成 SQL（节选）</span><span class="meta">由指标对象映射</span></div><div class="card-b">'
+       +'<div class="codeblk"><span class="c">-- M_REACH_RATE v3 · 按申请时间 · snap-20261031</span>\n<span class="k">SELECT</span> channel,\n       <span class="k">SUM</span>(reach_cnt)\n         <span class="k">/</span> <span class="k">SUM</span>(list_cnt) <span class="k">AS</span> rate\n<span class="k">FROM</span>   dw.camp_reach_wide\n<span class="k">WHERE</span>  stat_month = <span class="s">\'2026-10\'</span>\n  <span class="k">AND</span>    caliber_ver = <span class="n">3</span>\n<span class="k">GROUP BY</span> channel;</div>'
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">校验与本体约束</span></div><div class="card-b">'
+       +'<div class="hi fact"><span class="ic">✓</span><div class="tx">口径一致性校验 通过</div><span class="go">PASS</span></div>'
+       +'<div class="hi fact"><span class="ic">✓</span><div class="tx">可比子集 98.2% ≥ 95%</div><span class="go">PASS</span></div>'
+       +'<div class="hi fact"><span class="ic">✓</span><div class="tx">阈值版本 THR-07 锁定</div><span class="go">PASS</span></div>'
+       +'<div class="hi model"><span class="ic">✕</span><div class="tx">本体禁止：客群 → 风险事件 直连（需经 资产）</div><span class="go">已拦截</span></div>'
+     +'</div><div class="card-f"><span class="tiny">全部校验留痕，可在 A9 证据与审计回放</span></div></section>'
+   +'</div>'
+   +'</div></div>';
+}
+YX.init({start:"a3",views:{a3:{title:"归因画布 · 把「为什么」算给你看",sub:"A3 · 贡献拆解 + 查询计划 + 校验留痕（可解释）",group:"g1",segs:[["a3","A3","归因画布"]],fn:viewA3}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>

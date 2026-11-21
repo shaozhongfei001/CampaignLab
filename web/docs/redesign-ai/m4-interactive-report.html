@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M4 · 可交互复盘报告（报告即分析入口）</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item" href="#a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item" href="#a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item" href="#a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item on" href="#a4" data-nav="a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item" href="#a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">浦发银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.1</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function blk(k,color,title,tag,html,tools){
+  return '<div class="rblk"><span class="k" style="background:'+color+'">'+k+'</span>'
+    +'<div class="tools">'+(tools||'<span class="mini" title="追问此段">?</span><span class="mini" title="查看证据">◆</span><span class="mini" title="重新生成">↻</span><span class="mini" title="沉淀为资产">★</span>')+'</div>'
+    +'<div class="h">'+title+' '+tag+'</div><div class="c">'+html+'</div></div>';
+}
+function viewA4(){
+  return '<div class="screen" style="flex:1;min-height:0;display:block"><div class="ws-ai" style="grid-template-columns:216px minmax(0,1fr) 400px;padding:12px;height:100%">'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">报告大纲</span></div><div class="card-b"><div class="sess">'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">摘要</div><div class="m">3 条结论</div></div></div>'
+       +'<div class="si on"><span class="d"></span><div><div class="t">一、指标</div><div class="m">4 项核心指标</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">二、结论</div><div class="m">3 条</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">三、归因</div><div class="m">4 因子</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">四、建议</div><div class="m">3 条动作</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">附录 · 证据</div><div class="m">6 条引用</div></div></div>'
+     +'</div></div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">版本与签认</span></div><div class="card-b"><div class="tl">'
+       +'<div class="tl-i done"><span class="d"></span><div class="h"><span class="ti">v3 生成</span><span class="tm num">06:20</span></div><div class="m">智能体自动成稿</div></div>'
+       +'<div class="tl-i done"><span class="d"></span><div class="h"><span class="ti">指标负责人复核</span><span class="tm num">09:40</span></div><div class="m">口径无异议</div></div>'
+       +'<div class="tl-i warn"><span class="d"></span><div class="h"><span class="ti">分行签认</span><span class="tm num">待</span></div><div class="m">等待 2 个分行</div></div>'
+     +'</div></div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">2026-10 营销策略复盘报告</span><span class="meta">RPT-2026-10 · v3</span></div>'
+       +'<div class="card-b" style="display:flex;flex-direction:column;gap:10px">'
+         +'<div class="row gap2" style="flex-wrap:wrap"><span class="chip info">期间 2026-10</span><span class="chip">快照 snap-20261031</span><span class="chip">口径 v3</span>'+stTag("PENDING_REVIEW")+'<div class="sp"></div><button class="btn btn-sm">下载 PDF</button><button class="btn btn-sm">发布</button><button class="btn btn-sm btn-p">沉淀为分析资产</button></div>'
+         +blk("指标","#0048d8","一、核心指标",""+'<span class="tag sys">4 项</span>',
+            '<div class="kpirow" style="grid-template-columns:repeat(4,1fr)">'
+            +kpi("有效触达数",'<span style="color:var(--danger-700)">1,728</span>',"基准 1,920","")
+            +kpi("有效触达率",'<span style="color:var(--danger-700)">15.0%</span>',"−1.8pp","")
+            +kpi("名单执行率",'<span style="color:var(--danger-700)">71%</span>',"−7pp","")
+            +kpi("覆盖率",'<span style="color:var(--warn-700)">88%</span>',"−4pp","")
+            +'</div><div class="tiny" style="margin-top:6px">每个数字均可点击角标回溯到快照与口径版本。<span class="ref">1</span><span class="ref">2</span></div>')
+         +blk("结论","#1a2438","二、结论","",
+            '① 本期触达整体未达标，降幅主要由<b>执行环节</b>而非策略本身造成；② 客群结构下沉构成持续性稀释，非单期偶发；③ 华东为最大区域降幅，但当前<b>部分可比</b>，结论待重算确认。<span class="ref">3</span>')
+         +blk("归因","#5b46d6","三、归因",""+'<span class="tag ai">贡献拆解</span>',
+            '名单执行率 −0.8pp（44%）&gt; 客群结构 −0.6pp（33%）&gt; 渠道覆盖 −0.5pp（28%），余量 +0.1pp 闭合。归因采用依次替换法，全过程可在 A3 画布回放。<span class="ref ai">4</span>')
+         +blk("建议","#18a890","四、建议",""+'<span class="tag ok">可执行</span>',
+            '① 补发 10/12 失败名单批次（渠道运营 · 下期验证执行率）；② 新客单设触达阈值（指标负责人）；③ 华东企微恢复后按可比子集重算并出修订版（数据团队）。')
+       +'</div>'
+       +'<div class="card-f"><span class="tiny">报告为「分析入口」而非终点：任一段落可追问、可重生成、可沉淀为组织资产</span></div></section>'
+   +'</div>'
+   +'<div class="colx thin" style="overflow-y:auto">'
+     +'<section class="card"><div class="card-h"><span class="t">报告检索</span><span class="meta">浦闪贷 / 全渠道</span></div><div class="card-b"><div class="sess">'
+       +'<div class="si on"><span class="d"></span><div><div class="t">2026-10 复盘报告</div><div class="m">v3 · 待签认 · 触达率 15.0%</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">2026-09 复盘报告</div><div class="m">v2 · 已签认 · 触达率 16.8%</div></div></div>'
+       +'<div class="si"><span class="d" style="background:var(--ink-300)"></span><div><div class="t">2026-08 复盘报告</div><div class="m">v1 · 已签认 · 触达率 16.9%</div></div></div>'
+     +'</div></div></section>'
+     +'<section class="card"><div class="card-h"><span class="aimark">AI</span><span class="t">针对本报告追问</span></div><div class="card-b">'
+       +'<div class="follow" style="margin-top:0"><span class="fq">为什么提到华东需重点关注</span><span class="fq">优客触达率变化是否影响整体</span><span class="fq">与 9 月报告结论差异</span><span class="fq">导出归因明细</span></div>'
+       +'<div class="say ok" style="margin-top:10px"><div class="sl">智能体摘要</div><div class="sv">本报告共 4 指标 / 3 结论 / 4 归因因子 / 3 建议；与 9 月相比新增「客群结构」归因维度。</div></div>'
+     +'</div></section>'
+     +'<section class="card"><div class="card-h"><span class="t">已沉淀分析资产</span><span class="meta">4</span></div><div class="card-b">'
+       +'<div class="hi fact"><span class="ic">★</span><div class="tx"><b>执行环节优先于策略归因</b> 的判断路径<div class="src"><span class="mono-s">KNW-041</span></div></div></div>'
+       +'<div class="hi fact"><span class="ic">★</span><div class="tx"><b>新客稀释</b> 需单设阈值的口径约定<div class="src"><span class="mono-s">KNW-042</span></div></div></div>'
+       +'<div class="hi fact"><span class="ic">★</span><div class="tx">部分可比时的<b>重算触发条件</b><div class="src"><span class="mono-s">KNW-043</span></div></div></div>'
+     +'</div><div class="card-f"><span class="tiny">资产可被后续复盘检索复用，形成组织经验闭环</span></div></section>'
+   +'</div>'
+   +'</div></div>';
+}
+YX.init({start:"a4",views:{a4:{title:"复盘报告 · 报告即分析入口",sub:"A4 · 四类结构化内容 + 段级追问 + 经验沉淀",group:"g1",segs:[["a4","A4","复盘报告"]],fn:viewA4}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>
