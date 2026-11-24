@@ -184,9 +184,9 @@ var SHEETS = {
       +'<div class="sheet-f"><button class="btn" data-close>关闭</button> <button class="btn btn-p" data-close data-say="已跳转归因画布（示例）">在画布中回放</button></div></div>';
   }
 };
-YX.init({start:"a1",sheets:SHEETS,views:{
+YX.init({start:"a1",sheets:SHEETS,hooks:{afterRender:function(){var pb=document.getElementById("pagebar");if(pb)pb.style.display=(YX.current==="a2")?"none":"";}},views:{
   a1:{title:"今日复盘 · AI 主动推送洞察",sub:"A1 · 指标脉搏 + 自动归因 + 待办签认（Pulse 式）",group:"g1",segs:[["a1","A1","今日复盘"]],fn:viewA1},
-  a2:{title:"复盘对话 · 一句话问出完整归因",sub:"A2 · 对话驱动 + 右侧分析画布（Artifact）",group:"g1",segs:[["a2","A2","复盘对话"]],fn:viewA2},
+  a2:{title:"复盘对话",sub:"",group:"g1",segs:[["a2","A2","复盘对话"]],fn:viewA2},
   a3:{title:"归因画布 · 把「为什么」算给你看",sub:"A3 · 贡献拆解 + 查询计划 + 校验留痕（可解释）",group:"g1",segs:[["a3","A3","归因画布"]],fn:viewA3},
   a4:{title:"复盘报告 · 报告即分析入口",sub:"A4 · 四类结构化内容 + 段级追问 + 经验沉淀",group:"g1",segs:[["a4","A4","复盘报告"]],fn:viewA4},
   a5:{title:"指标语义层 · AI 的知识底座",sub:"A5 · 指标对象 + 本体约束 + 别名归一",group:"g2",segs:[["a5","A5","指标语义层"]],fn:viewA5},

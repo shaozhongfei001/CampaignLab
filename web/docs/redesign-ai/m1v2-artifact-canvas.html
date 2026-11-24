@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>效果图 M1-v2 · 复盘对话 + Artifact 嵌入画布</title>
+<link rel="stylesheet" href="vendor/css/tokens.css">
+<link rel="stylesheet" href="vendor/css/youxia-ui.css">
+<link rel="stylesheet" href="ai-layer.css">
+<style>
+.ws-ai--2b{grid-template-columns:minmax(0,1fr) 566px}
+.tracebar{flex-wrap:nowrap;gap:5px}
+.tracebar .tb-t{font-size:10.5px}
+.tracebar .nd{padding:0 5px;font-size:10.5px}
+.tracebar .tb-t,.tracebar .nd,.tracebar .exp,.tracebar .ar{white-space:nowrap;flex:none}
+.tracebar .nd{padding:0 7px}
+.handoff .seg4 .b{font-size:11px;line-height:1.6}
+.handoff .seg4{margin-bottom:6px}
+.msg.a .bub{padding:9px 12px}
+.msg .who{margin-bottom:2px}
+.follow{margin-top:6px}
+.artwrap{flex:1;min-height:0;display:flex;flex-direction:column}
+.art-h{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+.art-ico{width:26px;height:26px;border-radius:7px;background:var(--ai-grad);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+.art-tt b{font-size:12.5px;color:var(--ink-900)}
+.art-tt small{display:block;font-size:9.5px;color:var(--ink-400);font-family:var(--font-mono)}
+.art-ver{display:flex;align-items:center;gap:4px;margin-left:4px}
+.art-ver .v{min-width:24px;height:20px;padding:0 5px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;color:var(--ink-500);background:var(--card)}
+.art-ver .v.on{border-color:var(--brand-600);color:var(--brand-600);background:var(--brand-50);font-weight:700}
+.art-ver .vl{font-size:10px;color:var(--ink-400);font-family:var(--font-mono)}
+.mini2{width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-size:11px;color:var(--ink-500);flex:none}
+.art-tabs{display:flex;align-items:center;gap:2px;padding:0 10px;border-bottom:1px solid var(--line);background:var(--ink-50)}
+.art-tabs .tab{padding:7px 10px 6px;font-size:11.5px;color:var(--ink-500);border-bottom:2px solid transparent;cursor:pointer}
+.art-tabs .tab.on{color:var(--brand-600);font-weight:700;border-bottom-color:var(--brand-600);background:var(--card)}
+.art-frame{flex:1;min-height:0;margin:10px;border:1px solid var(--line);border-radius:10px;background:var(--ink-100);display:flex;flex-direction:column;overflow:hidden}
+.art-bar{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--ink-50);border-bottom:1px solid var(--line)}
+.art-bar .url{font-family:var(--font-mono);font-size:10px;color:var(--ink-500);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.art-doc{flex:1;min-height:0;overflow-y:auto;margin:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.doc-t{font-size:13.5px;font-weight:800;color:var(--ink-900);display:flex;align-items:center;gap:8px}
+.doc-chips{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 9px}
+.dsec{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:7px;background:#fff}
+.ds-h{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-900);margin-bottom:6px}
+.ds-h i{width:3px;height:12px;border-radius:2px;flex:none}
+.ds-h .mono-s{margin-left:auto;font-weight:400}
+.dsec .chartcap{margin-top:4px}
+.mkgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.mk{border:1px solid var(--line);border-radius:7px;padding:5px 7px;background:var(--ink-50)}
+.mk .l{font-size:9.5px;color:var(--ink-500);display:block}
+.mk b{font-size:15px;color:var(--ink-900)}
+.mk .d{font-size:9.5px;color:var(--ink-400);display:block}
+.mk .d.dn{color:var(--danger-700)}
+.mk .d.dw{color:var(--warn-700)}
+.dlist{font-size:11.5px;color:var(--ink-600);line-height:1.6}
+.art-f{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line);background:var(--card)}
+.artcard{display:flex;align-items:center;gap:9px;border:1px solid var(--ai-500);background:var(--ai-50);border-radius:10px;padding:8px 10px;margin-top:10px}
+.artcard .ac-ico{width:30px;height:30px;border-radius:8px;background:var(--ai-grad);color:#fff;display:grid;place-items:center;font-size:14px;flex:none}
+.artcard .ac-tt b{font-size:12px;display:block;color:var(--ink-900)}
+.artcard .ac-tt small{font-size:10px;color:var(--ink-500)}
+.artcard .ac-st{margin-left:auto;font-size:10.5px;color:var(--ai-700);font-weight:700;white-space:nowrap}
+.ainote{font-size:11.5px;color:var(--ink-600);margin-top:8px;line-height:1.7}
+</style>
+</head><body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-top"><div class="mark">复</div><div class="nm">CampaignLab<small>STRATEGY REVIEW OS</small></div><button class="fold" id="fold" title="收起导航">&#8249;</button></div>
+    <div class="rail-group">智能复盘</div>
+    <a class="rail-item" href="#a1"><span class="ic">01</span><b>今日复盘</b><span class="em">A1</span></a>
+    <a class="rail-item on" href="#a2" data-nav="a2"><span class="ic">02</span><b>复盘对话</b><span class="em">A2</span></a>
+    <a class="rail-item" href="#a3"><span class="ic">03</span><b>归因画布</b><span class="em">A3</span></a>
+    <a class="rail-item" href="#a4"><span class="ic">04</span><b>复盘报告</b><span class="em">A4</span></a>
+    <div class="rail-group">分析资产</div>
+    <a class="rail-item" href="#a5"><span class="ic">05</span><b>指标语义层</b><span class="em">A5</span></a>
+    <a class="rail-item" href="#a6"><span class="ic">06</span><b>分析技能库</b><span class="em">A6</span></a>
+    <a class="rail-item" href="#a7"><span class="ic">07</span><b>经验沉淀</b><span class="em">A7</span></a>
+    <div class="rail-group">执行与治理</div>
+    <a class="rail-item" href="#a8"><span class="ic">08</span><b>运行与作业</b><span class="em">A8</span></a>
+    <a class="rail-item" href="#a9"><span class="ic">09</span><b>证据与审计</b><span class="em">A9</span></a>
+    <a class="rail-item" href="#a10"><span class="ic">10</span><b>改进项</b><span class="em">A10</span></a>
+    <div class="rail-foot"><div class="synth"><i></i><span>合成数据 · 示例口径</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="appbar">
+      <div class="logo">中信银行 · 营销策略复盘智能体<small>AI Review OS</small></div>
+      <span class="chip ver">REDESIGN V0.2</span>
+      <div class="sp"></div>
+      <span class="chip ok"><i class="dot"></i>语义层就绪 · 指标对象 128</span>
+      <span class="hdr-item">操作者 <b>张三</b> <span class="mono">A-0001</span></span>
+      <span class="clock num" id="clk">--:--:--</span>
+    </div>
+    <div class="pagebar" id="pagebar"></div>
+    <div class="view on" id="viewHost"></div>
+  </div>
+</div>
+<div class="scrim" id="scrim" data-close></div><div id="sheetHost"></div><div class="toast" id="toast"></div>
+<script src="vendor/js/youxia-charts.js"></script>
+<script src="vendor/js/ai-charts.js"></script>
+<script src="vendor/js/youxia-shell.js"></script>
+<script>
+function tracebar(){
+  var N=["语义","规划","映射","SQL","校验","解释"];
+  return '<div class="tracebar"><span class="tb-t"><span class="aimark">AI</span>受控链路 6/6</span>'
+    +N.map(function(n,i){var now=i===5;return '<span class="nd'+(now?" now":"")+'"><i>'+(now?"●":(i+1))+'</i>'+n+'</span>';}).join("")
+    +'<span class="exp">轨迹 ▾</span></div>';
+}
+function para(){
+  var G='<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">';
+  var M=' style="margin-bottom:0"';
+  return '<div class="handoff">'
+   +'<div class="seg4 danger"><div class="h"><span class="n">1</span><span class="t">指标判断 · 发生了什么</span>'+stTag("WARN")+'</div><div class="b">'
+   +'有效触达 <b class="num">1,728</b>／基准 <b class="num">1,920</b>，差 <b class="num" style="color:var(--danger-700)">−192（−10.0%）</b><span class="ref">1</span>；触达率 <b class="num">15.0%</b>（−1.8pp）触发 THR-07<span class="ref">3</span>。</div></div>'
+   +G
+   +'<div class="seg4"'+M+'><div class="h"><span class="n">2</span><span class="t">结构拆解</span><span class="tag sys">结构</span></div><div class="b">新客占比 41%→47% 下沉；华东 −0.9pp 最大；企微<b>部分可比</b>。</div></div>'
+   +'<div class="seg4"'+M+'><div class="h"><span class="n">3</span><span class="t">归因分析</span><span class="tag ai">归因</span></div><div class="b">名单执行 −0.8pp/44% ＞ 客群 −0.6pp/33% ＞ 渠道 −0.5pp/28%<span class="ref">2</span>。</div></div>'
+   +'</div>'
+   +'<div class="seg4"><div class="h"><span class="n">4</span><span class="t">决策建议</span><span class="tag ok">可执行</span></div><div class="b">① 补发失败名单；② 新客单设阈值；③ 华东按可比子集重算。</div></div>'
+   +'</div>';
+}
+function artcard(){
+  return '<div class="artcard"><span class="ac-ico">归</span>'
+   +'<div class="ac-tt"><b>有效触达下降 · 归因分析</b><small>artifact://ATTR-202610-01 · v1 · RUN-1121-03</small></div>'
+   +'<span class="ac-st">已在画布打开 · 图表同步 ↗</span></div>'
+   +'<div class="ainote">归因分析已在右侧<b>嵌入画布</b>打开：三图与结论同构（引用 1、2），可一键插入报告 §3。</div>';
+}
+function canvas(){
+  var MK=function(l,v,d,cls){return '<div class="mk"><span class="l">'+l+'</span><b class="num">'+v+'</b><span class="d '+(cls||"")+'">'+d+'</span></div>';};
+  return '<div class="colx thin" style="min-height:0;display:flex">'
+   +'<section class="card artwrap">'
+     +'<div class="art-h"><span class="art-ico">归</span>'
+       +'<div class="art-tt"><b>有效触达下降 · 归因分析</b><small>artifact://ATTR-202610-01</small></div>'
+       +'<div class="art-ver"><span class="v on">v1</span><span class="vl">1/1</span></div>'
+       +'<div class="sp"></div><span class="mini2" title="复制编号">⧉</span><span class="mini2" title="全屏打开">⤢</span><span class="mini2" title="关闭画布">✕</span></div>'
+     +'<div class="art-tabs"><span class="tab on">分析预览</span><span class="tab">查询计划</span><span class="tab">证据 3</span><div class="sp"></div><span class="tag ai">AI 归因 · 只读</span></div>'
+     +'<div class="art-frame">'
+       +'<div class="art-bar"><span class="url">artifact://ATTR-202610-01/v1 · 嵌入预览</span><div class="sp"></div><span class="mini2" title="刷新">↻</span><span class="mini2" title="新窗口打开">⤢</span></div>'
+       +'<div class="art-doc v2scroll">'
+         +'<div class="doc-t">为什么下降？· 归因分析<span class="tag warn">THR-07 触发</span></div>'
+         +'<div class="doc-chips"><span class="chip info">期间 2026-10</span><span class="chip">基准 16.8%</span><span class="chip">快照 snap-20261031</span><span class="chip">可比子集 98.2%</span></div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--brand-600)"></i>下降了多少<span class="mono-s">4 项 KPI</span></div>'
+           +'<div class="mkgrid">'
+             +MK("有效触达","1,728","基准 1,920 · −192","dn")
+             +MK("触达率","15.0%","基准 16.8% · −1.8pp","dn")
+             +MK("名单执行率","71%","基准 78% · −7pp","dn")
+             +MK("最大区域降幅","华东","−0.9pp · 待重算","dw")
+           +'</div></div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--ink-700)"></i>一句话结论<span class="mono-s">直接回答本问</span></div>'
+           +'<div class="dlist">① 下降真实且超阈值：−192 人／−1.8pp，触发 THR-07；② 主因在<b>执行层</b>：名单执行率 78%→71% 贡献 44%，非策略本身；③ 渠道看<b>企微</b>（−96，部分可比）、客群看<b>新客稀释</b>（占比 47%、触达率仅 9.8%）。</div></div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--ai-500)"></i>为什么降 · 贡献瀑布（pp）<span class="mono-s">引用 2</span></div>'
+           +AIC.waterfall([{l:"基准",sub:"16.8%",type:"tot",from:12,to:16.8,tot:"16.8"},
+                            {l:"名单执行",sub:"44%",type:"neg",from:16.8,to:16.0},
+                            {l:"客群结构",sub:"33%",type:"neg",from:16.0,to:15.4},
+                            {l:"渠道覆盖",sub:"28%",type:"neg",from:15.4,to:14.9},
+                            {l:"其他",sub:"−5%",type:"pos",from:14.9,to:15.0},
+                            {l:"本期",sub:"15.0%",type:"tot",from:12,to:15.0,tot:"15.0"}],{w:486,h:150,min:12,max:18})
+           +'<div class="chartcap">四因子合计 = −1.8pp，闭合校验通过；「其他」为正向余量。观察结果不构成因果结论。</div>'
+         +'</div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--ai-500)"></i>哪个渠道 · 贡献（触达数 vs 基准）<span class="mono-s">引用 4</span></div>'
+           +AIC.divbars([{l:"企微",v:-96,t:"−96"},{l:"短信",v:-52,t:"−52"},{l:"外呼",v:-31,t:"−31"},{l:"App 推送",v:14,t:"+14"}],{w:486,rh:23,pl:64,pr:48,max:100})
+           +'<div class="chartcap">企微缺口最大但处覆盖恢复期（部分可比）；App 推送为正贡献。</div>'
+         +'</div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--ai-500)"></i>哪个客群 · 触达率（%）<span class="mono-s">引用 2</span></div>'
+           +hbars([{l:"优客",v:21.4,t:"21.4",c:"#003bb3"},{l:"存客",v:18.2,t:"18.2",c:"#0048d8"},{l:"普客",v:12.6,t:"12.6",c:"#3368e0"},{l:"新客",v:9.8,t:"9.8",c:"#6a5af9"}],{w:486,rh:23,pl:52,pr:44,max:24})
+           +'<div class="chartcap">新客占比 41%→47% 而触达率仅 9.8%，结构性稀释 −0.6pp。</div>'
+         +'</div>'
+         +'<div class="dsec"><div class="ds-h"><i style="background:var(--ink-400)"></i>证据与运行<span class="mono-s">RUN-1121-03 · 12s · 校验 PASS</span></div>'
+           +'<div class="doc-chips" style="margin:0"><span class="chip">EVD-1031-01</span><span class="chip">EVD-1031-02</span><span class="chip">EVD-1031-04</span><span class="chip info">M_REACH_RATE v3</span></div></div>'
+       +'</div>'
+     +'</div>'
+     +'<div class="art-f"><span class="tiny">3 图表 · 3 引用 · 与对话结论同构</span><div class="sp"></div><button class="btn btn-sm">导出</button><button class="btn btn-p btn-sm">插入报告 §3</button></div>'
+   +'</section></div>';
+}
+function viewA2(){
+  return '<div class="screen" style="flex:1;min-height:0;display:block">'
+   +'<div class="ws-ai ws-ai--2b">'
+   +'<div class="colx"><section class="card" style="flex:1;min-height:0;display:flex;flex-direction:column">'
+     +'<div class="cvhead"><span class="aimark">AI</span><span class="t">复盘对话 · 2026-10 月度复盘</span><span class="meta">上下文：期间 2026-10 · 机构 全行 · 口径 v3</span><div class="sp"></div><span class="chip info">画布：归因分析 v1</span></div>'
+     +'<div class="feed thin" style="gap:10px;padding:8px 14px">'
+       +'<div class="msg u"><div class="av">张</div><div class="bd"><div class="who">张三 · 分行运营 <span class="num">09:12</span></div><div class="bub">本月有效触达为什么下降？主要受哪个渠道和客群影响？</div></div></div>'
+       +'<div class="msg a"><div class="av">AI</div><div class="bd"><div class="who"><span class="aimark">AI</span>复盘智能体 · 命中指标对象 3 · 校验 PASS</div>'
+         +'<div class="bub">'+tracebar()+para()+artcard()
+           +'<div class="follow"><span class="fq">那车贷渠道呢</span><span class="fq">只看华东分行</span><span class="fq">拆到支行层级</span><span class="fq">§3 插入并签认</span></div>'
+         +'</div></div></div>'
+     +'</div>'
+     +'<div class="composer"><div class="cbox">'
+       +'<div class="ctx"><span class="chip info">期间 2026-10</span><span class="chip info">机构 全行</span><span class="chip info">口径 v3</span><span class="chip">快照 snap-20261031</span></div>'
+       +'<div class="in"><span class="ph">继续追问，或输入新的复盘问题…<span class="cur"></span></span></div>'
+       +'<div class="tools"><span class="tool" title="附件">⎘</span><span class="tool" title="指标对象">@</span><span class="tool" title="证据">◆</span>'
+         +'<span class="mode">◈ 深度复盘</span><span class="chip" style="height:24px">快速问数</span><span class="chip" style="height:24px">情景试算</span>'
+         +'<div class="sp"></div><button class="send">➤</button></div>'
+     +'</div></div>'
+   +'</section></div>'
+   +canvas()
+   +'</div></div>';
+}
+YX.init({start:"a2",hooks:{afterRender:function(){var pb=document.getElementById("pagebar");if(pb)pb.style.display=(YX.current==="a2")?"none":"";}},views:{a2:{title:"复盘对话",sub:"",group:"g1",segs:[["a2","A2","复盘对话"]],fn:viewA2}}});
+(function tick(){var c=document.getElementById("clk");if(c)c.textContent=new Date().toTimeString().slice(0,8);setTimeout(tick,1000);})();
+</script></body></html>
