@@ -109,3 +109,9 @@
 2. **「游侠工作台」改为「华小侠工作台」**：左轨品牌块改为红底「华」mark + 「华小侠工作台 / CAMPAIGNLAB · STRATEGY REVIEW OS」；`vendor/`（tokens.css / youxia-ui.css / youxia-charts.js / youxia-shell.js）注释与文件头说明机械更名 游侠→华小侠、浦发→华夏、SPDB→HXB，规则本体零改动。
 3. 手册正文仍不出现行名（品牌仅存在于嵌图）；validate 通过：PPR-ORDER-BAD none、embeds 12 match、anchors-ok True。
 4. 本批依旧零冻结、零 spec/contracts 改动；CR 清单不变（CR-IA-01 / CR-TOKEN-01 / CR-AILAYER-01 / CR-CHART-01 / CR-COMP-01 待主线裁决）。
+## 10. V0.4 试行与撤回记录（2026-11-25）
+
+1. 当日曾按用户指令试行 V0.4 品牌（中信银行 logo + 「策略仿真工作台」）：完成 mock 补丁、全量重渲染与手册重出，并一度镜像到本目录（**始终未 commit / 未 push**）。
+2. 用户随后明确撤回该指令（「当我没说过」），V0.4 全量回退：本目录恢复 V0.3 口径（华夏银行徽标 + 「华小侠工作台」，commit `5b90870`）。
+3. 回退方式：`git checkout -- web/docs/redesign-ai` 丢弃未提交改动，并将 HEAD 的 V0.3 资产（6 个 html、demo-system、vendor 四文件、shots 18 图、手册 docx）回抄构建目录；不重渲染以避免时钟噪点。
+4. 边界与清单不变：零冻结、零 spec/contracts 改动；CR-IA-01 / CR-TOKEN-01 / CR-AILAYER-01 / CR-CHART-01 / CR-COMP-01 仍待主线裁决。
