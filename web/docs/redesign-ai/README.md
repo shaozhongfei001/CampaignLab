@@ -103,3 +103,9 @@
 3. **品牌字样**：appbar 统一「中信银行 · 营销策略复盘智能体」（m1–m5、demo-system、手册 12 图全部重渲染）；手册正文不出现行名。
 4. **手册 v0.2 重出**：§1.2 职责/步骤/结果怎么看、图 02 题注、附录 A 串讲第 2 步同步 Artifact 画布口径；「展开轨迹」统一为「轨迹」。
 5. 演示与手册仍为零冻结、零 spec/contracts 改动；构建链 `demo-src/`（assemble → render_demo/render_drawers → mk_manual → validate）一键复现。
+## 9. V0.3 品牌补丁（2026-11-25 增补）：华夏银行徽标 + 「华小侠工作台」命名
+
+1. **logo 改为华夏银行徽标**：appbar logo 前置内联 SVG 徽标（外圆＝玉龙环、内方＝古钱币方孔、右上笔触＝龙尾挑笔），取华夏红 `#D7000F`；字样「华夏银行 · 营销策略复盘智能体」，副题「华小侠工作台 · AI Review OS」。m1–m5、m1v2、demo-system（A1–A10 + 查询计划/证据抽屉）与手册 12 图全部重渲染。
+2. **「游侠工作台」改为「华小侠工作台」**：左轨品牌块改为红底「华」mark + 「华小侠工作台 / CAMPAIGNLAB · STRATEGY REVIEW OS」；`vendor/`（tokens.css / youxia-ui.css / youxia-charts.js / youxia-shell.js）注释与文件头说明机械更名 游侠→华小侠、浦发→华夏、SPDB→HXB，规则本体零改动。
+3. 手册正文仍不出现行名（品牌仅存在于嵌图）；validate 通过：PPR-ORDER-BAD none、embeds 12 match、anchors-ok True。
+4. 本批依旧零冻结、零 spec/contracts 改动；CR 清单不变（CR-IA-01 / CR-TOKEN-01 / CR-AILAYER-01 / CR-CHART-01 / CR-COMP-01 待主线裁决）。

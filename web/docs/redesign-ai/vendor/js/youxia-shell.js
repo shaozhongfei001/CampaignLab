@@ -1,5 +1,5 @@
 /* ===========================================================================
-   游侠 · 浦发风格 壳层运行时  youxia-shell.js  V1.0（2026-11-05）
+   华小侠 · 华夏风格 壳层运行时  youxia-shell.js  V1.0（2026-11-05）
    职责：左导航折叠 / 视图注册与切换 / 页头 seg / 抽屉 / 轻提示 / 事件委托。
    约定：DOM 骨架必须含 .shell > .rail + .main(.appbar + .pagebar#pagebar + .view#viewHost)，
         以及 body 末尾的 #scrim / #sheetHost / #toast。缺任一节点只降级不报错。

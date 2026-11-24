@@ -1,5 +1,5 @@
 /* ===========================================================================
-   游侠 · 浦发风格 图表与格式化运行时  youxia-charts.js  V1.0（2026-11-05）
+   华小侠 · 华夏风格 图表与格式化运行时  youxia-charts.js  V1.0（2026-11-05）
    零依赖 · 函数体从母版 V2.3 原样搬运（未重写实现），保证模板出图与现行原型一致。
    格式化：esc pad nf pct n2 pc ii pp | 徽标：stTag bandTag kpi objCard synRow
    统计：normCdf twoProp srmTest sumBy wavgBy（p 值一律 0..1；缺数返回 null）
