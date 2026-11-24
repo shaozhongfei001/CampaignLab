@@ -1,13 +1,13 @@
 /* ============================================================================
-   华小侠 · 华夏风格前端设计模板  youxia-ui.css  V1.1（2026-11-05）
-   来源：华小侠高仿真原型 V2.3 本地母版（SHA256 f1b54b203443db54…）四层样式表机械提取，规则本体未手写改动；V1.1 追加 1 条数字归一化规则（见文件末尾）。
-   层序：L1 设计系统基座 → L2 共用壳层 → L3 HXB 浅色主题 → L4 工作台组件扩展
+   游侠 · 浦发风格前端设计模板  youxia-ui.css  V1.1（2026-11-05）
+   来源：游侠高仿真原型 V2.3 本地母版（SHA256 f1b54b203443db54…）四层样式表机械提取，规则本体未手写改动；V1.1 追加 1 条数字归一化规则（见文件末尾）。
+   层序：L1 设计系统基座 → L2 共用壳层 → L3 SPDB 浅色主题 → L4 工作台组件扩展
    剔除：项目专用规则 20 条（.screen.dp0X / .screen.p5），清单见 tools/extract_report.json
    用法：新项目 <link> 本文件即可；换肤只覆盖 tokens.css 的 :root 变量，不要改本文件。
    ========================================================================== */
 /* ########## L1 设计系统基座 hifi-design-system V1.0 ########## */
 /* ============================================================
-   华小侠高仿真原型 · 设计系统 V1.0 (hifi-design-system.css)
+   游侠高仿真原型 · 设计系统 V1.0 (hifi-design-system.css)
    状态: DESIGN_CANDIDATE / BUSINESS_REVIEW_PENDING
    适用: S01-S04 高仿真作业台单文件页面 (构建时内联)
    ============================================================ */
@@ -306,9 +306,9 @@ details.tech .in{padding:0 14px 12px;font-family:var(--font-mono);font-size:11.5
   white-space:nowrap;letter-spacing:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media print{.fab,.fabr{display:none}}
-/* ########## L2 共用壳层 shell V1（HXB 浅色） ########## */
+/* ########## L2 共用壳层 shell V1（SPDB 浅色） ########## */
 /* ============================================================
-   华小侠二期工作台 · 共用壳层 V1（HXB 浅色）
+   游侠二期工作台 · 共用壳层 V1（SPDB 浅色）
    适用: S02 及后续 S03/S04；与 hifi-design-system + theme-spdb 叠加
    ============================================================ */
 /* ---------- 壳：左导航 + 主区 ---------- */
@@ -721,10 +721,10 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50
   .p04{grid-template-columns:262px minmax(0,1fr) 346px}
   .pgrid{grid-template-columns:400px minmax(0,1fr) 366px}
 }
-/* ########## L3 HXB 浅色主题层 V4（参考 credit-risk-decision 前端） ########## */
+/* ########## L3 SPDB 浅色主题层 V4（参考 credit-risk-decision 前端） ########## */
 /* ============================================================
-   华小侠高仿真原型 · HXB 浅色主题层 V4
-   参考: D:\dev\credit-risk-decision-main\frontend (华夏 UI 设计系统)
+   游侠高仿真原型 · SPDB 浅色主题层 V4
+   参考: D:\dev\credit-risk-decision-main\frontend (浦发 UI 设计系统)
    说明: 仅覆盖视觉令牌与组件皮肤，不改业务结构/文案/治理口径
    ============================================================ */
 :root{
@@ -740,7 +740,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50
   --warn-700:#c87f0a; --warn-600:#f39c12; --warn-100:#fdeccd; --warn-50:#fff8ec;
   --danger-700:#c0392b; --danger-600:#e74c3c; --danger-100:#fbdcd8; --danger-50:#fdf3f1;
   --info-600:#0048d8; --info-100:#dbe6ff; --info-50:#eef3fe;
-  /* 原紫色系统一收敛为华夏青绿，避免多品牌杂色 */
+  /* 原紫色系统一收敛为浦发青绿，避免多品牌杂色 */
   --violet-700:#12836f; --violet-600:#18a890; --violet-100:#d7f2ec; --violet-50:#eef9f6;
   /* 画布与阴影 */
   --canvas:#f5f7fb; --card:#ffffff; --line:#e8ecf4;
@@ -952,7 +952,7 @@ details.tech summary{font-size:11.5px;color:var(--ink-500)}
 .mrow .md{grid-column:1/-1;font-size:11px;color:var(--ink-400);line-height:1.55}
 /* ########## L4 工作台组件扩展层（已去项目专用） ########## */
 /* ============================================================
-   华小侠二期 S03/S04/D 全链路联动工作台 · 华夏浅色风格扩展
+   游侠二期 S03/S04/D 全链路联动工作台 · 浦发浅色风格扩展
    仅新增页面级组件，不改动既有壳层与主题令牌
    ============================================================ */
 :root{
@@ -1440,7 +1440,7 @@ body{overflow:hidden}
 .demo-step.compact .dom{font-size:7.5px;padding:0 3px}
 /* =====================================================================
    V2 · 合成数据接入层样式（S03/S04/D 后台深化）
-   仅新增数据呈现所需样式，不改 V1 既有视觉语法（浅色华夏风格）。
+   仅新增数据呈现所需样式，不改 V1 既有视觉语法（浅色浦发风格）。
    ===================================================================== */
 .synbadge{display:inline-flex;align-items:center;gap:4px;height:16px;padding:0 6px;border:1px dashed #d8bd7a;background:#fffaf0;border-radius:9px;font-size:9px;font-weight:600;color:#8a6100;letter-spacing:.02em;white-space:nowrap;vertical-align:middle}
 .tbl tr.roww>td{background:#fffaf5}
